@@ -90,6 +90,11 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
   @override
   Widget build(BuildContext context) {
     final settings = widget.settings;
+    final protectionReady =
+        settings.password != null &&
+        settings.selectedAppIds.isNotEmpty &&
+        _capabilities?.androidReady == true &&
+        _capabilities?.monitorServiceRunning == true;
 
     return SafeArea(
       bottom: false,
@@ -103,19 +108,26 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 22),
-          _ProtectionStatusCard(
-            passwordReady: settings.password != null,
-            appsReady: settings.selectedAppIds.isNotEmpty,
-            capabilities: _capabilities,
-            onPermissionsTap: _openNativePermissions,
-          ),
-          const SizedBox(height: 14),
-          _SettingTile(
-            icon: Icons.admin_panel_settings_outlined,
-            title: '기기 권한',
-            value: 'Android 권한 상태 확인',
-            onTap: _openNativePermissions,
-          ),
+          if (protectionReady) ...[
+            _CompactProtectionStatus(
+              onTap: _openNativePermissions,
+            ),
+            const SizedBox(height: 14),
+          ] else ...[
+            _ProtectionStatusCard(
+              passwordReady: settings.password != null,
+              appsReady: settings.selectedAppIds.isNotEmpty,
+              capabilities: _capabilities,
+              onPermissionsTap: _openNativePermissions,
+            ),
+            const SizedBox(height: 14),
+            _SettingTile(
+              icon: Icons.admin_panel_settings_outlined,
+              title: '기기 권한',
+              value: 'Android 권한 상태 확인',
+              onTap: _openNativePermissions,
+            ),
+          ],
           _SettingTile(
             icon: Icons.lock_rounded,
             title: '비밀번호',
@@ -331,6 +343,67 @@ class _SettingTile extends StatelessWidget {
   }
 }
 
+
+class _CompactProtectionStatus extends StatelessWidget {
+  const _CompactProtectionStatus({
+    required this.onTap,
+  });
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(0xFFF0EDFF),
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0xFFCFC4FF)),
+          ),
+          child: const Row(
+            children: [
+              Icon(
+                Icons.shield_rounded,
+                color: brandPurple,
+                size: 20,
+              ),
+              SizedBox(width: 9),
+              Expanded(
+                child: Text(
+                  '보호 ON',
+                  style: TextStyle(
+                    color: ink,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              Text(
+                '정상 작동 중',
+                style: TextStyle(
+                  color: brandPurple,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(width: 4),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: brandPurple,
+                size: 18,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _ProtectionStatusCard extends StatelessWidget {
   const _ProtectionStatusCard({
