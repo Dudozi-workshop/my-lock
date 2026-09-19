@@ -19,6 +19,7 @@ class FloatingEngine {
   MovementStyle _movementStyle = MovementStyle.floating;
   MovementArea _movementArea = MovementArea.full;
   FloatingSpeed _speed = FloatingSpeed.normal;
+  double _topInset = 0;
   int _objectCount = defaultObjectCount;
   List<LockToken> _allowedTokens = List<LockToken>.from(defaultTokens);
   List<LockToken> _requiredTokens = <LockToken>[];
@@ -83,8 +84,18 @@ class FloatingEngine {
     if (_area != Size.zero) _seedObjects();
   }
 
-  double get _movementTop =>
-      _movementArea == MovementArea.lower ? _area.height * 0.5 : 0.0;
+  void setTopInset(double inset) {
+    final normalized = max(0.0, inset);
+    if ((_topInset - normalized).abs() < 0.5) return;
+    _topInset = normalized;
+    if (_area != Size.zero) _seedObjects();
+  }
+
+  double get _movementTop {
+    final areaTop =
+        _movementArea == MovementArea.lower ? _area.height * 0.40 : 0.0;
+    return max(_topInset, areaTop);
+  }
 
   double get _movementHeight => _area.height - _movementTop;
 
