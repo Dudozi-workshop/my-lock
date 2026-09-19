@@ -5,10 +5,13 @@ import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
 import android.provider.Settings
+import android.content.Intent
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 
@@ -82,13 +85,20 @@ object OverlayLockController {
         val density = context.resources.displayMetrics.density
         fun dp(value: Int): Int = (value * density).toInt()
 
-        val root = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-            setPadding(dp(28), dp(28), dp(28), dp(28))
+        val root = FrameLayout(context).apply {
+            setPadding(dp(20), dp(20), dp(20), dp(20))
             background = buildBackground(context)
             isClickable = true
             isFocusable = true
+            isFocusableInTouchMode = true
+            setOnKeyListener { _, keyCode, _ ->
+                keyCode == KeyEvent.KEYCODE_BACK
+            }
+        }
+
+        val content = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
         }
 
         val title = TextView(context).apply {
@@ -100,7 +110,7 @@ object OverlayLockController {
         }
 
         val subtitle = TextView(context).apply {
-            text = "Overlay Test\n아래 앱의 터치가 차단되는지 확인해 주세요."
+            text = "Overlay Test\n홈·최근 앱을 시도해도 잠금은 유지됩니다."
             setTextColor(Color.parseColor("#FF6D647A"))
             textSize = 14f
             gravity = Gravity.CENTER
@@ -116,21 +126,21 @@ object OverlayLockController {
             }
         }
 
-        root.addView(
+        content.addView(
             title,
             LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
             ),
         )
-        root.addView(
+        content.addView(
             subtitle,
             LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
             ),
         )
-        root.addView(
+        content.addView(
             unlockButton,
             LinearLayout.LayoutParams(
                 dp(180),
@@ -138,7 +148,59 @@ object OverlayLockController {
             ),
         )
 
+        root.addView(
+            content,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            ),
+        )
+
+        val closeButton = TextView(context).apply {
+            text = "✕"
+            setTextColor(Color.parseColor("#FF2A2238"))
+            textSize = 28f
+            gravity = Gravity.CENTER
+            isClickable = true
+            setPadding(dp(12), dp(8), dp(12), dp(8))
+            setOnClickListener {
+                exitToHome(context, appId)
+            }
+        }
+
+        root.addView(
+            closeButton,
+            FrameLayout.LayoutParams(
+                dp(56),
+                dp(56),
+                Gravity.TOP or Gravity.END,
+            ),
+        )
+
+        root.post {
+            root.requestFocus()
+        }
+
         return root
+    }
+
+    private fun exitToHome(context: Context, appId: String) {
+        context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+            .edit()
+            .remove("last_unlocked_app")
+            .remove("last_unlocked_at")
+            .putString("last_protected_exit_app", appId)
+            .putLong("last_protected_exit_at", System.currentTimeMillis())
+            .apply()
+
+        hide()
+
+        val homeIntent = Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_HOME)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+        runCatching { context.startActivity(homeIntent) }
+        LockMonitorService.resetForegroundTracking()
     }
 
     private fun markUnlocked(context: Context, appId: String) {
