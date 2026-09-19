@@ -62,7 +62,9 @@ class LockRuntimeCoordinator {
   }
 
   Future<void> grantUnlock(String appId) async {
-    _session.markUnlocked();
+    if (appId != LockRequest.deviceScreenAppId) {
+      _session.markUnlocked();
+    }
     await _bridge.notifyUnlockGranted(appId);
   }
 
