@@ -87,6 +87,12 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.settings.onboardingStarted) {
+      return _IntroScreen(
+        onStart: widget.settings.startOnboarding,
+      );
+    }
+
     if (_loading) {
       return const Scaffold(
         backgroundColor: appBackground,
@@ -228,6 +234,127 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }
 }
 
+class _IntroScreen extends StatelessWidget {
+  const _IntroScreen({
+    required this.onStart,
+  });
+
+  final VoidCallback onStart;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: appBackground,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Spacer(),
+              Container(
+                width: 78,
+                height: 78,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: brandLavender,
+                  borderRadius: BorderRadius.circular(26),
+                ),
+                child: const Icon(
+                  Icons.lock_person_rounded,
+                  color: brandPurple,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 26),
+              const Text(
+                '움직이는 비밀번호로\n앱을 잠그세요',
+                style: TextStyle(
+                  color: ink,
+                  fontSize: 29,
+                  height: 1.15,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'MY LOCK은 선택한 앱을 열 때 도형과 색상으로 만든 그래픽 비밀번호를 보여주는 앱 잠금 도구입니다.\n\n잠금 화면의 움직임과 배치도 직접 설정할 수 있고, 비밀번호를 잊었을 때는 보조 PIN으로 복구할 수 있습니다.',
+                style: TextStyle(
+                  color: secondaryInk,
+                  fontSize: 14,
+                  height: 1.55,
+                ),
+              ),
+              const SizedBox(height: 24),
+              const _IntroFeature(
+                icon: Icons.apps_rounded,
+                text: '원하는 앱만 선택해서 보호',
+              ),
+              const SizedBox(height: 10),
+              const _IntroFeature(
+                icon: Icons.motion_photos_on_rounded,
+                text: '움직이는 도형 기반 그래픽 비밀번호',
+              ),
+              const SizedBox(height: 10),
+              const _IntroFeature(
+                icon: Icons.pin_rounded,
+                text: '분실 대비 4자리 보조 PIN',
+              ),
+              const Spacer(flex: 2),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(56),
+                  backgroundColor: brandPurple,
+                ),
+                onPressed: onStart,
+                child: const Text('시작하기'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _IntroFeature extends StatelessWidget {
+  const _IntroFeature({
+    required this.icon,
+    required this.text,
+  });
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0EDFF),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: brandPurple, size: 19),
+        ),
+        const SizedBox(width: 11),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: ink,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _ProgressRow extends StatelessWidget {
   const _ProgressRow({required this.currentStep});
 
@@ -327,8 +454,9 @@ class _StepCard extends StatelessWidget {
         return const _OnboardingStepData(
           icon: Icons.query_stats_rounded,
           title: '앱 사용 정보 접근',
-          body: '현재 어떤 앱이 열려 있는지 감지하기 위해 필요한 Android 권한입니다.',
-          button: '권한 설정',
+          body:
+              '현재 어떤 앱이 열려 있는지 감지하기 위해 필요한 Android 권한입니다. 설정 목록에서 MY LOCK을 찾아 사용 정보 접근을 허용해 주세요.',
+          button: 'MY LOCK 권한 찾기',
         );
       case 1:
         return const _OnboardingStepData(
