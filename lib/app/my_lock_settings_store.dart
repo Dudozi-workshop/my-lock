@@ -16,6 +16,7 @@ class MyLockStoredSettings {
     required this.movementStyle,
     required this.popStyle,
     required this.password,
+    this.recoveryPin,
     required this.selectedAppIds,
     required this.objectCount,
     required this.speed,
@@ -29,6 +30,7 @@ class MyLockStoredSettings {
   final MovementStyle movementStyle;
   final PopStyle popStyle;
   final List<LockToken>? password;
+  final String? recoveryPin;
   final Set<String> selectedAppIds;
   final int objectCount;
   final FloatingSpeed speed;
@@ -42,6 +44,8 @@ abstract class MyLockSettingsPersistence {
   Future<void> savePreferences(MyLockStoredSettings settings);
 
   Future<void> savePassword(List<LockToken> password);
+
+  Future<void> saveRecoveryPin(String pin) async {}
 }
 
 class MyLockSettingsStore implements MyLockSettingsPersistence {
@@ -62,6 +66,7 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
   static const _movementAreaKey = 'movement_area';
   static const _relockKey = 'relock_policy';
   static const _passwordKey = 'graphical_password';
+  static const _recoveryPinKey = 'recovery_pin';
 
   final SharedPreferencesAsync _preferences;
   final FlutterSecureStorage _secureStorage;
@@ -78,6 +83,7 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
     );
 
     final passwordRaw = await _secureStorage.read(key: _passwordKey);
+    final recoveryPinRaw = await _secureStorage.read(key: _recoveryPinKey);
 
     return MyLockStoredSettings(
       selectedShapes: shapes.isEmpty ? ShapeKind.values.toSet() : shapes,
@@ -98,6 +104,7 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
         PopStyle.basicPop,
       ),
       password: _decodePassword(passwordRaw),
+      recoveryPin: _normalizeRecoveryPin(recoveryPinRaw),
       selectedAppIds:
           (await _preferences.getStringList(_appsKey) ?? const <String>[])
               .toSet(),
@@ -151,6 +158,76 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
   Future<void> savePassword(List<LockToken> password) async {
     final value = jsonEncode(password.map((token) => token.id).toList());
     await _secureStorage.write(key: _passwordKey, value: value);
+  }
+
+  @override
+  Future<void> saveRecoveryPin(String pin) async {
+    if (_normalizeRecoveryPin(pin) == null) return;
+    await _secureStorage.write(key: _recoveryPinKey, value: pin);
+  }
+
+  String? _normalizeRecoveryPin(String? value) {
+    if (value == null || !RegExp(r'^\\d{4}(String? raw) {
+    if (raw == null || raw.isEmpty) return null;
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) return null;
+
+      final tokens = <LockToken>[];
+      for (final value in decoded) {
+        if (value is! String) return null;
+        final token = _tokenFromId(value);
+        if (token == null) return null;
+        tokens.add(token);
+      }
+
+      if (tokens.length < 3 || tokens.length > 6) return null;
+      return tokens;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  LockToken? _tokenFromId(String id) {
+    for (final tone in ShapeTone.values) {
+      for (final shape in ShapeKind.values) {
+        final token = LockToken(shape: shape, tone: tone);
+        if (token.id == id) return token;
+      }
+    }
+    return null;
+  }
+
+  Set<T> _parseEnums<T extends Enum>(
+    Iterable<T> values,
+    List<String>? names,
+  ) {
+    if (names == null) return <T>{};
+    return {
+      for (final value in values)
+        if (names.contains(value.name)) value,
+    };
+  }
+
+  T _enumOrDefault<T extends Enum>(
+    Iterable<T> values,
+    String? name,
+    T fallback,
+  ) {
+    if (name == null) return fallback;
+    for (final value in values) {
+      if (value.name == name) return value;
+    }
+    return fallback;
+  }
+
+  int _normalizeObjectCount(int? value) {
+    return const {6, 9, 12}.contains(value) ? value! : 9;
+  }
+}
+).hasMatch(value)) return null;
+    return value;
   }
 
   List<LockToken>? _decodePassword(String? raw) {
