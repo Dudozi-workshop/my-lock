@@ -256,7 +256,7 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     final title = confirming
         ? '같은 순서로 다시 눌러주세요.'
-        : '3~6개의 도형을 순서대로 눌러주세요.';
+        : '2~6개의 도형을 순서대로 눌러주세요.';
     final helper = confirming
         ? '$count / ${targetCount ?? 0}'
         : '$count / ${PasswordSetupController.maxLength} · 최소 ${PasswordSetupController.minLength}개';
