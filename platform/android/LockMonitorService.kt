@@ -7,7 +7,6 @@ import android.app.Service
 import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
 import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -78,12 +77,7 @@ class LockMonitorService : Service() {
     private val pollRunnable = object : Runnable {
         override fun run() {
             pollForegroundApp()
-            val delay = if (isAccessibilityServiceEnabled()) {
-                heartbeatIntervalMs
-            } else {
-                pollIntervalMs
-            }
-            handler.postDelayed(this, delay)
+            handler.postDelayed(this, pollIntervalMs)
         }
     }
 
@@ -191,7 +185,6 @@ class LockMonitorService : Service() {
 
     private fun pollForegroundApp() {
         writeHeartbeat()
-        if (isAccessibilityServiceEnabled()) return
         if (!hasUsageAccess()) return
         if (LockActivity.lockUiVisible) {
             lastQueryAt = System.currentTimeMillis()
@@ -315,27 +308,6 @@ class LockMonitorService : Service() {
             .getStringSet(protectedAppsKey, emptySet())
             ?.toSet()
             .orEmpty()
-    }
-
-    private fun isAccessibilityServiceEnabled(): Boolean {
-        val enabled = Settings.Secure.getInt(
-            contentResolver,
-            Settings.Secure.ACCESSIBILITY_ENABLED,
-            0,
-        ) == 1
-        if (!enabled) return false
-
-        val expected =
-            ComponentName(this, MyLockAccessibilityService::class.java)
-                .flattenToString()
-        val services = Settings.Secure.getString(
-            contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
-        ).orEmpty()
-
-        return services
-            .split(':')
-            .any { it.equals(expected, ignoreCase = true) }
     }
 
     private fun hasUsageAccess(): Boolean {
