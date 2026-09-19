@@ -215,5 +215,8 @@ class _FakeStore implements MyLockSettingsPersistence {
   Future<void> savePassword(List<LockToken> password) async {}
 
   @override
+  Future<void> saveRecoveryPin(String pin) async {}
+
+  @override
   Future<void> savePreferences(MyLockStoredSettings settings) async {}
 }
