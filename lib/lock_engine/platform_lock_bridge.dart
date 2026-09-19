@@ -7,6 +7,7 @@ class PlatformLockCapabilities {
   const PlatformLockCapabilities({
     required this.nativeBridgeAvailable,
     required this.usageAccessGranted,
+    required this.accessibilityGranted,
     required this.overlayGranted,
     required this.monitorServiceRunning,
   });
@@ -14,15 +15,18 @@ class PlatformLockCapabilities {
   const PlatformLockCapabilities.web()
       : nativeBridgeAvailable = false,
         usageAccessGranted = false,
+        accessibilityGranted = false,
         overlayGranted = false,
         monitorServiceRunning = false;
 
   final bool nativeBridgeAvailable;
   final bool usageAccessGranted;
+  final bool accessibilityGranted;
   final bool overlayGranted;
   final bool monitorServiceRunning;
 
-  bool get androidReady => usageAccessGranted && overlayGranted;
+  bool get androidReady =>
+      (accessibilityGranted || usageAccessGranted) && overlayGranted;
 }
 
 enum PlatformLockEventType {
@@ -62,6 +66,8 @@ abstract class PlatformLockBridge {
   Future<PlatformLockCapabilities> getCapabilities();
 
   Future<void> openUsageAccessSettings();
+
+  Future<void> openAccessibilitySettings();
 
   Future<void> openOverlaySettings();
 }
@@ -161,6 +167,7 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
       return PlatformLockCapabilities(
         nativeBridgeAvailable: result != null,
         usageAccessGranted: result?['usageAccessGranted'] == true,
+        accessibilityGranted: result?['accessibilityGranted'] == true,
         overlayGranted: result?['overlayGranted'] == true,
         monitorServiceRunning: result?['monitorServiceRunning'] == true,
       );
@@ -175,6 +182,12 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
   Future<void> openUsageAccessSettings() async {
     if (kIsWeb) return;
     await _invokeSafely('openUsageAccessSettings', const <String, Object?>{});
+  }
+
+  @override
+  Future<void> openAccessibilitySettings() async {
+    if (kIsWeb) return;
+    await _invokeSafely('openAccessibilitySettings', const <String, Object?>{});
   }
 
   @override
