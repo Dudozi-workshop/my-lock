@@ -49,7 +49,7 @@ class FloatingEngine {
   }
 
   void setRequiredTokens(List<LockToken> tokens) {
-    _requiredTokens = tokens.take(2).toList(growable: false);
+    _requiredTokens = List<LockToken>.from(tokens, growable: false);
     if (_area != Size.zero) _ensureRequiredVisible();
   }
 
