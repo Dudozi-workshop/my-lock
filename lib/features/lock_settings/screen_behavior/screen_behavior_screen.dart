@@ -10,12 +10,18 @@ class ScreenBehaviorScreen extends StatefulWidget {
     super.key,
     required this.objectCount,
     required this.speed,
+    required this.movementArea,
     required this.onChanged,
   });
 
   final int objectCount;
   final FloatingSpeed speed;
-  final void Function(int objectCount, FloatingSpeed speed) onChanged;
+  final MovementArea movementArea;
+  final void Function(
+    int objectCount,
+    FloatingSpeed speed,
+    MovementArea movementArea,
+  ) onChanged;
 
   @override
   State<ScreenBehaviorScreen> createState() => _ScreenBehaviorScreenState();
@@ -24,12 +30,14 @@ class ScreenBehaviorScreen extends StatefulWidget {
 class _ScreenBehaviorScreenState extends State<ScreenBehaviorScreen> {
   late int _objectCount;
   late FloatingSpeed _speed;
+  late MovementArea _movementArea;
 
   @override
   void initState() {
     super.initState();
     _objectCount = widget.objectCount;
     _speed = widget.speed;
+    _movementArea = widget.movementArea;
   }
 
   @override
@@ -73,6 +81,7 @@ class _ScreenBehaviorScreenState extends State<ScreenBehaviorScreen> {
                       selectedTones: ShapeTone.values.toSet(),
                       objectCount: _objectCount,
                       speed: _speed,
+                      movementArea: _movementArea,
                     ),
                   ),
                   Positioned(
@@ -139,6 +148,35 @@ class _ScreenBehaviorScreenState extends State<ScreenBehaviorScreen> {
               ],
             ),
             const SizedBox(height: 24),
+            Text('이동 영역', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 6),
+            Text(
+              '도형이 움직일 수 있는 세로 범위를 선택합니다.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _ChoiceCard(
+                    title: '전체',
+                    subtitle: '화면 전체',
+                    selected: _movementArea == MovementArea.full,
+                    onTap: () => _setMovementArea(MovementArea.full),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _ChoiceCard(
+                    title: '하단 영역',
+                    subtitle: '화면 아래 절반',
+                    selected: _movementArea == MovementArea.lower,
+                    onTap: () => _setMovementArea(MovementArea.lower),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
             Text('속도', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 6),
             Text(
@@ -182,13 +220,19 @@ class _ScreenBehaviorScreenState extends State<ScreenBehaviorScreen> {
   void _setObjectCount(int value) {
     if (_objectCount == value) return;
     setState(() => _objectCount = value);
-    widget.onChanged(_objectCount, _speed);
+    widget.onChanged(_objectCount, _speed, _movementArea);
   }
 
   void _setSpeed(FloatingSpeed value) {
     if (_speed == value) return;
     setState(() => _speed = value);
-    widget.onChanged(_objectCount, _speed);
+    widget.onChanged(_objectCount, _speed, _movementArea);
+  }
+
+  void _setMovementArea(MovementArea value) {
+    if (_movementArea == value) return;
+    setState(() => _movementArea = value);
+    widget.onChanged(_objectCount, _speed, _movementArea);
   }
 }
 
