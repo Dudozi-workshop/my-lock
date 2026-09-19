@@ -45,11 +45,13 @@ class FloatingShapePainter extends CustomPainter {
     switch (popStyle) {
       case PopStyle.bubble:
         _paintBubbleRings(canvas, object, progress);
+        break;
       case PopStyle.basicPop:
       case PopStyle.spark:
       case PopStyle.pixel:
       case PopStyle.glassBreak:
         _paintPopParticles(canvas, object, progress);
+        break;
     }
   }
 

@@ -138,11 +138,13 @@ class FloatingEngine {
       switch (_movementStyle) {
         case MovementStyle.bounce:
           _stepBounce(object, dt);
+          break;
         case MovementStyle.floating:
         case MovementStyle.orbit:
         case MovementStyle.zeroGravity:
         case MovementStyle.underwater:
           _stepFloating(object, dt);
+          break;
       }
     }
   }
