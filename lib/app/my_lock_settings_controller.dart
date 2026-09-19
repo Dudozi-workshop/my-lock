@@ -22,6 +22,7 @@ class MyLockSettingsController extends ChangeNotifier {
   Set<String> _selectedAppIds = <String>{};
   int _objectCount = 9;
   FloatingSpeed _speed = FloatingSpeed.normal;
+  MovementArea _movementArea = MovementArea.full;
   RelockPolicy _relockPolicy = RelockPolicy.immediate;
 
   bool _loaded = false;
@@ -38,6 +39,7 @@ class MyLockSettingsController extends ChangeNotifier {
   Set<String> get selectedAppIds => Set.unmodifiable(_selectedAppIds);
   int get objectCount => _objectCount;
   FloatingSpeed get speed => _speed;
+  MovementArea get movementArea => _movementArea;
   RelockPolicy get relockPolicy => _relockPolicy;
 
   Future<void> load() async {
@@ -56,6 +58,7 @@ class MyLockSettingsController extends ChangeNotifier {
     _selectedAppIds = Set<String>.from(stored.selectedAppIds);
     _objectCount = stored.objectCount;
     _speed = stored.speed;
+    _movementArea = stored.movementArea;
     _relockPolicy = stored.relockPolicy;
     _loaded = true;
     notifyListeners();
@@ -101,11 +104,20 @@ class MyLockSettingsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setScreenBehavior(int objectCount, FloatingSpeed speed) {
+  void setScreenBehavior(
+    int objectCount,
+    FloatingSpeed speed,
+    MovementArea movementArea,
+  ) {
     if (!const {6, 9, 12}.contains(objectCount)) return;
-    if (_objectCount == objectCount && _speed == speed) return;
+    if (_objectCount == objectCount &&
+        _speed == speed &&
+        _movementArea == movementArea) {
+      return;
+    }
     _objectCount = objectCount;
     _speed = speed;
+    _movementArea = movementArea;
     _persistPreferences();
     notifyListeners();
   }
@@ -129,6 +141,7 @@ class MyLockSettingsController extends ChangeNotifier {
         selectedAppIds: _selectedAppIds,
         objectCount: _objectCount,
         speed: _speed,
+        movementArea: _movementArea,
         relockPolicy: _relockPolicy,
       ),
     );
