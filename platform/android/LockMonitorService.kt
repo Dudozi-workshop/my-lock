@@ -26,6 +26,7 @@ class LockMonitorService : Service() {
         private const val protectedAppsKey = "protected_apps"
         private const val pendingLockAppKey = "pending_lock_app"
         const val heartbeatKey = "monitor_heartbeat_at"
+        const val actionResetForeground = "com.mylock.app.RESET_FOREGROUND"
         private const val heartbeatIntervalMs = 2_000L
     }
 
@@ -95,6 +96,10 @@ class LockMonitorService : Service() {
         flags: Int,
         startId: Int,
     ): Int {
+        if (intent?.action == actionResetForeground) {
+            foregroundPackage = null
+            lastQueryAt = System.currentTimeMillis() - 750L
+        }
         return START_STICKY
     }
 
