@@ -71,7 +71,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   int get _currentStep {
     final capabilities = _capabilities;
-    if (capabilities?.usageAccessGranted != true) return 0;
+    if (capabilities?.accessibilityGranted != true) return 0;
     if (capabilities?.overlayGranted != true) return 1;
     if (widget.settings.password == null) return 2;
     if (!widget.settings.recoveryPinReady) return 3;
@@ -186,7 +186,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   Future<void> _handleCurrentStep() async {
     switch (_currentStep) {
       case 0:
-        await _bridge.openUsageAccessSettings();
+        await _bridge.openAccessibilitySettings();
         break;
       case 1:
         await _bridge.openOverlaySettings();
@@ -452,11 +452,11 @@ class _StepCard extends StatelessWidget {
     switch (step) {
       case 0:
         return const _OnboardingStepData(
-          icon: Icons.query_stats_rounded,
-          title: '앱 사용 정보 접근',
+          icon: Icons.flash_on_rounded,
+          title: '빠른 앱 감지',
           body:
-              '현재 어떤 앱이 열려 있는지 감지하기 위해 필요한 Android 권한입니다. 설정 목록에서 MY LOCK을 찾아 사용 정보 접근을 허용해 주세요.',
-          button: 'MY LOCK 권한 찾기',
+              '보호 앱으로 화면이 바뀌는 순간을 Android가 MY LOCK에 알려주는 기능입니다. 화면 내용이나 입력 내용은 읽지 않고 앱 전환만 감지합니다.',
+          button: '빠른 감지 켜기',
         );
       case 1:
         return const _OnboardingStepData(
