@@ -213,7 +213,7 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
         tokens.add(token);
       }
 
-      if (tokens.length < 3 || tokens.length > 6) return null;
+      if (tokens.length < 2 || tokens.length > 6) return null;
       return tokens;
     } catch (_) {
       return null;
