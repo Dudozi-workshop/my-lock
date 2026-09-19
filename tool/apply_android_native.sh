@@ -9,6 +9,7 @@ MANIFEST="$ANDROID/app/src/main/AndroidManifest.xml"
 mkdir -p "$MAIN_DIR"
 cp "$ROOT/platform/android/MainActivity.kt" "$MAIN_DIR/MainActivity.kt"
 cp "$ROOT/platform/android/LockMonitorService.kt" "$MAIN_DIR/LockMonitorService.kt"
+cp "$ROOT/platform/android/BootReceiver.kt" "$MAIN_DIR/BootReceiver.kt"
 
 python3 - "$MANIFEST" <<'PY'
 from pathlib import Path
@@ -23,6 +24,7 @@ permissions = [
     '<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />',
     '<uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />',
     '<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />',
+    '<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />',
 ]
 
 marker = '<application'
@@ -54,6 +56,20 @@ service = '''        <service
 
 if 'android:name=".LockMonitorService"' not in text:
     text = text.replace('</application>', service + '    </application>', 1)
+
+receiver = '''        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+'''
+
+if 'android:name=".BootReceiver"' not in text:
+    text = text.replace('</application>', receiver + '    </application>', 1)
 
 path.write_text(text)
 PY
