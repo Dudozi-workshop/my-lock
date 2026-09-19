@@ -83,6 +83,7 @@ class _LockModeScreenState extends State<LockModeScreen> {
                   objectCount: settings.objectCount,
                   speed: settings.speed,
                   movementArea: settings.movementArea,
+                  topInset: _canUseRecoveryPin ? 178 : 142,
                   requiredTokens: _controller.requiredTokens,
                   onTokenTap: _controller.tap,
                 ),
