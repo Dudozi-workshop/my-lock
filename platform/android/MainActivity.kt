@@ -227,34 +227,34 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun loadLockableApps(): List<Map<String, String>> {
-        val intents = listOf(
-            Intent(Intent.ACTION_MAIN).apply {
-                addCategory(Intent.CATEGORY_LAUNCHER)
-            },
-            Intent(Intent.ACTION_MAIN).apply {
-                addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
-            },
-        )
+        val installedApps = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.getInstalledApplications(
+                android.content.pm.PackageManager.ApplicationInfoFlags.of(0L),
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.getInstalledApplications(0)
+        }
 
-        return intents
+        return installedApps
             .asSequence()
-            .flatMap { packageManager.queryIntentActivities(it, 0).asSequence() }
-            .mapNotNull { resolveInfo ->
-                val appInfo = resolveInfo.activityInfo?.applicationInfo
-                    ?: return@mapNotNull null
+            .filter { it.enabled }
+            .filter { it.packageName != packageName }
+            .mapNotNull { appInfo ->
                 val packageId = appInfo.packageName
-                if (packageId == packageName) return@mapNotNull null
+                val name = runCatching {
+                    packageManager.getApplicationLabel(appInfo).toString()
+                }.getOrNull()?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
 
                 val icon = runCatching {
-                    encodeDrawableToBase64(packageManager.getApplicationIcon(appInfo))
+                    encodeDrawableToBase64(
+                        packageManager.getApplicationIcon(appInfo),
+                    )
                 }.getOrNull()
 
                 buildMap {
                     put("id", packageId)
-                    put(
-                        "name",
-                        packageManager.getApplicationLabel(appInfo).toString(),
-                    )
+                    put("name", name)
                     if (!icon.isNullOrBlank()) {
                         put("iconBase64", icon)
                     }
@@ -280,7 +280,7 @@ class MainActivity : FlutterActivity() {
             }
         }
 
-        val scaled = Bitmap.createScaledBitmap(bitmap, 96, 96, true)
+        val scaled = Bitmap.createScaledBitmap(bitmap, 72, 72, true)
         val stream = ByteArrayOutputStream()
         scaled.compress(Bitmap.CompressFormat.PNG, 90, stream)
         return Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP)
