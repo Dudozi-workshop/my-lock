@@ -17,6 +17,7 @@ class FloatingEngine {
   Size _area = Size.zero;
   int _nextId = 0;
   MovementStyle _movementStyle = MovementStyle.floating;
+  MovementArea _movementArea = MovementArea.full;
   FloatingSpeed _speed = FloatingSpeed.normal;
   int _objectCount = defaultObjectCount;
   List<LockToken> _allowedTokens = List<LockToken>.from(defaultTokens);
@@ -76,6 +77,17 @@ class FloatingEngine {
     if (_area != Size.zero) _seedObjects();
   }
 
+  void setMovementArea(MovementArea area) {
+    if (_movementArea == area) return;
+    _movementArea = area;
+    if (_area != Size.zero) _seedObjects();
+  }
+
+  double get _movementTop =>
+      _movementArea == MovementArea.lower ? _area.height * 0.5 : 0.0;
+
+  double get _movementHeight => _area.height - _movementTop;
+
   void resize(Size area) {
     if (area.width <= 0 || area.height <= 0) return;
 
@@ -88,14 +100,7 @@ class FloatingEngine {
     }
 
     for (final object in objects) {
-      object.position = Offset(
-        object.position.dx
-            .clamp(object.radius, area.width - object.radius)
-            .toDouble(),
-        object.position.dy
-            .clamp(object.radius, area.height - object.radius)
-            .toDouble(),
-      );
+      _clampInside(object);
     }
   }
 
@@ -132,12 +137,14 @@ class FloatingEngine {
   }
 
   Offset _findSpawnPosition(double radius) {
-    Offset candidate = Offset(_area.width / 2, _area.height / 2);
+    final top = _movementTop;
+    final usableHeight = max(1.0, _movementHeight - radius * 2);
+    Offset candidate = Offset(_area.width / 2, top + _movementHeight / 2);
 
     for (var attempt = 0; attempt < 30; attempt++) {
       candidate = Offset(
         radius + _random.nextDouble() * max(1, _area.width - radius * 2),
-        radius + _random.nextDouble() * max(1, _area.height - radius * 2),
+        top + radius + _random.nextDouble() * usableHeight,
       );
 
       final clear = objects.every((other) {
@@ -248,7 +255,7 @@ class FloatingEngine {
     double dt,
     double minDimension,
   ) {
-    final bottomThreshold = _area.height * 0.70;
+    final bottomThreshold = _movementTop + _movementHeight * 0.55;
     if (first.position.dy < bottomThreshold ||
         second.position.dy < bottomThreshold) {
       return;
@@ -279,7 +286,7 @@ class FloatingEngine {
           .clamp(object.radius, _area.width - object.radius)
           .toDouble(),
       object.position.dy
-          .clamp(object.radius, _area.height - object.radius)
+          .clamp(_movementTop + object.radius, _area.height - object.radius)
           .toDouble(),
     );
   }
@@ -296,8 +303,8 @@ class FloatingEngine {
       velocity = Offset(-velocity.dx.abs(), velocity.dy);
     }
 
-    if (next.dy - object.radius <= 0) {
-      next = Offset(next.dx, object.radius);
+    if (next.dy - object.radius <= _movementTop) {
+      next = Offset(next.dx, _movementTop + object.radius);
       velocity = Offset(velocity.dx, velocity.dy.abs());
     } else if (next.dy + object.radius >= _area.height) {
       next = Offset(next.dx, _area.height - object.radius);
@@ -332,8 +339,8 @@ class FloatingEngine {
         minDimension * 0.24 * _speed.multiplier,
       );
       velocity = Offset(velocity.dx, -rebound);
-    } else if (next.dy - object.radius <= 0) {
-      next = Offset(next.dx, object.radius);
+    } else if (next.dy - object.radius <= _movementTop) {
+      next = Offset(next.dx, _movementTop + object.radius);
       velocity = Offset(velocity.dx, velocity.dy.abs());
     }
 
