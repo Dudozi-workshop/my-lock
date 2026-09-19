@@ -122,6 +122,63 @@ void main() {
     expect(count, greaterThanOrEqualTo(2));
   });
 
+
+  test('all nine required combinations can stay visible at once', () {
+    final engine = FloatingEngine(seed: 10);
+    engine.resize(const Size(320, 480));
+    engine.setObjectCount(12);
+
+    final allTokens = [
+      for (final tone in ShapeTone.values)
+        for (final shape in ShapeKind.values)
+          LockToken(shape: shape, tone: tone),
+    ];
+
+    const filler = LockToken(
+      shape: ShapeKind.circle,
+      tone: ShapeTone.pink,
+    );
+    for (final object in engine.objects) {
+      object.token = filler;
+    }
+
+    engine.setRequiredTokens(allTokens);
+
+    final visibleIds = engine.objects
+        .where((object) => !object.isPopping)
+        .map((object) => object.token.id)
+        .toSet();
+
+    expect(visibleIds, containsAll(allTokens.map((token) => token.id)));
+  });
+
+  test('full combination set can reserve duplicate next tokens', () {
+    final engine = FloatingEngine(seed: 11);
+    engine.resize(const Size(320, 480));
+    engine.setObjectCount(12);
+
+    final allTokens = [
+      for (final tone in ShapeTone.values)
+        for (final shape in ShapeKind.values)
+          LockToken(shape: shape, tone: tone),
+    ];
+    final repeated = allTokens.first;
+
+    engine.setRequiredTokens([
+      ...allTokens,
+      repeated,
+      repeated,
+    ]);
+
+    final visible = engine.objects.where((object) => !object.isPopping).toList();
+    final uniqueIds = visible.map((object) => object.token.id).toSet();
+    final repeatedCount =
+        visible.where((object) => object.token.id == repeated.id).length;
+
+    expect(uniqueIds, containsAll(allTokens.map((token) => token.id)));
+    expect(repeatedCount, greaterThanOrEqualTo(3));
+  });
+
   test('required token is restored when an existing copy is popping', () {
     final engine = FloatingEngine(seed: 7);
     engine.resize(const Size(320, 480));
