@@ -97,22 +97,10 @@ class _NativePermissionsScreenState extends State<NativePermissionsScreen>
               )
             else ...[
               _PermissionCard(
-                icon: Icons.flash_on_rounded,
-                title: '빠른 앱 감지',
-                body: '앱이 바뀌는 순간 Android 이벤트를 받아 거의 바로 잠금을 표시합니다.',
-                granted: capabilities!.accessibilityGranted,
-                onTap: capabilities.accessibilityGranted
-                    ? null
-                    : _bridge.openAccessibilitySettings,
-              ),
-              const SizedBox(height: 10),
-              _PermissionCard(
                 icon: Icons.query_stats_rounded,
                 title: '앱 사용 정보 접근',
-                body: capabilities.accessibilityGranted
-                    ? '빠른 감지가 꺼졌을 때 사용하는 백업 감지 권한입니다.'
-                    : '현재 화면에 열린 앱을 확인하는 백업 감지에 사용합니다.',
-                granted: capabilities.usageAccessGranted,
+                body: '현재 화면에 열린 앱을 감지하는 데 사용합니다.',
+                granted: capabilities!.usageAccessGranted,
                 onTap: capabilities.usageAccessGranted
                     ? null
                     : _bridge.openUsageAccessSettings,
@@ -133,15 +121,11 @@ class _NativePermissionsScreenState extends State<NativePermissionsScreen>
                     ? Icons.check_circle_rounded
                     : Icons.info_outline_rounded,
                 title: capabilities.androidReady
-                    ? (capabilities.accessibilityGranted
-                        ? '빠른 감지 준비 완료'
-                        : '기본 보호 준비 완료')
+                    ? '필수 권한 준비 완료'
                     : '권한 설정이 필요합니다',
                 body: capabilities.androidReady
-                    ? (capabilities.accessibilityGranted
-                        ? '앱 전환 이벤트를 이용해 보호 앱을 빠르게 감지합니다. 사용정보 접근은 백업으로 유지됩니다.'
-                        : '기본 보호는 가능하지만, 빠른 감지를 켜면 잠금 반응이 더 빨라집니다.')
-                    : '다른 앱 위에 표시와 빠른 감지 또는 사용정보 접근 중 하나가 필요합니다.',
+                    ? '앱 사용 정보 접근과 다른 앱 위에 표시 권한이 준비되었습니다.'
+                    : '위 두 권한을 모두 허용해야 실제 앱 잠금 기능을 사용할 수 있습니다.',
               ),
             ],
           ],
