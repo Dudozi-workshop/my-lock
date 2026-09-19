@@ -69,6 +69,11 @@ class LockMonitorService : Service() {
         handler.post(pollRunnable)
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        MainActivity.lockUiVisible = false
+        super.onTaskRemoved(rootIntent)
+    }
+
     override fun onDestroy() {
         handler.removeCallbacks(pollRunnable)
         runCatching { unregisterReceiver(screenReceiver) }
