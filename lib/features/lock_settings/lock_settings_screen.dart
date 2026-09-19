@@ -4,6 +4,7 @@ import '../../app/my_lock_settings_controller.dart';
 import '../../app/theme.dart';
 import '../../lock_engine/effects.dart';
 import '../../lock_engine/models.dart';
+import '../../lock_engine/platform_lock_bridge.dart';
 import '../lock_mode/lock_mode_screen.dart';
 import 'app_selection/app_selection_screen.dart';
 import 'native_permissions/native_permissions_screen.dart';
@@ -23,28 +24,50 @@ class LockSettingsScreen extends StatefulWidget {
   State<LockSettingsScreen> createState() => _LockSettingsScreenState();
 }
 
-class _LockSettingsScreenState extends State<LockSettingsScreen> {
+class _LockSettingsScreenState extends State<LockSettingsScreen>
+    with WidgetsBindingObserver {
+  final MethodChannelPlatformLockBridge _platformBridge =
+      MethodChannelPlatformLockBridge();
+
+  PlatformLockCapabilities? _capabilities;
+
   @override
   void initState() {
     super.initState();
-    widget.settings.addListener(_refresh);
+    WidgetsBinding.instance.addObserver(this);
+    widget.settings.addListener(_refreshSettings);
+    _refreshCapabilities();
   }
 
   @override
   void didUpdateWidget(covariant LockSettingsScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.settings == widget.settings) return;
-    oldWidget.settings.removeListener(_refresh);
-    widget.settings.addListener(_refresh);
+    oldWidget.settings.removeListener(_refreshSettings);
+    widget.settings.addListener(_refreshSettings);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refreshCapabilities();
+    }
   }
 
   @override
   void dispose() {
-    widget.settings.removeListener(_refresh);
+    WidgetsBinding.instance.removeObserver(this);
+    widget.settings.removeListener(_refreshSettings);
     super.dispose();
   }
 
-  void _refresh() => setState(() {});
+  void _refreshSettings() => setState(() {});
+
+  Future<void> _refreshCapabilities() async {
+    final capabilities = await _platformBridge.getCapabilities();
+    if (!mounted) return;
+    setState(() => _capabilities = capabilities);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +85,13 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 22),
+          _ProtectionStatusCard(
+            passwordReady: settings.password != null,
+            appsReady: settings.selectedAppIds.isNotEmpty,
+            capabilities: _capabilities,
+            onPermissionsTap: _openNativePermissions,
+          ),
+          const SizedBox(height: 14),
           _SettingTile(
             icon: Icons.admin_panel_settings_outlined,
             title: '기기 권한',
@@ -260,6 +290,170 @@ class _SettingTile extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+
+class _ProtectionStatusCard extends StatelessWidget {
+  const _ProtectionStatusCard({
+    required this.passwordReady,
+    required this.appsReady,
+    required this.capabilities,
+    required this.onPermissionsTap,
+  });
+
+  final bool passwordReady;
+  final bool appsReady;
+  final PlatformLockCapabilities? capabilities;
+  final VoidCallback onPermissionsTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final nativeAvailable = capabilities?.nativeBridgeAvailable == true;
+    final permissionsReady = capabilities?.androidReady == true;
+    final ready = passwordReady && appsReady && permissionsReady;
+
+    final title = ready
+        ? '보호 준비 완료'
+        : nativeAvailable
+            ? '보호 설정을 완료해 주세요'
+            : '웹 미리보기 모드';
+
+    final subtitle = ready
+        ? '선택한 앱을 MY LOCK으로 보호할 준비가 됐습니다.'
+        : nativeAvailable
+            ? _missingSummary(permissionsReady)
+            : '실제 앱 감지와 권한 상태는 Android 설치본에서 활성화됩니다.';
+
+    return Container(
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: ready ? const Color(0xFFF0EDFF) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: ready
+              ? const Color(0xFFCFC4FF)
+              : const Color(0xFFEDEBF2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: brandLavender,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  ready
+                      ? Icons.shield_rounded
+                      : Icons.shield_outlined,
+                  color: brandPurple,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: ink,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: secondaryInk,
+                        fontSize: 12,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (nativeAvailable && !ready) ...[
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _StatusChip(label: '비밀번호', ready: passwordReady),
+                _StatusChip(label: '보호 앱', ready: appsReady),
+                _StatusChip(label: '기기 권한', ready: permissionsReady),
+              ],
+            ),
+            if (!permissionsReady) ...[
+              const SizedBox(height: 12),
+              TextButton.icon(
+                onPressed: onPermissionsTap,
+                icon: const Icon(Icons.settings_rounded, size: 18),
+                label: const Text('권한 설정'),
+              ),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _missingSummary(bool permissionsReady) {
+    final missing = <String>[
+      if (!passwordReady) '비밀번호',
+      if (!appsReady) '보호 앱',
+      if (!permissionsReady) '기기 권한',
+    ];
+    return '${missing.join(' · ')} 설정이 필요합니다.';
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({
+    required this.label,
+    required this.ready,
+  });
+
+  final String label;
+  final bool ready;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: ready ? brandLavender : const Color(0xFFF4F3F7),
+        borderRadius: BorderRadius.circular(99),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            ready ? Icons.check_rounded : Icons.remove_rounded,
+            size: 14,
+            color: ready ? brandPurple : secondaryInk,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: ready ? brandPurple : secondaryInk,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }
