@@ -17,6 +17,7 @@ class FloatingEngine {
   int _nextId = 0;
   MovementStyle _movementStyle = MovementStyle.floating;
   List<LockToken> _allowedTokens = List<LockToken>.from(defaultTokens);
+  List<LockToken> _requiredTokens = <LockToken>[];
 
   static const List<LockToken> defaultTokens = [
     LockToken(shape: ShapeKind.circle, tone: ShapeTone.pink),
@@ -42,6 +43,11 @@ class FloatingEngine {
 
     if (_area == Size.zero) return;
     _seedObjects();
+  }
+
+  void setRequiredTokens(List<LockToken> tokens) {
+    _requiredTokens = tokens.take(2).toList(growable: false);
+    if (_area != Size.zero) _ensureRequiredVisible();
   }
 
   void setMovementStyle(MovementStyle style) {
@@ -81,6 +87,7 @@ class FloatingEngine {
       final token = _allowedTokens[i % _allowedTokens.length];
       objects.add(_spawn(token));
     }
+    _ensureRequiredVisible();
   }
 
   FloatingObject _spawn(LockToken token) {
@@ -224,6 +231,53 @@ class FloatingEngine {
     return target.token;
   }
 
+  void _ensureRequiredVisible() {
+    if (_requiredTokens.isEmpty || objects.isEmpty) return;
+
+    final requiredCounts = <String, int>{};
+    final tokenById = <String, LockToken>{};
+    for (final token in _requiredTokens) {
+      requiredCounts[token.id] = (requiredCounts[token.id] ?? 0) + 1;
+      tokenById[token.id] = token;
+    }
+
+    final visibleCounts = <String, int>{};
+    for (final object in objects) {
+      if (object.isPopping) continue;
+      visibleCounts[object.token.id] =
+          (visibleCounts[object.token.id] ?? 0) + 1;
+    }
+
+    for (final entry in requiredCounts.entries) {
+      final id = entry.key;
+      final requiredCount = entry.value;
+      final requiredToken = tokenById[id]!;
+
+      while ((visibleCounts[id] ?? 0) < requiredCount) {
+        FloatingObject? candidate;
+
+        for (final object in objects) {
+          if (object.isPopping || object.token.id == id) continue;
+
+          final candidateId = object.token.id;
+          final candidateRequired = requiredCounts[candidateId] ?? 0;
+          final candidateVisible = visibleCounts[candidateId] ?? 0;
+          if (candidateVisible > candidateRequired) {
+            candidate = object;
+            break;
+          }
+        }
+
+        if (candidate == null) break;
+
+        final previousId = candidate.token.id;
+        visibleCounts[previousId] = (visibleCounts[previousId] ?? 1) - 1;
+        candidate.token = requiredToken;
+        visibleCounts[id] = (visibleCounts[id] ?? 0) + 1;
+      }
+    }
+  }
+
   void _respawn(FloatingObject object) {
     if (_allowedTokens.isEmpty) {
       objects.remove(object);
@@ -245,5 +299,7 @@ class FloatingEngine {
       ..position = _findSpawnPosition(object.radius)
       ..velocity = Offset(cos(angle) * speed, sin(angle) * speed)
       ..popElapsed = -1;
+
+    _ensureRequiredVisible();
   }
 }

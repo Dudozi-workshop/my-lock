@@ -63,4 +63,85 @@ void main() {
 
     expect(engine.objects.map((object) => object.token.id).toList(), before);
   });
+  test('next two required tokens are always visible', () {
+    final engine = FloatingEngine(seed: 5);
+    engine.resize(const Size(320, 480));
+
+    const filler = LockToken(
+      shape: ShapeKind.square,
+      tone: ShapeTone.yellow,
+    );
+    const first = LockToken(
+      shape: ShapeKind.circle,
+      tone: ShapeTone.pink,
+    );
+    const second = LockToken(
+      shape: ShapeKind.triangle,
+      tone: ShapeTone.blue,
+    );
+
+    for (final object in engine.objects) {
+      object.token = filler;
+    }
+
+    engine.setRequiredTokens([first, second]);
+
+    final visibleIds = engine.objects
+        .where((object) => !object.isPopping)
+        .map((object) => object.token.id)
+        .toList();
+
+    expect(visibleIds.where((id) => id == first.id).length, greaterThanOrEqualTo(1));
+    expect(visibleIds.where((id) => id == second.id).length, greaterThanOrEqualTo(1));
+  });
+
+  test('duplicate next tokens require two visible copies', () {
+    final engine = FloatingEngine(seed: 6);
+    engine.resize(const Size(320, 480));
+
+    const filler = LockToken(
+      shape: ShapeKind.square,
+      tone: ShapeTone.yellow,
+    );
+    const repeated = LockToken(
+      shape: ShapeKind.circle,
+      tone: ShapeTone.pink,
+    );
+
+    for (final object in engine.objects) {
+      object.token = filler;
+    }
+
+    engine.setRequiredTokens([repeated, repeated]);
+
+    final count = engine.objects
+        .where((object) => !object.isPopping && object.token.id == repeated.id)
+        .length;
+
+    expect(count, greaterThanOrEqualTo(2));
+  });
+
+  test('required token is restored when an existing copy is popping', () {
+    final engine = FloatingEngine(seed: 7);
+    engine.resize(const Size(320, 480));
+
+    const required = LockToken(
+      shape: ShapeKind.circle,
+      tone: ShapeTone.pink,
+    );
+
+    engine.setRequiredTokens([required]);
+    final visible = engine.objects.firstWhere(
+      (object) => object.token.id == required.id && !object.isPopping,
+    );
+    visible.popElapsed = 0;
+
+    engine.setRequiredTokens([required]);
+
+    final count = engine.objects
+        .where((object) => !object.isPopping && object.token.id == required.id)
+        .length;
+
+    expect(count, greaterThanOrEqualTo(1));
+  });
 }

@@ -90,6 +90,7 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
                     selectedShapes: ShapeKind.values.toSet(),
                     selectedTones: ShapeTone.values.toSet(),
                     onTokenTap: _controller.addToken,
+                    requiredTokens: _nextRequiredTokens(confirming),
                   ),
                 ),
               ),
@@ -144,6 +145,15 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
         ),
       ),
     );
+  }
+
+  List<LockToken> _nextRequiredTokens(bool confirming) {
+    if (!confirming) return const <LockToken>[];
+
+    return _controller.pattern
+        .skip(_controller.input.length)
+        .take(2)
+        .toList(growable: false);
   }
 
   void _verify() {
