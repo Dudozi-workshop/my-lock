@@ -9,6 +9,7 @@ import '../lock_mode/lock_mode_screen.dart';
 import 'app_selection/app_selection_screen.dart';
 import 'native_permissions/native_permissions_screen.dart';
 import 'password_setup/password_setup_screen.dart';
+import 'recovery_pin/recovery_pin_screen.dart';
 import 'relock/relock_screen.dart';
 import 'screen_behavior/screen_behavior_screen.dart';
 
@@ -124,6 +125,12 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
             onTap: _openPasswordSetup,
           ),
           _SettingTile(
+            icon: Icons.pin_rounded,
+            title: '보조 PIN',
+            value: settings.recoveryPinReady ? '4자리 PIN 설정됨' : '설정 전',
+            onTap: _openRecoveryPinSetup,
+          ),
+          _SettingTile(
             icon: Icons.apps_rounded,
             title: '잠글 앱',
             value: settings.selectedAppIds.isEmpty
@@ -212,6 +219,17 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
       case FloatingSpeed.fast:
         return '빠르게';
     }
+  }
+
+  Future<void> _openRecoveryPinSetup() async {
+    final pin = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (context) => const RecoveryPinScreen(),
+      ),
+    );
+
+    if (pin == null) return;
+    widget.settings.setRecoveryPin(pin);
   }
 
   Future<void> _openAppSelection() async {
