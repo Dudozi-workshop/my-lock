@@ -9,6 +9,7 @@ mkdir -p "$MAIN_DIR"
 cp "$ROOT/platform/android/MainActivity.kt" "$MAIN_DIR/MainActivity.kt"
 cp "$ROOT/platform/android/LockActivity.kt" "$MAIN_DIR/LockActivity.kt"
 cp "$ROOT/platform/android/LockMonitorService.kt" "$MAIN_DIR/LockMonitorService.kt"
+cp "$ROOT/platform/android/OverlayLockController.kt" "$MAIN_DIR/OverlayLockController.kt"
 cp "$ROOT/platform/android/BootReceiver.kt" "$MAIN_DIR/BootReceiver.kt"
 
 python3 - "$MANIFEST" <<'PY'
