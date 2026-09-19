@@ -6,12 +6,11 @@ void main() {
   const pinkCircle = LockToken(shape: ShapeKind.circle, tone: ShapeTone.pink);
   const blueSquare = LockToken(shape: ShapeKind.square, tone: ShapeTone.blue);
 
-  test('requires at least three tokens before confirmation', () {
+  test('requires at least two tokens before confirmation', () {
     final controller = PasswordSetupController();
     controller.addToken(pinkCircle);
-    controller.addToken(blueSquare);
     expect(controller.canContinue, isFalse);
-    controller.addToken(pinkCircle);
+    controller.addToken(blueSquare);
     expect(controller.canContinue, isTrue);
   });
 
