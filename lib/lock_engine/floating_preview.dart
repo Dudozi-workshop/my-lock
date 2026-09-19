@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
+import 'effects.dart';
 import 'floating_engine.dart';
 import 'models.dart';
 import 'shape_painter.dart';
@@ -12,10 +13,14 @@ class FloatingPreview extends StatefulWidget {
     super.key,
     required this.selectedShapes,
     required this.selectedTones,
+    this.movementStyle = MovementStyle.floating,
+    this.popStyle = PopStyle.basicPop,
   });
 
   final Set<ShapeKind> selectedShapes;
   final Set<ShapeTone> selectedTones;
+  final MovementStyle movementStyle;
+  final PopStyle popStyle;
 
   @override
   State<FloatingPreview> createState() => _FloatingPreviewState();
@@ -31,7 +36,9 @@ class _FloatingPreviewState extends State<FloatingPreview>
   @override
   void initState() {
     super.initState();
-    _engine.setSelection(widget.selectedShapes, widget.selectedTones);
+    _engine
+      ..setSelection(widget.selectedShapes, widget.selectedTones)
+      ..setMovementStyle(widget.movementStyle);
     _ticker = createTicker(_onTick)..start();
   }
 
@@ -41,6 +48,9 @@ class _FloatingPreviewState extends State<FloatingPreview>
     if (!setEquals(oldWidget.selectedShapes, widget.selectedShapes) ||
         !setEquals(oldWidget.selectedTones, widget.selectedTones)) {
       _engine.setSelection(widget.selectedShapes, widget.selectedTones);
+    }
+    if (oldWidget.movementStyle != widget.movementStyle) {
+      _engine.setMovementStyle(widget.movementStyle);
     }
   }
 
@@ -84,7 +94,10 @@ class _FloatingPreviewState extends State<FloatingPreview>
             }
           },
           child: CustomPaint(
-            painter: FloatingShapePainter(objects: _engine.objects),
+            painter: FloatingShapePainter(
+              objects: _engine.objects,
+              popStyle: widget.popStyle,
+            ),
             child: const SizedBox.expand(),
           ),
         );

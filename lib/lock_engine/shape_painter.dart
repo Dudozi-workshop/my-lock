@@ -2,12 +2,17 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'effects.dart';
 import 'models.dart';
 
 class FloatingShapePainter extends CustomPainter {
-  const FloatingShapePainter({required this.objects});
+  const FloatingShapePainter({
+    required this.objects,
+    this.popStyle = PopStyle.basicPop,
+  });
 
   final List<FloatingObject> objects;
+  final PopStyle popStyle;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -17,14 +22,34 @@ class FloatingShapePainter extends CustomPainter {
           : 0.0;
 
       if (object.isPopping) {
-        _paintPopParticles(canvas, object, progress);
+        _paintPopFeedback(canvas, object, progress);
       }
 
-      final scale = object.isPopping ? 1 + progress * 0.42 : 1.0;
+      final scale = object.isPopping
+          ? popStyle == PopStyle.bubble
+              ? 1 + progress * 0.16
+              : 1 + progress * 0.42
+          : 1.0;
       final opacity = object.isPopping
           ? (1 - progress).clamp(0.0, 1.0).toDouble()
           : 1.0;
       _paintShape(canvas, object, scale: scale, opacity: opacity);
+    }
+  }
+
+  void _paintPopFeedback(
+    Canvas canvas,
+    FloatingObject object,
+    double progress,
+  ) {
+    switch (popStyle) {
+      case PopStyle.bubble:
+        _paintBubbleRings(canvas, object, progress);
+      case PopStyle.basicPop:
+      case PopStyle.spark:
+      case PopStyle.pixel:
+      case PopStyle.glassBreak:
+        _paintPopParticles(canvas, object, progress);
     }
   }
 
@@ -95,6 +120,33 @@ class FloatingShapePainter extends CustomPainter {
           object.position + Offset(cos(angle), sin(angle)) * distance;
       final particleRadius = object.radius * (0.09 - progress * 0.045);
       canvas.drawCircle(particle, max(1.2, particleRadius), paint);
+    }
+  }
+
+  void _paintBubbleRings(
+    Canvas canvas,
+    FloatingObject object,
+    double progress,
+  ) {
+    final colors = _toneColors(object.token.tone);
+    final opacity = (1 - progress).clamp(0.0, 1.0).toDouble();
+
+    for (var i = 0; i < 2; i++) {
+      final delay = i * 0.18;
+      final localProgress =
+          ((progress - delay) / (1 - delay)).clamp(0.0, 1.0).toDouble();
+      if (progress < delay) continue;
+
+      final paint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = max(1.5, object.radius * 0.055)
+        ..color = colors.$1.withValues(alpha: opacity * 0.75);
+
+      canvas.drawCircle(
+        object.position,
+        object.radius * (0.72 + localProgress * 1.55),
+        paint,
+      );
     }
   }
 

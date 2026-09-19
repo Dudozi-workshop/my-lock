@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
+import '../../lock_engine/effects.dart';
 import '../../lock_engine/floating_preview.dart';
 import '../../lock_engine/models.dart';
 import '../../widgets/customization_card.dart';
 import 'background/background_screen.dart';
 import 'background/background_style.dart';
+import 'effects/effects_screen.dart';
 import 'shape_style_screen.dart';
 
 class CustomizeScreen extends StatefulWidget {
@@ -19,6 +21,8 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
   Set<ShapeKind> _selectedShapes = ShapeKind.values.toSet();
   Set<ShapeTone> _selectedTones = ShapeTone.values.toSet();
   LockBackground _selectedBackground = LockBackground.softGradient;
+  MovementStyle _movementStyle = MovementStyle.floating;
+  PopStyle _popStyle = PopStyle.basicPop;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +69,8 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
                         child: FloatingPreview(
                           selectedShapes: _selectedShapes,
                           selectedTones: _selectedTones,
+                          movementStyle: _movementStyle,
+                          popStyle: _popStyle,
                         ),
                       ),
                       Positioned(
@@ -135,13 +141,33 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
                 CustomizationCard(
                   icon: Icons.auto_fix_high_rounded,
                   title: '효과',
-                  subtitle: 'Floating · Basic Pop',
-                  onTap: () => _showPrototypeSheet(context, '효과'),
+                  subtitle: '${_movementStyle.label} · ${_popStyle.label}',
+                  onTap: () => _openEffects(context),
                 ),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+
+  Future<void> _openEffects(BuildContext context) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => EffectsScreen(
+          background: _selectedBackground,
+          selectedShapes: _selectedShapes,
+          selectedTones: _selectedTones,
+          movementStyle: _movementStyle,
+          popStyle: _popStyle,
+          onChanged: (movement, popStyle) {
+            setState(() {
+              _movementStyle = movement;
+              _popStyle = popStyle;
+            });
+          },
+        ),
       ),
     );
   }
@@ -184,39 +210,4 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
     );
   }
 
-  void _showPrototypeSheet(BuildContext context, String title) {
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      backgroundColor: Colors.white,
-      builder: (context) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(22, 4, 22, 28),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 10),
-                Text(
-                  '다음 단계에서 실제 선택 기능을 연결합니다.',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 24),
-                FilledButton(
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(52),
-                    backgroundColor: brandPurple,
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('확인'),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 }
