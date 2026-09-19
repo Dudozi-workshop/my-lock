@@ -10,50 +10,54 @@ class LockModeController extends ChangeNotifier {
         _password = List<LockToken>.from(password);
 
   final List<LockToken> _password;
+  final List<LockToken> _input = [];
 
-  int _progress = 0;
   bool _mismatch = false;
   bool _unlocked = false;
   int _failedAttempts = 0;
 
-  int get progress => _progress;
+  int get progress => _input.length;
   int get passwordLength => _password.length;
   bool get mismatch => _mismatch;
   bool get unlocked => _unlocked;
   int get failedAttempts => _failedAttempts;
 
   List<LockToken> get requiredTokens => _password
-      .skip(_progress)
+      .skip(_input.length)
       .take(2)
       .toList(growable: false);
 
   LockTapResult tap(LockToken token) {
     if (_unlocked) return LockTapResult.ignored;
 
-    final expected = _password[_progress];
-    if (token.id != expected.id) {
-      _progress = 0;
-      _mismatch = true;
-      _failedAttempts += 1;
+    _mismatch = false;
+    _input.add(token);
+
+    if (_input.length < _password.length) {
       notifyListeners();
-      return LockTapResult.wrong;
+      return LockTapResult.correct;
     }
 
-    _mismatch = false;
-    _progress += 1;
+    final matches = List.generate(
+      _password.length,
+      (index) => _password[index].id == _input[index].id,
+    ).every((value) => value);
 
-    if (_progress == _password.length) {
+    if (matches) {
       _unlocked = true;
       notifyListeners();
       return LockTapResult.unlocked;
     }
 
+    _input.clear();
+    _mismatch = true;
+    _failedAttempts += 1;
     notifyListeners();
-    return LockTapResult.correct;
+    return LockTapResult.wrong;
   }
 
   void reset() {
-    _progress = 0;
+    _input.clear();
     _mismatch = false;
     _unlocked = false;
     _failedAttempts = 0;
