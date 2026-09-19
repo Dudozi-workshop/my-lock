@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/theme.dart';
-import '../../../lock_engine/floating_preview.dart';
 import '../../../lock_engine/models.dart';
 import 'password_setup_controller.dart';
 
@@ -38,9 +37,18 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
     super.dispose();
   }
 
+  List<LockToken> get _availableTokens => [
+        for (final tone in ShapeTone.values)
+          if (widget.selectedTones.contains(tone))
+            for (final shape in ShapeKind.values)
+              if (widget.selectedShapes.contains(shape))
+                LockToken(shape: shape, tone: tone),
+      ];
+
   @override
   Widget build(BuildContext context) {
     final confirming = _controller.phase == PasswordSetupPhase.confirm;
+    final tokens = _availableTokens;
 
     return Scaffold(
       backgroundColor: appBackground,
@@ -81,24 +89,46 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
                 child: Container(
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFFFFF4FB),
-                        Color(0xFFF1EEFF),
-                        Color(0xFFECF7FF),
-                      ],
-                    ),
                     border: Border.all(color: const Color(0xFFE9E4F3)),
                   ),
-                  child: FloatingPreview(
-                    selectedShapes: widget.selectedShapes,
-                    selectedTones: widget.selectedTones,
-                    objectCount: _setupObjectCount,
-                    onTokenTap: _controller.addToken,
-                    requiredTokens: _requiredSetupTokens(confirming),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 15, 16, 10),
+                        child: Row(
+                          children: [
+                            const Expanded(
+                              child: Text(
+                                '사용할 도형을 선택하세요',
+                                style: TextStyle(
+                                  color: ink,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              '${tokens.length}개 조합',
+                              style: const TextStyle(
+                                color: secondaryInk,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 1, color: Color(0xFFF0EDF4)),
+                      Expanded(
+                        child: _TokenSelectionGrid(
+                          tokens: tokens,
+                          onTap: _controller.addToken,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -155,38 +185,56 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
     );
   }
 
-  int get _setupObjectCount {
-    final combinationCount =
-        widget.selectedShapes.length * widget.selectedTones.length;
-    final requiredCapacity = combinationCount + 2;
-
-    if (requiredCapacity <= 6) return 6;
-    if (requiredCapacity <= 9) return 9;
-    return 12;
-  }
-
-  List<LockToken> _requiredSetupTokens(bool confirming) {
-    final tokens = <LockToken>[
-      for (final tone in ShapeTone.values)
-        if (widget.selectedTones.contains(tone))
-          for (final shape in ShapeKind.values)
-            if (widget.selectedShapes.contains(shape))
-              LockToken(shape: shape, tone: tone),
-    ];
-
-    if (confirming) {
-      tokens.addAll(
-        _controller.pattern.skip(_controller.input.length).take(2),
-      );
-    }
-
-    return tokens;
-  }
-
   void _verify() {
     if (!_controller.verify()) return;
     Navigator.of(context).pop<List<LockToken>>(
       List<LockToken>.from(_controller.pattern),
+    );
+  }
+}
+
+class _TokenSelectionGrid extends StatelessWidget {
+  const _TokenSelectionGrid({
+    required this.tokens,
+    required this.onTap,
+  });
+
+  final List<LockToken> tokens;
+  final ValueChanged<LockToken> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      padding: const EdgeInsets.all(12),
+      itemCount: tokens.length,
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 86,
+        mainAxisSpacing: 9,
+        crossAxisSpacing: 9,
+        childAspectRatio: 1,
+      ),
+      itemBuilder: (context, index) {
+        final token = tokens[index];
+        return Material(
+          color: const Color(0xFFFAF9FC),
+          borderRadius: BorderRadius.circular(18),
+          child: InkWell(
+            onTap: () => onTap(token),
+            borderRadius: BorderRadius.circular(18),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFFE8E4EF)),
+              ),
+              padding: const EdgeInsets.all(8),
+              child: CustomPaint(
+                painter: _TokenPainter(token),
+                child: const SizedBox.expand(),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
