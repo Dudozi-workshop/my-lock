@@ -30,6 +30,7 @@ enum PlatformLockEventType {
   protectedAppExited,
   screenOff,
   screenOn,
+  lockActivityUnlocked,
 }
 
 class PlatformLockEvent {
@@ -116,24 +117,20 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
             const PlatformLockEvent(PlatformLockEventType.screenOn),
           );
           break;
+        case 'lockActivityUnlocked':
+          final appId = _readAppId(call.arguments);
+          if (appId != null) {
+            _events.add(
+              PlatformLockEvent(
+                PlatformLockEventType.lockActivityUnlocked,
+                appId: appId,
+              ),
+            );
+          }
+          break;
       }
     });
 
-    final pendingAppId = await _consumePendingLock();
-    if (pendingAppId != null) {
-      if (pendingAppId == '__device_screen__') {
-        _events.add(
-          const PlatformLockEvent(PlatformLockEventType.screenOn),
-        );
-      } else {
-        _events.add(
-          PlatformLockEvent(
-            PlatformLockEventType.protectedAppEntered,
-            appId: pendingAppId,
-          ),
-        );
-      }
-    }
   }
 
   @override
@@ -216,18 +213,6 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
       'presentLockScreen',
       <String, Object?>{'appId': appId},
     );
-  }
-
-  Future<String?> _consumePendingLock() async {
-    if (kIsWeb) return null;
-
-    try {
-      return await _channel.invokeMethod<String>('consumePendingLock');
-    } on MissingPluginException {
-      return null;
-    } on PlatformException {
-      return null;
-    }
   }
 
   String? _readAppId(Object? arguments) {
