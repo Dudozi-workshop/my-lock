@@ -24,6 +24,7 @@ class MyLockSettingsController extends ChangeNotifier {
   int _objectCount = 9;
   FloatingSpeed _speed = FloatingSpeed.normal;
   MovementArea _movementArea = MovementArea.full;
+  bool _onboardingStarted = false;
   bool _onboardingCompleted = false;
   RelockPolicy _relockPolicy = RelockPolicy.immediate;
 
@@ -44,6 +45,7 @@ class MyLockSettingsController extends ChangeNotifier {
   int get objectCount => _objectCount;
   FloatingSpeed get speed => _speed;
   MovementArea get movementArea => _movementArea;
+  bool get onboardingStarted => _onboardingStarted;
   bool get onboardingCompleted => _onboardingCompleted;
   RelockPolicy get relockPolicy => _relockPolicy;
 
@@ -65,6 +67,7 @@ class MyLockSettingsController extends ChangeNotifier {
     _objectCount = stored.objectCount;
     _speed = stored.speed;
     _movementArea = stored.movementArea;
+    _onboardingStarted = stored.onboardingStarted;
     _onboardingCompleted = stored.onboardingCompleted;
     _relockPolicy = stored.relockPolicy;
     _loaded = true;
@@ -139,6 +142,13 @@ class MyLockSettingsController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void startOnboarding() {
+    if (_onboardingStarted) return;
+    _onboardingStarted = true;
+    _persistPreferences();
+    notifyListeners();
+  }
+
   void completeOnboarding() {
     if (_onboardingCompleted) return;
     _onboardingCompleted = true;
@@ -167,6 +177,7 @@ class MyLockSettingsController extends ChangeNotifier {
         objectCount: _objectCount,
         speed: _speed,
         movementArea: _movementArea,
+        onboardingStarted: _onboardingStarted,
         onboardingCompleted: _onboardingCompleted,
         relockPolicy: _relockPolicy,
       ),
