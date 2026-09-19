@@ -5,7 +5,7 @@ import '../../../lock_engine/models.dart';
 enum PasswordSetupPhase { create, confirm }
 
 class PasswordSetupController extends ChangeNotifier {
-  static const int minLength = 3;
+  static const int minLength = 2;
   static const int maxLength = 6;
 
   PasswordSetupPhase _phase = PasswordSetupPhase.create;
