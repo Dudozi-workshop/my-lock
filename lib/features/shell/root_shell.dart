@@ -7,6 +7,7 @@ import '../../app/theme.dart';
 import '../../lock_engine/lock_runtime_coordinator.dart';
 import '../../lock_engine/platform_lock_bridge.dart';
 import '../lock_mode/lock_mode_screen.dart';
+import '../onboarding/onboarding_screen.dart';
 import '../customize/customize_screen.dart';
 import '../lock_settings/lock_settings_screen.dart';
 import '../shop/shop_screen.dart';
@@ -29,7 +30,7 @@ class _RootShellState extends State<RootShell> {
   @override
   void initState() {
     super.initState();
-    _settings = MyLockSettingsController();
+    _settings = MyLockSettingsController()..addListener(_refreshSettings);
     _runtime = LockRuntimeCoordinator(
       settings: _settings,
       bridge: MethodChannelPlatformLockBridge(),
@@ -61,10 +62,15 @@ class _RootShellState extends State<RootShell> {
     }
   }
 
+  void _refreshSettings() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
     unawaited(_lockRequestSubscription?.cancel());
     unawaited(_runtime.stop());
+    _settings.removeListener(_refreshSettings);
     _settings.dispose();
     super.dispose();
   }
@@ -120,6 +126,15 @@ class _RootShellState extends State<RootShell> {
                 ),
               ),
             ),
+          );
+        }
+
+        if (!_settings.onboardingCompleted) {
+          return OnboardingScreen(
+            settings: _settings,
+            onCompleted: () {
+              if (mounted) setState(() {});
+            },
           );
         }
 
