@@ -4,6 +4,7 @@ import '../../app/my_lock_settings_controller.dart';
 import '../../app/theme.dart';
 import '../../lock_engine/effects.dart';
 import '../../lock_engine/models.dart';
+import '../lock_mode/lock_mode_screen.dart';
 import 'app_selection/app_selection_screen.dart';
 import 'password_setup/password_setup_screen.dart';
 import 'relock/relock_screen.dart';
@@ -89,7 +90,27 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
             value: settings.relockPolicy.summary,
             onTap: _openRelock,
           ),
+          const SizedBox(height: 8),
+          _SettingTile(
+            icon: Icons.play_circle_outline_rounded,
+            title: '잠금화면 테스트',
+            value: settings.password == null
+                ? '비밀번호 설정 후 테스트 가능'
+                : '현재 설정으로 잠금 해제 흐름 확인',
+            onTap: settings.password == null ? null : _openLockTest,
+          ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _openLockTest() async {
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => LockModeScreen(
+          settings: widget.settings,
+          demoMode: true,
+        ),
       ),
     );
   }
@@ -146,7 +167,10 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
   Future<void> _openPasswordSetup() async {
     final pattern = await Navigator.of(context).push<List<LockToken>>(
       MaterialPageRoute(
-        builder: (context) => const PasswordSetupScreen(),
+        builder: (context) => PasswordSetupScreen(
+          selectedShapes: widget.settings.selectedShapes,
+          selectedTones: widget.settings.selectedTones,
+        ),
       ),
     );
 

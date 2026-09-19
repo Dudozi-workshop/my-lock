@@ -6,7 +6,14 @@ import '../../../lock_engine/models.dart';
 import 'password_setup_controller.dart';
 
 class PasswordSetupScreen extends StatefulWidget {
-  const PasswordSetupScreen({super.key});
+  const PasswordSetupScreen({
+    super.key,
+    required this.selectedShapes,
+    required this.selectedTones,
+  });
+
+  final Set<ShapeKind> selectedShapes;
+  final Set<ShapeTone> selectedTones;
 
   @override
   State<PasswordSetupScreen> createState() => _PasswordSetupScreenState();
@@ -87,8 +94,8 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
                     border: Border.all(color: const Color(0xFFE9E4F3)),
                   ),
                   child: FloatingPreview(
-                    selectedShapes: ShapeKind.values.toSet(),
-                    selectedTones: ShapeTone.values.toSet(),
+                    selectedShapes: widget.selectedShapes,
+                    selectedTones: widget.selectedTones,
                     onTokenTap: _controller.addToken,
                     requiredTokens: _nextRequiredTokens(confirming),
                   ),
