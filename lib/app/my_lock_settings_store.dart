@@ -19,6 +19,7 @@ class MyLockStoredSettings {
     required this.selectedAppIds,
     required this.objectCount,
     required this.speed,
+    this.movementArea = MovementArea.full,
     required this.relockPolicy,
   });
 
@@ -31,6 +32,7 @@ class MyLockStoredSettings {
   final Set<String> selectedAppIds;
   final int objectCount;
   final FloatingSpeed speed;
+  final MovementArea movementArea;
   final RelockPolicy relockPolicy;
 }
 
@@ -57,6 +59,7 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
   static const _appsKey = 'selected_app_ids';
   static const _objectCountKey = 'object_count';
   static const _speedKey = 'floating_speed';
+  static const _movementAreaKey = 'movement_area';
   static const _relockKey = 'relock_policy';
   static const _passwordKey = 'graphical_password';
 
@@ -106,6 +109,11 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
         await _preferences.getString(_speedKey),
         FloatingSpeed.normal,
       ),
+      movementArea: _enumOrDefault(
+        MovementArea.values,
+        await _preferences.getString(_movementAreaKey),
+        MovementArea.full,
+      ),
       relockPolicy: _enumOrDefault(
         RelockPolicy.values,
         await _preferences.getString(_relockKey),
@@ -134,6 +142,7 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
       ),
       _preferences.setInt(_objectCountKey, settings.objectCount),
       _preferences.setString(_speedKey, settings.speed.name),
+      _preferences.setString(_movementAreaKey, settings.movementArea.name),
       _preferences.setString(_relockKey, settings.relockPolicy.name),
     ]);
   }
