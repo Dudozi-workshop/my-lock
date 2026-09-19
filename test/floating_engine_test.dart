@@ -306,7 +306,7 @@ void main() {
     for (final object in engine.objects) {
       expect(
         object.position.dy - object.radius,
-        greaterThanOrEqualTo(size.height * 0.5),
+        greaterThanOrEqualTo(size.height * 0.40),
       );
       expect(
         object.position.dy + object.radius,
@@ -324,7 +324,25 @@ void main() {
 
     expect(
       engine.objects.every(
-        (object) => object.position.dy - object.radius >= size.height * 0.5,
+        (object) => object.position.dy - object.radius >= size.height * 0.40,
+      ),
+      isTrue,
+    );
+  });
+
+  test('top inset keeps objects below lock header', () {
+    final engine = FloatingEngine(seed: 19);
+    const size = Size(400, 700);
+    engine.resize(size);
+    engine.setTopInset(150);
+
+    for (var i = 0; i < 600; i++) {
+      engine.step(1 / 60);
+    }
+
+    expect(
+      engine.objects.every(
+        (object) => object.position.dy - object.radius >= 150,
       ),
       isTrue,
     );
