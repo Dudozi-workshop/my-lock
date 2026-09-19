@@ -14,11 +14,13 @@ class LockModeController extends ChangeNotifier {
   int _progress = 0;
   bool _mismatch = false;
   bool _unlocked = false;
+  int _failedAttempts = 0;
 
   int get progress => _progress;
   int get passwordLength => _password.length;
   bool get mismatch => _mismatch;
   bool get unlocked => _unlocked;
+  int get failedAttempts => _failedAttempts;
 
   List<LockToken> get requiredTokens => _password
       .skip(_progress)
@@ -32,6 +34,7 @@ class LockModeController extends ChangeNotifier {
     if (token.id != expected.id) {
       _progress = 0;
       _mismatch = true;
+      _failedAttempts += 1;
       notifyListeners();
       return LockTapResult.wrong;
     }
@@ -53,6 +56,7 @@ class LockModeController extends ChangeNotifier {
     _progress = 0;
     _mismatch = false;
     _unlocked = false;
+    _failedAttempts = 0;
     notifyListeners();
   }
 }
