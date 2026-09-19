@@ -26,7 +26,14 @@ class LockMonitorService : Service() {
         private const val protectedAppsKey = "protected_apps"
         private const val pendingLockAppKey = "pending_lock_app"
         const val heartbeatKey = "monitor_heartbeat_at"
-        const val actionResetForeground = "com.mylock.app.RESET_FOREGROUND"
+
+        @Volatile
+        private var activeInstance: LockMonitorService? = null
+
+        fun resetForegroundTracking() {
+            activeInstance?.resetForegroundState()
+        }
+
         private const val heartbeatIntervalMs = 2_000L
     }
 
@@ -55,6 +62,7 @@ class LockMonitorService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        activeInstance = this
         usageStatsManager =
             getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
 
@@ -80,6 +88,7 @@ class LockMonitorService : Service() {
     }
 
     override fun onDestroy() {
+        activeInstance = null
         handler.removeCallbacks(pollRunnable)
         runCatching { unregisterReceiver(screenReceiver) }
         getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
@@ -96,11 +105,12 @@ class LockMonitorService : Service() {
         flags: Int,
         startId: Int,
     ): Int {
-        if (intent?.action == actionResetForeground) {
-            foregroundPackage = null
-            lastQueryAt = System.currentTimeMillis() - 750L
-        }
         return START_STICKY
+    }
+
+    private fun resetForegroundState() {
+        foregroundPackage = null
+        lastQueryAt = System.currentTimeMillis() - 750L
     }
 
     private fun startAsForeground() {
