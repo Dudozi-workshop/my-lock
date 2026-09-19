@@ -25,6 +25,7 @@ class LockMonitorService : Service() {
         private const val preferencesName = "my_lock_native"
         private const val protectedAppsKey = "protected_apps"
         private const val experimentalScreenLockKey = "experimental_screen_lock"
+        private const val experimentalOverlayLockKey = "experimental_overlay_lock"
         private const val relockPolicyKey = "relock_policy"
         private const val lastUnlockedAppKey = "last_unlocked_app"
         private const val lastUnlockedAtKey = "last_unlocked_at"
@@ -54,6 +55,7 @@ class LockMonitorService : Service() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
+                    OverlayLockController.hide()
                     foregroundPackage = null
                     getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
                         .edit()
@@ -113,6 +115,7 @@ class LockMonitorService : Service() {
 
     override fun onDestroy() {
         activeInstance = null
+        OverlayLockController.hide()
         handler.removeCallbacks(pollRunnable)
         runCatching { unregisterReceiver(screenReceiver) }
         getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
@@ -227,6 +230,9 @@ class LockMonitorService : Service() {
         val protectedApps = protectedApps()
 
         if (previous != null && protectedApps.contains(previous)) {
+            if (experimentalOverlayLockEnabled()) {
+                OverlayLockController.hide()
+            }
             getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
                 .edit()
                 .putString(lastProtectedExitAppKey, previous)
@@ -238,6 +244,13 @@ class LockMonitorService : Service() {
         foregroundPackage = packageName
 
         if (!protectedApps.contains(packageName)) return
+
+        if (experimentalOverlayLockEnabled()) {
+            if (shouldLockInNativeFallback(packageName)) {
+                OverlayLockController.show(this, packageName)
+            }
+            return
+        }
 
         val delivered = MainActivity.emitProtectedAppEntered(packageName)
         if (!delivered && shouldLockInNativeFallback(packageName)) {
@@ -290,6 +303,11 @@ class LockMonitorService : Service() {
     private fun experimentalScreenLockEnabled(): Boolean {
         return getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
             .getBoolean(experimentalScreenLockKey, false)
+    }
+
+    private fun experimentalOverlayLockEnabled(): Boolean {
+        return getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+            .getBoolean(experimentalOverlayLockKey, false)
     }
 
     private fun writeHeartbeat(force: Boolean = false) {
