@@ -157,6 +157,15 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
 
+                "syncRelockPolicy" -> {
+                    val policy = call.argument<String>("policy") ?: "immediate"
+                    getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+                        .edit()
+                        .putString("relock_policy", policy)
+                        .apply()
+                    result.success(null)
+                }
+
                 "unlockGranted" -> {
                     val appId = call.argument<String>("appId")
                     getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
