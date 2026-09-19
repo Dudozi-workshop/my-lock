@@ -48,6 +48,9 @@ class LockRuntimeCoordinator {
     await _bridge.syncExperimentalScreenLock(
       _settings.experimentalScreenLock,
     );
+    await _bridge.syncExperimentalOverlayLock(
+      _settings.experimentalOverlayLock,
+    );
     await _bridge.syncRelockPolicy(_settings.relockPolicy.name);
     await _bridge.syncLockBackground(_settings.background.name);
   }
@@ -74,6 +77,9 @@ class LockRuntimeCoordinator {
     _bridge.syncProtectedApps(_settings.selectedAppIds);
     _bridge.syncExperimentalScreenLock(
       _settings.experimentalScreenLock,
+    );
+    _bridge.syncExperimentalOverlayLock(
+      _settings.experimentalOverlayLock,
     );
     _bridge.syncRelockPolicy(_settings.relockPolicy.name);
     _bridge.syncLockBackground(_settings.background.name);
