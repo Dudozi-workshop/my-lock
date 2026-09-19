@@ -34,9 +34,9 @@ enum MovementArea {
 }
 
 enum FloatingSpeed {
-  slow(0.72),
-  normal(1.0),
-  fast(1.38);
+  slow(0.65),
+  normal(1.15),
+  fast(1.75);
 
   const FloatingSpeed(this.multiplier);
 
