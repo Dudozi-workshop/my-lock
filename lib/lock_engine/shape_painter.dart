@@ -1,5 +1,6 @@
 import 'dart:math';
-import 'dart:ui';
+
+import 'package:flutter/material.dart';
 
 import 'models.dart';
 
@@ -54,7 +55,9 @@ class FloatingShapePainter extends CustomPainter {
           colors.$2.withValues(alpha: 0.98 * opacity),
         ],
         stops: const [0.0, 0.35, 1.0],
-      ).createShader(Rect.fromCircle(center: object.position, radius: radius));
+      ).createShader(
+        Rect.fromCircle(center: object.position, radius: radius),
+      );
 
     canvas.drawPath(path, fill);
 
@@ -88,7 +91,8 @@ class FloatingShapePainter extends CustomPainter {
     for (var i = 0; i < 8; i++) {
       final angle = pi * 2 * i / 8;
       final distance = object.radius * (0.55 + progress * 1.2);
-      final particle = object.position + Offset(cos(angle), sin(angle)) * distance;
+      final particle =
+          object.position + Offset(cos(angle), sin(angle)) * distance;
       final particleRadius = object.radius * (0.09 - progress * 0.045);
       canvas.drawCircle(particle, max(1.2, particleRadius), paint);
     }
@@ -117,7 +121,12 @@ class FloatingShapePainter extends CustomPainter {
           height: radius * 1.58,
         );
         return Path()
-          ..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius * 0.32)));
+          ..addRRect(
+            RRect.fromRectAndRadius(
+              rect,
+              Radius.circular(radius * 0.32),
+            ),
+          );
     }
   }
 

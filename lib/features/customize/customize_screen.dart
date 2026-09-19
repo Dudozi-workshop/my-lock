@@ -2,10 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
 import '../../lock_engine/floating_preview.dart';
+import '../../lock_engine/models.dart';
 import '../../widgets/customization_card.dart';
+import 'shape_style_screen.dart';
 
-class CustomizeScreen extends StatelessWidget {
+class CustomizeScreen extends StatefulWidget {
   const CustomizeScreen({super.key});
+
+  @override
+  State<CustomizeScreen> createState() => _CustomizeScreenState();
+}
+
+class _CustomizeScreenState extends State<CustomizeScreen> {
+  Set<ShapeKind> _selectedShapes = ShapeKind.values.toSet();
+  Set<ShapeTone> _selectedTones = ShapeTone.values.toSet();
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +31,10 @@ class CustomizeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('MY LOCK', style: Theme.of(context).textTheme.headlineMedium),
+                Text(
+                  'MY LOCK',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
                 const SizedBox(height: 4),
                 Text(
                   '나만의 잠금화면을 꾸며보세요.',
@@ -53,12 +66,20 @@ class CustomizeScreen extends StatelessWidget {
                   ),
                   child: Stack(
                     children: [
-                      const Positioned.fill(child: FloatingPreview()),
+                      Positioned.fill(
+                        child: FloatingPreview(
+                          selectedShapes: _selectedShapes,
+                          selectedTones: _selectedTones,
+                        ),
+                      ),
                       Positioned(
                         top: 18,
                         right: 18,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 11,
+                            vertical: 7,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.82),
                             borderRadius: BorderRadius.circular(99),
@@ -78,14 +99,19 @@ class CustomizeScreen extends StatelessWidget {
                         left: 18,
                         bottom: 18,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.78),
                             borderRadius: BorderRadius.circular(99),
                           ),
-                          child: const Text(
-                            '도형을 눌러보세요',
-                            style: TextStyle(
+                          child: Text(
+                            _selectedShapes.isEmpty || _selectedTones.isEmpty
+                                ? '도형 또는 색상을 선택해보세요'
+                                : '도형을 눌러보세요',
+                            style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               color: Color(0xFF615D6A),
@@ -107,8 +133,8 @@ class CustomizeScreen extends StatelessWidget {
                 CustomizationCard(
                   icon: Icons.category_rounded,
                   title: '도형 & 스타일',
-                  subtitle: '원 · 세모 · 네모 / 핑크 · 블루 · 옐로우',
-                  onTap: () => _showPrototypeSheet(context, '도형 & 스타일'),
+                  subtitle: _styleSummary,
+                  onTap: () => _openShapeStyle(context),
                 ),
                 const SizedBox(height: 10),
                 CustomizationCard(
@@ -121,6 +147,29 @@ class CustomizeScreen extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  String get _styleSummary {
+    final shapeCount = _selectedShapes.length;
+    final toneCount = _selectedTones.length;
+    return '도형 $shapeCount개 · 색상 $toneCount개 · Basic Glossy';
+  }
+
+  Future<void> _openShapeStyle(BuildContext context) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => ShapeStyleScreen(
+          selectedShapes: _selectedShapes,
+          selectedTones: _selectedTones,
+          onChanged: (shapes, tones) {
+            setState(() {
+              _selectedShapes = Set<ShapeKind>.from(shapes);
+              _selectedTones = Set<ShapeTone>.from(tones);
+            });
+          },
+        ),
       ),
     );
   }
@@ -141,7 +190,7 @@ class CustomizeScreen extends StatelessWidget {
                 Text(title, style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 10),
                 Text(
-                  '다음 단계에서 이 패널에 실제 선택 기능을 연결합니다.',
+                  '다음 단계에서 실제 선택 기능을 연결합니다.',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 24),

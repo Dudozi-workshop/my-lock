@@ -1,11 +1,21 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import 'floating_engine.dart';
+import 'models.dart';
 import 'shape_painter.dart';
 
 class FloatingPreview extends StatefulWidget {
-  const FloatingPreview({super.key});
+  const FloatingPreview({
+    super.key,
+    required this.selectedShapes,
+    required this.selectedTones,
+  });
+
+  final Set<ShapeKind> selectedShapes;
+  final Set<ShapeTone> selectedTones;
 
   @override
   State<FloatingPreview> createState() => _FloatingPreviewState();
@@ -21,7 +31,17 @@ class _FloatingPreviewState extends State<FloatingPreview>
   @override
   void initState() {
     super.initState();
+    _engine.setSelection(widget.selectedShapes, widget.selectedTones);
     _ticker = createTicker(_onTick)..start();
+  }
+
+  @override
+  void didUpdateWidget(covariant FloatingPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!setEquals(oldWidget.selectedShapes, widget.selectedShapes) ||
+        !setEquals(oldWidget.selectedTones, widget.selectedTones)) {
+      _engine.setSelection(widget.selectedShapes, widget.selectedTones);
+    }
   }
 
   void _onTick(Duration elapsed) {
@@ -29,7 +49,8 @@ class _FloatingPreviewState extends State<FloatingPreview>
 
     final delta = _previous == Duration.zero
         ? 0.0
-        : (elapsed - _previous).inMicroseconds / Duration.microsecondsPerSecond;
+        : (elapsed - _previous).inMicroseconds /
+            Duration.microsecondsPerSecond;
     _previous = elapsed;
 
     if (delta > 0) {

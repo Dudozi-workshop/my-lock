@@ -14,7 +14,10 @@ class ShopScreen extends StatelessWidget {
         children: [
           Text('상점', style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 6),
-          Text('새로운 스타일은 다음 단계에서 연결합니다.', style: Theme.of(context).textTheme.bodyMedium),
+          Text(
+            '새로운 스타일은 다음 단계에서 연결합니다.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
           const SizedBox(height: 22),
           Container(
             height: 220,
@@ -22,7 +25,11 @@ class ShopScreen extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
               gradient: const LinearGradient(
-                colors: [Color(0xFFEDE7FF), Color(0xFFFFEAF7), Color(0xFFE8F4FF)],
+                colors: [
+                  Color(0xFFEDE7FF),
+                  Color(0xFFFFEAF7),
+                  Color(0xFFE8F4FF),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -31,16 +38,26 @@ class ShopScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text('GALAXY PACK', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: ink)),
+                Text(
+                  'GALAXY PACK',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    color: ink,
+                  ),
+                ),
                 SizedBox(height: 6),
-                Text('테마팩 UI 자리', style: TextStyle(color: secondaryInk)),
+                Text(
+                  '테마팩 UI 자리',
+                  style: TextStyle(color: secondaryInk),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 18),
-          _PlaceholderRow(title: '인기 아이템'),
+          const _PlaceholderRow(title: '인기 아이템'),
           const SizedBox(height: 14),
-          _PlaceholderRow(title: '새로운 아이템'),
+          const _PlaceholderRow(title: '새로운 아이템'),
         ],
       ),
     );
@@ -73,8 +90,16 @@ class _PlaceholderRow extends StatelessWidget {
                 ),
                 child: Center(
                   child: Icon(
-                    [Icons.favorite_rounded, Icons.star_rounded, Icons.blur_on_rounded][index],
-                    color: [const Color(0xFFFF81C7), brandPurple, const Color(0xFF60A8FF)][index],
+                    [
+                      Icons.favorite_rounded,
+                      Icons.star_rounded,
+                      Icons.blur_on_rounded,
+                    ][index],
+                    color: [
+                      const Color(0xFFFF81C7),
+                      brandPurple,
+                      const Color(0xFF60A8FF),
+                    ][index],
                     size: 38,
                   ),
                 ),

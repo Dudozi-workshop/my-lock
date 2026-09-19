@@ -14,6 +14,7 @@ class FloatingEngine {
 
   Size _area = Size.zero;
   int _nextId = 0;
+  List<LockToken> _allowedTokens = List<LockToken>.from(defaultTokens);
 
   static const List<LockToken> defaultTokens = [
     LockToken(shape: ShapeKind.circle, tone: ShapeTone.pink),
@@ -27,6 +28,20 @@ class FloatingEngine {
     LockToken(shape: ShapeKind.square, tone: ShapeTone.yellow),
   ];
 
+  void setSelection(Set<ShapeKind> shapes, Set<ShapeTone> tones) {
+    if (shapes.isEmpty || tones.isEmpty) return;
+
+    _allowedTokens = [
+      for (final tone in ShapeTone.values)
+        if (tones.contains(tone))
+          for (final shape in ShapeKind.values)
+            if (shapes.contains(shape)) LockToken(shape: shape, tone: tone),
+    ];
+
+    if (_area == Size.zero) return;
+    _seedObjects();
+  }
+
   void resize(Size area) {
     if (area.width <= 0 || area.height <= 0) return;
 
@@ -34,22 +49,29 @@ class FloatingEngine {
     _area = area;
 
     if (firstLayout) {
-      _seedDefaultObjects();
+      _seedObjects();
       return;
     }
 
     for (final object in objects) {
       object.position = Offset(
-        object.position.dx.clamp(object.radius, area.width - object.radius).toDouble(),
-        object.position.dy.clamp(object.radius, area.height - object.radius).toDouble(),
+        object.position.dx
+            .clamp(object.radius, area.width - object.radius)
+            .toDouble(),
+        object.position.dy
+            .clamp(object.radius, area.height - object.radius)
+            .toDouble(),
       );
     }
   }
 
-  void _seedDefaultObjects() {
+  void _seedObjects() {
     objects.clear();
+    if (_allowedTokens.isEmpty || _area == Size.zero) return;
+
     for (var i = 0; i < defaultObjectCount; i++) {
-      objects.add(_spawn(defaultTokens[i]));
+      final token = _allowedTokens[i % _allowedTokens.length];
+      objects.add(_spawn(token));
     }
   }
 
@@ -143,7 +165,12 @@ class FloatingEngine {
   }
 
   void _respawn(FloatingObject object) {
-    final token = defaultTokens[_random.nextInt(defaultTokens.length)];
+    if (_allowedTokens.isEmpty) {
+      objects.remove(object);
+      return;
+    }
+
+    final token = _allowedTokens[_random.nextInt(_allowedTokens.length)];
     final minDimension = min(_area.width, _area.height);
     final speed = minDimension * (0.085 + _random.nextDouble() * 0.055);
     final angle = _random.nextDouble() * pi * 2;
