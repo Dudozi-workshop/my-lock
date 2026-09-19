@@ -6,7 +6,6 @@ import '../../app/my_lock_settings_controller.dart';
 import '../../app/theme.dart';
 import '../../lock_engine/lock_runtime_coordinator.dart';
 import '../../lock_engine/platform_lock_bridge.dart';
-import '../lock_mode/lock_mode_screen.dart';
 import '../onboarding/onboarding_screen.dart';
 import '../customize/customize_screen.dart';
 import '../lock_settings/lock_settings_screen.dart';
@@ -24,8 +23,6 @@ class _RootShellState extends State<RootShell> {
   late final MyLockSettingsController _settings;
   late final LockRuntimeCoordinator _runtime;
   late final Future<void> _loadFuture;
-  StreamSubscription<LockRequest>? _lockRequestSubscription;
-  bool _lockScreenOpen = false;
 
   @override
   void initState() {
@@ -41,25 +38,6 @@ class _RootShellState extends State<RootShell> {
   Future<void> _initialize() async {
     await _settings.load();
     await _runtime.start();
-    _lockRequestSubscription = _runtime.lockRequests.listen(_handleLockRequest);
-  }
-
-  Future<void> _handleLockRequest(LockRequest request) async {
-    if (!mounted || _lockScreenOpen || _settings.password == null) return;
-
-    _lockScreenOpen = true;
-    final unlocked = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder: (context) => LockModeScreen(
-          settings: _settings,
-        ),
-      ),
-    );
-    _lockScreenOpen = false;
-
-    if (unlocked == true) {
-      await _runtime.grantUnlock(request.appId);
-    }
   }
 
   void _refreshSettings() {
@@ -68,7 +46,6 @@ class _RootShellState extends State<RootShell> {
 
   @override
   void dispose() {
-    unawaited(_lockRequestSubscription?.cancel());
     unawaited(_runtime.stop());
     _settings.removeListener(_refreshSettings);
     _settings.dispose();
