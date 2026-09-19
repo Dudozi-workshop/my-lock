@@ -7,7 +7,11 @@ import 'platform_lock_bridge.dart';
 class LockRequest {
   const LockRequest(this.appId);
 
+  static const deviceScreenAppId = '__device_screen__';
+
   final String appId;
+
+  bool get isDeviceScreen => appId == deviceScreenAppId;
 }
 
 class LockRuntimeCoordinator {
@@ -41,6 +45,9 @@ class LockRuntimeCoordinator {
     _settings.addListener(_syncSettings);
     await _bridge.start();
     await _bridge.syncProtectedApps(_settings.selectedAppIds);
+    await _bridge.syncExperimentalScreenLock(
+      _settings.experimentalScreenLock,
+    );
   }
 
   Future<void> stop() async {
@@ -61,6 +68,9 @@ class LockRuntimeCoordinator {
 
   void _syncSettings() {
     _bridge.syncProtectedApps(_settings.selectedAppIds);
+    _bridge.syncExperimentalScreenLock(
+      _settings.experimentalScreenLock,
+    );
   }
 
   Future<void> _handleEvent(PlatformLockEvent event) async {
@@ -91,6 +101,17 @@ class LockRuntimeCoordinator {
 
       case PlatformLockEventType.screenOff:
         _session.markScreenOff();
+        break;
+
+      case PlatformLockEventType.screenOn:
+        if (!_settings.experimentalScreenLock ||
+            _settings.password == null) {
+          return;
+        }
+        await _bridge.presentLockScreen(LockRequest.deviceScreenAppId);
+        _lockRequests.add(
+          const LockRequest(LockRequest.deviceScreenAppId),
+        );
         break;
     }
   }
