@@ -1,0 +1,71 @@
+name: MY LOCK CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  android:
+    name: Android analyze, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Bootstrap Android
+        env:
+          PLATFORMS: android
+        run: bash tool/bootstrap.sh
+
+      - name: Build debug APK
+        run: flutter build apk --debug
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-lock-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+
+  ios:
+    name: iOS analyze, test, compile
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Bootstrap iOS
+        env:
+          PLATFORMS: ios
+        run: bash tool/bootstrap.sh
+
+      - name: Compile iOS without signing
+        run: flutter build ios --debug --no-codesign
+
+      - name: Upload iOS app bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-lock-ios-debug-app
+          path: build/ios/iphoneos/Runner.app
+          if-no-files-found: error
