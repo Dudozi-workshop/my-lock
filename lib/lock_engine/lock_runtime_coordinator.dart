@@ -115,6 +115,13 @@ class LockRuntimeCoordinator {
           const LockRequest(LockRequest.deviceScreenAppId),
         );
         break;
+
+      case PlatformLockEventType.lockActivityUnlocked:
+        final appId = event.appId;
+        if (appId != null && appId != LockRequest.deviceScreenAppId) {
+          _session.markUnlocked();
+        }
+        break;
     }
   }
 }
