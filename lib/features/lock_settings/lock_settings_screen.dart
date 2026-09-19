@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
 import '../../lock_engine/models.dart';
+import 'app_selection/app_selection_screen.dart';
 import 'password_setup/password_setup_screen.dart';
 
 class LockSettingsScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class LockSettingsScreen extends StatefulWidget {
 
 class _LockSettingsScreenState extends State<LockSettingsScreen> {
   List<LockToken>? _password;
+  Set<String> _selectedAppIds = <String>{};
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +38,13 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
                 : '${_password!.length}자리 그래픽 패턴',
             onTap: _openPasswordSetup,
           ),
-          const _SettingTile(
+          _SettingTile(
             icon: Icons.apps_rounded,
             title: '잠글 앱',
-            value: '선택 전',
+            value: _selectedAppIds.isEmpty
+                ? '선택 전'
+                : '${_selectedAppIds.length}개 앱 보호 중',
+            onTap: _openAppSelection,
           ),
           const _SettingTile(
             icon: Icons.tune_rounded,
@@ -54,6 +59,19 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _openAppSelection() async {
+    final selected = await Navigator.of(context).push<Set<String>>(
+      MaterialPageRoute(
+        builder: (context) => AppSelectionScreen(
+          initialSelectedIds: _selectedAppIds,
+        ),
+      ),
+    );
+
+    if (selected == null) return;
+    setState(() => _selectedAppIds = Set<String>.from(selected));
   }
 
   Future<void> _openPasswordSetup() async {
