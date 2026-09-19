@@ -328,6 +328,9 @@ class _FakeBridge implements PlatformLockBridge {
 
   @override
   Future<void> syncExperimentalScreenLock(bool enabled) async {}
+
+  @override
+  Future<void> syncRelockPolicy(String policy) async {}
 }
 
 class _FakeStore implements MyLockSettingsPersistence {
