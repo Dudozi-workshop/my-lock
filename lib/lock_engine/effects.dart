@@ -24,6 +24,15 @@ enum PopStyle {
   final bool locked;
 }
 
+enum MovementArea {
+  full('전체'),
+  lower('하단 영역');
+
+  const MovementArea(this.label);
+
+  final String label;
+}
+
 enum FloatingSpeed {
   slow(0.72),
   normal(1.0),
