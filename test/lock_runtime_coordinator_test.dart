@@ -46,6 +46,19 @@ void main() {
     settings.dispose();
   });
 
+  test('recovery PIN is stored in controller and verified exactly', () {
+    final settings = MyLockSettingsController(store: _FakeStore());
+
+    settings.setRecoveryPin('2580');
+
+    expect(settings.recoveryPinReady, isTrue);
+    expect(settings.verifyRecoveryPin('2580'), isTrue);
+    expect(settings.verifyRecoveryPin('2581'), isFalse);
+    expect(settings.verifyRecoveryPin('258'), isFalse);
+
+    settings.dispose();
+  });
+
   test('unlock grant suppresses immediate re-lock until app exits', () async {
     final bridge = _FakeBridge();
     final settings = MyLockSettingsController(store: _FakeStore())
