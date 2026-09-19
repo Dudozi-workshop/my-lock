@@ -26,6 +26,20 @@ void main() {
     expect(controller.mismatch, isTrue);
   });
 
+  test('wrong attempts are counted for recovery PIN eligibility', () {
+    final controller = LockModeController([a, b, a]);
+
+    controller
+      ..tap(b)
+      ..tap(b)
+      ..tap(b);
+
+    expect(controller.failedAttempts, 3);
+
+    controller.reset();
+    expect(controller.failedAttempts, 0);
+  });
+
   test('required tokens track next two positions including duplicates', () {
     final controller = LockModeController([a, a, b]);
 
