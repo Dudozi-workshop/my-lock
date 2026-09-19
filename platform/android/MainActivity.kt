@@ -166,6 +166,16 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
 
+                "syncLockBackground" -> {
+                    val background =
+                        call.argument<String>("background") ?: "softGradient"
+                    getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+                        .edit()
+                        .putString("lock_background", background)
+                        .apply()
+                    result.success(null)
+                }
+
                 "unlockGranted" -> {
                     val appId = call.argument<String>("appId")
                     getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
