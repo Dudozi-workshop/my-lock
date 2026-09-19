@@ -30,6 +30,17 @@ for permission in permissions:
     if permission not in text:
         text = text.replace(marker, f'{permission}\n    {marker}', 1)
 
+queries = '''    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+'''
+
+if '<queries>' not in text:
+    text = text.replace('<application', queries + '    <application', 1)
+
 service = '''        <service
             android:name=".LockMonitorService"
             android:enabled="true"

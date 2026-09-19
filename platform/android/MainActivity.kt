@@ -59,6 +59,34 @@ class MainActivity : FlutterActivity() {
 
         channel.setMethodCallHandler { call, result ->
             when (call.method) {
+                "getLaunchableApps" -> {
+                    val launcherIntent = Intent(Intent.ACTION_MAIN).apply {
+                        addCategory(Intent.CATEGORY_LAUNCHER)
+                    }
+                    val apps = packageManager
+                        .queryIntentActivities(launcherIntent, 0)
+                        .asSequence()
+                        .mapNotNull { resolveInfo ->
+                            val appInfo = resolveInfo.activityInfo?.applicationInfo
+                                ?: return@mapNotNull null
+                            val packageId = appInfo.packageName
+                            if (packageId == packageName) {
+                                return@mapNotNull null
+                            }
+                            mapOf(
+                                "id" to packageId,
+                                "name" to packageManager
+                                    .getApplicationLabel(appInfo)
+                                    .toString(),
+                            )
+                        }
+                        .distinctBy { it["id"] }
+                        .sortedBy { it["name"]?.lowercase() }
+                        .toList()
+
+                    result.success(apps)
+                }
+
                 "getAndroidCapabilities" -> {
                     ensureMonitorServiceIfReady()
                     result.success(
