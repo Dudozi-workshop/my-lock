@@ -25,6 +25,7 @@ class LockMonitorService : Service() {
         private const val preferencesName = "my_lock_native"
         private const val protectedAppsKey = "protected_apps"
         private const val pendingLockAppKey = "pending_lock_app"
+        private const val experimentalScreenLockKey = "experimental_screen_lock"
         const val heartbeatKey = "monitor_heartbeat_at"
 
         @Volatile
@@ -46,9 +47,20 @@ class LockMonitorService : Service() {
 
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == Intent.ACTION_SCREEN_OFF) {
-                foregroundPackage = null
-                MainActivity.emitScreenOff()
+            when (intent?.action) {
+                Intent.ACTION_SCREEN_OFF -> {
+                    foregroundPackage = null
+                    MainActivity.emitScreenOff()
+                }
+                Intent.ACTION_SCREEN_ON -> {
+                    foregroundPackage = null
+                    if (experimentalScreenLockEnabled()) {
+                        val delivered = MainActivity.emitScreenOn()
+                        if (!delivered) {
+                            launchScreenLockFallback()
+                        }
+                    }
+                }
             }
         }
     }
@@ -69,7 +81,10 @@ class LockMonitorService : Service() {
         createNotificationChannel()
         startAsForeground()
 
-        val filter = IntentFilter(Intent.ACTION_SCREEN_OFF)
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_SCREEN_ON)
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(screenReceiver, filter, RECEIVER_NOT_EXPORTED)
         } else {
@@ -236,6 +251,34 @@ class LockMonitorService : Service() {
 
         runCatching { startActivity(intent) }
             .onFailure { MainActivity.lockUiVisible = false }
+    }
+
+    private fun launchScreenLockFallback() {
+        if (!Settings.canDrawOverlays(this)) return
+
+        getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+            .edit()
+            .putString(pendingLockAppKey, MainActivity.deviceScreenAppId)
+            .apply()
+
+        MainActivity.lockUiVisible = true
+
+        val intent = Intent(this, MainActivity::class.java).apply {
+            addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                    Intent.FLAG_ACTIVITY_REORDER_TO_FRONT,
+            )
+            putExtra(MainActivity.showWhenLockedExtra, true)
+        }
+
+        runCatching { startActivity(intent) }
+            .onFailure { MainActivity.lockUiVisible = false }
+    }
+
+    private fun experimentalScreenLockEnabled(): Boolean {
+        return getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+            .getBoolean(experimentalScreenLockKey, false)
     }
 
     private fun writeHeartbeat(force: Boolean = false) {
