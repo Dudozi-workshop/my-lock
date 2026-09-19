@@ -31,7 +31,7 @@ class _LockModeScreenState extends State<LockModeScreen> {
   void initState() {
     super.initState();
     final password = widget.settings.password;
-    assert(password != null && password.length >= 3);
+    assert(password != null && password.length >= 2);
     _controller = LockModeController(password!)..addListener(_refresh);
   }
 
