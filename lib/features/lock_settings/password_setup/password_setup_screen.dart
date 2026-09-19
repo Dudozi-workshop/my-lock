@@ -96,8 +96,9 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
                   child: FloatingPreview(
                     selectedShapes: widget.selectedShapes,
                     selectedTones: widget.selectedTones,
+                    objectCount: _setupObjectCount,
                     onTokenTap: _controller.addToken,
-                    requiredTokens: _nextRequiredTokens(confirming),
+                    requiredTokens: _requiredSetupTokens(confirming),
                   ),
                 ),
               ),
@@ -154,13 +155,32 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
     );
   }
 
-  List<LockToken> _nextRequiredTokens(bool confirming) {
-    if (!confirming) return const <LockToken>[];
+  int get _setupObjectCount {
+    final combinationCount =
+        widget.selectedShapes.length * widget.selectedTones.length;
+    final requiredCapacity = combinationCount + 2;
 
-    return _controller.pattern
-        .skip(_controller.input.length)
-        .take(2)
-        .toList(growable: false);
+    if (requiredCapacity <= 6) return 6;
+    if (requiredCapacity <= 9) return 9;
+    return 12;
+  }
+
+  List<LockToken> _requiredSetupTokens(bool confirming) {
+    final tokens = <LockToken>[
+      for (final tone in ShapeTone.values)
+        if (widget.selectedTones.contains(tone))
+          for (final shape in ShapeKind.values)
+            if (widget.selectedShapes.contains(shape))
+              LockToken(shape: shape, tone: tone),
+    ];
+
+    if (confirming) {
+      tokens.addAll(
+        _controller.pattern.skip(_controller.input.length).take(2),
+      );
+    }
+
+    return tokens;
   }
 
   void _verify() {
