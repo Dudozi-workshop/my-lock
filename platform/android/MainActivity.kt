@@ -138,6 +138,19 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
 
+                "syncExperimentalOverlayLock" -> {
+                    val enabled = call.argument<Boolean>("enabled") == true
+                    getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+                        .edit()
+                        .putBoolean("experimental_overlay_lock", enabled)
+                        .apply()
+                    if (!enabled) {
+                        OverlayLockController.hide()
+                    }
+                    updateMonitorServiceState()
+                    result.success(null)
+                }
+
                 "syncRelockPolicy" -> {
                     val policy = call.argument<String>("policy") ?: "immediate"
                     getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
