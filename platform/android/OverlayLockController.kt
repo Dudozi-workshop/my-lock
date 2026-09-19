@@ -1,6 +1,7 @@
 package com.mylock.app.my_lock
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
@@ -90,13 +91,9 @@ object OverlayLockController {
             background = buildBackground(context)
             isClickable = true
             isFocusable = true
-            isFocusableInTouchMode = true
-            setOnKeyListener { _, keyCode, _ ->
-                keyCode == KeyEvent.KEYCODE_BACK
-            }
         }
 
-        val content = LinearLayout(context).apply {
+        val centerContent = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
         }
@@ -110,7 +107,7 @@ object OverlayLockController {
         }
 
         val subtitle = TextView(context).apply {
-            text = "Overlay Test\n홈·최근 앱을 시도해도 잠금은 유지됩니다."
+            text = "Overlay Test\n홈/최근 앱을 눌러도 잠금이 유지되는지 확인해 주세요."
             setTextColor(Color.parseColor("#FF6D647A"))
             textSize = 14f
             gravity = Gravity.CENTER
@@ -126,21 +123,33 @@ object OverlayLockController {
             }
         }
 
-        content.addView(
+        val closeButton = TextView(context).apply {
+            text = "×"
+            setTextColor(Color.parseColor("#FF2A2238"))
+            textSize = 32f
+            gravity = Gravity.CENTER
+            isClickable = true
+            isFocusable = true
+            setOnClickListener {
+                exitToHome(context, appId)
+            }
+        }
+
+        centerContent.addView(
             title,
             LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
             ),
         )
-        content.addView(
+        centerContent.addView(
             subtitle,
             LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
             ),
         )
-        content.addView(
+        centerContent.addView(
             unlockButton,
             LinearLayout.LayoutParams(
                 dp(180),
@@ -149,24 +158,13 @@ object OverlayLockController {
         )
 
         root.addView(
-            content,
+            centerContent,
             FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER,
             ),
         )
-
-        val closeButton = TextView(context).apply {
-            text = "✕"
-            setTextColor(Color.parseColor("#FF2A2238"))
-            textSize = 28f
-            gravity = Gravity.CENTER
-            isClickable = true
-            setPadding(dp(12), dp(8), dp(12), dp(8))
-            setOnClickListener {
-                exitToHome(context, appId)
-            }
-        }
 
         root.addView(
             closeButton,
@@ -177,30 +175,30 @@ object OverlayLockController {
             ),
         )
 
-        root.post {
-            root.requestFocus()
-        }
-
         return root
     }
 
     private fun exitToHome(context: Context, appId: String) {
-        context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
-            .edit()
-            .remove("last_unlocked_app")
-            .remove("last_unlocked_at")
-            .putString("last_protected_exit_app", appId)
-            .putLong("last_protected_exit_at", System.currentTimeMillis())
-            .apply()
-
+        forceRelock(context, appId)
         hide()
+        LockMonitorService.resetForegroundTracking()
 
         val homeIntent = Intent(Intent.ACTION_MAIN).apply {
             addCategory(Intent.CATEGORY_HOME)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         runCatching { context.startActivity(homeIntent) }
-        LockMonitorService.resetForegroundTracking()
+    }
+
+    private fun forceRelock(context: Context, appId: String) {
+        val preferences =
+            context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+        if (preferences.getString("last_unlocked_app", null) == appId) {
+            preferences.edit()
+                .remove("last_unlocked_app")
+                .remove("last_unlocked_at")
+                .apply()
+        }
     }
 
     private fun markUnlocked(context: Context, appId: String) {
