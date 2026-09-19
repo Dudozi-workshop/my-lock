@@ -1,7 +1,6 @@
 package com.mylock.app.my_lock
 
 import android.app.AppOpsManager
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -84,7 +83,6 @@ class MainActivity : FlutterActivity() {
                     result.success(
                         mapOf(
                             "usageAccessGranted" to hasUsageAccess(),
-                            "accessibilityGranted" to isAccessibilityServiceEnabled(),
                             "overlayGranted" to Settings.canDrawOverlays(this),
                             "monitorServiceRunning" to isMonitorServiceRunning(),
                         ),
@@ -93,11 +91,6 @@ class MainActivity : FlutterActivity() {
 
                 "openUsageAccessSettings" -> {
                     openUsageAccessSettings()
-                    result.success(null)
-                }
-
-                "openAccessibilitySettings" -> {
-                    openAccessibilitySettings()
                     result.success(null)
                 }
 
@@ -194,9 +187,7 @@ class MainActivity : FlutterActivity() {
             preferences.getBoolean("experimental_screen_lock", false)
         val overlayReady = Settings.canDrawOverlays(this)
         val appProtectionReady =
-            protectedApps.isNotEmpty() &&
-                (hasUsageAccess() || isAccessibilityServiceEnabled()) &&
-                overlayReady
+            protectedApps.isNotEmpty() && hasUsageAccess() && overlayReady
         val screenProtectionReady = screenLockEnabled && overlayReady
 
         if (!appProtectionReady && !screenProtectionReady) {
@@ -294,50 +285,6 @@ class MainActivity : FlutterActivity() {
         val fallback = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
         runCatching { startActivity(direct) }
             .recoverCatching { startActivity(fallback) }
-    }
-
-    private fun openAccessibilitySettings() {
-        val component =
-            ComponentName(this, MyLockAccessibilityService::class.java)
-        val direct = Intent("android.settings.ACCESSIBILITY_DETAILS_SETTINGS").apply {
-            putExtra(
-                "android.intent.extra.COMPONENT_NAME",
-                component.flattenToString(),
-            )
-            data = Uri.parse("package:$packageName")
-        }
-        val fallback = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-
-        runCatching {
-            if (direct.resolveActivity(packageManager) != null) {
-                startActivity(direct)
-            } else {
-                startActivity(fallback)
-            }
-        }.recoverCatching {
-            startActivity(fallback)
-        }
-    }
-
-    private fun isAccessibilityServiceEnabled(): Boolean {
-        val enabled = Settings.Secure.getInt(
-            contentResolver,
-            Settings.Secure.ACCESSIBILITY_ENABLED,
-            0,
-        ) == 1
-        if (!enabled) return false
-
-        val expected =
-            ComponentName(this, MyLockAccessibilityService::class.java)
-                .flattenToString()
-        val services = Settings.Secure.getString(
-            contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
-        ).orEmpty()
-
-        return services
-            .split(':')
-            .any { it.equals(expected, ignoreCase = true) }
     }
 
     private fun hasUsageAccess(): Boolean {
