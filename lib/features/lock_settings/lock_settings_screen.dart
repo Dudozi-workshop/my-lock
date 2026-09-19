@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import '../../app/theme.dart';
 import '../../lock_engine/effects.dart';
 import '../../lock_engine/models.dart';
+import '../../lock_engine/relock_policy.dart';
 import 'app_selection/app_selection_screen.dart';
 import 'password_setup/password_setup_screen.dart';
 import 'screen_behavior/screen_behavior_screen.dart';
+import 'relock/relock_screen.dart';
 
 class LockSettingsScreen extends StatefulWidget {
   const LockSettingsScreen({super.key});
@@ -19,6 +21,7 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
   Set<String> _selectedAppIds = <String>{};
   int _objectCount = 9;
   FloatingSpeed _speed = FloatingSpeed.normal;
+  RelockPolicy _relockPolicy = RelockPolicy.immediate;
 
   @override
   Widget build(BuildContext context) {
@@ -56,12 +59,26 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
             value: '도형 ${_objectCount}개 · 속도 ${_speedLabel(_speed)}',
             onTap: _openScreenBehavior,
           ),
-          const _SettingTile(
+          _SettingTile(
             icon: Icons.schedule_rounded,
             title: '다시 잠그기',
-            value: '앱을 벗어나면 즉시',
+            value: _relockPolicy.summary,
+            onTap: _openRelock,
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _openRelock() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => RelockScreen(
+          selectedPolicy: _relockPolicy,
+          onChanged: (policy) {
+            setState(() => _relockPolicy = policy);
+          },
+        ),
       ),
     );
   }
