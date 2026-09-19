@@ -169,6 +169,13 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
             badge: 'BETA',
           ),
           const SizedBox(height: 8),
+          _ExperimentalOverlayLockTile(
+            enabled: settings.experimentalOverlayLock,
+            available: settings.selectedAppIds.isNotEmpty &&
+                _capabilities?.overlayGranted == true,
+            onChanged: settings.setExperimentalOverlayLock,
+          ),
+          const SizedBox(height: 8),
           _ExperimentalScreenLockTile(
             enabled: settings.experimentalScreenLock,
             available: settings.password != null &&
@@ -322,6 +329,79 @@ class _SectionLabel extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ExperimentalOverlayLockTile extends StatelessWidget {
+  const _ExperimentalOverlayLockTile({
+    required this.enabled,
+    required this.available,
+    required this.onChanged,
+  });
+
+  final bool enabled;
+  final bool available;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 15, 12, 15),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7F4FF),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFD9D0FF)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: brandLavender,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Icon(
+              Icons.layers_rounded,
+              color: brandPurple,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Overlay 잠금 테스트',
+                  style: TextStyle(
+                    color: ink,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  available
+                      ? '보호 앱 위에 최근 앱 카드가 생기지 않는 네이티브 차단막을 표시합니다. 현재는 비밀번호 대신 테스트 해제 버튼만 사용합니다.'
+                      : '보호 앱 선택과 다른 앱 위에 표시 권한이 필요합니다.',
+                  style: const TextStyle(
+                    color: secondaryInk,
+                    fontSize: 11,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Switch(
+            value: enabled && available,
+            onChanged: available ? onChanged : null,
+          ),
+        ],
+      ),
     );
   }
 }
