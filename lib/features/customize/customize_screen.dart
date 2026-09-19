@@ -1,31 +1,52 @@
 import 'package:flutter/material.dart';
 
+import '../../app/my_lock_settings_controller.dart';
 import '../../app/theme.dart';
-import '../../lock_engine/effects.dart';
 import '../../lock_engine/floating_preview.dart';
-import '../../lock_engine/models.dart';
 import '../../widgets/customization_card.dart';
 import 'background/background_screen.dart';
-import 'background/background_style.dart';
 import 'effects/effects_screen.dart';
 import 'shape_style_screen.dart';
 
 class CustomizeScreen extends StatefulWidget {
-  const CustomizeScreen({super.key});
+  const CustomizeScreen({
+    super.key,
+    required this.settings,
+  });
+
+  final MyLockSettingsController settings;
 
   @override
   State<CustomizeScreen> createState() => _CustomizeScreenState();
 }
 
 class _CustomizeScreenState extends State<CustomizeScreen> {
-  Set<ShapeKind> _selectedShapes = ShapeKind.values.toSet();
-  Set<ShapeTone> _selectedTones = ShapeTone.values.toSet();
-  LockBackground _selectedBackground = LockBackground.softGradient;
-  MovementStyle _movementStyle = MovementStyle.floating;
-  PopStyle _popStyle = PopStyle.basicPop;
+  @override
+  void initState() {
+    super.initState();
+    widget.settings.addListener(_refresh);
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomizeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.settings == widget.settings) return;
+    oldWidget.settings.removeListener(_refresh);
+    widget.settings.addListener(_refresh);
+  }
+
+  @override
+  void dispose() {
+    widget.settings.removeListener(_refresh);
+    super.dispose();
+  }
+
+  void _refresh() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
+    final settings = widget.settings;
+
     return SafeArea(
       bottom: false,
       child: LayoutBuilder(
@@ -53,7 +74,7 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(32),
-                    gradient: _selectedBackground.gradient,
+                    gradient: settings.background.gradient,
                     border: Border.all(color: const Color(0xFFE9E4F3)),
                     boxShadow: const [
                       BoxShadow(
@@ -67,10 +88,12 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
                     children: [
                       Positioned.fill(
                         child: FloatingPreview(
-                          selectedShapes: _selectedShapes,
-                          selectedTones: _selectedTones,
-                          movementStyle: _movementStyle,
-                          popStyle: _popStyle,
+                          selectedShapes: settings.selectedShapes,
+                          selectedTones: settings.selectedTones,
+                          movementStyle: settings.movementStyle,
+                          popStyle: settings.popStyle,
+                          objectCount: settings.objectCount,
+                          speed: settings.speed,
                         ),
                       ),
                       Positioned(
@@ -108,11 +131,9 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
                             color: Colors.white.withValues(alpha: 0.78),
                             borderRadius: BorderRadius.circular(99),
                           ),
-                          child: Text(
-                            _selectedShapes.isEmpty || _selectedTones.isEmpty
-                                ? '도형 또는 색상을 선택해보세요'
-                                : '도형을 눌러보세요',
-                            style: const TextStyle(
+                          child: const Text(
+                            '도형을 눌러보세요',
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               color: Color(0xFF615D6A),
@@ -127,7 +148,7 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
                 CustomizationCard(
                   icon: Icons.wallpaper_rounded,
                   title: '배경',
-                  subtitle: _selectedBackground.label,
+                  subtitle: settings.background.label,
                   onTap: () => _openBackground(context),
                 ),
                 const SizedBox(height: 10),
@@ -141,7 +162,8 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
                 CustomizationCard(
                   icon: Icons.auto_fix_high_rounded,
                   title: '효과',
-                  subtitle: '${_movementStyle.label} · ${_popStyle.label}',
+                  subtitle:
+                      '${settings.movementStyle.label} · ${settings.popStyle.label}',
                   onTap: () => _openEffects(context),
                 ),
               ],
@@ -152,62 +174,51 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
     );
   }
 
+  String get _styleSummary {
+    final settings = widget.settings;
+    return '도형 ${settings.selectedShapes.length}개 · 색상 ${settings.selectedTones.length}개 · Basic Glossy';
+  }
+
   Future<void> _openEffects(BuildContext context) async {
+    final settings = widget.settings;
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (context) => EffectsScreen(
-          background: _selectedBackground,
-          selectedShapes: _selectedShapes,
-          selectedTones: _selectedTones,
-          movementStyle: _movementStyle,
-          popStyle: _popStyle,
-          onChanged: (movement, popStyle) {
-            setState(() {
-              _movementStyle = movement;
-              _popStyle = popStyle;
-            });
-          },
+          background: settings.background,
+          selectedShapes: settings.selectedShapes,
+          selectedTones: settings.selectedTones,
+          movementStyle: settings.movementStyle,
+          popStyle: settings.popStyle,
+          onChanged: settings.setEffects,
         ),
       ),
     );
   }
 
   Future<void> _openBackground(BuildContext context) async {
+    final settings = widget.settings;
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (context) => BackgroundScreen(
-          selectedBackground: _selectedBackground,
-          selectedShapes: _selectedShapes,
-          selectedTones: _selectedTones,
-          onChanged: (background) {
-            setState(() => _selectedBackground = background);
-          },
+          selectedBackground: settings.background,
+          selectedShapes: settings.selectedShapes,
+          selectedTones: settings.selectedTones,
+          onChanged: settings.setBackground,
         ),
       ),
     );
-  }
-
-  String get _styleSummary {
-    final shapeCount = _selectedShapes.length;
-    final toneCount = _selectedTones.length;
-    return '도형 $shapeCount개 · 색상 $toneCount개 · Basic Glossy';
   }
 
   Future<void> _openShapeStyle(BuildContext context) async {
+    final settings = widget.settings;
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (context) => ShapeStyleScreen(
-          selectedShapes: _selectedShapes,
-          selectedTones: _selectedTones,
-          onChanged: (shapes, tones) {
-            setState(() {
-              _selectedShapes = Set<ShapeKind>.from(shapes);
-              _selectedTones = Set<ShapeTone>.from(tones);
-            });
-          },
+          selectedShapes: settings.selectedShapes,
+          selectedTones: settings.selectedTones,
+          onChanged: settings.setShapeStyle,
         ),
       ),
     );
   }
-
 }

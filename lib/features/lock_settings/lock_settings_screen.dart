@@ -1,30 +1,53 @@
 import 'package:flutter/material.dart';
 
+import '../../app/my_lock_settings_controller.dart';
 import '../../app/theme.dart';
 import '../../lock_engine/effects.dart';
 import '../../lock_engine/models.dart';
-import '../../lock_engine/relock_policy.dart';
 import 'app_selection/app_selection_screen.dart';
 import 'password_setup/password_setup_screen.dart';
 import 'relock/relock_screen.dart';
 import 'screen_behavior/screen_behavior_screen.dart';
 
 class LockSettingsScreen extends StatefulWidget {
-  const LockSettingsScreen({super.key});
+  const LockSettingsScreen({
+    super.key,
+    required this.settings,
+  });
+
+  final MyLockSettingsController settings;
 
   @override
   State<LockSettingsScreen> createState() => _LockSettingsScreenState();
 }
 
 class _LockSettingsScreenState extends State<LockSettingsScreen> {
-  List<LockToken>? _password;
-  Set<String> _selectedAppIds = <String>{};
-  int _objectCount = 9;
-  FloatingSpeed _speed = FloatingSpeed.normal;
-  RelockPolicy _relockPolicy = RelockPolicy.immediate;
+  @override
+  void initState() {
+    super.initState();
+    widget.settings.addListener(_refresh);
+  }
+
+  @override
+  void didUpdateWidget(covariant LockSettingsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.settings == widget.settings) return;
+    oldWidget.settings.removeListener(_refresh);
+    widget.settings.addListener(_refresh);
+  }
+
+  @override
+  void dispose() {
+    widget.settings.removeListener(_refresh);
+    super.dispose();
+  }
+
+  void _refresh() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
+    final settings = widget.settings;
+
     return SafeArea(
       bottom: false,
       child: ListView(
@@ -40,29 +63,30 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
           _SettingTile(
             icon: Icons.lock_rounded,
             title: '비밀번호',
-            value: _password == null
+            value: settings.password == null
                 ? '설정 전'
-                : '${_password!.length}자리 그래픽 패턴',
+                : '${settings.password!.length}자리 그래픽 패턴',
             onTap: _openPasswordSetup,
           ),
           _SettingTile(
             icon: Icons.apps_rounded,
             title: '잠글 앱',
-            value: _selectedAppIds.isEmpty
+            value: settings.selectedAppIds.isEmpty
                 ? '선택 전'
-                : '${_selectedAppIds.length}개 앱 보호 중',
+                : '${settings.selectedAppIds.length}개 앱 보호 중',
             onTap: _openAppSelection,
           ),
           _SettingTile(
             icon: Icons.tune_rounded,
             title: '화면 동작',
-            value: '도형 ${_objectCount}개 · 속도 ${_speedLabel(_speed)}',
+            value:
+                '도형 ${settings.objectCount}개 · 속도 ${_speedLabel(settings.speed)}',
             onTap: _openScreenBehavior,
           ),
           _SettingTile(
             icon: Icons.schedule_rounded,
             title: '다시 잠그기',
-            value: _relockPolicy.summary,
+            value: settings.relockPolicy.summary,
             onTap: _openRelock,
           ),
         ],
@@ -71,30 +95,25 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
   }
 
   Future<void> _openRelock() async {
+    final settings = widget.settings;
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (context) => RelockScreen(
-          selectedPolicy: _relockPolicy,
-          onChanged: (policy) {
-            setState(() => _relockPolicy = policy);
-          },
+          selectedPolicy: settings.relockPolicy,
+          onChanged: settings.setRelockPolicy,
         ),
       ),
     );
   }
 
   Future<void> _openScreenBehavior() async {
+    final settings = widget.settings;
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (context) => ScreenBehaviorScreen(
-          objectCount: _objectCount,
-          speed: _speed,
-          onChanged: (objectCount, speed) {
-            setState(() {
-              _objectCount = objectCount;
-              _speed = speed;
-            });
-          },
+          objectCount: settings.objectCount,
+          speed: settings.speed,
+          onChanged: settings.setScreenBehavior,
         ),
       ),
     );
@@ -115,13 +134,13 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
     final selected = await Navigator.of(context).push<Set<String>>(
       MaterialPageRoute(
         builder: (context) => AppSelectionScreen(
-          initialSelectedIds: _selectedAppIds,
+          initialSelectedIds: widget.settings.selectedAppIds,
         ),
       ),
     );
 
     if (selected == null) return;
-    setState(() => _selectedAppIds = Set<String>.from(selected));
+    widget.settings.setSelectedApps(selected);
   }
 
   Future<void> _openPasswordSetup() async {
@@ -132,7 +151,7 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
     );
 
     if (pattern == null || pattern.isEmpty) return;
-    setState(() => _password = pattern);
+    widget.settings.setPassword(pattern);
   }
 }
 
