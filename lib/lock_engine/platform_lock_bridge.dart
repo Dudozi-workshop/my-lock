@@ -51,6 +51,8 @@ abstract class PlatformLockBridge {
 
   Future<void> syncExperimentalScreenLock(bool enabled);
 
+  Future<void> syncRelockPolicy(String policy);
+
   Future<void> notifyUnlockGranted(String appId);
 
   Future<void> presentLockScreen(String appId);
@@ -194,6 +196,15 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
     await _invokeSafely(
       'syncExperimentalScreenLock',
       <String, Object?>{'enabled': enabled},
+    );
+  }
+
+  @override
+  Future<void> syncRelockPolicy(String policy) async {
+    if (kIsWeb) return;
+    await _invokeSafely(
+      'syncRelockPolicy',
+      <String, Object?>{'policy': policy},
     );
   }
 
