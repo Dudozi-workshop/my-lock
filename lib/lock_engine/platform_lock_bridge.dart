@@ -51,7 +51,7 @@ abstract class PlatformLockBridge {
 
   Future<void> syncExperimentalScreenLock(bool enabled);
 
-  Future<void> syncExperimentalOverlayLock(bool enabled);
+  Future<void> syncExperimentalOverlayLock(bool enabled) async {}
 
   Future<void> syncRelockPolicy(String policy);
 
