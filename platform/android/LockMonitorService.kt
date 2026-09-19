@@ -24,7 +24,6 @@ class LockMonitorService : Service() {
         private const val pollIntervalMs = 350L
         private const val preferencesName = "my_lock_native"
         private const val protectedAppsKey = "protected_apps"
-        private const val pendingLockAppKey = "pending_lock_app"
         private const val experimentalScreenLockKey = "experimental_screen_lock"
         const val heartbeatKey = "monitor_heartbeat_at"
 
@@ -98,7 +97,7 @@ class LockMonitorService : Service() {
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        MainActivity.lockUiVisible = false
+        LockActivity.lockUiVisible = false
         super.onTaskRemoved(rootIntent)
     }
 
@@ -177,7 +176,7 @@ class LockMonitorService : Service() {
     private fun pollForegroundApp() {
         writeHeartbeat()
         if (!hasUsageAccess()) return
-        if (MainActivity.lockUiVisible) {
+        if (LockActivity.lockUiVisible) {
             lastQueryAt = System.currentTimeMillis()
             return
         }
@@ -233,47 +232,12 @@ class LockMonitorService : Service() {
 
     private fun launchLockFallback(appId: String) {
         if (!Settings.canDrawOverlays(this)) return
-
-        getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
-            .edit()
-            .putString(pendingLockAppKey, appId)
-            .apply()
-
-        MainActivity.lockUiVisible = true
-
-        val intent = Intent(this, MainActivity::class.java).apply {
-            addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_SINGLE_TOP or
-                    Intent.FLAG_ACTIVITY_REORDER_TO_FRONT,
-            )
-        }
-
-        runCatching { startActivity(intent) }
-            .onFailure { MainActivity.lockUiVisible = false }
+        LockActivity.launch(this, appId)
     }
 
     private fun launchScreenLockFallback() {
         if (!Settings.canDrawOverlays(this)) return
-
-        getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
-            .edit()
-            .putString(pendingLockAppKey, MainActivity.deviceScreenAppId)
-            .apply()
-
-        MainActivity.lockUiVisible = true
-
-        val intent = Intent(this, MainActivity::class.java).apply {
-            addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_SINGLE_TOP or
-                    Intent.FLAG_ACTIVITY_REORDER_TO_FRONT,
-            )
-            putExtra(MainActivity.showWhenLockedExtra, true)
-        }
-
-        runCatching { startActivity(intent) }
-            .onFailure { MainActivity.lockUiVisible = false }
+        LockActivity.launch(this, LockActivity.deviceScreenAppId)
     }
 
     private fun experimentalScreenLockEnabled(): Boolean {
