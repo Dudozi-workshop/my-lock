@@ -26,6 +26,7 @@ class MyLockSettingsController extends ChangeNotifier {
   MovementArea _movementArea = MovementArea.full;
   bool _onboardingStarted = false;
   bool _onboardingCompleted = false;
+  bool _experimentalScreenLock = false;
   RelockPolicy _relockPolicy = RelockPolicy.immediate;
 
   bool _loaded = false;
@@ -47,6 +48,7 @@ class MyLockSettingsController extends ChangeNotifier {
   MovementArea get movementArea => _movementArea;
   bool get onboardingStarted => _onboardingStarted;
   bool get onboardingCompleted => _onboardingCompleted;
+  bool get experimentalScreenLock => _experimentalScreenLock;
   RelockPolicy get relockPolicy => _relockPolicy;
 
   Future<void> load() async {
@@ -69,6 +71,7 @@ class MyLockSettingsController extends ChangeNotifier {
     _movementArea = stored.movementArea;
     _onboardingStarted = stored.onboardingStarted;
     _onboardingCompleted = stored.onboardingCompleted;
+    _experimentalScreenLock = stored.experimentalScreenLock;
     _relockPolicy = stored.relockPolicy;
     _loaded = true;
     notifyListeners();
@@ -156,6 +159,13 @@ class MyLockSettingsController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setExperimentalScreenLock(bool enabled) {
+    if (_experimentalScreenLock == enabled) return;
+    _experimentalScreenLock = enabled;
+    _persistPreferences();
+    notifyListeners();
+  }
+
   void setRelockPolicy(RelockPolicy policy) {
     if (_relockPolicy == policy) return;
     _relockPolicy = policy;
@@ -179,6 +189,7 @@ class MyLockSettingsController extends ChangeNotifier {
         movementArea: _movementArea,
         onboardingStarted: _onboardingStarted,
         onboardingCompleted: _onboardingCompleted,
+        experimentalScreenLock: _experimentalScreenLock,
         relockPolicy: _relockPolicy,
       ),
     );
