@@ -1,0 +1,135 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+
+enum PlatformLockEventType {
+  protectedAppEntered,
+  protectedAppExited,
+  screenOff,
+}
+
+class PlatformLockEvent {
+  const PlatformLockEvent(this.type, {this.appId});
+
+  final PlatformLockEventType type;
+  final String? appId;
+}
+
+abstract class PlatformLockBridge {
+  Stream<PlatformLockEvent> get events;
+
+  Future<void> start();
+
+  Future<void> stop();
+
+  Future<void> syncProtectedApps(Set<String> appIds);
+
+  Future<void> notifyUnlockGranted(String appId);
+}
+
+class MethodChannelPlatformLockBridge implements PlatformLockBridge {
+  MethodChannelPlatformLockBridge({
+    MethodChannel? channel,
+  }) : _channel = channel ?? const MethodChannel('com.mylock.app/lock');
+
+  final MethodChannel _channel;
+  final StreamController<PlatformLockEvent> _events =
+      StreamController<PlatformLockEvent>.broadcast();
+
+  bool _started = false;
+
+  @override
+  Stream<PlatformLockEvent> get events => _events.stream;
+
+  @override
+  Future<void> start() async {
+    if (_started) return;
+    _started = true;
+
+    if (kIsWeb) return;
+
+    _channel.setMethodCallHandler((call) async {
+      switch (call.method) {
+        case 'protectedAppEntered':
+          final appId = _readAppId(call.arguments);
+          if (appId != null) {
+            _events.add(
+              PlatformLockEvent(
+                PlatformLockEventType.protectedAppEntered,
+                appId: appId,
+              ),
+            );
+          }
+          break;
+        case 'protectedAppExited':
+          final appId = _readAppId(call.arguments);
+          if (appId != null) {
+            _events.add(
+              PlatformLockEvent(
+                PlatformLockEventType.protectedAppExited,
+                appId: appId,
+              ),
+            );
+          }
+          break;
+        case 'screenOff':
+          _events.add(
+            const PlatformLockEvent(PlatformLockEventType.screenOff),
+          );
+          break;
+      }
+    });
+  }
+
+  @override
+  Future<void> stop() async {
+    if (!_started) return;
+    _started = false;
+
+    if (!kIsWeb) {
+      _channel.setMethodCallHandler(null);
+    }
+
+    await _events.close();
+  }
+
+  @override
+  Future<void> syncProtectedApps(Set<String> appIds) async {
+    if (kIsWeb) return;
+    await _invokeSafely(
+      'syncProtectedApps',
+      <String, Object?>{'appIds': appIds.toList()},
+    );
+  }
+
+  @override
+  Future<void> notifyUnlockGranted(String appId) async {
+    if (kIsWeb) return;
+    await _invokeSafely(
+      'unlockGranted',
+      <String, Object?>{'appId': appId},
+    );
+  }
+
+  String? _readAppId(Object? arguments) {
+    if (arguments is Map) {
+      final value = arguments['appId'];
+      if (value is String && value.isNotEmpty) return value;
+    }
+    return null;
+  }
+
+  Future<void> _invokeSafely(
+    String method,
+    Map<String, Object?> arguments,
+  ) async {
+    try {
+      await _channel.invokeMethod<void>(method, arguments);
+    } on MissingPluginException {
+      // Native integration is optional until the platform layer is installed.
+    } on PlatformException {
+      // Native capability/permission handling is surfaced by the platform UI.
+    }
+  }
+}

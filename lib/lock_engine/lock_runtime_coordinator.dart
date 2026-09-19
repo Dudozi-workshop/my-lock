@@ -1,0 +1,94 @@
+import 'dart:async';
+
+import '../app/my_lock_settings_controller.dart';
+import 'lock_session_controller.dart';
+import 'platform_lock_bridge.dart';
+
+class LockRequest {
+  const LockRequest(this.appId);
+
+  final String appId;
+}
+
+class LockRuntimeCoordinator {
+  LockRuntimeCoordinator({
+    required MyLockSettingsController settings,
+    required PlatformLockBridge bridge,
+    LockSessionController? session,
+  })  : _settings = settings,
+        _bridge = bridge,
+        _session = session ?? LockSessionController();
+
+  final MyLockSettingsController _settings;
+  final PlatformLockBridge _bridge;
+  final LockSessionController _session;
+
+  final StreamController<LockRequest> _lockRequests =
+      StreamController<LockRequest>.broadcast();
+
+  StreamSubscription<PlatformLockEvent>? _subscription;
+  bool _started = false;
+
+  Stream<LockRequest> get lockRequests => _lockRequests.stream;
+
+  Future<void> start() async {
+    if (_started) return;
+    _started = true;
+
+    await _bridge.start();
+    await _bridge.syncProtectedApps(_settings.selectedAppIds);
+    _settings.addListener(_syncSettings);
+    _subscription = _bridge.events.listen(_handleEvent);
+  }
+
+  Future<void> stop() async {
+    if (!_started) return;
+    _started = false;
+
+    _settings.removeListener(_syncSettings);
+    await _subscription?.cancel();
+    _subscription = null;
+    await _bridge.stop();
+    await _lockRequests.close();
+  }
+
+  Future<void> grantUnlock(String appId) async {
+    _session.markUnlocked();
+    await _bridge.notifyUnlockGranted(appId);
+  }
+
+  void _syncSettings() {
+    _bridge.syncProtectedApps(_settings.selectedAppIds);
+  }
+
+  void _handleEvent(PlatformLockEvent event) {
+    switch (event.type) {
+      case PlatformLockEventType.protectedAppEntered:
+        final appId = event.appId;
+        if (appId == null ||
+            !_settings.selectedAppIds.contains(appId) ||
+            _settings.password == null) {
+          return;
+        }
+
+        final needsLock = _session.requiresLockOnProtectedAppEnter(
+          _settings.relockPolicy,
+        );
+        if (needsLock) {
+          _lockRequests.add(LockRequest(appId));
+        }
+        break;
+
+      case PlatformLockEventType.protectedAppExited:
+        final appId = event.appId;
+        if (appId != null && _settings.selectedAppIds.contains(appId)) {
+          _session.markProtectedAppExited();
+        }
+        break;
+
+      case PlatformLockEventType.screenOff:
+        _session.markScreenOff();
+        break;
+    }
+  }
+}
