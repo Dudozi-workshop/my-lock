@@ -292,7 +292,45 @@ void main() {
         .length;
 
     expect(count, greaterThanOrEqualTo(1));
-  });  test('object count can switch between supported presets', () {
+  });
+  test('lower movement area keeps every object in the bottom half', () {
+    final engine = FloatingEngine(seed: 17);
+    const size = Size(400, 600);
+    engine.resize(size);
+    engine.setMovementArea(MovementArea.lower);
+
+    for (var i = 0; i < 600; i++) {
+      engine.step(1 / 60);
+    }
+
+    for (final object in engine.objects) {
+      expect(
+        object.position.dy - object.radius,
+        greaterThanOrEqualTo(size.height * 0.5),
+      );
+      expect(
+        object.position.dy + object.radius,
+        lessThanOrEqualTo(size.height),
+      );
+    }
+  });
+
+  test('switching to lower area immediately reseeds inside lower bounds', () {
+    final engine = FloatingEngine(seed: 18);
+    const size = Size(400, 600);
+    engine.resize(size);
+
+    engine.setMovementArea(MovementArea.lower);
+
+    expect(
+      engine.objects.every(
+        (object) => object.position.dy - object.radius >= size.height * 0.5,
+      ),
+      isTrue,
+    );
+  });
+
+  test('object count can switch between supported presets', () {
     final engine = FloatingEngine(seed: 8);
     engine.resize(const Size(320, 480));
 
