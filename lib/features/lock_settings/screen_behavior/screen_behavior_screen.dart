@@ -169,7 +169,7 @@ class _ScreenBehaviorScreenState extends State<ScreenBehaviorScreen> {
                 Expanded(
                   child: _ChoiceCard(
                     title: '하단 영역',
-                    subtitle: '화면 아래 절반',
+                    subtitle: '화면 아래 60%',
                     selected: _movementArea == MovementArea.lower,
                     onTap: () => _setMovementArea(MovementArea.lower),
                   ),
