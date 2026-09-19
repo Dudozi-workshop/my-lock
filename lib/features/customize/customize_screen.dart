@@ -4,6 +4,8 @@ import '../../app/theme.dart';
 import '../../lock_engine/floating_preview.dart';
 import '../../lock_engine/models.dart';
 import '../../widgets/customization_card.dart';
+import 'background/background_screen.dart';
+import 'background/background_style.dart';
 import 'shape_style_screen.dart';
 
 class CustomizeScreen extends StatefulWidget {
@@ -16,6 +18,7 @@ class CustomizeScreen extends StatefulWidget {
 class _CustomizeScreenState extends State<CustomizeScreen> {
   Set<ShapeKind> _selectedShapes = ShapeKind.values.toSet();
   Set<ShapeTone> _selectedTones = ShapeTone.values.toSet();
+  LockBackground _selectedBackground = LockBackground.softGradient;
 
   @override
   Widget build(BuildContext context) {
@@ -46,15 +49,7 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(32),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFFFFF3FB),
-                        Color(0xFFF3F0FF),
-                        Color(0xFFEAF5FF),
-                      ],
-                    ),
+                    gradient: _selectedBackground.gradient,
                     border: Border.all(color: const Color(0xFFE9E4F3)),
                     boxShadow: const [
                       BoxShadow(
@@ -126,8 +121,8 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
                 CustomizationCard(
                   icon: Icons.wallpaper_rounded,
                   title: '배경',
-                  subtitle: 'Soft Gradient',
-                  onTap: () => _showPrototypeSheet(context, '배경'),
+                  subtitle: _selectedBackground.label,
+                  onTap: () => _openBackground(context),
                 ),
                 const SizedBox(height: 10),
                 CustomizationCard(
@@ -147,6 +142,21 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Future<void> _openBackground(BuildContext context) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => BackgroundScreen(
+          selectedBackground: _selectedBackground,
+          selectedShapes: _selectedShapes,
+          selectedTones: _selectedTones,
+          onChanged: (background) {
+            setState(() => _selectedBackground = background);
+          },
+        ),
       ),
     );
   }
