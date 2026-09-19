@@ -89,7 +89,7 @@ class _NativePermissionsScreenState extends State<NativePermissionsScreen>
                 ),
               )
             else if (kIsWeb || capabilities?.nativeBridgeAvailable != true)
-              _InfoCard(
+              const _InfoCard(
                 icon: Icons.language_rounded,
                 title: '웹 미리보기',
                 body:
