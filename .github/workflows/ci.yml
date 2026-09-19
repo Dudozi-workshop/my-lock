@@ -1,6 +1,8 @@
 name: MY LOCK CI
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       target:
@@ -15,7 +17,7 @@ on:
 
 jobs:
   android:
-    if: ${{ github.event.inputs.target == 'android' || github.event.inputs.target == 'all' }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.target == 'android' || github.event.inputs.target == 'all' }}
     name: Android analyze, test, build
     runs-on: ubuntu-latest
     steps:
@@ -50,7 +52,7 @@ jobs:
           if-no-files-found: error
 
   ios:
-    if: ${{ github.event.inputs.target == 'ios' || github.event.inputs.target == 'all' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.target == 'ios' || github.event.inputs.target == 'all') }}
     name: iOS analyze, test, compile
     runs-on: macos-latest
     steps:
