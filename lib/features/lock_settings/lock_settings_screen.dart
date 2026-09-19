@@ -135,7 +135,7 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
             icon: Icons.tune_rounded,
             title: '화면 동작',
             value:
-                '도형 ${settings.objectCount}개 · 속도 ${_speedLabel(settings.speed)}',
+                '도형 ${settings.objectCount}개 · ${settings.movementArea.label} · 속도 ${_speedLabel(settings.speed)}',
             onTap: _openScreenBehavior,
           ),
           _SettingTile(
@@ -196,6 +196,7 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
         builder: (context) => ScreenBehaviorScreen(
           objectCount: settings.objectCount,
           speed: settings.speed,
+          movementArea: settings.movementArea,
           onChanged: settings.setScreenBehavior,
         ),
       ),
