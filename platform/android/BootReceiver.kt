@@ -12,6 +12,7 @@ class BootReceiver : BroadcastReceiver() {
     companion object {
         private const val preferencesName = "my_lock_native"
         private const val protectedAppsKey = "protected_apps"
+        private const val experimentalScreenLockKey = "experimental_screen_lock"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -38,9 +39,15 @@ class BootReceiver : BroadcastReceiver() {
                 .getStringSet(protectedAppsKey, emptySet())
                 .orEmpty()
 
-        return protectedApps.isNotEmpty() &&
-            hasUsageAccess(context) &&
-            Settings.canDrawOverlays(context)
+        val screenLockEnabled =
+            context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+                .getBoolean(experimentalScreenLockKey, false)
+        val overlayReady = Settings.canDrawOverlays(context)
+        val appProtectionReady =
+            protectedApps.isNotEmpty() && hasUsageAccess(context) && overlayReady
+        val screenProtectionReady = screenLockEnabled && overlayReady
+
+        return appProtectionReady || screenProtectionReady
     }
 
     private fun hasUsageAccess(context: Context): Boolean {
