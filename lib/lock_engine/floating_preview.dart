@@ -19,6 +19,7 @@ class FloatingPreview extends StatefulWidget {
     this.requiredTokens = const <LockToken>[],
     this.objectCount = FloatingEngine.defaultObjectCount,
     this.speed = FloatingSpeed.normal,
+    this.movementArea = MovementArea.full,
   });
 
   final Set<ShapeKind> selectedShapes;
@@ -29,6 +30,7 @@ class FloatingPreview extends StatefulWidget {
   final List<LockToken> requiredTokens;
   final int objectCount;
   final FloatingSpeed speed;
+  final MovementArea movementArea;
 
   @override
   State<FloatingPreview> createState() => _FloatingPreviewState();
@@ -49,6 +51,7 @@ class _FloatingPreviewState extends State<FloatingPreview>
       ..setMovementStyle(widget.movementStyle)
       ..setObjectCount(widget.objectCount)
       ..setSpeed(widget.speed)
+      ..setMovementArea(widget.movementArea)
       ..setRequiredTokens(widget.requiredTokens);
     _ticker = createTicker(_onTick)..start();
   }
@@ -68,6 +71,9 @@ class _FloatingPreviewState extends State<FloatingPreview>
     }
     if (oldWidget.speed != widget.speed) {
       _engine.setSpeed(widget.speed);
+    }
+    if (oldWidget.movementArea != widget.movementArea) {
+      _engine.setMovementArea(widget.movementArea);
     }
     _engine.setRequiredTokens(widget.requiredTokens);
   }
