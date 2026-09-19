@@ -121,12 +121,18 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
 
     final pendingAppId = await _consumePendingLock();
     if (pendingAppId != null) {
-      _events.add(
-        PlatformLockEvent(
-          PlatformLockEventType.protectedAppEntered,
-          appId: pendingAppId,
-        ),
-      );
+      if (pendingAppId == '__device_screen__') {
+        _events.add(
+          const PlatformLockEvent(PlatformLockEventType.screenOn),
+        );
+      } else {
+        _events.add(
+          PlatformLockEvent(
+            PlatformLockEventType.protectedAppEntered,
+            appId: pendingAppId,
+          ),
+        );
+      }
     }
   }
 
