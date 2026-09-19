@@ -17,6 +17,33 @@ void main() {
     tone: ShapeTone.pink,
   );
 
+  test('pending lock emitted during bridge start is not lost', () async {
+    final bridge = _FakeBridge(
+      startEvent: const PlatformLockEvent(
+        PlatformLockEventType.protectedAppEntered,
+        appId: appId,
+      ),
+    );
+    final settings = MyLockSettingsController(store: _FakeStore())
+      ..setSelectedApps({appId})
+      ..setPassword([token, token, token]);
+
+    final runtime = LockRuntimeCoordinator(
+      settings: settings,
+      bridge: bridge,
+    );
+
+    final requestFuture = runtime.lockRequests.first;
+    await runtime.start();
+
+    final request = await requestFuture;
+    expect(request.appId, appId);
+    expect(bridge.presentedApps, [appId]);
+
+    await runtime.stop();
+    settings.dispose();
+  });
+
   test('protected app entry emits lock request when configured', () async {
     final bridge = _FakeBridge();
     final settings = MyLockSettingsController(store: _FakeStore())
@@ -108,6 +135,9 @@ void main() {
 }
 
 class _FakeBridge implements PlatformLockBridge {
+  _FakeBridge({this.startEvent});
+
+  final PlatformLockEvent? startEvent;
   final StreamController<PlatformLockEvent> _controller =
       StreamController<PlatformLockEvent>.broadcast();
 
@@ -140,7 +170,12 @@ class _FakeBridge implements PlatformLockBridge {
   Future<void> openUsageAccessSettings() async {}
 
   @override
-  Future<void> start() async {}
+  Future<void> start() async {
+    final event = startEvent;
+    if (event != null) {
+      _controller.add(event);
+    }
+  }
 
   @override
   Future<void> stop() async {
