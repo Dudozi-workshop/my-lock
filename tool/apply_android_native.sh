@@ -5,12 +5,16 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ANDROID="$ROOT/android"
 MAIN_DIR="$ANDROID/app/src/main/kotlin/com/mylock/app/my_lock"
 MANIFEST="$ANDROID/app/src/main/AndroidManifest.xml"
+XML_DIR="$ANDROID/app/src/main/res/xml"
+STRINGS="$ANDROID/app/src/main/res/values/strings.xml"
 
-mkdir -p "$MAIN_DIR"
+mkdir -p "$MAIN_DIR" "$XML_DIR"
 cp "$ROOT/platform/android/MainActivity.kt" "$MAIN_DIR/MainActivity.kt"
 cp "$ROOT/platform/android/LockActivity.kt" "$MAIN_DIR/LockActivity.kt"
 cp "$ROOT/platform/android/LockMonitorService.kt" "$MAIN_DIR/LockMonitorService.kt"
 cp "$ROOT/platform/android/BootReceiver.kt" "$MAIN_DIR/BootReceiver.kt"
+cp "$ROOT/platform/android/MyLockAccessibilityService.kt" "$MAIN_DIR/MyLockAccessibilityService.kt"
+cp "$ROOT/platform/android/my_lock_accessibility_service.xml" "$XML_DIR/my_lock_accessibility_service.xml"
 
 python3 - "$MANIFEST" <<'PY'
 from pathlib import Path
@@ -75,6 +79,28 @@ service = '''        <service
 if 'android:name=".LockMonitorService"' not in text:
     text = text.replace('</application>', service + '    </application>', 1)
 
+accessibility_service = '''        <service
+            android:name=".MyLockAccessibilityService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="MY LOCK 빠른 앱 감지"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/my_lock_accessibility_service" />
+        </service>
+'''
+
+if 'android:name=".MyLockAccessibilityService"' not in text:
+    text = text.replace(
+        '</application>',
+        accessibility_service + '    </application>',
+        1,
+    )
+
 receiver = '''        <receiver
             android:name=".BootReceiver"
             android:enabled="true"
@@ -88,6 +114,26 @@ receiver = '''        <receiver
 
 if 'android:name=".BootReceiver"' not in text:
     text = text.replace('</application>', receiver + '    </application>', 1)
+
+path.write_text(text)
+PY
+
+python3 - "$STRINGS" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+text = path.read_text()
+
+entry = (
+    '    <string name="accessibility_service_description">'
+    'MY LOCK이 보호할 앱으로 화면이 전환되는 순간을 감지하여 잠금 화면을 빠르게 표시합니다. '
+    '화면 내용이나 입력 내용은 읽거나 수집하지 않습니다.'
+    '</string>\n'
+)
+
+if 'name="accessibility_service_description"' not in text:
+    text = text.replace('</resources>', entry + '</resources>')
 
 path.write_text(text)
 PY
