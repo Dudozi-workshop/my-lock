@@ -55,7 +55,6 @@ class LockMonitorService : Service() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
-                    OverlayLockController.hide()
                     foregroundPackage = null
                     getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
                         .edit()
@@ -230,9 +229,6 @@ class LockMonitorService : Service() {
         val protectedApps = protectedApps()
 
         if (previous != null && protectedApps.contains(previous)) {
-            if (experimentalOverlayLockEnabled()) {
-                OverlayLockController.hide()
-            }
             getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
                 .edit()
                 .putString(lastProtectedExitAppKey, previous)
@@ -242,6 +238,10 @@ class LockMonitorService : Service() {
         }
 
         foregroundPackage = packageName
+
+        if (experimentalOverlayLockEnabled() && OverlayLockController.isVisible) {
+            return
+        }
 
         if (!protectedApps.contains(packageName)) return
 
