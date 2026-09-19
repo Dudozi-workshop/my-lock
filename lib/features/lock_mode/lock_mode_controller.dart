@@ -6,7 +6,7 @@ enum LockTapResult { correct, wrong, unlocked, ignored }
 
 class LockModeController extends ChangeNotifier {
   LockModeController(List<LockToken> password)
-      : assert(password.length >= 3 && password.length <= 6),
+      : assert(password.length >= 2 && password.length <= 6),
         _password = List<LockToken>.from(password);
 
   final List<LockToken> _password;
