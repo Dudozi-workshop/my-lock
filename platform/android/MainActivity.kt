@@ -1,12 +1,18 @@
 package com.mylock.app.my_lock
 
 import android.app.AppOpsManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Process
 import android.provider.Settings
+import android.util.Base64
+import java.io.ByteArrayOutputStream
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -70,31 +76,7 @@ class MainActivity : FlutterActivity() {
         channel.setMethodCallHandler { call, result ->
             when (call.method) {
                 "getLaunchableApps" -> {
-                    val launcherIntent = Intent(Intent.ACTION_MAIN).apply {
-                        addCategory(Intent.CATEGORY_LAUNCHER)
-                    }
-                    val apps = packageManager
-                        .queryIntentActivities(launcherIntent, 0)
-                        .asSequence()
-                        .mapNotNull { resolveInfo ->
-                            val appInfo = resolveInfo.activityInfo?.applicationInfo
-                                ?: return@mapNotNull null
-                            val packageId = appInfo.packageName
-                            if (packageId == packageName) {
-                                return@mapNotNull null
-                            }
-                            mapOf(
-                                "id" to packageId,
-                                "name" to packageManager
-                                    .getApplicationLabel(appInfo)
-                                    .toString(),
-                            )
-                        }
-                        .distinctBy { it["id"] }
-                        .sortedBy { it["name"]?.lowercase() }
-                        .toList()
-
-                    result.success(apps)
+                    result.success(loadLockableApps())
                 }
 
                 "getAndroidCapabilities" -> {
@@ -102,6 +84,7 @@ class MainActivity : FlutterActivity() {
                     result.success(
                         mapOf(
                             "usageAccessGranted" to hasUsageAccess(),
+                            "accessibilityGranted" to isAccessibilityServiceEnabled(),
                             "overlayGranted" to Settings.canDrawOverlays(this),
                             "monitorServiceRunning" to isMonitorServiceRunning(),
                         ),
@@ -109,7 +92,12 @@ class MainActivity : FlutterActivity() {
                 }
 
                 "openUsageAccessSettings" -> {
-                    startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+                    openUsageAccessSettings()
+                    result.success(null)
+                }
+
+                "openAccessibilitySettings" -> {
+                    openAccessibilitySettings()
                     result.success(null)
                 }
 
@@ -206,7 +194,9 @@ class MainActivity : FlutterActivity() {
             preferences.getBoolean("experimental_screen_lock", false)
         val overlayReady = Settings.canDrawOverlays(this)
         val appProtectionReady =
-            protectedApps.isNotEmpty() && hasUsageAccess() && overlayReady
+            protectedApps.isNotEmpty() &&
+                (hasUsageAccess() || isAccessibilityServiceEnabled()) &&
+                overlayReady
         val screenProtectionReady = screenLockEnabled && overlayReady
 
         if (!appProtectionReady && !screenProtectionReady) {
@@ -234,6 +224,120 @@ class MainActivity : FlutterActivity() {
 
         if (heartbeat <= 0L) return false
         return System.currentTimeMillis() - heartbeat <= 5_000L
+    }
+
+    private fun loadLockableApps(): List<Map<String, String>> {
+        val intents = listOf(
+            Intent(Intent.ACTION_MAIN).apply {
+                addCategory(Intent.CATEGORY_LAUNCHER)
+            },
+            Intent(Intent.ACTION_MAIN).apply {
+                addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
+            },
+        )
+
+        return intents
+            .asSequence()
+            .flatMap { packageManager.queryIntentActivities(it, 0).asSequence() }
+            .mapNotNull { resolveInfo ->
+                val appInfo = resolveInfo.activityInfo?.applicationInfo
+                    ?: return@mapNotNull null
+                val packageId = appInfo.packageName
+                if (packageId == packageName) return@mapNotNull null
+
+                val icon = runCatching {
+                    encodeDrawableToBase64(packageManager.getApplicationIcon(appInfo))
+                }.getOrNull()
+
+                buildMap {
+                    put("id", packageId)
+                    put(
+                        "name",
+                        packageManager.getApplicationLabel(appInfo).toString(),
+                    )
+                    if (!icon.isNullOrBlank()) {
+                        put("iconBase64", icon)
+                    }
+                }
+            }
+            .distinctBy { it["id"] }
+            .sortedBy { it["name"]?.lowercase() }
+            .toList()
+    }
+
+    private fun encodeDrawableToBase64(
+        drawable: android.graphics.drawable.Drawable,
+    ): String {
+        val bitmap = if (drawable is BitmapDrawable) {
+            drawable.bitmap
+        } else {
+            val width = drawable.intrinsicWidth.coerceAtLeast(1)
+            val height = drawable.intrinsicHeight.coerceAtLeast(1)
+            Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).also {
+                val canvas = Canvas(it)
+                drawable.setBounds(0, 0, canvas.width, canvas.height)
+                drawable.draw(canvas)
+            }
+        }
+
+        val scaled = Bitmap.createScaledBitmap(bitmap, 96, 96, true)
+        val stream = ByteArrayOutputStream()
+        scaled.compress(Bitmap.CompressFormat.PNG, 90, stream)
+        return Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP)
+    }
+
+    private fun openUsageAccessSettings() {
+        val direct = Intent(
+            Settings.ACTION_USAGE_ACCESS_SETTINGS,
+            Uri.parse("package:$packageName"),
+        )
+        val fallback = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+        runCatching { startActivity(direct) }
+            .recoverCatching { startActivity(fallback) }
+    }
+
+    private fun openAccessibilitySettings() {
+        val component =
+            ComponentName(this, MyLockAccessibilityService::class.java)
+        val direct = Intent("android.settings.ACCESSIBILITY_DETAILS_SETTINGS").apply {
+            putExtra(
+                "android.intent.extra.COMPONENT_NAME",
+                component.flattenToString(),
+            )
+            data = Uri.parse("package:$packageName")
+        }
+        val fallback = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+
+        runCatching {
+            if (direct.resolveActivity(packageManager) != null) {
+                startActivity(direct)
+            } else {
+                startActivity(fallback)
+            }
+        }.recoverCatching {
+            startActivity(fallback)
+        }
+    }
+
+    private fun isAccessibilityServiceEnabled(): Boolean {
+        val enabled = Settings.Secure.getInt(
+            contentResolver,
+            Settings.Secure.ACCESSIBILITY_ENABLED,
+            0,
+        ) == 1
+        if (!enabled) return false
+
+        val expected =
+            ComponentName(this, MyLockAccessibilityService::class.java)
+                .flattenToString()
+        val services = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+        ).orEmpty()
+
+        return services
+            .split(':')
+            .any { it.equals(expected, ignoreCase = true) }
     }
 
     private fun hasUsageAccess(): Boolean {
