@@ -10,10 +10,12 @@ class LockModeScreen extends StatefulWidget {
     super.key,
     required this.settings,
     this.demoMode = false,
+    this.onUnlocked,
   });
 
   final MyLockSettingsController settings;
   final bool demoMode;
+  final Future<void> Function()? onUnlocked;
 
   @override
   State<LockModeScreen> createState() => _LockModeScreenState();
@@ -51,6 +53,11 @@ class _LockModeScreenState extends State<LockModeScreen> {
     });
     await Future<void>.delayed(const Duration(milliseconds: 700));
     if (!mounted) return;
+    final onUnlocked = widget.onUnlocked;
+    if (onUnlocked != null) {
+      await onUnlocked();
+      return;
+    }
     Navigator.of(context).pop(true);
   }
 
@@ -219,6 +226,11 @@ class _LockModeScreenState extends State<LockModeScreen> {
       _finishing = true;
       _allowRoutePop = true;
     });
+    final onUnlocked = widget.onUnlocked;
+    if (onUnlocked != null) {
+      await onUnlocked();
+      return;
+    }
     Navigator.of(context).pop(true);
   }
 }
