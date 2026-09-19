@@ -69,6 +69,7 @@ class _LockModeScreenState extends State<LockModeScreen> {
                   popStyle: settings.popStyle,
                   objectCount: settings.objectCount,
                   speed: settings.speed,
+                  movementArea: settings.movementArea,
                   requiredTokens: _controller.requiredTokens,
                   onTokenTap: _controller.tap,
                 ),
