@@ -73,6 +73,94 @@ void main() {
     settings.dispose();
   });
 
+  test('screen on emits device lock request when beta is enabled', () async {
+    final bridge = _FakeBridge();
+    final settings = MyLockSettingsController(store: _FakeStore())
+      ..setPassword([token, token, token])
+      ..setExperimentalScreenLock(true);
+
+    final runtime = LockRuntimeCoordinator(
+      settings: settings,
+      bridge: bridge,
+    );
+
+    await runtime.start();
+    final requestFuture = runtime.lockRequests.first;
+
+    bridge.emit(
+      const PlatformLockEvent(PlatformLockEventType.screenOn),
+    );
+
+    final request = await requestFuture;
+    expect(request.isDeviceScreen, isTrue);
+    expect(
+      bridge.presentedApps,
+      [LockRequest.deviceScreenAppId],
+    );
+
+    await runtime.stop();
+    settings.dispose();
+  });
+
+  test('screen on is ignored when beta screen lock is disabled', () async {
+    final bridge = _FakeBridge();
+    final settings = MyLockSettingsController(store: _FakeStore())
+      ..setPassword([token, token, token]);
+
+    final runtime = LockRuntimeCoordinator(
+      settings: settings,
+      bridge: bridge,
+    );
+
+    await runtime.start();
+
+    var requests = 0;
+    final subscription = runtime.lockRequests.listen((_) => requests++);
+
+    bridge.emit(
+      const PlatformLockEvent(PlatformLockEventType.screenOn),
+    );
+    await Future<void>.delayed(Duration.zero);
+
+    expect(requests, 0);
+    expect(bridge.presentedApps, isEmpty);
+
+    await subscription.cancel();
+    await runtime.stop();
+    settings.dispose();
+  });
+
+  test('device screen unlock does not unlock protected app session', () async {
+    final bridge = _FakeBridge();
+    final settings = MyLockSettingsController(store: _FakeStore())
+      ..setSelectedApps({appId})
+      ..setPassword([token, token, token])
+      ..setExperimentalScreenLock(true)
+      ..setRelockPolicy(RelockPolicy.immediate);
+
+    final runtime = LockRuntimeCoordinator(
+      settings: settings,
+      bridge: bridge,
+    );
+
+    await runtime.start();
+    await runtime.grantUnlock(LockRequest.deviceScreenAppId);
+
+    final requestFuture = runtime.lockRequests.first;
+    bridge.emit(
+      const PlatformLockEvent(
+        PlatformLockEventType.protectedAppEntered,
+        appId: appId,
+      ),
+    );
+
+    final request = await requestFuture;
+    expect(request.appId, appId);
+
+    await runtime.stop();
+    settings.dispose();
+  });
+
   test('recovery PIN is stored in controller and verified exactly', () {
     final settings = MyLockSettingsController(store: _FakeStore());
 
@@ -184,6 +272,9 @@ class _FakeBridge implements PlatformLockBridge {
 
   @override
   Future<void> syncProtectedApps(Set<String> appIds) async {}
+
+  @override
+  Future<void> syncExperimentalScreenLock(bool enabled) async {}
 }
 
 class _FakeStore implements MyLockSettingsPersistence {
