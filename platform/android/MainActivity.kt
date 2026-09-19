@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.os.Process
 import android.provider.Settings
 import io.flutter.embedding.android.FlutterActivity
@@ -16,6 +17,8 @@ class MainActivity : FlutterActivity() {
         private const val channelName = "com.mylock.app/lock"
         private const val preferencesName = "my_lock_native"
         private const val pendingLockAppKey = "pending_lock_app"
+        const val deviceScreenAppId = "__device_screen__"
+        const val showWhenLockedExtra = "show_when_locked"
 
         @Volatile
         private var lockChannel: MethodChannel? = null
@@ -45,6 +48,27 @@ class MainActivity : FlutterActivity() {
             val channel = lockChannel ?: return false
             channel.invokeMethod("screenOff", null)
             return true
+        }
+
+        fun emitScreenOn(): Boolean {
+            val channel = lockChannel ?: return false
+            channel.invokeMethod("screenOn", null)
+            return true
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        if (intent?.getBooleanExtra(showWhenLockedExtra, false) == true) {
+            setShowWhenLocked(true)
+        }
+        super.onCreate(savedInstanceState)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.getBooleanExtra(showWhenLockedExtra, false)) {
+            setShowWhenLocked(true)
         }
     }
 
@@ -131,7 +155,9 @@ class MainActivity : FlutterActivity() {
                             null,
                         )
                     } else {
-                        presentLockScreen()
+                        presentLockScreen(
+                            showWhenLocked = appId == deviceScreenAppId,
+                        )
                         result.success(null)
                     }
                 }
@@ -143,11 +169,17 @@ class MainActivity : FlutterActivity() {
                         .putStringSet("protected_apps", appIds.toSet())
                         .apply()
 
-                    if (appIds.isEmpty()) {
-                        stopService(Intent(this, LockMonitorService::class.java))
-                    } else {
-                        ensureMonitorServiceIfReady()
-                    }
+                    updateMonitorServiceState()
+                    result.success(null)
+                }
+
+                "syncExperimentalScreenLock" -> {
+                    val enabled = call.argument<Boolean>("enabled") == true
+                    getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+                        .edit()
+                        .putBoolean("experimental_screen_lock", enabled)
+                        .apply()
+                    updateMonitorServiceState()
                     result.success(null)
                 }
 
@@ -159,6 +191,9 @@ class MainActivity : FlutterActivity() {
                         .putLong("last_unlocked_at", System.currentTimeMillis())
                         .apply()
 
+                    if (appId == deviceScreenAppId) {
+                        setShowWhenLocked(false)
+                    }
                     lockUiVisible = false
                     result.success(null)
                     moveTaskToBack(true)
@@ -183,9 +218,12 @@ class MainActivity : FlutterActivity() {
         super.onDestroy()
     }
 
-    private fun presentLockScreen() {
+    private fun presentLockScreen(showWhenLocked: Boolean = false) {
         if (lockUiVisible) return
         lockUiVisible = true
+        if (showWhenLocked) {
+            setShowWhenLocked(true)
+        }
 
         val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(
@@ -193,6 +231,7 @@ class MainActivity : FlutterActivity() {
                     Intent.FLAG_ACTIVITY_SINGLE_TOP or
                     Intent.FLAG_ACTIVITY_REORDER_TO_FRONT,
             )
+            putExtra(showWhenLockedExtra, showWhenLocked)
         }
         startActivity(intent)
 
@@ -200,17 +239,20 @@ class MainActivity : FlutterActivity() {
         overridePendingTransition(0, 0)
     }
 
-    private fun ensureMonitorServiceIfReady() {
-        val protectedApps =
+    private fun updateMonitorServiceState() {
+        val preferences =
             getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
-                .getStringSet("protected_apps", emptySet())
-                .orEmpty()
+        val protectedApps =
+            preferences.getStringSet("protected_apps", emptySet()).orEmpty()
+        val screenLockEnabled =
+            preferences.getBoolean("experimental_screen_lock", false)
+        val overlayReady = Settings.canDrawOverlays(this)
+        val appProtectionReady =
+            protectedApps.isNotEmpty() && hasUsageAccess() && overlayReady
+        val screenProtectionReady = screenLockEnabled && overlayReady
 
-        if (
-            protectedApps.isEmpty() ||
-            !hasUsageAccess() ||
-            !Settings.canDrawOverlays(this)
-        ) {
+        if (!appProtectionReady && !screenProtectionReady) {
+            stopService(Intent(this, LockMonitorService::class.java))
             return
         }
 
@@ -220,6 +262,10 @@ class MainActivity : FlutterActivity() {
         } else {
             startService(intent)
         }
+    }
+
+    private fun ensureMonitorServiceIfReady() {
+        updateMonitorServiceState()
     }
 
     private fun isMonitorServiceRunning(): Boolean {
