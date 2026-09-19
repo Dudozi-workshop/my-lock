@@ -2,6 +2,8 @@ package com.mylock.app.my_lock
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -25,7 +27,9 @@ class LockActivity : FlutterActivity() {
             val intent = Intent(context, LockActivity::class.java).apply {
                 addFlags(
                     Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_NO_ANIMATION,
+                        Intent.FLAG_ACTIVITY_NO_ANIMATION or
+                        Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS or
+                        Intent.FLAG_ACTIVITY_NO_HISTORY,
                 )
                 putExtra(targetAppExtra, appId)
             }
@@ -46,6 +50,7 @@ class LockActivity : FlutterActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         targetAppId = intent?.getStringExtra(targetAppExtra)
+        window.setBackgroundDrawable(buildImmediateBlockBackground())
         if (targetAppId == deviceScreenAppId) {
             setShowWhenLocked(true)
         }
@@ -108,6 +113,49 @@ class LockActivity : FlutterActivity() {
     override fun onDestroy() {
         lockUiVisible = false
         super.onDestroy()
+    }
+
+    private fun buildImmediateBlockBackground(): GradientDrawable {
+        val background = getSharedPreferences(
+            preferencesName,
+            Context.MODE_PRIVATE,
+        ).getString("lock_background", "softGradient")
+
+        val colors = when (background) {
+            "basicLight" -> intArrayOf(
+                Color.parseColor("#FFFFFFFF"),
+                Color.parseColor("#FFF4F3F8"),
+            )
+            "basicDark" -> intArrayOf(
+                Color.parseColor("#FF17151F"),
+                Color.parseColor("#FF302A46"),
+            )
+            "galaxy" -> intArrayOf(
+                Color.parseColor("#FF1B1640"),
+                Color.parseColor("#FF5F43C7"),
+                Color.parseColor("#FFB675D8"),
+            )
+            "ocean" -> intArrayOf(
+                Color.parseColor("#FFBDEBFF"),
+                Color.parseColor("#FF5DA9E9"),
+                Color.parseColor("#FF3566C8"),
+            )
+            "aurora" -> intArrayOf(
+                Color.parseColor("#FFBDFBE8"),
+                Color.parseColor("#FF86B6FF"),
+                Color.parseColor("#FFD6A7FF"),
+            )
+            else -> intArrayOf(
+                Color.parseColor("#FFFFF3FB"),
+                Color.parseColor("#FFF3F0FF"),
+                Color.parseColor("#FFEAF5FF"),
+            )
+        }
+
+        return GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            colors,
+        )
     }
 
     private fun completeUnlock(appId: String) {
