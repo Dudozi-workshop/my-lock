@@ -23,6 +23,9 @@ class _LockModeScreenState extends State<LockModeScreen> {
   late final LockModeController _controller;
   bool _finishing = false;
 
+  bool get _canUseRecoveryPin =>
+      widget.settings.recoveryPinReady && _controller.failedAttempts >= 3;
+
   @override
   void initState() {
     super.initState();
@@ -35,12 +38,16 @@ class _LockModeScreenState extends State<LockModeScreen> {
     if (!mounted) return;
     setState(() {});
     if (_controller.unlocked && !_finishing) {
-      _finishing = true;
-      Future<void>.delayed(const Duration(milliseconds: 700), () {
-        if (!mounted) return;
-        Navigator.of(context).pop(true);
-      });
+      _finishUnlock();
     }
+  }
+
+  Future<void> _finishUnlock() async {
+    if (_finishing) return;
+    _finishing = true;
+    await Future<void>.delayed(const Duration(milliseconds: 700));
+    if (!mounted) return;
+    Navigator.of(context).pop(true);
   }
 
   @override
@@ -83,6 +90,8 @@ class _LockModeScreenState extends State<LockModeScreen> {
                   progress: _controller.progress,
                   passwordLength: _controller.passwordLength,
                   mismatch: _controller.mismatch,
+                  showRecoveryPin: _canUseRecoveryPin,
+                  onRecoveryPin: _openRecoveryPin,
                   onClose: () => Navigator.of(context).pop(false),
                 ),
               ),
@@ -137,6 +146,70 @@ class _LockModeScreenState extends State<LockModeScreen> {
       ),
     );
   }
+
+  Future<void> _openRecoveryPin() async {
+    if (!_canUseRecoveryPin || _finishing) return;
+
+    var input = '';
+    var mismatch = false;
+
+    final unlocked = await showModalBottomSheet<bool>(
+      context: context,
+      isDismissible: true,
+      enableDrag: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            void addDigit(int digit) {
+              if (input.length >= 4) return;
+              setModalState(() {
+                mismatch = false;
+                input += digit.toString();
+              });
+
+              if (input.length == 4) {
+                final correct = widget.settings.verifyRecoveryPin(input);
+                if (correct) {
+                  Navigator.of(sheetContext).pop(true);
+                } else {
+                  Future<void>.delayed(
+                    const Duration(milliseconds: 120),
+                    () {
+                      if (!sheetContext.mounted) return;
+                      setModalState(() {
+                        input = '';
+                        mismatch = true;
+                      });
+                    },
+                  );
+                }
+              }
+            }
+
+            void removeLast() {
+              if (input.isEmpty) return;
+              setModalState(() {
+                mismatch = false;
+                input = input.substring(0, input.length - 1);
+              });
+            }
+
+            return _RecoveryPinSheet(
+              length: input.length,
+              mismatch: mismatch,
+              onDigit: addDigit,
+              onBackspace: removeLast,
+            );
+          },
+        );
+      },
+    );
+
+    if (unlocked != true || !mounted || _finishing) return;
+    _finishing = true;
+    Navigator.of(context).pop(true);
+  }
 }
 
 class _Header extends StatelessWidget {
@@ -145,6 +218,8 @@ class _Header extends StatelessWidget {
     required this.progress,
     required this.passwordLength,
     required this.mismatch,
+    required this.showRecoveryPin,
+    required this.onRecoveryPin,
     required this.onClose,
   });
 
@@ -152,6 +227,8 @@ class _Header extends StatelessWidget {
   final int progress;
   final int passwordLength;
   final bool mismatch;
+  final bool showRecoveryPin;
+  final VoidCallback onRecoveryPin;
   final VoidCallback onClose;
 
   @override
@@ -221,7 +298,193 @@ class _Header extends StatelessWidget {
               ],
             ],
           ),
+          if (showRecoveryPin) ...[
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: onRecoveryPin,
+              icon: const Icon(Icons.pin_rounded, size: 17),
+              label: const Text('보조 PIN 사용'),
+            ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _RecoveryPinSheet extends StatelessWidget {
+  const _RecoveryPinSheet({
+    required this.length,
+    required this.mismatch,
+    required this.onDigit,
+    required this.onBackspace,
+  });
+
+  final int length;
+  final bool mismatch;
+  final ValueChanged<int> onDigit;
+  final VoidCallback onBackspace;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(22, 20, 22, 24),
+        decoration: const BoxDecoration(
+          color: appBackground,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              '보조 PIN',
+              style: TextStyle(
+                color: ink,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              mismatch ? 'PIN이 일치하지 않습니다.' : '설정한 4자리 PIN을 입력하세요.',
+              style: TextStyle(
+                color: mismatch ? const Color(0xFFD94262) : secondaryInk,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (var i = 0; i < 4; i++) ...[
+                  if (i > 0) const SizedBox(width: 16),
+                  Container(
+                    width: 15,
+                    height: 15,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: i < length ? brandPurple : Colors.transparent,
+                      border: Border.all(
+                        color: i < length
+                            ? brandPurple
+                            : const Color(0xFFCBC7D3),
+                        width: 1.6,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 22),
+            _RecoveryNumberPad(
+              onDigit: onDigit,
+              onBackspace: onBackspace,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RecoveryNumberPad extends StatelessWidget {
+  const _RecoveryNumberPad({
+    required this.onDigit,
+    required this.onBackspace,
+  });
+
+  final ValueChanged<int> onDigit;
+  final VoidCallback onBackspace;
+
+  @override
+  Widget build(BuildContext context) {
+    const rows = [
+      [1, 2, 3],
+      [4, 5, 6],
+      [7, 8, 9],
+    ];
+
+    return Column(
+      children: [
+        for (final row in rows) ...[
+          Row(
+            children: [
+              for (var i = 0; i < row.length; i++) ...[
+                if (i > 0) const SizedBox(width: 10),
+                Expanded(
+                  child: _PinKey(
+                    label: row[i].toString(),
+                    onTap: () => onDigit(row[i]),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 10),
+        ],
+        Row(
+          children: [
+            const Expanded(child: SizedBox(height: 56)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _PinKey(
+                label: '0',
+                onTap: () => onDigit(0),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: SizedBox(
+                height: 56,
+                child: IconButton(
+                  onPressed: onBackspace,
+                  icon: const Icon(Icons.backspace_outlined),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _PinKey extends StatelessWidget {
+  const _PinKey({
+    required this.label,
+    required this.onTap,
+  });
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          height: 56,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0xFFE8E5ED)),
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: ink,
+              fontSize: 21,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
       ),
     );
   }
