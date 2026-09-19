@@ -124,7 +124,11 @@ from pathlib import Path
 import sys
 
 path = Path(sys.argv[1])
-text = path.read_text()
+if path.exists():
+    text = path.read_text()
+else:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    text = '<resources>\n</resources>\n'
 
 entry = (
     '    <string name="accessibility_service_description">'
