@@ -30,6 +30,7 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
       MethodChannelPlatformLockBridge();
 
   PlatformLockCapabilities? _capabilities;
+  bool _serviceRetryScheduled = false;
 
   @override
   void initState() {
@@ -67,6 +68,22 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
     final capabilities = await _platformBridge.getCapabilities();
     if (!mounted) return;
     setState(() => _capabilities = capabilities);
+
+    if (capabilities.nativeBridgeAvailable &&
+        capabilities.androidReady &&
+        !capabilities.monitorServiceRunning &&
+        !_serviceRetryScheduled) {
+      _serviceRetryScheduled = true;
+      Future<void>.delayed(const Duration(milliseconds: 900), () async {
+        if (!mounted) return;
+        final refreshed = await _platformBridge.getCapabilities();
+        if (!mounted) return;
+        setState(() {
+          _capabilities = refreshed;
+          _serviceRetryScheduled = false;
+        });
+      });
+    }
   }
 
   @override
@@ -313,18 +330,20 @@ class _ProtectionStatusCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final nativeAvailable = capabilities?.nativeBridgeAvailable == true;
     final permissionsReady = capabilities?.androidReady == true;
-    final ready = passwordReady && appsReady && permissionsReady;
+    final serviceRunning = capabilities?.monitorServiceRunning == true;
+    final ready =
+        passwordReady && appsReady && permissionsReady && serviceRunning;
 
     final title = ready
-        ? '보호 준비 완료'
+        ? '보호 ON'
         : nativeAvailable
-            ? '보호 설정을 완료해 주세요'
+            ? '보호 설정을 확인해 주세요'
             : '웹 미리보기 모드';
 
     final subtitle = ready
-        ? '선택한 앱을 MY LOCK으로 보호할 준비가 됐습니다.'
+        ? '감지 서비스가 실행 중이며 선택한 앱을 보호하고 있습니다.'
         : nativeAvailable
-            ? _missingSummary(permissionsReady)
+            ? _missingSummary(permissionsReady, serviceRunning)
             : '실제 앱 감지와 권한 상태는 Android 설치본에서 활성화됩니다.';
 
     return Container(
@@ -393,6 +412,7 @@ class _ProtectionStatusCard extends StatelessWidget {
                 _StatusChip(label: '비밀번호', ready: passwordReady),
                 _StatusChip(label: '보호 앱', ready: appsReady),
                 _StatusChip(label: '기기 권한', ready: permissionsReady),
+                _StatusChip(label: '보호 서비스', ready: serviceRunning),
               ],
             ),
             if (!permissionsReady) ...[
@@ -409,11 +429,15 @@ class _ProtectionStatusCard extends StatelessWidget {
     );
   }
 
-  String _missingSummary(bool permissionsReady) {
+  String _missingSummary(
+    bool permissionsReady,
+    bool serviceRunning,
+  ) {
     final missing = <String>[
       if (!passwordReady) '비밀번호',
       if (!appsReady) '보호 앱',
       if (!permissionsReady) '기기 권한',
+      if (!serviceRunning) '보호 서비스',
     ];
     return '${missing.join(' · ')} 설정이 필요합니다.';
   }

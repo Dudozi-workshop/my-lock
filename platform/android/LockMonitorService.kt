@@ -25,12 +25,15 @@ class LockMonitorService : Service() {
         private const val preferencesName = "my_lock_native"
         private const val protectedAppsKey = "protected_apps"
         private const val pendingLockAppKey = "pending_lock_app"
+        const val heartbeatKey = "monitor_heartbeat_at"
+        private const val heartbeatIntervalMs = 2_000L
     }
 
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var usageStatsManager: UsageStatsManager
 
     private var lastQueryAt = 0L
+    private var lastHeartbeatAt = 0L
     private var foregroundPackage: String? = null
 
     private val screenReceiver = object : BroadcastReceiver() {
@@ -66,6 +69,7 @@ class LockMonitorService : Service() {
         }
 
         lastQueryAt = System.currentTimeMillis() - 2_000L
+        writeHeartbeat(force = true)
         handler.post(pollRunnable)
     }
 
@@ -77,6 +81,10 @@ class LockMonitorService : Service() {
     override fun onDestroy() {
         handler.removeCallbacks(pollRunnable)
         runCatching { unregisterReceiver(screenReceiver) }
+        getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+            .edit()
+            .remove(heartbeatKey)
+            .apply()
         super.onDestroy()
     }
 
@@ -137,6 +145,7 @@ class LockMonitorService : Service() {
     }
 
     private fun pollForegroundApp() {
+        writeHeartbeat()
         if (!hasUsageAccess()) return
         if (MainActivity.lockUiVisible) {
             lastQueryAt = System.currentTimeMillis()
@@ -212,6 +221,17 @@ class LockMonitorService : Service() {
 
         runCatching { startActivity(intent) }
             .onFailure { MainActivity.lockUiVisible = false }
+    }
+
+    private fun writeHeartbeat(force: Boolean = false) {
+        val now = System.currentTimeMillis()
+        if (!force && now - lastHeartbeatAt < heartbeatIntervalMs) return
+
+        lastHeartbeatAt = now
+        getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+            .edit()
+            .putLong(heartbeatKey, now)
+            .apply()
     }
 
     private fun protectedApps(): Set<String> {

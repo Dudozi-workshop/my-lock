@@ -93,6 +93,7 @@ class MainActivity : FlutterActivity() {
                         mapOf(
                             "usageAccessGranted" to hasUsageAccess(),
                             "overlayGranted" to Settings.canDrawOverlays(this),
+                            "monitorServiceRunning" to isMonitorServiceRunning(),
                         ),
                     )
                 }
@@ -211,6 +212,16 @@ class MainActivity : FlutterActivity() {
         } else {
             startService(intent)
         }
+    }
+
+    private fun isMonitorServiceRunning(): Boolean {
+        val heartbeat = getSharedPreferences(
+            preferencesName,
+            Context.MODE_PRIVATE,
+        ).getLong(LockMonitorService.heartbeatKey, 0L)
+
+        if (heartbeat <= 0L) return false
+        return System.currentTimeMillis() - heartbeat <= 5_000L
     }
 
     private fun hasUsageAccess(): Boolean {

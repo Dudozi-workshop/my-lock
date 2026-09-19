@@ -8,16 +8,19 @@ class PlatformLockCapabilities {
     required this.nativeBridgeAvailable,
     required this.usageAccessGranted,
     required this.overlayGranted,
+    required this.monitorServiceRunning,
   });
 
   const PlatformLockCapabilities.web()
       : nativeBridgeAvailable = false,
         usageAccessGranted = false,
-        overlayGranted = false;
+        overlayGranted = false,
+        monitorServiceRunning = false;
 
   final bool nativeBridgeAvailable;
   final bool usageAccessGranted;
   final bool overlayGranted;
+  final bool monitorServiceRunning;
 
   bool get androidReady => usageAccessGranted && overlayGranted;
 }
@@ -144,6 +147,7 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
         nativeBridgeAvailable: result != null,
         usageAccessGranted: result?['usageAccessGranted'] == true,
         overlayGranted: result?['overlayGranted'] == true,
+        monitorServiceRunning: result?['monitorServiceRunning'] == true,
       );
     } on MissingPluginException {
       return const PlatformLockCapabilities.web();
