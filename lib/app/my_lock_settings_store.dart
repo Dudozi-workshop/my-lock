@@ -23,6 +23,7 @@ class MyLockStoredSettings {
     this.movementArea = MovementArea.full,
     this.onboardingStarted = false,
     this.onboardingCompleted = false,
+    this.experimentalScreenLock = false,
     required this.relockPolicy,
   });
 
@@ -39,6 +40,7 @@ class MyLockStoredSettings {
   final MovementArea movementArea;
   final bool onboardingStarted;
   final bool onboardingCompleted;
+  final bool experimentalScreenLock;
   final RelockPolicy relockPolicy;
 }
 
@@ -70,6 +72,7 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
   static const _movementAreaKey = 'movement_area';
   static const _onboardingStartedKey = 'onboarding_started';
   static const _onboardingCompletedKey = 'onboarding_completed';
+  static const _experimentalScreenLockKey = 'experimental_screen_lock';
   static const _relockKey = 'relock_policy';
   static const _passwordKey = 'graphical_password';
   static const _recoveryPinKey = 'recovery_pin';
@@ -131,6 +134,8 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
           await _preferences.getBool(_onboardingStartedKey) ?? false,
       onboardingCompleted:
           await _preferences.getBool(_onboardingCompletedKey) ?? false,
+      experimentalScreenLock:
+          await _preferences.getBool(_experimentalScreenLockKey) ?? false,
       relockPolicy: _enumOrDefault(
         RelockPolicy.values,
         await _preferences.getString(_relockKey),
@@ -167,6 +172,10 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
       _preferences.setBool(
         _onboardingCompletedKey,
         settings.onboardingCompleted,
+      ),
+      _preferences.setBool(
+        _experimentalScreenLockKey,
+        settings.experimentalScreenLock,
       ),
       _preferences.setString(_relockKey, settings.relockPolicy.name),
     ]);
