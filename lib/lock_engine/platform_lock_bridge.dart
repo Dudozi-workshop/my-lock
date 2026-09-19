@@ -29,6 +29,7 @@ enum PlatformLockEventType {
   protectedAppEntered,
   protectedAppExited,
   screenOff,
+  screenOn,
 }
 
 class PlatformLockEvent {
@@ -46,6 +47,8 @@ abstract class PlatformLockBridge {
   Future<void> stop();
 
   Future<void> syncProtectedApps(Set<String> appIds);
+
+  Future<void> syncExperimentalScreenLock(bool enabled);
 
   Future<void> notifyUnlockGranted(String appId);
 
@@ -106,6 +109,11 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
         case 'screenOff':
           _events.add(
             const PlatformLockEvent(PlatformLockEventType.screenOff),
+          );
+          break;
+        case 'screenOn':
+          _events.add(
+            const PlatformLockEvent(PlatformLockEventType.screenOn),
           );
           break;
       }
@@ -174,6 +182,15 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
     await _invokeSafely(
       'syncProtectedApps',
       <String, Object?>{'appIds': appIds.toList()},
+    );
+  }
+
+  @override
+  Future<void> syncExperimentalScreenLock(bool enabled) async {
+    if (kIsWeb) return;
+    await _invokeSafely(
+      'syncExperimentalScreenLock',
+      <String, Object?>{'enabled': enabled},
     );
   }
 
