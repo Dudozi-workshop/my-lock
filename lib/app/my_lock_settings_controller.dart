@@ -19,6 +19,7 @@ class MyLockSettingsController extends ChangeNotifier {
   PopStyle _popStyle = PopStyle.basicPop;
 
   List<LockToken>? _password;
+  String? _recoveryPin;
   Set<String> _selectedAppIds = <String>{};
   int _objectCount = 9;
   FloatingSpeed _speed = FloatingSpeed.normal;
@@ -36,6 +37,8 @@ class MyLockSettingsController extends ChangeNotifier {
 
   List<LockToken>? get password =>
       _password == null ? null : List.unmodifiable(_password!);
+  String? get recoveryPin => _recoveryPin;
+  bool get recoveryPinReady => _recoveryPin != null;
   Set<String> get selectedAppIds => Set.unmodifiable(_selectedAppIds);
   int get objectCount => _objectCount;
   FloatingSpeed get speed => _speed;
@@ -55,6 +58,7 @@ class MyLockSettingsController extends ChangeNotifier {
     _password = stored.password == null
         ? null
         : List<LockToken>.from(stored.password!);
+    _recoveryPin = stored.recoveryPin;
     _selectedAppIds = Set<String>.from(stored.selectedAppIds);
     _objectCount = stored.objectCount;
     _speed = stored.speed;
@@ -96,6 +100,67 @@ class MyLockSettingsController extends ChangeNotifier {
     _store.savePassword(_password!);
     notifyListeners();
   }
+
+  void setRecoveryPin(String pin) {
+    if (!RegExp(r'^\\d{4}
+    if (setEquals(_selectedAppIds, appIds)) return;
+    _selectedAppIds = Set<String>.from(appIds);
+    _persistPreferences();
+    notifyListeners();
+  }
+
+  void setScreenBehavior(
+    int objectCount,
+    FloatingSpeed speed,
+    MovementArea movementArea,
+  ) {
+    if (!const {6, 9, 12}.contains(objectCount)) return;
+    if (_objectCount == objectCount &&
+        _speed == speed &&
+        _movementArea == movementArea) {
+      return;
+    }
+    _objectCount = objectCount;
+    _speed = speed;
+    _movementArea = movementArea;
+    _persistPreferences();
+    notifyListeners();
+  }
+
+  void setRelockPolicy(RelockPolicy policy) {
+    if (_relockPolicy == policy) return;
+    _relockPolicy = policy;
+    _persistPreferences();
+    notifyListeners();
+  }
+
+  void _persistPreferences() {
+    _store.savePreferences(
+      MyLockStoredSettings(
+        selectedShapes: _selectedShapes,
+        selectedTones: _selectedTones,
+        background: _background,
+        movementStyle: _movementStyle,
+        popStyle: _popStyle,
+        password: _password,
+        recoveryPin: _recoveryPin,
+        selectedAppIds: _selectedAppIds,
+        objectCount: _objectCount,
+        speed: _speed,
+        movementArea: _movementArea,
+        relockPolicy: _relockPolicy,
+      ),
+    );
+  }
+}
+).hasMatch(pin) || _recoveryPin == pin) return;
+    _recoveryPin = pin;
+    _store.saveRecoveryPin(pin);
+    notifyListeners();
+  }
+
+  bool verifyRecoveryPin(String pin) =>
+      _recoveryPin != null && _recoveryPin == pin;
 
   void setSelectedApps(Set<String> appIds) {
     if (setEquals(_selectedAppIds, appIds)) return;
