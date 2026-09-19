@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../app/my_lock_settings_controller.dart';
 import '../../app/theme.dart';
 import '../../lock_engine/floating_preview.dart';
-import '../../lock_engine/models.dart';
 import 'lock_mode_controller.dart';
 
 class LockModeScreen extends StatefulWidget {
