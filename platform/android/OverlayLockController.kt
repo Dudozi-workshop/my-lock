@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
 import android.provider.Settings
-import android.content.Intent
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
