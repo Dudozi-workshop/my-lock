@@ -102,58 +102,7 @@ class MyLockSettingsController extends ChangeNotifier {
   }
 
   void setRecoveryPin(String pin) {
-    if (!RegExp(r'^\\d{4}
-    if (setEquals(_selectedAppIds, appIds)) return;
-    _selectedAppIds = Set<String>.from(appIds);
-    _persistPreferences();
-    notifyListeners();
-  }
-
-  void setScreenBehavior(
-    int objectCount,
-    FloatingSpeed speed,
-    MovementArea movementArea,
-  ) {
-    if (!const {6, 9, 12}.contains(objectCount)) return;
-    if (_objectCount == objectCount &&
-        _speed == speed &&
-        _movementArea == movementArea) {
-      return;
-    }
-    _objectCount = objectCount;
-    _speed = speed;
-    _movementArea = movementArea;
-    _persistPreferences();
-    notifyListeners();
-  }
-
-  void setRelockPolicy(RelockPolicy policy) {
-    if (_relockPolicy == policy) return;
-    _relockPolicy = policy;
-    _persistPreferences();
-    notifyListeners();
-  }
-
-  void _persistPreferences() {
-    _store.savePreferences(
-      MyLockStoredSettings(
-        selectedShapes: _selectedShapes,
-        selectedTones: _selectedTones,
-        background: _background,
-        movementStyle: _movementStyle,
-        popStyle: _popStyle,
-        password: _password,
-        recoveryPin: _recoveryPin,
-        selectedAppIds: _selectedAppIds,
-        objectCount: _objectCount,
-        speed: _speed,
-        movementArea: _movementArea,
-        relockPolicy: _relockPolicy,
-      ),
-    );
-  }
-}
-).hasMatch(pin) || _recoveryPin == pin) return;
+    if (!RegExp(r'^\d{4}$').hasMatch(pin) || _recoveryPin == pin) return;
     _recoveryPin = pin;
     _store.saveRecoveryPin(pin);
     notifyListeners();
@@ -203,6 +152,7 @@ class MyLockSettingsController extends ChangeNotifier {
         movementStyle: _movementStyle,
         popStyle: _popStyle,
         password: _password,
+        recoveryPin: _recoveryPin,
         selectedAppIds: _selectedAppIds,
         objectCount: _objectCount,
         speed: _speed,
