@@ -8,6 +8,7 @@ MANIFEST="$ANDROID/app/src/main/AndroidManifest.xml"
 
 mkdir -p "$MAIN_DIR"
 cp "$ROOT/platform/android/MainActivity.kt" "$MAIN_DIR/MainActivity.kt"
+cp "$ROOT/platform/android/LockActivity.kt" "$MAIN_DIR/LockActivity.kt"
 cp "$ROOT/platform/android/LockMonitorService.kt" "$MAIN_DIR/LockMonitorService.kt"
 cp "$ROOT/platform/android/BootReceiver.kt" "$MAIN_DIR/BootReceiver.kt"
 
@@ -44,6 +45,18 @@ queries = '''    <queries>
 
 if '<queries>' not in text:
     text = text.replace('<application', queries + '    <application', 1)
+
+lock_activity = '''        <activity
+            android:name=".LockActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="standard"
+            android:theme="@style/LaunchTheme"
+            android:windowSoftInputMode="adjustResize" />
+'''
+
+if 'android:name=".LockActivity"' not in text:
+    text = text.replace('</application>', lock_activity + '    </application>', 1)
 
 service = '''        <service
             android:name=".LockMonitorService"
