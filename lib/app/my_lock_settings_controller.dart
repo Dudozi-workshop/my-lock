@@ -4,8 +4,14 @@ import '../features/customize/background/background_style.dart';
 import '../lock_engine/effects.dart';
 import '../lock_engine/models.dart';
 import '../lock_engine/relock_policy.dart';
+import 'my_lock_settings_store.dart';
 
 class MyLockSettingsController extends ChangeNotifier {
+  MyLockSettingsController({MyLockSettingsStore? store})
+      : _store = store ?? MyLockSettingsStore();
+
+  final MyLockSettingsStore _store;
+
   Set<ShapeKind> _selectedShapes = ShapeKind.values.toSet();
   Set<ShapeTone> _selectedTones = ShapeTone.values.toSet();
   LockBackground _background = LockBackground.softGradient;
@@ -17,6 +23,9 @@ class MyLockSettingsController extends ChangeNotifier {
   int _objectCount = 9;
   FloatingSpeed _speed = FloatingSpeed.normal;
   RelockPolicy _relockPolicy = RelockPolicy.immediate;
+
+  bool _loaded = false;
+  bool get loaded => _loaded;
 
   Set<ShapeKind> get selectedShapes => Set.unmodifiable(_selectedShapes);
   Set<ShapeTone> get selectedTones => Set.unmodifiable(_selectedTones);
@@ -31,6 +40,27 @@ class MyLockSettingsController extends ChangeNotifier {
   FloatingSpeed get speed => _speed;
   RelockPolicy get relockPolicy => _relockPolicy;
 
+  Future<void> load() async {
+    if (_loaded) return;
+
+    final stored = await _store.load();
+
+    _selectedShapes = Set<ShapeKind>.from(stored.selectedShapes);
+    _selectedTones = Set<ShapeTone>.from(stored.selectedTones);
+    _background = stored.background;
+    _movementStyle = stored.movementStyle;
+    _popStyle = stored.popStyle;
+    _password = stored.password == null
+        ? null
+        : List<LockToken>.from(stored.password!);
+    _selectedAppIds = Set<String>.from(stored.selectedAppIds);
+    _objectCount = stored.objectCount;
+    _speed = stored.speed;
+    _relockPolicy = stored.relockPolicy;
+    _loaded = true;
+    notifyListeners();
+  }
+
   void setShapeStyle(Set<ShapeKind> shapes, Set<ShapeTone> tones) {
     if (shapes.isEmpty || tones.isEmpty) return;
     if (setEquals(_selectedShapes, shapes) && setEquals(_selectedTones, tones)) {
@@ -38,12 +68,14 @@ class MyLockSettingsController extends ChangeNotifier {
     }
     _selectedShapes = Set<ShapeKind>.from(shapes);
     _selectedTones = Set<ShapeTone>.from(tones);
+    _persistPreferences();
     notifyListeners();
   }
 
   void setBackground(LockBackground background) {
     if (_background == background) return;
     _background = background;
+    _persistPreferences();
     notifyListeners();
   }
 
@@ -51,18 +83,21 @@ class MyLockSettingsController extends ChangeNotifier {
     if (_movementStyle == movementStyle && _popStyle == popStyle) return;
     _movementStyle = movementStyle;
     _popStyle = popStyle;
+    _persistPreferences();
     notifyListeners();
   }
 
   void setPassword(List<LockToken> password) {
     if (password.length < 3 || password.length > 6) return;
     _password = List<LockToken>.from(password);
+    _store.savePassword(_password!);
     notifyListeners();
   }
 
   void setSelectedApps(Set<String> appIds) {
     if (setEquals(_selectedAppIds, appIds)) return;
     _selectedAppIds = Set<String>.from(appIds);
+    _persistPreferences();
     notifyListeners();
   }
 
@@ -71,12 +106,31 @@ class MyLockSettingsController extends ChangeNotifier {
     if (_objectCount == objectCount && _speed == speed) return;
     _objectCount = objectCount;
     _speed = speed;
+    _persistPreferences();
     notifyListeners();
   }
 
   void setRelockPolicy(RelockPolicy policy) {
     if (_relockPolicy == policy) return;
     _relockPolicy = policy;
+    _persistPreferences();
     notifyListeners();
+  }
+
+  void _persistPreferences() {
+    _store.savePreferences(
+      MyLockStoredSettings(
+        selectedShapes: _selectedShapes,
+        selectedTones: _selectedTones,
+        background: _background,
+        movementStyle: _movementStyle,
+        popStyle: _popStyle,
+        password: _password,
+        selectedAppIds: _selectedAppIds,
+        objectCount: _objectCount,
+        speed: _speed,
+        relockPolicy: _relockPolicy,
+      ),
+    );
   }
 }
