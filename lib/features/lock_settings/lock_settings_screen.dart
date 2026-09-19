@@ -4,9 +4,11 @@ import '../../app/theme.dart';
 import '../../lock_engine/effects.dart';
 import '../../lock_engine/models.dart';
 import '../../lock_engine/relock_policy.dart';
+import '../../lock_engine/relock_policy.dart';
 import 'app_selection/app_selection_screen.dart';
 import 'password_setup/password_setup_screen.dart';
 import 'screen_behavior/screen_behavior_screen.dart';
+import 'relock/relock_screen.dart';
 import 'relock/relock_screen.dart';
 
 class LockSettingsScreen extends StatefulWidget {
@@ -21,6 +23,7 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
   Set<String> _selectedAppIds = <String>{};
   int _objectCount = 9;
   FloatingSpeed _speed = FloatingSpeed.normal;
+  RelockPolicy _relockPolicy = RelockPolicy.immediate;
   RelockPolicy _relockPolicy = RelockPolicy.immediate;
 
   @override
@@ -71,6 +74,19 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
   }
 
   Future<void> _openRelock() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => RelockScreen(
+          selectedPolicy: _relockPolicy,
+          onChanged: (policy) {
+            setState(() => _relockPolicy = policy);
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openRelockSettings() async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (context) => RelockScreen(
