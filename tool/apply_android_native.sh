@@ -26,6 +26,7 @@ text = path.read_text()
 text = text.replace('android:label="my_lock"', 'android:label="MY LOCK"')
 
 permissions = [
+    '<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />',
     '<uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />',
     '<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />',
     '<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />',
