@@ -6,6 +6,14 @@ void main() {
   const a = LockToken(shape: ShapeKind.circle, tone: ShapeTone.pink);
   const b = LockToken(shape: ShapeKind.square, tone: ShapeTone.blue);
 
+  test('two-token sequence unlocks', () {
+    final controller = LockModeController([a, b]);
+
+    expect(controller.tap(a), LockTapResult.correct);
+    expect(controller.tap(b), LockTapResult.unlocked);
+    expect(controller.unlocked, isTrue);
+  });
+
   test('correct sequence unlocks', () {
     final controller = LockModeController([a, b, a]);
 
