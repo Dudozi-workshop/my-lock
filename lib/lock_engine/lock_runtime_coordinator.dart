@@ -48,6 +48,7 @@ class LockRuntimeCoordinator {
     await _bridge.syncExperimentalScreenLock(
       _settings.experimentalScreenLock,
     );
+    await _bridge.syncRelockPolicy(_settings.relockPolicy.name);
   }
 
   Future<void> stop() async {
@@ -73,6 +74,7 @@ class LockRuntimeCoordinator {
     _bridge.syncExperimentalScreenLock(
       _settings.experimentalScreenLock,
     );
+    _bridge.syncRelockPolicy(_settings.relockPolicy.name);
   }
 
   Future<void> _handleEvent(PlatformLockEvent event) async {
