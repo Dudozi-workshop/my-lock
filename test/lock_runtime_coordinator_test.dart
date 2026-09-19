@@ -305,9 +305,6 @@ class _FakeBridge implements PlatformLockBridge {
   }
 
   @override
-  Future<void> openAccessibilitySettings() async {}
-
-  @override
   Future<void> openOverlaySettings() async {}
 
   @override
