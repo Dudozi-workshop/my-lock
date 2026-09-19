@@ -104,7 +104,7 @@ class MyLockSettingsController extends ChangeNotifier {
   }
 
   void setPassword(List<LockToken> password) {
-    if (password.length < 3 || password.length > 6) return;
+    if (password.length < 2 || password.length > 6) return;
     _password = List<LockToken>.from(password);
     _store.savePassword(_password!);
     notifyListeners();
