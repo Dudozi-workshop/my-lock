@@ -3,6 +3,25 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+class PlatformLockCapabilities {
+  const PlatformLockCapabilities({
+    required this.nativeBridgeAvailable,
+    required this.usageAccessGranted,
+    required this.overlayGranted,
+  });
+
+  const PlatformLockCapabilities.web()
+      : nativeBridgeAvailable = false,
+        usageAccessGranted = false,
+        overlayGranted = false;
+
+  final bool nativeBridgeAvailable;
+  final bool usageAccessGranted;
+  final bool overlayGranted;
+
+  bool get androidReady => usageAccessGranted && overlayGranted;
+}
+
 enum PlatformLockEventType {
   protectedAppEntered,
   protectedAppExited,
@@ -26,6 +45,12 @@ abstract class PlatformLockBridge {
   Future<void> syncProtectedApps(Set<String> appIds);
 
   Future<void> notifyUnlockGranted(String appId);
+
+  Future<PlatformLockCapabilities> getCapabilities();
+
+  Future<void> openUsageAccessSettings();
+
+  Future<void> openOverlaySettings();
 }
 
 class MethodChannelPlatformLockBridge implements PlatformLockBridge {
@@ -92,6 +117,39 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
     }
 
     await _events.close();
+  }
+
+  @override
+  Future<PlatformLockCapabilities> getCapabilities() async {
+    if (kIsWeb) return const PlatformLockCapabilities.web();
+
+    try {
+      final result = await _channel.invokeMapMethod<String, Object?>(
+        'getAndroidCapabilities',
+      );
+
+      return PlatformLockCapabilities(
+        nativeBridgeAvailable: result != null,
+        usageAccessGranted: result?['usageAccessGranted'] == true,
+        overlayGranted: result?['overlayGranted'] == true,
+      );
+    } on MissingPluginException {
+      return const PlatformLockCapabilities.web();
+    } on PlatformException {
+      return const PlatformLockCapabilities.web();
+    }
+  }
+
+  @override
+  Future<void> openUsageAccessSettings() async {
+    if (kIsWeb) return;
+    await _invokeSafely('openUsageAccessSettings', const <String, Object?>{});
+  }
+
+  @override
+  Future<void> openOverlaySettings() async {
+    if (kIsWeb) return;
+    await _invokeSafely('openOverlaySettings', const <String, Object?>{});
   }
 
   @override

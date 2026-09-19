@@ -6,6 +6,7 @@ import '../../lock_engine/effects.dart';
 import '../../lock_engine/models.dart';
 import '../lock_mode/lock_mode_screen.dart';
 import 'app_selection/app_selection_screen.dart';
+import 'native_permissions/native_permissions_screen.dart';
 import 'password_setup/password_setup_screen.dart';
 import 'relock/relock_screen.dart';
 import 'screen_behavior/screen_behavior_screen.dart';
@@ -62,6 +63,12 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
           ),
           const SizedBox(height: 22),
           _SettingTile(
+            icon: Icons.admin_panel_settings_outlined,
+            title: '기기 권한',
+            value: 'Android 권한 상태 확인',
+            onTap: _openNativePermissions,
+          ),
+          _SettingTile(
             icon: Icons.lock_rounded,
             title: '비밀번호',
             value: settings.password == null
@@ -100,6 +107,14 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
             onTap: settings.password == null ? null : _openLockTest,
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _openNativePermissions() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => const NativePermissionsScreen(),
       ),
     );
   }
