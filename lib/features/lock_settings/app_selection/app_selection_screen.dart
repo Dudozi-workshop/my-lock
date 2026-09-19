@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -8,12 +10,14 @@ class LockableApp {
   const LockableApp({
     required this.id,
     required this.name,
-    required this.icon,
+    this.icon,
+    this.iconBytes,
   });
 
   final String id;
   final String name;
-  final IconData icon;
+  final IconData? icon;
+  final Uint8List? iconBytes;
 }
 
 class AppSelectionScreen extends StatefulWidget {
@@ -80,6 +84,7 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
                 id: app.id,
                 name: app.name,
                 icon: Icons.apps_rounded,
+                iconBytes: app.iconBytes,
               ),
             )
             .toList(growable: false);
@@ -192,10 +197,20 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
                                       color: brandLavender,
                                       borderRadius: BorderRadius.circular(14),
                                     ),
-                                    child: Icon(
-                                      app.icon,
-                                      color: brandPurple,
-                                    ),
+                                    child: app.iconBytes != null
+                                        ? ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: Image.memory(
+                                              app.iconBytes!,
+                                              fit: BoxFit.cover,
+                                              gaplessPlayback: true,
+                                            ),
+                                          )
+                                        : Icon(
+                                            app.icon ?? Icons.apps_rounded,
+                                            color: brandPurple,
+                                          ),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
