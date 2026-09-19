@@ -374,7 +374,12 @@ void main() {
     expect(engine.objects.first.id, firstId);
     expect(
       engine.objects.first.velocity.distance,
-      closeTo(normalSpeed * FloatingSpeed.fast.multiplier, 0.0001),
+      closeTo(
+        normalSpeed *
+            FloatingSpeed.fast.multiplier /
+            FloatingSpeed.normal.multiplier,
+        0.0001,
+      ),
     );
   });
 }
