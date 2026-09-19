@@ -2,6 +2,7 @@ package com.mylock.app.my_lock
 
 import android.app.AppOpsManager
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -44,10 +45,33 @@ class BootReceiver : BroadcastReceiver() {
                 .getBoolean(experimentalScreenLockKey, false)
         val overlayReady = Settings.canDrawOverlays(context)
         val appProtectionReady =
-            protectedApps.isNotEmpty() && hasUsageAccess(context) && overlayReady
+            protectedApps.isNotEmpty() &&
+                (hasUsageAccess(context) || isAccessibilityServiceEnabled(context)) &&
+                overlayReady
         val screenProtectionReady = screenLockEnabled && overlayReady
 
         return appProtectionReady || screenProtectionReady
+    }
+
+    private fun isAccessibilityServiceEnabled(context: Context): Boolean {
+        val enabled = Settings.Secure.getInt(
+            context.contentResolver,
+            Settings.Secure.ACCESSIBILITY_ENABLED,
+            0,
+        ) == 1
+        if (!enabled) return false
+
+        val expected =
+            ComponentName(context, MyLockAccessibilityService::class.java)
+                .flattenToString()
+        val services = Settings.Secure.getString(
+            context.contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+        ).orEmpty()
+
+        return services
+            .split(':')
+            .any { it.equals(expected, ignoreCase = true) }
     }
 
     private fun hasUsageAccess(context: Context): Boolean {
