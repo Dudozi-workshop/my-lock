@@ -1,14 +1,21 @@
 name: MY LOCK CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
+    inputs:
+      target:
+        description: Build target
+        required: true
+        default: android
+        type: choice
+        options:
+          - android
+          - ios
+          - all
 
 jobs:
   android:
+    if: ${{ github.event.inputs.target == 'android' || github.event.inputs.target == 'all' }}
     name: Android analyze, test, build
     runs-on: ubuntu-latest
     steps:
@@ -43,6 +50,7 @@ jobs:
           if-no-files-found: error
 
   ios:
+    if: ${{ github.event.inputs.target == 'ios' || github.event.inputs.target == 'all' }}
     name: iOS analyze, test, compile
     runs-on: macos-latest
     steps:
