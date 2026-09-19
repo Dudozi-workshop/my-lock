@@ -172,6 +172,13 @@ class MainActivity : FlutterActivity() {
     override fun onStop() {
         if (lockUiVisible) {
             lockUiVisible = false
+            runCatching {
+                startService(
+                    Intent(this, LockMonitorService::class.java).apply {
+                        action = LockMonitorService.actionResetForeground
+                    },
+                )
+            }
         }
         super.onStop()
     }
