@@ -174,6 +174,59 @@ void main() {
     settings.dispose();
   });
 
+  test('LockActivity unlock event updates app lock session', () async {
+    final bridge = _FakeBridge();
+    final settings = MyLockSettingsController(store: _FakeStore())
+      ..setSelectedApps({appId})
+      ..setPassword([token, token])
+      ..setRelockPolicy(RelockPolicy.immediate);
+
+    final runtime = LockRuntimeCoordinator(
+      settings: settings,
+      bridge: bridge,
+    );
+
+    await runtime.start();
+
+    bridge.emit(
+      const PlatformLockEvent(
+        PlatformLockEventType.lockActivityUnlocked,
+        appId: appId,
+      ),
+    );
+
+    var requests = 0;
+    final subscription = runtime.lockRequests.listen((_) => requests++);
+
+    bridge.emit(
+      const PlatformLockEvent(
+        PlatformLockEventType.protectedAppEntered,
+        appId: appId,
+      ),
+    );
+    await Future<void>.delayed(Duration.zero);
+    expect(requests, 0);
+
+    bridge.emit(
+      const PlatformLockEvent(
+        PlatformLockEventType.protectedAppExited,
+        appId: appId,
+      ),
+    );
+    bridge.emit(
+      const PlatformLockEvent(
+        PlatformLockEventType.protectedAppEntered,
+        appId: appId,
+      ),
+    );
+    await Future<void>.delayed(Duration.zero);
+    expect(requests, 1);
+
+    await subscription.cancel();
+    await runtime.stop();
+    settings.dispose();
+  });
+
   test('unlock grant suppresses immediate re-lock until app exits', () async {
     final bridge = _FakeBridge();
     final settings = MyLockSettingsController(store: _FakeStore())
