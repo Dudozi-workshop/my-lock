@@ -51,8 +51,6 @@ abstract class PlatformLockBridge {
 
   Future<void> syncExperimentalScreenLock(bool enabled);
 
-  Future<void> syncExperimentalOverlayLock(bool enabled) async {}
-
   Future<void> syncRelockPolicy(String policy);
 
   Future<void> syncLockBackground(String background);
@@ -203,7 +201,6 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
     );
   }
 
-  @override
   Future<void> syncExperimentalOverlayLock(bool enabled) async {
     if (kIsWeb) return;
     await _invokeSafely(
