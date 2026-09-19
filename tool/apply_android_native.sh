@@ -50,6 +50,7 @@ lock_activity = '''        <activity
             android:name=".LockActivity"
             android:exported="false"
             android:excludeFromRecents="true"
+            android:noHistory="true"
             android:launchMode="standard"
             android:taskAffinity="${applicationId}.lock"
             android:theme="@style/LaunchTheme"
