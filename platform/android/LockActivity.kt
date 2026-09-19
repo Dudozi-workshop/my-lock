@@ -93,9 +93,14 @@ class LockActivity : FlutterActivity() {
     }
 
     override fun onStop() {
-        if (!isChangingConfigurations && lockUiVisible) {
-            lockUiVisible = false
-            LockMonitorService.resetForegroundTracking()
+        if (!isChangingConfigurations) {
+            if (lockUiVisible) {
+                lockUiVisible = false
+                LockMonitorService.resetForegroundTracking()
+            }
+            if (!isFinishing) {
+                finishAndRemoveTask()
+            }
         }
         super.onStop()
     }
