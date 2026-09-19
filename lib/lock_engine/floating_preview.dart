@@ -20,6 +20,7 @@ class FloatingPreview extends StatefulWidget {
     this.objectCount = FloatingEngine.defaultObjectCount,
     this.speed = FloatingSpeed.normal,
     this.movementArea = MovementArea.full,
+    this.topInset = 0,
   });
 
   final Set<ShapeKind> selectedShapes;
@@ -31,6 +32,7 @@ class FloatingPreview extends StatefulWidget {
   final int objectCount;
   final FloatingSpeed speed;
   final MovementArea movementArea;
+  final double topInset;
 
   @override
   State<FloatingPreview> createState() => _FloatingPreviewState();
@@ -52,6 +54,7 @@ class _FloatingPreviewState extends State<FloatingPreview>
       ..setObjectCount(widget.objectCount)
       ..setSpeed(widget.speed)
       ..setMovementArea(widget.movementArea)
+      ..setTopInset(widget.topInset)
       ..setRequiredTokens(widget.requiredTokens);
     _ticker = createTicker(_onTick)..start();
   }
@@ -74,6 +77,9 @@ class _FloatingPreviewState extends State<FloatingPreview>
     }
     if (oldWidget.movementArea != widget.movementArea) {
       _engine.setMovementArea(widget.movementArea);
+    }
+    if (oldWidget.topInset != widget.topInset) {
+      _engine.setTopInset(widget.topInset);
     }
     _engine.setRequiredTokens(widget.requiredTokens);
   }
