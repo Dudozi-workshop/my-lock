@@ -252,7 +252,7 @@ class MainActivity : FlutterActivity() {
                     )
                 }.getOrNull()
 
-                buildMap {
+                buildMap<String, String> {
                     put("id", packageId)
                     put("name", name)
                     if (!icon.isNullOrBlank()) {
