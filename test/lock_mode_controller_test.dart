@@ -15,24 +15,33 @@ void main() {
     expect(controller.unlocked, isTrue);
   });
 
-  test('wrong token resets progress', () {
+  test('wrong input is not revealed until the full sequence is entered', () {
     final controller = LockModeController([a, b, a]);
 
-    controller.tap(a);
+    expect(controller.tap(b), LockTapResult.correct);
     expect(controller.progress, 1);
+    expect(controller.mismatch, isFalse);
+    expect(controller.failedAttempts, 0);
 
-    expect(controller.tap(a), LockTapResult.wrong);
+    expect(controller.tap(b), LockTapResult.correct);
+    expect(controller.progress, 2);
+    expect(controller.mismatch, isFalse);
+
+    expect(controller.tap(b), LockTapResult.wrong);
     expect(controller.progress, 0);
     expect(controller.mismatch, isTrue);
+    expect(controller.failedAttempts, 1);
   });
 
-  test('wrong attempts are counted for recovery PIN eligibility', () {
+  test('recovery PIN eligibility counts failed full sequences', () {
     final controller = LockModeController([a, b, a]);
 
-    controller
-      ..tap(b)
-      ..tap(b)
-      ..tap(b);
+    for (var attempt = 0; attempt < 3; attempt++) {
+      controller
+        ..tap(b)
+        ..tap(b)
+        ..tap(b);
+    }
 
     expect(controller.failedAttempts, 3);
 
@@ -40,13 +49,14 @@ void main() {
     expect(controller.failedAttempts, 0);
   });
 
-  test('required tokens track next two positions including duplicates', () {
+  test('required tokens follow input position without revealing correctness', () {
     final controller = LockModeController([a, a, b]);
 
     expect(controller.requiredTokens.map((e) => e.id).toList(), [a.id, a.id]);
 
-    controller.tap(a);
+    controller.tap(b);
     expect(controller.requiredTokens.map((e) => e.id).toList(), [a.id, b.id]);
+    expect(controller.mismatch, isFalse);
   });
 
   test('tap is ignored after unlock', () {
