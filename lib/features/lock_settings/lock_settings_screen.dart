@@ -164,6 +164,18 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
             onTap: _openRelock,
           ),
           const SizedBox(height: 8),
+          const _SectionLabel(
+            title: '실험 기능',
+            badge: 'BETA',
+          ),
+          const SizedBox(height: 8),
+          _ExperimentalScreenLockTile(
+            enabled: settings.experimentalScreenLock,
+            available: settings.password != null &&
+                _capabilities?.overlayGranted == true,
+            onChanged: settings.setExperimentalScreenLock,
+          ),
+          const SizedBox(height: 8),
           _SettingTile(
             icon: Icons.play_circle_outline_rounded,
             title: '잠금화면 테스트',
@@ -269,6 +281,121 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
 
     if (pattern == null || pattern.isEmpty) return;
     widget.settings.setPassword(pattern);
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel({
+    required this.title,
+    required this.badge,
+  });
+
+  final String title;
+  final String badge;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: ink,
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(width: 7),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+          decoration: BoxDecoration(
+            color: brandLavender,
+            borderRadius: BorderRadius.circular(99),
+          ),
+          child: Text(
+            badge,
+            style: const TextStyle(
+              color: brandPurple,
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ExperimentalScreenLockTile extends StatelessWidget {
+  const _ExperimentalScreenLockTile({
+    required this.enabled,
+    required this.available,
+    required this.onChanged,
+  });
+
+  final bool enabled;
+  final bool available;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 15, 12, 15),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFCF5),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFF0E2B8)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF2C9),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Icon(
+              Icons.phone_android_rounded,
+              color: Color(0xFFA77300),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '화면 켤 때 MY LOCK',
+                  style: TextStyle(
+                    color: ink,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  available
+                      ? '휴대폰 화면이 켜질 때 MY LOCK을 추가 잠금으로 표시합니다. 시스템 PIN·지문 잠금을 대체하지 않습니다.'
+                      : '그래픽 비밀번호와 다른 앱 위에 표시 권한이 필요합니다.',
+                  style: const TextStyle(
+                    color: secondaryInk,
+                    fontSize: 11,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Switch(
+            value: enabled && available,
+            onChanged: available ? onChanged : null,
+          ),
+        ],
+      ),
+    );
   }
 }
 
