@@ -23,3 +23,13 @@ enum PopStyle {
   final String label;
   final bool locked;
 }
+
+enum FloatingSpeed {
+  slow(0.72),
+  normal(1.0),
+  fast(1.38);
+
+  const FloatingSpeed(this.multiplier);
+
+  final double multiplier;
+}

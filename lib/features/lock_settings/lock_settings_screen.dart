@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
+import '../../lock_engine/effects.dart';
 import '../../lock_engine/models.dart';
 import 'app_selection/app_selection_screen.dart';
 import 'password_setup/password_setup_screen.dart';
+import 'screen_behavior/screen_behavior_screen.dart';
 
 class LockSettingsScreen extends StatefulWidget {
   const LockSettingsScreen({super.key});
@@ -15,6 +17,8 @@ class LockSettingsScreen extends StatefulWidget {
 class _LockSettingsScreenState extends State<LockSettingsScreen> {
   List<LockToken>? _password;
   Set<String> _selectedAppIds = <String>{};
+  int _objectCount = 9;
+  FloatingSpeed _speed = FloatingSpeed.normal;
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +50,11 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
                 : '${_selectedAppIds.length}개 앱 보호 중',
             onTap: _openAppSelection,
           ),
-          const _SettingTile(
+          _SettingTile(
             icon: Icons.tune_rounded,
             title: '화면 동작',
-            value: '도형 보통 · 속도 보통',
+            value: '도형 ${_objectCount}개 · 속도 ${_speedLabel(_speed)}',
+            onTap: _openScreenBehavior,
           ),
           const _SettingTile(
             icon: Icons.schedule_rounded,
@@ -59,6 +64,34 @@ class _LockSettingsScreenState extends State<LockSettingsScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _openScreenBehavior() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => ScreenBehaviorScreen(
+          objectCount: _objectCount,
+          speed: _speed,
+          onChanged: (objectCount, speed) {
+            setState(() {
+              _objectCount = objectCount;
+              _speed = speed;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  String _speedLabel(FloatingSpeed speed) {
+    switch (speed) {
+      case FloatingSpeed.slow:
+        return '느리게';
+      case FloatingSpeed.normal:
+        return '보통';
+      case FloatingSpeed.fast:
+        return '빠르게';
+    }
   }
 
   Future<void> _openAppSelection() async {

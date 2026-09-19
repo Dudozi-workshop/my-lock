@@ -8,6 +8,7 @@ class FloatingEngine {
   FloatingEngine({int seed = 4921}) : _random = Random(seed);
 
   static const int defaultObjectCount = 9;
+  static const Set<int> supportedObjectCounts = {6, 9, 12};
   static const double popDuration = 0.18;
 
   final Random _random;
@@ -16,6 +17,8 @@ class FloatingEngine {
   Size _area = Size.zero;
   int _nextId = 0;
   MovementStyle _movementStyle = MovementStyle.floating;
+  FloatingSpeed _speed = FloatingSpeed.normal;
+  int _objectCount = defaultObjectCount;
   List<LockToken> _allowedTokens = List<LockToken>.from(defaultTokens);
   List<LockToken> _requiredTokens = <LockToken>[];
 
@@ -48,6 +51,23 @@ class FloatingEngine {
   void setRequiredTokens(List<LockToken> tokens) {
     _requiredTokens = tokens.take(2).toList(growable: false);
     if (_area != Size.zero) _ensureRequiredVisible();
+  }
+
+  void setObjectCount(int count) {
+    if (!supportedObjectCounts.contains(count) || _objectCount == count) return;
+    _objectCount = count;
+    if (_area != Size.zero) _seedObjects();
+  }
+
+  void setSpeed(FloatingSpeed speed) {
+    if (_speed == speed) return;
+
+    final ratio = speed.multiplier / _speed.multiplier;
+    _speed = speed;
+
+    for (final object in objects) {
+      object.velocity = object.velocity * ratio;
+    }
   }
 
   void setMovementStyle(MovementStyle style) {
@@ -83,7 +103,7 @@ class FloatingEngine {
     objects.clear();
     if (_allowedTokens.isEmpty || _area == Size.zero) return;
 
-    for (var i = 0; i < defaultObjectCount; i++) {
+    for (var i = 0; i < _objectCount; i++) {
       final token = _allowedTokens[i % _allowedTokens.length];
       objects.add(_spawn(token));
     }
@@ -97,8 +117,9 @@ class FloatingEngine {
         _movementStyle == MovementStyle.bounce ? 0.13 : 0.085;
     final speedRange =
         _movementStyle == MovementStyle.bounce ? 0.06 : 0.055;
-    final speed =
-        minDimension * (speedScale + _random.nextDouble() * speedRange);
+    final speed = minDimension *
+        (speedScale + _random.nextDouble() * speedRange) *
+        _speed.multiplier;
     final angle = _random.nextDouble() * pi * 2;
 
     return FloatingObject(
@@ -182,7 +203,7 @@ class FloatingEngine {
 
   void _stepBounce(FloatingObject object, double dt) {
     final minDimension = min(_area.width, _area.height);
-    final gravity = minDimension * 0.9;
+    final gravity = minDimension * 0.9 * _speed.multiplier;
     var velocity = Offset(
       object.velocity.dx,
       object.velocity.dy + gravity * dt,
@@ -201,7 +222,7 @@ class FloatingEngine {
       next = Offset(next.dx, _area.height - object.radius);
       final rebound = max(
         velocity.dy.abs() * 0.82,
-        minDimension * 0.24,
+        minDimension * 0.24 * _speed.multiplier,
       );
       velocity = Offset(velocity.dx, -rebound);
     } else if (next.dy - object.radius <= 0) {
@@ -290,8 +311,9 @@ class FloatingEngine {
         _movementStyle == MovementStyle.bounce ? 0.13 : 0.085;
     final speedRange =
         _movementStyle == MovementStyle.bounce ? 0.06 : 0.055;
-    final speed =
-        minDimension * (speedScale + _random.nextDouble() * speedRange);
+    final speed = minDimension *
+        (speedScale + _random.nextDouble() * speedRange) *
+        _speed.multiplier;
     final angle = _random.nextDouble() * pi * 2;
 
     object

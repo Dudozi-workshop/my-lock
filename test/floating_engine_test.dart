@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:my_lock/lock_engine/effects.dart';
 import 'package:my_lock/lock_engine/floating_engine.dart';
 import 'package:my_lock/lock_engine/models.dart';
 
@@ -143,5 +144,33 @@ void main() {
         .length;
 
     expect(count, greaterThanOrEqualTo(1));
+  });  test('object count can switch between supported presets', () {
+    final engine = FloatingEngine(seed: 8);
+    engine.resize(const Size(320, 480));
+
+    engine.setObjectCount(6);
+    expect(engine.objects.length, 6);
+
+    engine.setObjectCount(12);
+    expect(engine.objects.length, 12);
+
+    engine.setObjectCount(7);
+    expect(engine.objects.length, 12);
+  });
+
+  test('speed change rescales current velocity without respawning', () {
+    final engine = FloatingEngine(seed: 9);
+    engine.resize(const Size(320, 480));
+
+    final firstId = engine.objects.first.id;
+    final normalSpeed = engine.objects.first.velocity.distance;
+
+    engine.setSpeed(FloatingSpeed.fast);
+
+    expect(engine.objects.first.id, firstId);
+    expect(
+      engine.objects.first.velocity.distance,
+      closeTo(normalSpeed * FloatingSpeed.fast.multiplier, 0.0001),
+    );
   });
 }
