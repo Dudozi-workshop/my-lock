@@ -169,6 +169,13 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    override fun onStop() {
+        if (lockUiVisible) {
+            lockUiVisible = false
+        }
+        super.onStop()
+    }
+
     override fun onDestroy() {
         lockChannel = null
         lockUiVisible = false
