@@ -22,6 +22,7 @@ class LockModeScreen extends StatefulWidget {
 class _LockModeScreenState extends State<LockModeScreen> {
   late final LockModeController _controller;
   bool _finishing = false;
+  bool _allowRoutePop = false;
 
   bool get _canUseRecoveryPin =>
       widget.settings.recoveryPinReady && _controller.failedAttempts >= 3;
@@ -44,7 +45,10 @@ class _LockModeScreenState extends State<LockModeScreen> {
 
   Future<void> _finishUnlock() async {
     if (_finishing) return;
-    _finishing = true;
+    setState(() {
+      _finishing = true;
+      _allowRoutePop = true;
+    });
     await Future<void>.delayed(const Duration(milliseconds: 700));
     if (!mounted) return;
     Navigator.of(context).pop(true);
@@ -62,8 +66,10 @@ class _LockModeScreenState extends State<LockModeScreen> {
   Widget build(BuildContext context) {
     final settings = widget.settings;
 
-    return Scaffold(
-      body: Container(
+    return PopScope(
+      canPop: widget.demoMode || _allowRoutePop,
+      child: Scaffold(
+        body: Container(
         decoration: BoxDecoration(gradient: settings.background.gradient),
         child: SafeArea(
           child: Stack(
@@ -144,6 +150,7 @@ class _LockModeScreenState extends State<LockModeScreen> {
           ),
         ),
       ),
+      ),
     );
   }
 
@@ -207,7 +214,10 @@ class _LockModeScreenState extends State<LockModeScreen> {
     );
 
     if (unlocked != true || !mounted || _finishing) return;
-    _finishing = true;
+    setState(() {
+      _finishing = true;
+      _allowRoutePop = true;
+    });
     Navigator.of(context).pop(true);
   }
 }
