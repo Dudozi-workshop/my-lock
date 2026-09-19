@@ -138,7 +138,7 @@ class _FakeBridge implements PlatformLockBridge {
   Future<void> syncProtectedApps(Set<String> appIds) async {}
 }
 
-class _FakeStore extends MyLockSettingsStore {
+class _FakeStore implements MyLockSettingsPersistence {
   @override
   Future<MyLockStoredSettings> load() async {
     return const MyLockStoredSettings(

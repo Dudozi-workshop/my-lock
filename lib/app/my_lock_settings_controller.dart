@@ -7,10 +7,10 @@ import '../lock_engine/relock_policy.dart';
 import 'my_lock_settings_store.dart';
 
 class MyLockSettingsController extends ChangeNotifier {
-  MyLockSettingsController({MyLockSettingsStore? store})
+  MyLockSettingsController({MyLockSettingsPersistence? store})
       : _store = store ?? MyLockSettingsStore();
 
-  final MyLockSettingsStore _store;
+  final MyLockSettingsPersistence _store;
 
   Set<ShapeKind> _selectedShapes = ShapeKind.values.toSet();
   Set<ShapeTone> _selectedTones = ShapeTone.values.toSet();

@@ -34,7 +34,15 @@ class MyLockStoredSettings {
   final RelockPolicy relockPolicy;
 }
 
-class MyLockSettingsStore {
+abstract class MyLockSettingsPersistence {
+  Future<MyLockStoredSettings> load();
+
+  Future<void> savePreferences(MyLockStoredSettings settings);
+
+  Future<void> savePassword(List<LockToken> password);
+}
+
+class MyLockSettingsStore implements MyLockSettingsPersistence {
   MyLockSettingsStore({
     SharedPreferencesAsync? preferences,
     FlutterSecureStorage? secureStorage,
@@ -55,6 +63,7 @@ class MyLockSettingsStore {
   final SharedPreferencesAsync _preferences;
   final FlutterSecureStorage _secureStorage;
 
+  @override
   Future<MyLockStoredSettings> load() async {
     final shapes = _parseEnums(
       ShapeKind.values,
@@ -105,6 +114,7 @@ class MyLockSettingsStore {
     );
   }
 
+  @override
   Future<void> savePreferences(MyLockStoredSettings settings) async {
     await Future.wait([
       _preferences.setStringList(
@@ -128,6 +138,7 @@ class MyLockSettingsStore {
     ]);
   }
 
+  @override
   Future<void> savePassword(List<LockToken> password) async {
     final value = jsonEncode(password.map((token) => token.id).toList());
     await _secureStorage.write(key: _passwordKey, value: value);
