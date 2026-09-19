@@ -4,6 +4,7 @@ import android.app.AppOpsManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Process
 import android.provider.Settings
 import io.flutter.embedding.android.FlutterActivity
@@ -11,17 +12,55 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    private val channelName = "com.mylock.app/lock"
+    companion object {
+        private const val channelName = "com.mylock.app/lock"
+        private const val preferencesName = "my_lock_native"
+        private const val pendingLockAppKey = "pending_lock_app"
+
+        @Volatile
+        private var lockChannel: MethodChannel? = null
+
+        @Volatile
+        var lockUiVisible: Boolean = false
+
+        fun emitProtectedAppEntered(appId: String): Boolean {
+            val channel = lockChannel ?: return false
+            channel.invokeMethod(
+                "protectedAppEntered",
+                mapOf("appId" to appId),
+            )
+            return true
+        }
+
+        fun emitProtectedAppExited(appId: String): Boolean {
+            val channel = lockChannel ?: return false
+            channel.invokeMethod(
+                "protectedAppExited",
+                mapOf("appId" to appId),
+            )
+            return true
+        }
+
+        fun emitScreenOff(): Boolean {
+            val channel = lockChannel ?: return false
+            channel.invokeMethod("screenOff", null)
+            return true
+        }
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
-        MethodChannel(
+        val channel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             channelName,
-        ).setMethodCallHandler { call, result ->
+        )
+        lockChannel = channel
+
+        channel.setMethodCallHandler { call, result ->
             when (call.method) {
                 "getAndroidCapabilities" -> {
+                    ensureMonitorServiceIfReady()
                     result.success(
                         mapOf(
                             "usageAccessGranted" to hasUsageAccess(),
@@ -44,27 +83,105 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
 
+                "consumePendingLock" -> {
+                    val preferences =
+                        getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+                    val appId = preferences.getString(pendingLockAppKey, null)
+                    if (appId != null) {
+                        preferences.edit().remove(pendingLockAppKey).apply()
+                    }
+                    result.success(appId)
+                }
+
+                "presentLockScreen" -> {
+                    val appId = call.argument<String>("appId")
+                    if (appId.isNullOrEmpty()) {
+                        result.error(
+                            "invalid_app_id",
+                            "A protected app id is required.",
+                            null,
+                        )
+                    } else {
+                        presentLockScreen()
+                        result.success(null)
+                    }
+                }
+
                 "syncProtectedApps" -> {
                     val appIds = call.argument<List<String>>("appIds").orEmpty()
-                    getSharedPreferences("my_lock_native", Context.MODE_PRIVATE)
+                    getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
                         .edit()
                         .putStringSet("protected_apps", appIds.toSet())
                         .apply()
+
+                    if (appIds.isEmpty()) {
+                        stopService(Intent(this, LockMonitorService::class.java))
+                    } else {
+                        ensureMonitorServiceIfReady()
+                    }
                     result.success(null)
                 }
 
                 "unlockGranted" -> {
                     val appId = call.argument<String>("appId")
-                    getSharedPreferences("my_lock_native", Context.MODE_PRIVATE)
+                    getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
                         .edit()
                         .putString("last_unlocked_app", appId)
                         .putLong("last_unlocked_at", System.currentTimeMillis())
                         .apply()
+
+                    lockUiVisible = false
                     result.success(null)
+                    moveTaskToBack(true)
                 }
 
                 else -> result.notImplemented()
             }
+        }
+    }
+
+    override fun onDestroy() {
+        lockChannel = null
+        lockUiVisible = false
+        super.onDestroy()
+    }
+
+    private fun presentLockScreen() {
+        if (lockUiVisible) return
+        lockUiVisible = true
+
+        val intent = Intent(this, MainActivity::class.java).apply {
+            addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                    Intent.FLAG_ACTIVITY_REORDER_TO_FRONT,
+            )
+        }
+        startActivity(intent)
+
+        @Suppress("DEPRECATION")
+        overridePendingTransition(0, 0)
+    }
+
+    private fun ensureMonitorServiceIfReady() {
+        val protectedApps =
+            getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+                .getStringSet("protected_apps", emptySet())
+                .orEmpty()
+
+        if (
+            protectedApps.isEmpty() ||
+            !hasUsageAccess() ||
+            !Settings.canDrawOverlays(this)
+        ) {
+            return
+        }
+
+        val intent = Intent(this, LockMonitorService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
         }
     }
 

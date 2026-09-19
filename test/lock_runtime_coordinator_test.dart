@@ -40,6 +40,7 @@ void main() {
 
     final request = await requestFuture;
     expect(request.appId, appId);
+    expect(bridge.presentedApps, [appId]);
 
     await runtime.stop();
     settings.dispose();
@@ -97,6 +98,8 @@ class _FakeBridge implements PlatformLockBridge {
   final StreamController<PlatformLockEvent> _controller =
       StreamController<PlatformLockEvent>.broadcast();
 
+  final List<String> presentedApps = <String>[];
+
   @override
   Stream<PlatformLockEvent> get events => _controller.stream;
 
@@ -106,6 +109,22 @@ class _FakeBridge implements PlatformLockBridge {
 
   @override
   Future<void> notifyUnlockGranted(String appId) async {}
+
+  @override
+  Future<void> presentLockScreen(String appId) async {
+    presentedApps.add(appId);
+  }
+
+  @override
+  Future<PlatformLockCapabilities> getCapabilities() async {
+    return const PlatformLockCapabilities.web();
+  }
+
+  @override
+  Future<void> openOverlaySettings() async {}
+
+  @override
+  Future<void> openUsageAccessSettings() async {}
 
   @override
   Future<void> start() async {}

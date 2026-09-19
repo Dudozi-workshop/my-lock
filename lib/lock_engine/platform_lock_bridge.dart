@@ -46,6 +46,8 @@ abstract class PlatformLockBridge {
 
   Future<void> notifyUnlockGranted(String appId);
 
+  Future<void> presentLockScreen(String appId);
+
   Future<PlatformLockCapabilities> getCapabilities();
 
   Future<void> openUsageAccessSettings();
@@ -105,6 +107,16 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
           break;
       }
     });
+
+    final pendingAppId = await _consumePendingLock();
+    if (pendingAppId != null) {
+      _events.add(
+        PlatformLockEvent(
+          PlatformLockEventType.protectedAppEntered,
+          appId: pendingAppId,
+        ),
+      );
+    }
   }
 
   @override
@@ -168,6 +180,27 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
       'unlockGranted',
       <String, Object?>{'appId': appId},
     );
+  }
+
+  @override
+  Future<void> presentLockScreen(String appId) async {
+    if (kIsWeb) return;
+    await _invokeSafely(
+      'presentLockScreen',
+      <String, Object?>{'appId': appId},
+    );
+  }
+
+  Future<String?> _consumePendingLock() async {
+    if (kIsWeb) return null;
+
+    try {
+      return await _channel.invokeMethod<String>('consumePendingLock');
+    } on MissingPluginException {
+      return null;
+    } on PlatformException {
+      return null;
+    }
   }
 
   String? _readAppId(Object? arguments) {

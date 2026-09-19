@@ -8,6 +8,7 @@ MANIFEST="$ANDROID/app/src/main/AndroidManifest.xml"
 
 mkdir -p "$MAIN_DIR"
 cp "$ROOT/platform/android/MainActivity.kt" "$MAIN_DIR/MainActivity.kt"
+cp "$ROOT/platform/android/LockMonitorService.kt" "$MAIN_DIR/LockMonitorService.kt"
 
 python3 - "$MANIFEST" <<'PY'
 from pathlib import Path
@@ -19,12 +20,29 @@ text = path.read_text()
 permissions = [
     '<uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />',
     '<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />',
+    '<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />',
+    '<uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />',
+    '<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />',
 ]
 
 marker = '<application'
 for permission in permissions:
     if permission not in text:
         text = text.replace(marker, f'{permission}\n    {marker}', 1)
+
+service = '''        <service
+            android:name=".LockMonitorService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Monitors user-selected protected apps to present the MY LOCK screen." />
+        </service>
+'''
+
+if 'android:name=".LockMonitorService"' not in text:
+    text = text.replace('</application>', service + '    </application>', 1)
 
 path.write_text(text)
 PY

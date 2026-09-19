@@ -38,7 +38,9 @@ class LockRuntimeCoordinator {
     await _bridge.start();
     await _bridge.syncProtectedApps(_settings.selectedAppIds);
     _settings.addListener(_syncSettings);
-    _subscription = _bridge.events.listen(_handleEvent);
+    _subscription = _bridge.events.listen(
+      (event) => unawaited(_handleEvent(event)),
+    );
   }
 
   Future<void> stop() async {
@@ -61,7 +63,7 @@ class LockRuntimeCoordinator {
     _bridge.syncProtectedApps(_settings.selectedAppIds);
   }
 
-  void _handleEvent(PlatformLockEvent event) {
+  Future<void> _handleEvent(PlatformLockEvent event) async {
     switch (event.type) {
       case PlatformLockEventType.protectedAppEntered:
         final appId = event.appId;
@@ -75,6 +77,7 @@ class LockRuntimeCoordinator {
           _settings.relockPolicy,
         );
         if (needsLock) {
+          await _bridge.presentLockScreen(appId);
           _lockRequests.add(LockRequest(appId));
         }
         break;
