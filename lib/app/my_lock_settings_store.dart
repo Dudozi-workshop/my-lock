@@ -167,66 +167,7 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
   }
 
   String? _normalizeRecoveryPin(String? value) {
-    if (value == null || !RegExp(r'^\\d{4}(String? raw) {
-    if (raw == null || raw.isEmpty) return null;
-
-    try {
-      final decoded = jsonDecode(raw);
-      if (decoded is! List) return null;
-
-      final tokens = <LockToken>[];
-      for (final value in decoded) {
-        if (value is! String) return null;
-        final token = _tokenFromId(value);
-        if (token == null) return null;
-        tokens.add(token);
-      }
-
-      if (tokens.length < 3 || tokens.length > 6) return null;
-      return tokens;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  LockToken? _tokenFromId(String id) {
-    for (final tone in ShapeTone.values) {
-      for (final shape in ShapeKind.values) {
-        final token = LockToken(shape: shape, tone: tone);
-        if (token.id == id) return token;
-      }
-    }
-    return null;
-  }
-
-  Set<T> _parseEnums<T extends Enum>(
-    Iterable<T> values,
-    List<String>? names,
-  ) {
-    if (names == null) return <T>{};
-    return {
-      for (final value in values)
-        if (names.contains(value.name)) value,
-    };
-  }
-
-  T _enumOrDefault<T extends Enum>(
-    Iterable<T> values,
-    String? name,
-    T fallback,
-  ) {
-    if (name == null) return fallback;
-    for (final value in values) {
-      if (value.name == name) return value;
-    }
-    return fallback;
-  }
-
-  int _normalizeObjectCount(int? value) {
-    return const {6, 9, 12}.contains(value) ? value! : 9;
-  }
-}
-).hasMatch(value)) return null;
+    if (value == null || !RegExp(r'^\d{4}$').hasMatch(value)) return null;
     return value;
   }
 
