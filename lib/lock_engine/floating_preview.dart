@@ -15,12 +15,14 @@ class FloatingPreview extends StatefulWidget {
     required this.selectedTones,
     this.movementStyle = MovementStyle.floating,
     this.popStyle = PopStyle.basicPop,
+    this.onTokenTap,
   });
 
   final Set<ShapeKind> selectedShapes;
   final Set<ShapeTone> selectedTones;
   final MovementStyle movementStyle;
   final PopStyle popStyle;
+  final ValueChanged<LockToken>? onTokenTap;
 
   @override
   State<FloatingPreview> createState() => _FloatingPreviewState();
@@ -88,8 +90,10 @@ class _FloatingPreviewState extends State<FloatingPreview>
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapDown: (details) {
-            if (_engine.tap(details.localPosition)) {
+            final token = _engine.tap(details.localPosition);
+            if (token != null) {
               HapticFeedback.lightImpact();
+              widget.onTokenTap?.call(token);
               setState(() {});
             }
           },

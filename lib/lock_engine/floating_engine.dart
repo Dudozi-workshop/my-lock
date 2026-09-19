@@ -206,7 +206,7 @@ class FloatingEngine {
     object.velocity = velocity;
   }
 
-  bool tap(Offset localPosition) {
+  LockToken? tap(Offset localPosition) {
     FloatingObject? target;
     var closestDistance = double.infinity;
 
@@ -219,9 +219,9 @@ class FloatingEngine {
       }
     }
 
-    if (target == null) return false;
+    if (target == null) return null;
     target.popElapsed = 0;
-    return true;
+    return target.token;
   }
 
   void _respawn(FloatingObject object) {
