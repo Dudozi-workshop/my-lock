@@ -35,12 +35,12 @@ class LockRuntimeCoordinator {
     if (_started) return;
     _started = true;
 
-    await _bridge.start();
-    await _bridge.syncProtectedApps(_settings.selectedAppIds);
-    _settings.addListener(_syncSettings);
     _subscription = _bridge.events.listen(
       (event) => unawaited(_handleEvent(event)),
     );
+    _settings.addListener(_syncSettings);
+    await _bridge.start();
+    await _bridge.syncProtectedApps(_settings.selectedAppIds);
   }
 
   Future<void> stop() async {
