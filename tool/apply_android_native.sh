@@ -51,6 +51,7 @@ lock_activity = '''        <activity
             android:exported="false"
             android:excludeFromRecents="true"
             android:launchMode="standard"
+            android:taskAffinity="${applicationId}.lock"
             android:theme="@style/LaunchTheme"
             android:windowSoftInputMode="adjustResize" />
 '''
