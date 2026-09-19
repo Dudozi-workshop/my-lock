@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -5,10 +8,12 @@ class PlatformAppInfo {
   const PlatformAppInfo({
     required this.id,
     required this.name,
+    this.iconBytes,
   });
 
   final String id;
   final String name;
+  final Uint8List? iconBytes;
 }
 
 class PlatformAppCatalog {
@@ -38,7 +43,23 @@ class PlatformAppCatalog {
           continue;
         }
 
-        apps.add(PlatformAppInfo(id: id, name: name));
+        Uint8List? iconBytes;
+        final iconBase64 = item['iconBase64'];
+        if (iconBase64 is String && iconBase64.isNotEmpty) {
+          try {
+            iconBytes = base64Decode(iconBase64);
+          } on FormatException {
+            iconBytes = null;
+          }
+        }
+
+        apps.add(
+          PlatformAppInfo(
+            id: id,
+            name: name,
+            iconBytes: iconBytes,
+          ),
+        );
       }
 
       return apps;
