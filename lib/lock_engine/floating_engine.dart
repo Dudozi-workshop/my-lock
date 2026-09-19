@@ -175,6 +175,113 @@ class FloatingEngine {
           break;
       }
     }
+
+    _applyPairRepulsion(dt);
+  }
+
+  void _applyPairRepulsion(double dt) {
+    final active = objects.where((object) => !object.isPopping).toList();
+    if (active.length < 2) return;
+
+    final minDimension = min(_area.width, _area.height);
+
+    for (var i = 0; i < active.length - 1; i++) {
+      final first = active[i];
+      for (var j = i + 1; j < active.length; j++) {
+        final second = active[j];
+
+        var delta = second.position - first.position;
+        var distance = delta.distance;
+        if (distance >= first.radius + second.radius) continue;
+
+        if (distance < 0.001) {
+          final direction = first.id <= second.id ? 1.0 : -1.0;
+          delta = Offset(direction, 0);
+          distance = 1.0;
+        }
+
+        final minDiameter = min(first.radius, second.radius) * 2;
+        final overlapDepth = first.radius + second.radius - distance;
+        final overlapRatio = overlapDepth / minDiameter;
+
+        if (overlapRatio <= 0.10) continue;
+
+        final normal = delta / distance;
+        final targetDistance =
+            first.radius + second.radius - minDiameter * 0.10;
+        final excess = max(0.0, targetDistance - distance);
+
+        final double response;
+        final double acceleration;
+        if (overlapRatio < 0.25) {
+          final t = ((overlapRatio - 0.10) / 0.15).clamp(0.0, 1.0);
+          response = 0.10 + 0.15 * t;
+          acceleration = minDimension * (0.08 + 0.10 * t);
+        } else {
+          final t = ((overlapRatio - 0.25) / 0.75).clamp(0.0, 1.0);
+          response = 0.35 + 0.25 * t;
+          acceleration = minDimension * (0.22 + 0.24 * t);
+        }
+
+        final correction = normal * (excess * response * 0.5);
+        first.position -= correction;
+        second.position += correction;
+
+        final impulse =
+            normal * (acceleration * _speed.multiplier * dt * 0.5);
+        first.velocity -= impulse;
+        second.velocity += impulse;
+
+        if (_movementStyle == MovementStyle.bounce) {
+          _applyBottomHorizontalSpread(first, second, dt, minDimension);
+        }
+
+        _clampInside(first);
+        _clampInside(second);
+      }
+    }
+  }
+
+  void _applyBottomHorizontalSpread(
+    FloatingObject first,
+    FloatingObject second,
+    double dt,
+    double minDimension,
+  ) {
+    final bottomThreshold = _area.height * 0.70;
+    if (first.position.dy < bottomThreshold ||
+        second.position.dy < bottomThreshold) {
+      return;
+    }
+
+    var direction = second.position.dx - first.position.dx;
+    if (direction.abs() < 0.001) {
+      direction = first.id <= second.id ? 1.0 : -1.0;
+    }
+
+    final sign = direction.isNegative ? -1.0 : 1.0;
+    final horizontalImpulse =
+        minDimension * 0.22 * _speed.multiplier * dt * 0.5;
+
+    first.velocity = Offset(
+      first.velocity.dx - sign * horizontalImpulse,
+      first.velocity.dy,
+    );
+    second.velocity = Offset(
+      second.velocity.dx + sign * horizontalImpulse,
+      second.velocity.dy,
+    );
+  }
+
+  void _clampInside(FloatingObject object) {
+    object.position = Offset(
+      object.position.dx
+          .clamp(object.radius, _area.width - object.radius)
+          .toDouble(),
+      object.position.dy
+          .clamp(object.radius, _area.height - object.radius)
+          .toDouble(),
+    );
   }
 
   void _stepFloating(FloatingObject object, double dt) {
