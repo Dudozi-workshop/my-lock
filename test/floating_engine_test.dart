@@ -123,6 +123,97 @@ void main() {
   });
 
 
+
+  test('overlap up to ten percent is left untouched by repulsion', () {
+    final engine = FloatingEngine(seed: 12);
+    engine.resize(const Size(400, 400));
+
+    final first = engine.objects[0]
+      ..radius = 40
+      ..position = const Offset(160, 200)
+      ..velocity = Offset.zero;
+    final second = engine.objects[1]
+      ..radius = 40
+      ..position = const Offset(236, 200)
+      ..velocity = Offset.zero;
+    engine.objects.removeRange(2, engine.objects.length);
+
+    final before = (second.position - first.position).distance;
+    engine.step(1 / 60);
+    final after = (second.position - first.position).distance;
+
+    expect(after, closeTo(before, 0.0001));
+  });
+
+  test('moderate overlap is separated gradually', () {
+    final engine = FloatingEngine(seed: 13);
+    engine.resize(const Size(400, 400));
+
+    final first = engine.objects[0]
+      ..radius = 40
+      ..position = const Offset(160, 200)
+      ..velocity = Offset.zero;
+    final second = engine.objects[1]
+      ..radius = 40
+      ..position = const Offset(224, 200)
+      ..velocity = Offset.zero;
+    engine.objects.removeRange(2, engine.objects.length);
+
+    final before = (second.position - first.position).distance;
+    engine.step(1 / 60);
+    final after = (second.position - first.position).distance;
+
+    expect(after, greaterThan(before));
+  });
+
+  test('heavy overlap receives stronger separation than moderate overlap', () {
+    double separationGain(double distance, int seed) {
+      final engine = FloatingEngine(seed: seed);
+      engine.resize(const Size(400, 400));
+
+      final first = engine.objects[0]
+        ..radius = 40
+        ..position = const Offset(160, 200)
+        ..velocity = Offset.zero;
+      final second = engine.objects[1]
+        ..radius = 40
+        ..position = Offset(160 + distance, 200)
+        ..velocity = Offset.zero;
+      engine.objects.removeRange(2, engine.objects.length);
+
+      final before = (second.position - first.position).distance;
+      engine.step(1 / 60);
+      final after = (second.position - first.position).distance;
+      return after - before;
+    }
+
+    final moderateGain = separationGain(64, 14);
+    final heavyGain = separationGain(48, 15);
+
+    expect(heavyGain, greaterThan(moderateGain));
+  });
+
+  test('bounce overlap near bottom adds horizontal dispersion', () {
+    final engine = FloatingEngine(seed: 16);
+    engine.resize(const Size(400, 400));
+    engine.setMovementStyle(MovementStyle.bounce);
+
+    final first = engine.objects[0]
+      ..radius = 40
+      ..position = const Offset(180, 320)
+      ..velocity = Offset.zero;
+    final second = engine.objects[1]
+      ..radius = 40
+      ..position = const Offset(230, 320)
+      ..velocity = Offset.zero;
+    engine.objects.removeRange(2, engine.objects.length);
+
+    engine.step(1 / 60);
+
+    expect(first.velocity.dx, lessThan(0));
+    expect(second.velocity.dx, greaterThan(0));
+  });
+
   test('all nine required combinations can stay visible at once', () {
     final engine = FloatingEngine(seed: 10);
     engine.resize(const Size(320, 480));
