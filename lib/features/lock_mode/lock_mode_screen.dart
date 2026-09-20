@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/my_lock_settings_controller.dart';
 import '../../app/theme.dart';
 import '../../lock_engine/floating_preview.dart';
-import '../../lock_engine/models.dart';
-import '../lock_settings/password_setup/password_setup_screen.dart';
 import 'lock_mode_controller.dart';
-import 'recovery_policy.dart';
 
 class LockModeScreen extends StatefulWidget {
   const LockModeScreen({
@@ -278,34 +275,6 @@ class _LockModeScreenState extends State<LockModeScreen>
         _finishing ||
         !_authenticationAttemptIsCurrent) {
       return;
-    }
-
-    final recoveryAction = recoveryPinActionFor(
-      appAuthentication: widget.appAuthentication,
-    );
-    if (recoveryAction == RecoveryPinAction.resetGraphicalPassword) {
-      final pattern = await Navigator.of(context).push<List<LockToken>>(
-        MaterialPageRoute(
-          builder: (context) => PasswordSetupScreen(
-            selectedShapes: widget.settings.selectedShapes,
-            selectedTones: widget.settings.selectedTones,
-            recoveryMode: true,
-          ),
-        ),
-      );
-      final completedSetup = pattern != null && pattern.isNotEmpty;
-      if (!mounted ||
-          _finishing ||
-          !_authenticationAttemptIsCurrent) {
-        return;
-      }
-      if (!shouldCommitRecoveredPassword(
-        action: recoveryAction,
-        completedSetup: completedSetup,
-      )) {
-        return;
-      }
-      widget.settings.setPassword(pattern!);
     }
 
     setState(() {
