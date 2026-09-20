@@ -1,9 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "my-lock-preview",
+  "main": "worker/index.js",
   "compatibility_date": "2026-09-19",
   "assets": {
     "directory": "./build/web",
+    "binding": "ASSETS",
+    "run_worker_first": ["/latest.apk", "/my-lock-latest.apk"],
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "single-page-application"
   }
