@@ -32,6 +32,7 @@ class _LockActivityHostState extends State<_LockActivityHost> {
   late final MyLockSettingsController _settings;
   late final Future<void> _loadFuture;
   String? _targetAppId;
+  bool _demoMode = false;
 
   @override
   void initState() {
@@ -43,6 +44,8 @@ class _LockActivityHostState extends State<_LockActivityHost> {
   Future<void> _initialize() async {
     await _settings.load();
     _targetAppId = await _channel.invokeMethod<String>('getLockTarget');
+    _demoMode =
+        await _channel.invokeMethod<bool>('getLockDemoMode') ?? false;
 
     if (_targetAppId == null || _settings.password == null) {
       await _channel.invokeMethod<void>('dismissLock');
@@ -93,6 +96,7 @@ class _LockActivityHostState extends State<_LockActivityHost> {
 
         return LockModeScreen(
           settings: _settings,
+          demoMode: _demoMode,
           onUnlocked: _unlock,
         );
       },
