@@ -17,7 +17,7 @@ class FloatingEngine {
   Size _area = Size.zero;
   int _nextId = 0;
   MovementStyle _movementStyle = MovementStyle.floating;
-  MovementArea _movementArea = MovementArea.full;
+  MovementArea _movementArea = MovementArea.lower;
   FloatingSpeed _speed = FloatingSpeed.normal;
   double _topInset = 0;
   int _objectCount = defaultObjectCount;
@@ -99,6 +99,13 @@ class FloatingEngine {
 
   double get _movementHeight => _area.height - _movementTop;
 
+  double get _horizontalInset =>
+      _movementArea == MovementArea.lower ? _area.width * 0.09 : 0.0;
+
+  double get _movementLeft => _horizontalInset;
+
+  double get _movementRight => _area.width - _horizontalInset;
+
   void resize(Size area) {
     if (area.width <= 0 || area.height <= 0) return;
 
@@ -154,7 +161,10 @@ class FloatingEngine {
 
     for (var attempt = 0; attempt < 30; attempt++) {
       candidate = Offset(
-        radius + _random.nextDouble() * max(1, _area.width - radius * 2),
+        _movementLeft +
+            radius +
+            _random.nextDouble() *
+                max(1, _movementRight - _movementLeft - radius * 2),
         top + radius + _random.nextDouble() * usableHeight,
       );
 
@@ -294,7 +304,10 @@ class FloatingEngine {
   void _clampInside(FloatingObject object) {
     object.position = Offset(
       object.position.dx
-          .clamp(object.radius, _area.width - object.radius)
+          .clamp(
+            _movementLeft + object.radius,
+            _movementRight - object.radius,
+          )
           .toDouble(),
       object.position.dy
           .clamp(_movementTop + object.radius, _area.height - object.radius)
@@ -306,11 +319,11 @@ class FloatingEngine {
     var next = object.position + object.velocity * dt;
     var velocity = object.velocity;
 
-    if (next.dx - object.radius <= 0) {
-      next = Offset(object.radius, next.dy);
+    if (next.dx - object.radius <= _movementLeft) {
+      next = Offset(_movementLeft + object.radius, next.dy);
       velocity = Offset(velocity.dx.abs(), velocity.dy);
-    } else if (next.dx + object.radius >= _area.width) {
-      next = Offset(_area.width - object.radius, next.dy);
+    } else if (next.dx + object.radius >= _movementRight) {
+      next = Offset(_movementRight - object.radius, next.dy);
       velocity = Offset(-velocity.dx.abs(), velocity.dy);
     }
 
@@ -335,11 +348,11 @@ class FloatingEngine {
     );
     var next = object.position + velocity * dt;
 
-    if (next.dx - object.radius <= 0) {
-      next = Offset(object.radius, next.dy);
+    if (next.dx - object.radius <= _movementLeft) {
+      next = Offset(_movementLeft + object.radius, next.dy);
       velocity = Offset(velocity.dx.abs(), velocity.dy);
-    } else if (next.dx + object.radius >= _area.width) {
-      next = Offset(_area.width - object.radius, next.dy);
+    } else if (next.dx + object.radius >= _movementRight) {
+      next = Offset(_movementRight - object.radius, next.dy);
       velocity = Offset(-velocity.dx.abs(), velocity.dy);
     }
 
@@ -366,7 +379,7 @@ class FloatingEngine {
     for (final object in objects) {
       if (object.isPopping) continue;
       final distance = (object.position - localPosition).distance;
-      if (distance <= object.radius * 1.22 && distance < closestDistance) {
+      if (distance <= object.radius && distance < closestDistance) {
         target = object;
         closestDistance = distance;
       }
