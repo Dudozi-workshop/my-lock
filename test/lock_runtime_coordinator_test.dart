@@ -334,6 +334,13 @@ class _FakeBridge implements PlatformLockBridge {
 
   @override
   Future<void> syncLockBackground(String background) async {}
+
+  @override
+  Future<void> syncLockPattern({
+    required List<String> tokenIds,
+    required Set<String> shapes,
+    required Set<String> tones,
+  }) async {}
 }
 
 class _FakeStore implements MyLockSettingsPersistence {
