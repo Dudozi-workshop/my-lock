@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/theme.dart';
+import '../../../lock_engine/effects.dart';
 import '../../../lock_engine/floating_preview.dart';
 import '../../../lock_engine/models.dart';
 import 'background_style.dart';
@@ -11,12 +12,22 @@ class BackgroundScreen extends StatefulWidget {
     required this.selectedBackground,
     required this.selectedShapes,
     required this.selectedTones,
+    required this.movementStyle,
+    required this.popStyle,
+    required this.objectCount,
+    required this.speed,
+    required this.movementArea,
     required this.onChanged,
   });
 
   final LockBackground selectedBackground;
   final Set<ShapeKind> selectedShapes;
   final Set<ShapeTone> selectedTones;
+  final MovementStyle movementStyle;
+  final PopStyle popStyle;
+  final int objectCount;
+  final FloatingSpeed speed;
+  final MovementArea movementArea;
   final ValueChanged<LockBackground> onChanged;
 
   @override
@@ -109,6 +120,11 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
             child: FloatingPreview(
               selectedShapes: widget.selectedShapes,
               selectedTones: widget.selectedTones,
+              movementStyle: widget.movementStyle,
+              popStyle: widget.popStyle,
+              objectCount: widget.objectCount,
+              speed: widget.speed,
+              movementArea: widget.movementArea,
             ),
           ),
           Positioned(
