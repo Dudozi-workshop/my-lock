@@ -143,8 +143,8 @@ class _AppSelectionScreenState extends State<AppSelectionScreen>
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.tab,
               tabs: [
-                Tab(text: '보안 중  ${_selectedIds.length}'),
                 const Tab(text: '전체 앱'),
+                Tab(text: '보안 중  ${_selectedIds.length}'),
               ],
             ),
           ),
@@ -182,8 +182,8 @@ class _AppSelectionScreenState extends State<AppSelectionScreen>
                   : TabBarView(
                       controller: _tabController,
                       children: [
-                        _buildAppList(onlySelected: true),
                         _buildAppList(onlySelected: false),
+                        _buildAppList(onlySelected: true),
                       ],
                     ),
             ),
