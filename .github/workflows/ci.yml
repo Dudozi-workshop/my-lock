@@ -56,15 +56,15 @@ jobs:
           path: ~/.android/debug.keystore
           key: my-lock-debug-keystore-v1
 
-      - name: Build debug APK
-        run: flutter build apk --debug
+      - name: Build lightweight ARM64 release APK
+        run: flutter build apk --release --split-per-abi
 
-      - name: Upload debug APK
+      - name: Upload ARM64 release APK
         id: upload_apk
         uses: actions/upload-artifact@v4
         with:
-          name: my-lock-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: my-lock-arm64-release-apk
+          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
           if-no-files-found: error
 
       - name: Publish stable APK download
@@ -72,13 +72,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp build/app/outputs/flutter-apk/app-debug.apk my-lock-latest.apk
-          gh release delete latest-debug --cleanup-tag -y || true
-          gh release create latest-debug my-lock-latest.apk \
-            --target "${GITHUB_SHA}" \
-            --title "MY LOCK Latest Debug" \
-            --notes "Latest successful Android debug build from main." \
-            --prerelease
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk my-lock-latest.apk
+          if ! gh release view latest-debug >/dev/null 2>&1; then
+            gh release create latest-debug \
+              --target "${GITHUB_SHA}" \
+              --title "MY LOCK Latest" \
+              --notes "Latest successful lightweight ARM64 Android build from main." \
+              --prerelease
+          fi
+          gh release upload latest-debug my-lock-latest.apk --clobber
 
       - name: Email APK download notice
         if: ${{ success() }}
@@ -109,7 +111,7 @@ jobs:
           msg["To"] = recipient
           msg["Subject"] = "MY LOCK 새 APK 빌드 완료"
           msg.set_content(
-              "MY LOCK Android APK 빌드가 완료되었습니다.\n\n"
+              "MY LOCK Android 경량 APK 빌드가 완료되었습니다.\n\n"
               f"커밋: {commit_sha[:8]}\n"
               f"APK 직접 다운로드: {apk_url}\n"
               f"빌드 상세: {run_url}\n\n"
