@@ -52,6 +52,7 @@ class LockRuntimeCoordinator {
     await _bridge.syncRelockPolicy(_settings.relockPolicy.name);
     await _bridge.syncLockBackground(_settings.background.name);
     await _syncLockPattern();
+    await _syncLockPresentation();
   }
 
   Future<void> stop() async {
@@ -81,6 +82,7 @@ class LockRuntimeCoordinator {
     _bridge.syncRelockPolicy(_settings.relockPolicy.name);
     _bridge.syncLockBackground(_settings.background.name);
     _syncLockPattern();
+    _syncLockPresentation();
   }
 
   Future<void> _syncLockPattern() async {
@@ -89,6 +91,15 @@ class LockRuntimeCoordinator {
           const <String>[],
       shapes: _settings.selectedShapes.map((value) => value.name).toSet(),
       tones: _settings.selectedTones.map((value) => value.name).toSet(),
+    );
+  }
+
+  Future<void> _syncLockPresentation() async {
+    await _bridge.syncLockPresentation(
+      objectCount: _settings.objectCount,
+      speed: _settings.speed.name,
+      movementArea: _settings.movementArea.name,
+      movementStyle: _settings.movementStyle.name,
     );
   }
 
