@@ -59,7 +59,7 @@ jobs:
           if-no-files-found: error
 
       - name: Email APK download notice
-        if: ${{ success() && secrets.APK_MAIL_APP_PASSWORD != '' }}
+        if: ${{ success() }}
         env:
           SMTP_USERNAME: ${{ secrets.APK_MAIL_USERNAME }}
           SMTP_APP_PASSWORD: ${{ secrets.APK_MAIL_APP_PASSWORD }}
@@ -73,8 +73,10 @@ jobs:
           import smtplib
           from email.message import EmailMessage
 
-          username = os.environ["SMTP_USERNAME"]
-          password = os.environ["SMTP_APP_PASSWORD"]
+          username = os.environ.get("SMTP_USERNAME", "")
+          password = os.environ.get("SMTP_APP_PASSWORD", "")
+          if not username or not password:
+              raise SystemExit(0)
           recipient = os.environ["RECIPIENT"]
           run_url = os.environ["RUN_URL"]
           artifact_url = os.environ["ARTIFACT_URL"]
