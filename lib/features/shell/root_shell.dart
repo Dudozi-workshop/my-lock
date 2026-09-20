@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/my_lock_settings_controller.dart';
@@ -9,6 +10,7 @@ import '../../lock_engine/platform_lock_bridge.dart';
 import '../onboarding/onboarding_screen.dart';
 import '../customize/customize_screen.dart';
 import '../lock_settings/lock_settings_screen.dart';
+import '../lock_mode/lock_mode_screen.dart';
 import '../shop/shop_screen.dart';
 
 class RootShell extends StatefulWidget {
@@ -22,16 +24,26 @@ class _RootShellState extends State<RootShell> {
   int _index = 0;
   late final MyLockSettingsController _settings;
   late final LockRuntimeCoordinator _runtime;
+  late final PlatformLockBridge _platformBridge;
+  WebTestPlatformLockBridge? _webBridge;
+  StreamSubscription<LockRequest>? _lockRequestSubscription;
   late final Future<void> _loadFuture;
 
   @override
   void initState() {
     super.initState();
     _settings = MyLockSettingsController()..addListener(_refreshSettings);
+    if (kIsWeb) {
+      _webBridge = WebTestPlatformLockBridge();
+      _platformBridge = _webBridge!;
+    } else {
+      _platformBridge = MethodChannelPlatformLockBridge();
+    }
     _runtime = LockRuntimeCoordinator(
       settings: _settings,
-      bridge: MethodChannelPlatformLockBridge(),
+      bridge: _platformBridge,
     );
+    _lockRequestSubscription = _runtime.lockRequests.listen(_handleLockRequest);
     _loadFuture = _initialize();
   }
 
@@ -44,8 +56,27 @@ class _RootShellState extends State<RootShell> {
     if (mounted) setState(() {});
   }
 
+  Future<void> _handleLockRequest(LockRequest request) async {
+    if (!mounted || _settings.password == null) return;
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => LockModeScreen(
+          settings: _settings,
+          onUnlocked: () async {
+            await _runtime.grantUnlock(request.appId);
+            if (context.mounted) {
+              Navigator.of(context).pop(true);
+            }
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
+    unawaited(_lockRequestSubscription?.cancel());
     unawaited(_runtime.stop());
     _settings.removeListener(_refreshSettings);
     _settings.dispose();
@@ -121,7 +152,10 @@ class _RootShellState extends State<RootShell> {
             children: [
               CustomizeScreen(settings: _settings),
               const ShopScreen(),
-              LockSettingsScreen(settings: _settings),
+              LockSettingsScreen(
+                settings: _settings,
+                webTestBridge: _webBridge,
+              ),
             ],
           ),
           bottomNavigationBar: NavigationBar(
