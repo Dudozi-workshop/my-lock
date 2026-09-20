@@ -442,7 +442,7 @@ object OverlayLockController {
 
     private data class MovingToken(
         var tokenId: String,
-        val view: View,
+        val view: FloatingTokenView,
         var x: Float,
         var y: Float,
         var vx: Float,
