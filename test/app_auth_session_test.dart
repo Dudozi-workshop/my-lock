@@ -16,11 +16,12 @@ void main() {
       );
     });
 
-    test('stays authenticated for the rest of the app session', () {
+    test('stays authenticated while the same attempt remains current', () {
       final session = AppAuthSession()
-        ..initialize(onboardingCompleted: true, hasPassword: true)
-        ..markAuthenticated();
+        ..initialize(onboardingCompleted: true, hasPassword: true);
+      final generation = session.generation;
 
+      expect(session.markAuthenticated(generation: generation), isTrue);
       expect(
         session.requiresAuthentication(
           onboardingCompleted: true,
@@ -30,18 +31,65 @@ void main() {
       );
     });
 
-    test('relocks after the app session leaves foreground', () {
+    test('relocks and invalidates an attempt after leaving foreground', () {
       final session = AppAuthSession()
-        ..initialize(onboardingCompleted: true, hasPassword: true)
-        ..markAuthenticated()
-        ..markUnauthenticated();
+        ..initialize(onboardingCompleted: true, hasPassword: true);
+      final staleGeneration = session.generation;
 
+      expect(
+        session.markAuthenticated(generation: staleGeneration),
+        isTrue,
+      );
+
+      session.markUnauthenticated();
+
+      expect(session.isAttemptCurrent(staleGeneration), isFalse);
       expect(
         session.requiresAuthentication(
           onboardingCompleted: true,
           hasPassword: true,
         ),
         isTrue,
+      );
+    });
+
+    test('stale success cannot authenticate a resumed app session', () {
+      final session = AppAuthSession()
+        ..initialize(onboardingCompleted: true, hasPassword: true);
+      final staleGeneration = session.generation;
+
+      session.markUnauthenticated();
+
+      expect(
+        session.markAuthenticated(generation: staleGeneration),
+        isFalse,
+      );
+      expect(
+        session.requiresAuthentication(
+          onboardingCompleted: true,
+          hasPassword: true,
+        ),
+        isTrue,
+      );
+    });
+
+    test('new attempt can authenticate after resume', () {
+      final session = AppAuthSession()
+        ..initialize(onboardingCompleted: true, hasPassword: true);
+
+      session.markUnauthenticated();
+      final currentGeneration = session.generation;
+
+      expect(
+        session.markAuthenticated(generation: currentGeneration),
+        isTrue,
+      );
+      expect(
+        session.requiresAuthentication(
+          onboardingCompleted: true,
+          hasPassword: true,
+        ),
+        isFalse,
       );
     });
 
