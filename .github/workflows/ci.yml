@@ -23,6 +23,10 @@ jobs:
     if: ${{ github.event_name == 'push' || github.event.inputs.target == 'android' || github.event.inputs.target == 'all' }}
     name: Android analyze, test, build
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: https://dddpxudwfsydrhfgvvyn.supabase.co
+      SUPABASE_BUCKET: my-lock-apk
+      SUPABASE_OBJECT: my-lock-arm64-release.apk
     steps:
       - uses: actions/checkout@v4
         with:
@@ -77,6 +81,31 @@ jobs:
           mkdir -p dist
           cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk dist/my-lock-arm64-release.apk
 
+      - name: Upload latest ARM64 APK to Supabase Storage
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -e
+          test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          APK="dist/my-lock-arm64-release.apk"
+          curl --fail --show-error --silent \
+            -X POST \
+            "$SUPABASE_URL/storage/v1/object/$SUPABASE_BUCKET/$SUPABASE_OBJECT" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/vnd.android.package-archive" \
+            -H "x-upsert: true" \
+            --data-binary "@$APK"
+
+      - name: Verify Supabase public APK download
+        run: |
+          set -e
+          APK_URL="$SUPABASE_URL/storage/v1/object/public/$SUPABASE_BUCKET/$SUPABASE_OBJECT"
+          curl --fail --location --retry 3 --retry-delay 2 \
+            --output /tmp/my-lock-arm64-release.apk "$APK_URL"
+          test -s /tmp/my-lock-arm64-release.apk
+          cmp --silent dist/my-lock-arm64-release.apk /tmp/my-lock-arm64-release.apk
+
       - name: Upload ARM64 release APK artifact
         uses: actions/upload-artifact@v4
         with:
@@ -112,13 +141,6 @@ jobs:
             gh release create "$TAG" "$APK" --title "$NAME" --notes "Latest MY LOCK Android ARM64 release APK.\nCommit: $COMMIT_SHA"
           fi
 
-      - name: Verify public ARM64 APK download link
-        run: |
-          set -e
-          APK_URL="https://github.com/${{ github.repository }}/releases/download/latest-apk/my-lock-arm64-release.apk"
-          curl --fail --location --retry 3 --retry-delay 2 --output /tmp/my-lock-arm64-release.apk "$APK_URL"
-          test -s /tmp/my-lock-arm64-release.apk
-
       - name: Build APK change summary
         id: change_summary
         env:
@@ -138,20 +160,18 @@ jobs:
 
           echo "summary_file=$SUMMARY_FILE" >> "$GITHUB_OUTPUT"
 
-      - name: Email ARM64 APK with change summary
+      - name: Email Supabase ARM64 APK with change summary
         if: ${{ success() }}
         env:
           SMTP_USERNAME: ${{ secrets.APK_MAIL_USERNAME }}
           SMTP_APP_PASSWORD: ${{ secrets.APK_MAIL_APP_PASSWORD }}
           RECIPIENT: rlatkd5959@gmail.com
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          APK_URL: https://github.com/${{ github.repository }}/releases/download/latest-apk/my-lock-arm64-release.apk
+          APK_URL: https://dddpxudwfsydrhfgvvyn.supabase.co/storage/v1/object/public/my-lock-apk/my-lock-arm64-release.apk
           COMMIT_SHA: ${{ github.sha }}
           BUILD_TIME: ${{ github.event.head_commit.timestamp }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           CHANGE_SUMMARY_FILE: ${{ steps.change_summary.outputs.summary_file }}
-          RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/latest-apk
-          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           python3 - <<'PY'
           import os
@@ -170,7 +190,6 @@ jobs:
           run_url = os.environ["RUN_URL"]
           commit_message = os.environ.get("COMMIT_MESSAGE", "").strip() or "변경 내역 없음"
           change_summary_file = os.environ.get("CHANGE_SUMMARY_FILE", "")
-          release_url = os.environ["RELEASE_URL"]
           try:
               with open(change_summary_file, "r", encoding="utf-8") as f:
                   change_summary = f.read().strip()
@@ -178,12 +197,6 @@ jobs:
               change_summary = ""
           if not change_summary:
               change_summary = f"- {commit_message.splitlines()[0]}"
-          chrome_url = (
-              "intent://github.com/"
-              + os.environ.get("GITHUB_REPOSITORY", "Dudozi-workshop/my-lock")
-              + "/releases/download/latest-apk/my-lock-arm64-release.apk"
-              + "#Intent;scheme=https;package=com.android.chrome;end"
-          )
           try:
               dt = datetime.fromisoformat(build_time.replace("Z", "+00:00"))
               display_time = dt.astimezone(timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M KST")
@@ -202,9 +215,8 @@ jobs:
               "----------------\n"
               f"{change_summary}\n\n"
               f"ARM64 Release APK: {apk_url}\n"
-              f"GitHub Release 페이지: {release_url}\n"
               f"빌드 상세: {run_url}\n\n"
-              "다운로드가 100%에서 멈추는 경우 메일의 'Chrome에서 다운로드' 버튼을 사용하세요."
+              "위 APK 주소는 Supabase Storage의 최신 ARM64 Release 파일로 유지됩니다."
           )
 
           summary_html = "<br>".join(
@@ -224,15 +236,9 @@ jobs:
                   ARM64 APK 다운로드
                 </a>
               </p>
-              <p>
-                <a href="{chrome_url}" style="display:inline-block;padding:12px 18px;border:1px solid #111;color:#111;text-decoration:none;border-radius:8px">
-                  Chrome에서 다운로드
-                </a>
-              </p>
 
               <p style="color:#666;font-size:13px">
-                다운로드가 100%에서 멈추면 Chrome에서 다운로드를 사용하세요.<br>
-                <a href="{release_url}">GitHub Release 페이지</a> ·
+                위 버튼은 Supabase Storage의 최신 ARM64 Release APK로 연결됩니다.<br>
                 <a href="{run_url}">빌드 상세</a>
               </p>
               <p style="color:#999;font-size:12px">commit {commit_sha}</p>
