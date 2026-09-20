@@ -1,4 +1,4 @@
-const overlayPinRecoveryThreshold = 5;
+const overlayPinRecoveryThreshold = 3;
 
 bool shouldOfferOverlayRecovery({
   required int failedAttempts,
