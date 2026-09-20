@@ -279,11 +279,11 @@ class _Header extends StatelessWidget {
                 )
               else
                 const SizedBox(width: 40),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'MY LOCK',
+                  appAuthentication ? 'MY LOCK 열기' : 'MY LOCK',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: ink,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0.4,
@@ -332,7 +332,7 @@ class _Header extends StatelessWidget {
             TextButton.icon(
               onPressed: onRecoveryPin,
               icon: const Icon(Icons.pin_rounded, size: 17),
-              label: const Text('보조 PIN 사용'),
+              label: Text(appAuthentication ? 'PIN으로 인증' : '보조 PIN 사용'),
             ),
           ],
         ],
@@ -367,9 +367,9 @@ class _RecoveryPinSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               '보조 PIN',
-              style: TextStyle(
+              style: const TextStyle(
                 color: ink,
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
