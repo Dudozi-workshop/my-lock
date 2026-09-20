@@ -6,7 +6,6 @@ import '../../app/theme.dart';
 import '../../lock_engine/effects.dart';
 import '../../lock_engine/models.dart';
 import '../../lock_engine/platform_lock_bridge.dart';
-import '../lock_mode/lock_mode_screen.dart';
 import 'app_selection/app_selection_screen.dart';
 import 'native_permissions/native_permissions_screen.dart';
 import 'password_setup/password_setup_screen.dart';
@@ -208,13 +207,9 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
   }
 
   Future<void> _openLockTest() async {
-    await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder: (context) => LockModeScreen(
-          settings: widget.settings,
-          demoMode: true,
-        ),
-      ),
+    await _platformBridge.presentLockScreen(
+      '__my_lock_demo__',
+      demoMode: true,
     );
   }
 
