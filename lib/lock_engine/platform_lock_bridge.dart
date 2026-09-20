@@ -397,6 +397,14 @@ class WebTestPlatformLockBridge implements PlatformLockBridge {
   }) async {}
 
   @override
+  Future<void> syncLockPresentation({
+    required int objectCount,
+    required String speed,
+    required String movementArea,
+    required String movementStyle,
+  }) async {}
+
+  @override
   Future<void> notifyUnlockGranted(String appId) async {}
 
   @override
