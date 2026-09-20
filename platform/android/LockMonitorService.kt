@@ -26,7 +26,6 @@ class LockMonitorService : Service() {
         private const val preferencesName = "my_lock_native"
         private const val protectedAppsKey = "protected_apps"
         private const val experimentalScreenLockKey = "experimental_screen_lock"
-        private const val experimentalOverlayLockKey = "experimental_overlay_lock"
         private const val relockPolicyKey = "relock_policy"
         private const val lastUnlockedAppKey = "last_unlocked_app"
         private const val lastUnlockedAtKey = "last_unlocked_at"
@@ -230,7 +229,7 @@ class LockMonitorService : Service() {
         if (packageName == this.packageName) return
 
         val protectedApps = protectedApps()
-        val overlayEnabled = experimentalOverlayLockEnabled()
+        val overlayEnabled = true
         val overlayTarget = OverlayLockController.currentTarget()
 
         if (overlayEnabled && OverlayLockController.isVisible && overlayTarget != null) {
@@ -394,11 +393,6 @@ class LockMonitorService : Service() {
     private fun experimentalScreenLockEnabled(): Boolean {
         return getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
             .getBoolean(experimentalScreenLockKey, false)
-    }
-
-    private fun experimentalOverlayLockEnabled(): Boolean {
-        return getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
-            .getBoolean(experimentalOverlayLockKey, false)
     }
 
     private fun writeHeartbeat(force: Boolean = false) {
