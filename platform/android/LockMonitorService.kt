@@ -291,7 +291,12 @@ class LockMonitorService : Service() {
             if (pendingOverlayExitPackage != appId) return@Runnable
 
             val currentTarget = OverlayLockController.currentTarget()
-            if (OverlayLockController.isVisible && currentTarget == appId) {
+            val latestForeground = latestForegroundPackage()
+            if (
+                OverlayLockController.isVisible &&
+                currentTarget == appId &&
+                latestForeground != appId
+            ) {
                 markProtectedAppExited(appId)
                 OverlayLockController.hide()
             }
@@ -315,6 +320,33 @@ class LockMonitorService : Service() {
             .putLong(lastProtectedExitAtKey, System.currentTimeMillis())
             .apply()
         MainActivity.emitProtectedAppExited(appId)
+    }
+
+    private fun latestForegroundPackage(): String? {
+        if (!hasUsageAccess()) return foregroundPackage
+
+        val now = System.currentTimeMillis()
+        val events = usageStatsManager.queryEvents(now - 1_500L, now)
+        val event = UsageEvents.Event()
+        var latestPackage: String? = null
+        var latestTimestamp = Long.MIN_VALUE
+
+        while (events.hasNextEvent()) {
+            events.getNextEvent(event)
+            val isForeground = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                event.eventType == UsageEvents.Event.ACTIVITY_RESUMED
+            } else {
+                @Suppress("DEPRECATION")
+                event.eventType == UsageEvents.Event.MOVE_TO_FOREGROUND
+            }
+
+            if (isForeground && event.timeStamp >= latestTimestamp) {
+                latestTimestamp = event.timeStamp
+                latestPackage = event.packageName
+            }
+        }
+
+        return latestPackage ?: foregroundPackage
     }
 
     private fun shouldLockInNativeFallback(appId: String): Boolean {
