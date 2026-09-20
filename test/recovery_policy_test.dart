@@ -3,41 +3,18 @@ import 'package:my_lock/features/lock_mode/recovery_policy.dart';
 
 void main() {
   group('recovery PIN policy', () {
-    test('MyLock app authentication requires graphical password reset', () {
+    test('PIN is an unlock-only authentication method', () {
       expect(
         recoveryPinActionFor(appAuthentication: true),
-        RecoveryPinAction.resetGraphicalPassword,
+        RecoveryPinAction.unlockOnly,
       );
-    });
-
-    test('protected app overlay unlocks without resetting password', () {
       expect(
         recoveryPinActionFor(appAuthentication: false),
         RecoveryPinAction.unlockOnly,
       );
     });
 
-    test('cancelled recovery setup never replaces existing password', () {
-      expect(
-        shouldCommitRecoveredPassword(
-          action: RecoveryPinAction.resetGraphicalPassword,
-          completedSetup: false,
-        ),
-        isFalse,
-      );
-    });
-
-    test('completed MyLock recovery setup may replace password', () {
-      expect(
-        shouldCommitRecoveredPassword(
-          action: RecoveryPinAction.resetGraphicalPassword,
-          completedSetup: true,
-        ),
-        isTrue,
-      );
-    });
-
-    test('overlay PIN never replaces graphical password', () {
+    test('PIN authentication never commits a graphical password change', () {
       expect(
         shouldCommitRecoveredPassword(
           action: RecoveryPinAction.unlockOnly,
