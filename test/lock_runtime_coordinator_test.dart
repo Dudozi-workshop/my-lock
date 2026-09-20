@@ -341,6 +341,14 @@ class _FakeBridge implements PlatformLockBridge {
     required Set<String> shapes,
     required Set<String> tones,
   }) async {}
+
+  @override
+  Future<void> syncLockPresentation({
+    required int objectCount,
+    required String speed,
+    required String movementArea,
+    required String movementStyle,
+  }) async {}
 }
 
 class _FakeStore implements MyLockSettingsPersistence {
