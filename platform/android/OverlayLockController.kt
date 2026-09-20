@@ -190,14 +190,12 @@ object OverlayLockController {
                     isFocusable = true
                     setOnClickListener { handleToken(tokenId) }
                 }
-                grid.addView(
-                    tokenView,
-                    GridLayout.LayoutParams().apply {
-                        width = dp(82)
-                        height = dp(82)
-                        setMargins(dp(4), dp(4), dp(4), dp(4))
-                    },
-                )
+                val gridParams = GridLayout.LayoutParams().apply {
+                    this.width = dp(82)
+                    this.height = dp(82)
+                    setMargins(dp(4), dp(4), dp(4), dp(4))
+                }
+                grid.addView(tokenView, gridParams)
             }
         }
 
