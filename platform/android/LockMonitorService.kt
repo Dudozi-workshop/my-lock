@@ -21,7 +21,7 @@ class LockMonitorService : Service() {
     companion object {
         private const val channelId = "my_lock_monitor"
         private const val notificationId = 1201
-        private const val pollIntervalMs = 350L
+        private const val pollIntervalMs = 150L\n        private const val overlayExitConfirmMs = 450L
         private const val preferencesName = "my_lock_native"
         private const val protectedAppsKey = "protected_apps"
         private const val experimentalScreenLockKey = "experimental_screen_lock"
@@ -223,29 +223,46 @@ class LockMonitorService : Service() {
 
     private fun handleForegroundPackage(packageName: String) {
         if (packageName == this.packageName) return
-        if (packageName == foregroundPackage) return
 
-        val previous = foregroundPackage
         val protectedApps = protectedApps()
+        val overlayEnabled = experimentalOverlayLockEnabled()
+        val overlayTarget = OverlayLockController.currentTarget()
 
-        if (previous != null && protectedApps.contains(previous)) {
-            getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
-                .edit()
-                .putString(lastProtectedExitAppKey, previous)
-                .putLong(lastProtectedExitAtKey, System.currentTimeMillis())
-                .apply()
-            MainActivity.emitProtectedAppExited(previous)
-        }
+        if (overlayEnabled && OverlayLockController.isVisible && overlayTarget != null) {
+            if (packageName == overlayTarget) {
+                cancelPendingOverlayExit()
+                foregroundPackage = packageName
+                return
+            }
 
-        foregroundPackage = packageName
+            if (protectedApps.contains(packageName)) {
+                cancelPendingOverlayExit()
+                foregroundPackage = packageName
+                if (shouldLockInNativeFallback(packageName)) {
+                    OverlayLockController.show(this, packageName)
+                } else {
+                    OverlayLockController.hide()
+                }
+                return
+            }
 
-        if (experimentalOverlayLockEnabled() && OverlayLockController.isVisible) {
+            scheduleOverlayExit(overlayTarget)
+            foregroundPackage = packageName
             return
         }
 
+        if (packageName == foregroundPackage) return
+
+        val previous = foregroundPackage
+        if (previous != null && protectedApps.contains(previous)) {
+            markProtectedAppExited(previous)
+        }
+
+        foregroundPackage = packageName
         if (!protectedApps.contains(packageName)) return
 
-        if (experimentalOverlayLockEnabled()) {
+        if (overlayEnabled) {
+            cancelPendingOverlayExit()
             if (shouldLockInNativeFallback(packageName)) {
                 OverlayLockController.show(this, packageName)
             }
@@ -256,6 +273,34 @@ class LockMonitorService : Service() {
         if (!delivered && shouldLockInNativeFallback(packageName)) {
             launchLockFallback(packageName)
         }
+    }
+
+    private fun scheduleOverlayExit(appId: String) {
+        if (pendingOverlayExitPackage == appId) {
+            if (System.currentTimeMillis() - pendingOverlayExitAt >= overlayExitConfirmMs) {
+                markProtectedAppExited(appId)
+                OverlayLockController.hide()
+                cancelPendingOverlayExit()
+            }
+            return
+        }
+
+        pendingOverlayExitPackage = appId
+        pendingOverlayExitAt = System.currentTimeMillis()
+    }
+
+    private fun cancelPendingOverlayExit() {
+        pendingOverlayExitPackage = null
+        pendingOverlayExitAt = 0L
+    }
+
+    private fun markProtectedAppExited(appId: String) {
+        getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+            .edit()
+            .putString(lastProtectedExitAppKey, appId)
+            .putLong(lastProtectedExitAtKey, System.currentTimeMillis())
+            .apply()
+        MainActivity.emitProtectedAppExited(appId)
     }
 
     private fun shouldLockInNativeFallback(appId: String): Boolean {
