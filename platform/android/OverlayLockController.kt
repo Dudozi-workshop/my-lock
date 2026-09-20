@@ -364,6 +364,7 @@ object OverlayLockController {
         private val tokenShape: String,
         private val tone: String,
     ) : View(context) {
+        private val hitScale = 1.22f
         private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE
@@ -371,6 +372,15 @@ object OverlayLockController {
         }
         private val highlightPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.argb(107, 255, 255, 255)
+        }
+
+        override fun pointInView(localX: Float, localY: Float, slop: Float): Boolean {
+            val extraX = width * (hitScale - 1f) * 0.5f
+            val extraY = height * (hitScale - 1f) * 0.5f
+            return localX >= -extraX - slop &&
+                localY >= -extraY - slop &&
+                localX < width + extraX + slop &&
+                localY < height + extraY + slop
         }
 
         override fun onDraw(canvas: Canvas) {
