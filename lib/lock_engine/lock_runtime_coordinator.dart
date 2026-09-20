@@ -51,6 +51,7 @@ class LockRuntimeCoordinator {
     await _bridge.syncRelockPolicy(_settings.relockPolicy.name);
     await _bridge.syncLockBackground(_settings.background.name);
     await _syncLockPattern();
+    await _syncRecoveryPin();
     await _syncLockPresentation();
   }
 
@@ -80,6 +81,7 @@ class LockRuntimeCoordinator {
     _bridge.syncRelockPolicy(_settings.relockPolicy.name);
     _bridge.syncLockBackground(_settings.background.name);
     _syncLockPattern();
+    _syncRecoveryPin();
     _syncLockPresentation();
   }
 
@@ -90,6 +92,10 @@ class LockRuntimeCoordinator {
       shapes: _settings.selectedShapes.map((value) => value.name).toSet(),
       tones: _settings.selectedTones.map((value) => value.name).toSet(),
     );
+  }
+
+  Future<void> _syncRecoveryPin() async {
+    await _bridge.syncRecoveryPin(_settings.recoveryPin);
   }
 
   Future<void> _syncLockPresentation() async {
