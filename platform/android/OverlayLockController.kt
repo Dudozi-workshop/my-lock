@@ -116,6 +116,8 @@ object OverlayLockController {
         val speedName = preferences.getString("lock_speed", "normal") ?: "normal"
         val movementArea =
             preferences.getString("lock_movement_area", "full") ?: "full"
+        val movementStyle =
+            preferences.getString("lock_movement_style", "floating") ?: "floating"
         val speedMultiplier = when (speedName) {
             "slow" -> 0.65f
             "fast" -> 1.75f
@@ -284,7 +286,9 @@ object OverlayLockController {
                 val y = top + radius +
                     random.nextFloat() * (height - top - radius * 2).coerceAtLeast(1f)
                 val angle = random.nextFloat() * Math.PI.toFloat() * 2f
-                val baseSpeed = minOf(width, height) * 0.10f * speedMultiplier
+                val styleMultiplier = if (movementStyle == "bounce") 1.32f else 1f
+                val baseSpeed =
+                    minOf(width, height) * 0.10f * speedMultiplier * styleMultiplier
                 val token = MovingToken(
                     tokenId = tokenId,
                     view = view,
