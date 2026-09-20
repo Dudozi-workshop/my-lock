@@ -152,6 +152,11 @@ object OverlayLockController {
                     }
                 }
 
+                "openAppRecovery" -> {
+                    result.success(null)
+                    openMyLockRecovery(context)
+                }
+
                 "dismissLock" -> {
                     result.success(null)
                     if (demoMode) {
@@ -171,6 +176,24 @@ object OverlayLockController {
         )
         engine.dartExecutor.executeDartEntrypoint(entrypoint)
         return engine
+    }
+
+    private fun openMyLockRecovery(context: Context) {
+        hide()
+        LockMonitorService.resetForegroundTracking()
+
+        val launchIntent = context.packageManager
+            .getLaunchIntentForPackage(context.packageName)
+            ?.apply {
+                addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP,
+                )
+            }
+        if (launchIntent != null) {
+            runCatching { context.startActivity(launchIntent) }
+        }
     }
 
     private fun exitToHome(context: Context, appId: String) {
