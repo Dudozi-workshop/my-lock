@@ -233,6 +233,7 @@ class _LockModeScreenState extends State<LockModeScreen> {
           builder: (context) => PasswordSetupScreen(
             selectedShapes: widget.settings.selectedShapes,
             selectedTones: widget.settings.selectedTones,
+            recoveryMode: true,
           ),
         ),
       );
