@@ -82,6 +82,8 @@ abstract class PlatformLockBridge {
   Future<void> openUsageAccessSettings();
 
   Future<void> openOverlaySettings();
+
+  Future<bool> authenticateDeviceOwner();
 }
 
 class MethodChannelPlatformLockBridge implements PlatformLockBridge {
@@ -199,6 +201,19 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
   Future<void> openOverlaySettings() async {
     if (kIsWeb) return;
     await _invokeSafely('openOverlaySettings', const <String, Object?>{});
+  }
+
+  @override
+  Future<bool> authenticateDeviceOwner() async {
+    if (kIsWeb) return false;
+    try {
+      return await _channel.invokeMethod<bool>('authenticateDeviceOwner') ??
+          false;
+    } on MissingPluginException {
+      return false;
+    } on PlatformException {
+      return false;
+    }
   }
 
   @override
@@ -433,4 +448,7 @@ class WebTestPlatformLockBridge implements PlatformLockBridge {
 
   @override
   Future<void> openOverlaySettings() async {}
+
+  @override
+  Future<bool> authenticateDeviceOwner() async => false;
 }
