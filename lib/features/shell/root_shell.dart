@@ -7,6 +7,7 @@ import '../../app/my_lock_settings_controller.dart';
 import '../../app/theme.dart';
 import '../../lock_engine/lock_runtime_coordinator.dart';
 import '../../lock_engine/platform_lock_bridge.dart';
+import '../app_auth/app_auth_session.dart';
 import '../onboarding/onboarding_screen.dart';
 import '../customize/customize_screen.dart';
 import '../lock_settings/lock_settings_screen.dart';
@@ -28,6 +29,7 @@ class _RootShellState extends State<RootShell> {
   WebTestPlatformLockBridge? _webBridge;
   StreamSubscription<LockRequest>? _lockRequestSubscription;
   late final Future<void> _loadFuture;
+  final AppAuthSession _appAuth = AppAuthSession();
 
   @override
   void initState() {
@@ -49,6 +51,10 @@ class _RootShellState extends State<RootShell> {
 
   Future<void> _initialize() async {
     await _settings.load();
+    _appAuth.initialize(
+      onboardingCompleted: _settings.onboardingCompleted,
+      hasPassword: _settings.password != null,
+    );
     await _runtime.start();
   }
 
@@ -141,6 +147,20 @@ class _RootShellState extends State<RootShell> {
           return OnboardingScreen(
             settings: _settings,
             onCompleted: () {
+              if (mounted) setState(() {});
+            },
+          );
+        }
+
+        if (_appAuth.requiresAuthentication(
+          onboardingCompleted: _settings.onboardingCompleted,
+          hasPassword: _settings.password != null,
+        )) {
+          return LockModeScreen(
+            settings: _settings,
+            appAuthentication: true,
+            onUnlocked: () async {
+              _appAuth.markAuthenticated();
               if (mounted) setState(() {});
             },
           );
