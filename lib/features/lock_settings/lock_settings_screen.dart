@@ -132,7 +132,7 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
           ],
           _SettingTile(
             icon: Icons.lock_rounded,
-            title: '비밀번호',
+            title: settings.password == null ? '비밀번호 설정' : '비밀번호 변경',
             value: settings.password == null
                 ? '설정 전'
                 : '${settings.password!.length}자리 그래픽 패턴',
@@ -140,7 +140,7 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
           ),
           _SettingTile(
             icon: Icons.pin_rounded,
-            title: '보조 PIN',
+            title: settings.recoveryPinReady ? '보조 PIN 변경' : '보조 PIN 설정',
             value: settings.recoveryPinReady ? '4자리 PIN 설정됨' : '설정 전',
             onTap: _openRecoveryPinSetup,
           ),
