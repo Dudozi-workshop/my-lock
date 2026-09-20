@@ -55,6 +55,12 @@ abstract class PlatformLockBridge {
 
   Future<void> syncLockBackground(String background);
 
+  Future<void> syncLockPattern({
+    required List<String> tokenIds,
+    required Set<String> shapes,
+    required Set<String> tones,
+  });
+
   Future<void> notifyUnlockGranted(String appId);
 
   Future<void> presentLockScreen(String appId);
@@ -224,6 +230,23 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
     await _invokeSafely(
       'syncLockBackground',
       <String, Object?>{'background': background},
+    );
+  }
+
+  @override
+  Future<void> syncLockPattern({
+    required List<String> tokenIds,
+    required Set<String> shapes,
+    required Set<String> tones,
+  }) async {
+    if (kIsWeb) return;
+    await _invokeSafely(
+      'syncLockPattern',
+      <String, Object?>{
+        'tokenIds': tokenIds,
+        'shapes': shapes.toList(),
+        'tones': tones.toList(),
+      },
     );
   }
 
