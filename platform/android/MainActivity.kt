@@ -107,15 +107,25 @@ class MainActivity : FlutterActivity() {
 
                 "presentLockScreen" -> {
                     val appId = call.argument<String>("appId")
+                    val demoMode = call.argument<Boolean>("demoMode") == true
                     if (appId.isNullOrEmpty()) {
                         result.error(
                             "invalid_app_id",
                             "A protected app id is required.",
                             null,
                         )
+                    } else if (demoMode) {
+                        result.success(
+                            OverlayLockController.show(
+                                this,
+                                appId,
+                                demoMode = true,
+                            ),
+                        )
+                    } else if (appId == LockActivity.deviceScreenAppId) {
+                        result.success(LockActivity.launch(this, appId))
                     } else {
-                        LockActivity.launch(this, appId)
-                        result.success(null)
+                        result.success(OverlayLockController.show(this, appId))
                     }
                 }
 
@@ -192,7 +202,7 @@ class MainActivity : FlutterActivity() {
                     val objectCount = call.argument<Int>("objectCount") ?: 9
                     val speed = call.argument<String>("speed") ?: "normal"
                     val movementArea =
-                        call.argument<String>("movementArea") ?: "full"
+                        call.argument<String>("movementArea") ?: "lower"
                     val movementStyle =
                         call.argument<String>("movementStyle") ?: "floating"
                     getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
