@@ -69,36 +69,50 @@ jobs:
             sleep $((attempt * 20))
           done
 
+      - name: Prepare stable ARM64 APK filename
+        run: |
+          set -e
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk dist/my-lock-arm64-release.apk
+
       - name: Upload ARM64 release APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: my-lock-arm64-release-apk
-          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+          path: dist/my-lock-arm64-release.apk
           if-no-files-found: error
 
-      - name: Publish latest APK download
+      - name: Publish latest ARM64 APK download
         env:
           GH_TOKEN: ${{ github.token }}
           COMMIT_SHA: ${{ github.sha }}
         run: |
           set -e
-          APK="build/app/outputs/flutter-apk/app-arm64-v8a-release.apk"
+          APK="dist/my-lock-arm64-release.apk"
           TAG="latest-apk"
-          NAME="MY LOCK Latest APK"
+          NAME="MY LOCK Latest ARM64 APK"
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$APK#my-lock-latest.apk" --clobber
+            gh release upload "$TAG" "$APK" --clobber
+            gh release edit "$TAG" --title "$NAME" --notes "Latest MY LOCK Android ARM64 release APK. Commit: $COMMIT_SHA"
           else
-            gh release create "$TAG" "$APK#my-lock-latest.apk" --title "$NAME" --notes "Latest MY LOCK Android APK. Commit: $COMMIT_SHA"
+            gh release create "$TAG" "$APK" --title "$NAME" --notes "Latest MY LOCK Android ARM64 release APK. Commit: $COMMIT_SHA"
           fi
 
-      - name: Email APK download link
+      - name: Verify public ARM64 APK download link
+        run: |
+          set -e
+          APK_URL="https://github.com/${{ github.repository }}/releases/download/latest-apk/my-lock-arm64-release.apk"
+          curl --fail --location --retry 3 --retry-delay 2 --output /tmp/my-lock-arm64-release.apk "$APK_URL"
+          test -s /tmp/my-lock-arm64-release.apk
+
+      - name: Email ARM64 APK download link
         if: ${{ success() }}
         env:
           SMTP_USERNAME: ${{ secrets.APK_MAIL_USERNAME }}
           SMTP_APP_PASSWORD: ${{ secrets.APK_MAIL_APP_PASSWORD }}
           RECIPIENT: rlatkd5959@gmail.com
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          APK_URL: https://github.com/${{ github.repository }}/releases/download/latest-apk/my-lock-latest.apk
+          APK_URL: https://github.com/${{ github.repository }}/releases/download/latest-apk/my-lock-arm64-release.apk
           COMMIT_SHA: ${{ github.sha }}
           BUILD_TIME: ${{ github.event.head_commit.timestamp }}
         run: |
@@ -126,14 +140,14 @@ jobs:
           msg = EmailMessage()
           msg["From"] = username
           msg["To"] = os.environ["RECIPIENT"]
-          msg["Subject"] = f"MY LOCK 최신 APK | {display_time} | {commit_sha[:8]}"
+          msg["Subject"] = f"MY LOCK ARM64 Release APK | {display_time} | {commit_sha[:8]}"
           msg.set_content(
-              "MY LOCK 최신 Android APK 빌드가 완료되었습니다.\n\n"
+              "MY LOCK Android ARM64 Release APK 빌드와 다운로드 검증이 완료되었습니다.\n\n"
               f"최종 수정: {display_time}\n"
               f"커밋: {commit_sha}\n"
-              f"바로 다운로드: {apk_url}\n"
+              f"ARM64 Release APK 바로 다운로드: {apk_url}\n"
               f"빌드 상세: {run_url}\n\n"
-              "위 다운로드 주소는 항상 최신 APK 파일로 갱신됩니다."
+              "위 주소는 항상 최신 ARM64 Release APK로 갱신되며, 메일 발송 전에 실제 다운로드 가능 여부까지 검증합니다."
           )
 
           with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
