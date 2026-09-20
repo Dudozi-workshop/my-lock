@@ -25,8 +25,8 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen>
     with WidgetsBindingObserver {
-  final MethodChannelPlatformLockBridge _bridge =
-      MethodChannelPlatformLockBridge();
+  late final PlatformLockBridge _bridge =
+      kIsWeb ? WebTestPlatformLockBridge() : MethodChannelPlatformLockBridge();
 
   PlatformLockCapabilities? _capabilities;
   bool _loading = true;
@@ -36,13 +36,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     widget.settings.addListener(_refresh);
-    _refreshCapabilities();
+    _startBridgeAndRefresh();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     widget.settings.removeListener(_refresh);
+    _bridge.stop();
     super.dispose();
   }
 
@@ -55,6 +56,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   void _refresh() {
     if (mounted) setState(() {});
+  }
+
+  Future<void> _startBridgeAndRefresh() async {
+    await _bridge.start();
+    await _refreshCapabilities();
   }
 
   Future<void> _refreshCapabilities() async {
@@ -105,7 +111,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       );
     }
 
-    if (kIsWeb || _capabilities?.nativeBridgeAvailable != true) {
+    if (!kIsWeb && _capabilities?.nativeBridgeAvailable != true) {
       return Scaffold(
         backgroundColor: appBackground,
         body: SafeArea(
@@ -142,6 +148,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     }
 
     final step = _currentStep;
+    if (kIsWeb && step < 2) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _refreshCapabilities();
+      });
+    }
     if (step == 5) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _completeIfReady());
     }
