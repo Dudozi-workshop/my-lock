@@ -331,6 +331,96 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
+class _WebTestPanel extends StatelessWidget {
+  const _WebTestPanel({
+    required this.settings,
+    required this.bridge,
+  });
+
+  final MyLockSettingsController settings;
+  final WebTestPlatformLockBridge bridge;
+
+  @override
+  Widget build(BuildContext context) {
+    final appId =
+        settings.selectedAppIds.isEmpty ? null : settings.selectedAppIds.first;
+    final ready = appId != null && settings.password != null;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0EDFF),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFCFC4FF)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.science_outlined, color: brandPurple),
+              SizedBox(width: 9),
+              Text(
+                'WEB TEST',
+                style: TextStyle(
+                  color: ink,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 7),
+          Text(
+            ready
+                ? 'Android 권한과 앱 전환 이벤트를 웹에서 시뮬레이션합니다.'
+                : '비밀번호와 보호 앱을 먼저 설정하면 실제 잠금 흐름을 테스트할 수 있습니다.',
+            style: const TextStyle(
+              color: secondaryInk,
+              fontSize: 12,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              FilledButton.tonalIcon(
+                onPressed: ready
+                    ? () => bridge.simulateProtectedAppEnter(appId)
+                    : null,
+                icon: const Icon(Icons.login_rounded, size: 18),
+                label: const Text('보호 앱 실행'),
+              ),
+              FilledButton.tonalIcon(
+                onPressed: appId == null
+                    ? null
+                    : () => bridge.simulateProtectedAppExit(appId),
+                icon: const Icon(Icons.logout_rounded, size: 18),
+                label: const Text('앱 종료'),
+              ),
+              FilledButton.tonalIcon(
+                onPressed: bridge.simulateScreenOff,
+                icon: const Icon(Icons.screen_lock_portrait_rounded, size: 18),
+                label: const Text('화면 OFF'),
+              ),
+              FilledButton.tonalIcon(
+                onPressed: settings.experimentalScreenLock &&
+                        settings.password != null
+                    ? bridge.simulateScreenOn
+                    : null,
+                icon: const Icon(Icons.phone_android_rounded, size: 18),
+                label: const Text('화면 ON'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ExperimentalScreenLockTile extends StatelessWidget {
   const _ExperimentalScreenLockTile({
     required this.enabled,
