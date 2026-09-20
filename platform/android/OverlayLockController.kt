@@ -2,8 +2,13 @@ package com.mylock.app.my_lock
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.PixelFormat
+import android.graphics.RadialGradient
+import android.graphics.Shader
 import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
@@ -223,11 +228,7 @@ object OverlayLockController {
                 val parts = tokenId.split("_", limit = 2)
                 val tone = parts.firstOrNull() ?: "pink"
                 val shape = parts.getOrNull(1) ?: "circle"
-                val view = TextView(context).apply {
-                    text = shapeSymbol(shape)
-                    textSize = 42f
-                    gravity = Gravity.CENTER
-                    setTextColor(toneColor(tone))
+                val view = FloatingTokenView(context, shape, tone).apply {
                     isClickable = true
                     isFocusable = true
                     setOnClickListener { handleToken(tokenId, this) }
@@ -313,6 +314,88 @@ object OverlayLockController {
         val radius: Float,
     )
 
+    private class FloatingTokenView(
+        context: Context,
+        private val tokenShape: String,
+        private val tone: String,
+    ) : View(context) {
+        private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.STROKE
+            color = Color.argb(158, 255, 255, 255)
+        }
+        private val highlightPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.argb(107, 255, 255, 255)
+        }
+
+        override fun onDraw(canvas: Canvas) {
+            super.onDraw(canvas)
+            val cx = width / 2f
+            val cy = height / 2f
+            val radius = minOf(width, height) * 0.38f
+            val path = tokenPath(tokenShape, cx, cy, radius)
+            val (light, dark) = toneColors(tone)
+
+            setLayerType(LAYER_TYPE_SOFTWARE, null)
+            fillPaint.setShadowLayer(radius * 0.18f, 0f, radius * 0.08f, Color.argb(66, Color.red(dark), Color.green(dark), Color.blue(dark)))
+            fillPaint.shader = RadialGradient(
+                cx - radius * 0.45f,
+                cy - radius * 0.55f,
+                radius * 1.25f,
+                intArrayOf(Color.WHITE, light, dark),
+                floatArrayOf(0f, 0.35f, 1f),
+                Shader.TileMode.CLAMP,
+            )
+            canvas.drawPath(path, fillPaint)
+
+            fillPaint.clearShadowLayer()
+            borderPaint.strokeWidth = maxOf(1.2f, radius * 0.035f)
+            canvas.drawPath(path, borderPaint)
+            canvas.drawOval(
+                cx - radius * 0.52f,
+                cy - radius * 0.40f,
+                cx,
+                cy - radius * 0.16f,
+                highlightPaint,
+            )
+        }
+
+        private fun tokenPath(shape: String, cx: Float, cy: Float, radius: Float): Path {
+            return when (shape) {
+                "triangle" -> Path().apply {
+                    for (i in 0..2) {
+                        val angle = -Math.PI / 2 + i * Math.PI * 2 / 3
+                        val x = cx + cos(angle).toFloat() * radius
+                        val y = cy + sin(angle).toFloat() * radius
+                        if (i == 0) moveTo(x, y) else lineTo(x, y)
+                    }
+                    close()
+                }
+                "square" -> Path().apply {
+                    val half = radius * 0.79f
+                    addRoundRect(
+                        cx - half,
+                        cy - half,
+                        cx + half,
+                        cy + half,
+                        radius * 0.32f,
+                        radius * 0.32f,
+                        Path.Direction.CW,
+                    )
+                }
+                else -> Path().apply {
+                    addCircle(cx, cy, radius, Path.Direction.CW)
+                }
+            }
+        }
+
+        private fun toneColors(tone: String): Pair<Int, Int> = when (tone) {
+            "blue" -> Color.parseColor("#79BFFF") to Color.parseColor("#3F6FEA")
+            "yellow" -> Color.parseColor("#FFDA72") to Color.parseColor("#F0A632")
+            else -> Color.parseColor("#FF8FD1") to Color.parseColor("#E656AB")
+        }
+    }
+
     private fun progressDots(progress: Int, total: Int): String =
         List(total) { index -> if (index < progress) "●" else "○" }
             .joinToString(separator = "  ")
@@ -322,18 +405,6 @@ object OverlayLockController {
         return MessageDigest.getInstance("SHA-256")
             .digest(payload.toByteArray(Charsets.UTF_8))
             .joinToString(separator = "") { byte -> "%02x".format(byte) }
-    }
-
-    private fun shapeSymbol(shape: String): String = when (shape) {
-        "triangle" -> "▲"
-        "square" -> "■"
-        else -> "●"
-    }
-
-    private fun toneColor(tone: String): Int = when (tone) {
-        "blue" -> Color.parseColor("#3F6FEA")
-        "yellow" -> Color.parseColor("#F0A632")
-        else -> Color.parseColor("#E656AB")
     }
 
     private fun exitToHome(context: Context, appId: String) {
