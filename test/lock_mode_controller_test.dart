@@ -41,7 +41,7 @@ void main() {
     expect(controller.failedAttempts, 1);
   });
 
-  test('recovery PIN eligibility counts failed full sequences', () {
+  test('failed attempt count remains diagnostic only', () {
     final controller = LockModeController([a, b, a]);
 
     for (var attempt = 0; attempt < 3; attempt++) {
