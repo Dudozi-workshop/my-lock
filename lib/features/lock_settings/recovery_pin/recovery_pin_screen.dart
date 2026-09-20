@@ -3,7 +3,12 @@ import 'package:flutter/material.dart';
 import '../../../app/theme.dart';
 
 class RecoveryPinScreen extends StatefulWidget {
-  const RecoveryPinScreen({super.key});
+  const RecoveryPinScreen({
+    super.key,
+    this.recoveryMode = false,
+  });
+
+  final bool recoveryMode;
 
   @override
   State<RecoveryPinScreen> createState() => _RecoveryPinScreenState();
@@ -22,9 +27,9 @@ class _RecoveryPinScreenState extends State<RecoveryPinScreen> {
       appBar: AppBar(
         backgroundColor: appBackground,
         surfaceTintColor: Colors.transparent,
-        title: const Text(
-          '보조 PIN',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          widget.recoveryMode ? '새 보조 PIN 설정' : '보조 PIN',
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: SafeArea(
@@ -41,7 +46,9 @@ class _RecoveryPinScreenState extends State<RecoveryPinScreen> {
               Text(
                 _mismatch
                     ? 'PIN이 일치하지 않습니다. 다시 입력하세요.'
-                    : '그래픽 비밀번호 대신 MY LOCK을 열 때 사용할 수 있습니다.',
+                    : widget.recoveryMode
+                        ? '기기 인증 후 사용할 새 4자리 PIN을 설정합니다.'
+                        : '그래픽 비밀번호 대신 MY LOCK을 열 때 사용할 수 있습니다.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: _mismatch
