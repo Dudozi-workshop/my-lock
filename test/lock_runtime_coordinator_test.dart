@@ -314,6 +314,9 @@ class _FakeBridge implements PlatformLockBridge {
   Future<void> openOverlaySettings() async {}
 
   @override
+  Future<bool> authenticateDeviceOwner() async => false;
+
+  @override
   Future<void> start() async {
     final event = startEvent;
     if (event != null) {
