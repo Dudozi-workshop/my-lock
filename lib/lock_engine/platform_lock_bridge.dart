@@ -61,6 +61,13 @@ abstract class PlatformLockBridge {
     required Set<String> tones,
   });
 
+  Future<void> syncLockPresentation({
+    required int objectCount,
+    required String speed,
+    required String movementArea,
+    required String movementStyle,
+  });
+
   Future<void> notifyUnlockGranted(String appId);
 
   Future<void> presentLockScreen(String appId);
@@ -246,6 +253,25 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
         'tokenIds': tokenIds,
         'shapes': shapes.toList(),
         'tones': tones.toList(),
+      },
+    );
+  }
+
+  @override
+  Future<void> syncLockPresentation({
+    required int objectCount,
+    required String speed,
+    required String movementArea,
+    required String movementStyle,
+  }) async {
+    if (kIsWeb) return;
+    await _invokeSafely(
+      'syncLockPresentation',
+      <String, Object?>{
+        'objectCount': objectCount,
+        'speed': speed,
+        'movementArea': movementArea,
+        'movementStyle': movementStyle,
       },
     );
   }
