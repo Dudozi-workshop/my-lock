@@ -58,6 +58,10 @@ class _LockActivityHostState extends State<_LockActivityHost> {
     super.dispose();
   }
 
+  Future<void> _openAppRecovery() async {
+    await _channel.invokeMethod<void>('openAppRecovery');
+  }
+
   Future<void> _unlock() async {
     final appId = _targetAppId;
     if (appId == null) return;
@@ -97,6 +101,7 @@ class _LockActivityHostState extends State<_LockActivityHost> {
         return LockModeScreen(
           settings: _settings,
           demoMode: _demoMode,
+          onOpenAppRecovery: _demoMode ? null : _openAppRecovery,
           onUnlocked: _unlock,
         );
       },
