@@ -5,6 +5,107 @@ import 'package:flutter/material.dart';
 import 'effects.dart';
 import 'models.dart';
 
+class LockTokenPainter extends CustomPainter {
+  const LockTokenPainter(this.token);
+
+  final LockToken token;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final radius = size.shortestSide * 0.31;
+    final path = _tokenShapePath(token.shape, center, radius);
+    final colors = _tokenToneColors(token.tone);
+
+    canvas.drawShadow(
+      path,
+      colors.$2.withValues(alpha: 0.26),
+      12,
+      true,
+    );
+
+    final fill = Paint()
+      ..shader = RadialGradient(
+        center: const Alignment(-0.45, -0.55),
+        radius: 1.25,
+        colors: [
+          Colors.white.withValues(alpha: 0.88),
+          colors.$1.withValues(alpha: 0.95),
+          colors.$2.withValues(alpha: 0.98),
+        ],
+        stops: const [0.0, 0.35, 1.0],
+      ).createShader(
+        Rect.fromCircle(center: center, radius: radius),
+      );
+
+    canvas.drawPath(path, fill);
+
+    final border = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = max(1.2, radius * 0.035)
+      ..color = Colors.white.withValues(alpha: 0.62);
+    canvas.drawPath(path, border);
+
+    final highlight = Paint()
+      ..color = Colors.white.withValues(alpha: 0.42);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: center.translate(-radius * 0.26, -radius * 0.28),
+        width: radius * 0.52,
+        height: radius * 0.24,
+      ),
+      highlight,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant LockTokenPainter oldDelegate) =>
+      oldDelegate.token.id != token.id;
+}
+
+Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
+  switch (kind) {
+    case ShapeKind.circle:
+      return Path()..addOval(Rect.fromCircle(center: center, radius: radius));
+    case ShapeKind.triangle:
+      final path = Path();
+      for (var i = 0; i < 3; i++) {
+        final angle = -pi / 2 + i * pi * 2 / 3;
+        final point = center + Offset(cos(angle), sin(angle)) * radius;
+        if (i == 0) {
+          path.moveTo(point.dx, point.dy);
+        } else {
+          path.lineTo(point.dx, point.dy);
+        }
+      }
+      return path..close();
+    case ShapeKind.square:
+      final rect = Rect.fromCenter(
+        center: center,
+        width: radius * 1.58,
+        height: radius * 1.58,
+      );
+      return Path()
+        ..addRRect(
+          RRect.fromRectAndRadius(
+            rect,
+            Radius.circular(radius * 0.32),
+          ),
+        );
+  }
+}
+
+(Color, Color) _tokenToneColors(ShapeTone tone) {
+  switch (tone) {
+    case ShapeTone.pink:
+      return (const Color(0xFFFF8FD1), const Color(0xFFE656AB));
+    case ShapeTone.blue:
+      return (const Color(0xFF79BFFF), const Color(0xFF3F6FEA));
+    case ShapeTone.yellow:
+      return (const Color(0xFFFFDA72), const Color(0xFFF0A632));
+  }
+}
+
 class FloatingShapePainter extends CustomPainter {
   const FloatingShapePainter({
     required this.objects,
@@ -152,48 +253,10 @@ class FloatingShapePainter extends CustomPainter {
     }
   }
 
-  Path _shapePath(ShapeKind kind, Offset center, double radius) {
-    switch (kind) {
-      case ShapeKind.circle:
-        return Path()..addOval(Rect.fromCircle(center: center, radius: radius));
-      case ShapeKind.triangle:
-        final path = Path();
-        for (var i = 0; i < 3; i++) {
-          final angle = -pi / 2 + i * pi * 2 / 3;
-          final point = center + Offset(cos(angle), sin(angle)) * radius;
-          if (i == 0) {
-            path.moveTo(point.dx, point.dy);
-          } else {
-            path.lineTo(point.dx, point.dy);
-          }
-        }
-        return path..close();
-      case ShapeKind.square:
-        final rect = Rect.fromCenter(
-          center: center,
-          width: radius * 1.58,
-          height: radius * 1.58,
-        );
-        return Path()
-          ..addRRect(
-            RRect.fromRectAndRadius(
-              rect,
-              Radius.circular(radius * 0.32),
-            ),
-          );
-    }
-  }
+  Path _shapePath(ShapeKind kind, Offset center, double radius) =>
+      _tokenShapePath(kind, center, radius);
 
-  (Color, Color) _toneColors(ShapeTone tone) {
-    switch (tone) {
-      case ShapeTone.pink:
-        return (const Color(0xFFFF8FD1), const Color(0xFFE656AB));
-      case ShapeTone.blue:
-        return (const Color(0xFF79BFFF), const Color(0xFF3F6FEA));
-      case ShapeTone.yellow:
-        return (const Color(0xFFFFDA72), const Color(0xFFF0A632));
-    }
-  }
+  (Color, Color) _toneColors(ShapeTone tone) => _tokenToneColors(tone);
 
   @override
   bool shouldRepaint(covariant FloatingShapePainter oldDelegate) => true;
