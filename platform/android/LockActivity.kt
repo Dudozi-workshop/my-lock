@@ -73,6 +73,10 @@ class LockActivity : FlutterActivity() {
                     result.success(targetAppId)
                 }
 
+                "getLockDemoMode" -> {
+                    result.success(false)
+                }
+
                 "unlockGranted" -> {
                     val appId = call.argument<String>("appId") ?: targetAppId
                     if (appId.isNullOrBlank()) {
