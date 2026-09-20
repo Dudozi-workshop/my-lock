@@ -53,6 +53,7 @@ class LockMonitorService : Service() {
     private var foregroundPackage: String? = null
     private var pendingOverlayExitPackage: String? = null
     private var pendingOverlayExitAt = 0L
+    private var pendingOverlayExitRunnable: Runnable? = null
 
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -118,6 +119,7 @@ class LockMonitorService : Service() {
     override fun onDestroy() {
         activeInstance = null
         OverlayLockController.hide()
+        cancelPendingOverlayExit()
         handler.removeCallbacks(pollRunnable)
         runCatching { unregisterReceiver(screenReceiver) }
         getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
@@ -279,20 +281,29 @@ class LockMonitorService : Service() {
     }
 
     private fun scheduleOverlayExit(appId: String) {
-        if (pendingOverlayExitPackage == appId) {
-            if (System.currentTimeMillis() - pendingOverlayExitAt >= overlayExitConfirmMs) {
-                markProtectedAppExited(appId)
-                OverlayLockController.hide()
-                cancelPendingOverlayExit()
-            }
-            return
-        }
+        if (pendingOverlayExitPackage == appId) return
 
+        cancelPendingOverlayExit()
         pendingOverlayExitPackage = appId
         pendingOverlayExitAt = System.currentTimeMillis()
+
+        val runnable = Runnable {
+            if (pendingOverlayExitPackage != appId) return@Runnable
+
+            val currentTarget = OverlayLockController.currentTarget()
+            if (OverlayLockController.isVisible && currentTarget == appId) {
+                markProtectedAppExited(appId)
+                OverlayLockController.hide()
+            }
+            cancelPendingOverlayExit()
+        }
+        pendingOverlayExitRunnable = runnable
+        handler.postDelayed(runnable, overlayExitConfirmMs)
     }
 
     private fun cancelPendingOverlayExit() {
+        pendingOverlayExitRunnable?.let(handler::removeCallbacks)
+        pendingOverlayExitRunnable = null
         pendingOverlayExitPackage = null
         pendingOverlayExitAt = 0L
     }
