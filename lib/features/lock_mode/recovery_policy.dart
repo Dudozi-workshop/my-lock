@@ -10,3 +10,11 @@ RecoveryPinAction recoveryPinActionFor({
       ? RecoveryPinAction.resetGraphicalPassword
       : RecoveryPinAction.unlockOnly;
 }
+
+bool shouldCommitRecoveredPassword({
+  required RecoveryPinAction action,
+  required bool completedSetup,
+}) {
+  return action == RecoveryPinAction.resetGraphicalPassword &&
+      completedSetup;
+}
