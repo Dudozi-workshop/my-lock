@@ -14,12 +14,14 @@ class LockModeScreen extends StatefulWidget {
     required this.settings,
     this.demoMode = false,
     this.appAuthentication = false,
+    this.authenticationAttemptIsCurrent,
     this.onUnlocked,
   });
 
   final MyLockSettingsController settings;
   final bool demoMode;
   final bool appAuthentication;
+  final bool Function()? authenticationAttemptIsCurrent;
   final Future<void> Function()? onUnlocked;
 
   @override
@@ -32,6 +34,9 @@ class _LockModeScreenState extends State<LockModeScreen> {
   bool _allowRoutePop = false;
 
   bool get _canUseRecoveryPin => widget.settings.recoveryPinReady;
+
+  bool get _authenticationAttemptIsCurrent =>
+      widget.authenticationAttemptIsCurrent?.call() ?? true;
 
   @override
   void initState() {
@@ -51,12 +56,23 @@ class _LockModeScreenState extends State<LockModeScreen> {
 
   Future<void> _finishUnlock() async {
     if (_finishing) return;
+    if (!_authenticationAttemptIsCurrent) return;
+
     setState(() {
       _finishing = true;
       _allowRoutePop = true;
     });
     await Future<void>.delayed(const Duration(milliseconds: 700));
-    if (!mounted) return;
+    if (!mounted || !_authenticationAttemptIsCurrent) {
+      if (mounted) {
+        setState(() {
+          _finishing = false;
+          _allowRoutePop = false;
+          _controller.reset();
+        });
+      }
+      return;
+    }
     final onUnlocked = widget.onUnlocked;
     if (onUnlocked != null) {
       await onUnlocked();
@@ -226,7 +242,12 @@ class _LockModeScreenState extends State<LockModeScreen> {
       },
     );
 
-    if (unlocked != true || !mounted || _finishing) return;
+    if (unlocked != true ||
+        !mounted ||
+        _finishing ||
+        !_authenticationAttemptIsCurrent) {
+      return;
+    }
 
     final recoveryAction = recoveryPinActionFor(
       appAuthentication: widget.appAuthentication,
@@ -242,7 +263,11 @@ class _LockModeScreenState extends State<LockModeScreen> {
         ),
       );
       final completedSetup = pattern != null && pattern.isNotEmpty;
-      if (!mounted || _finishing) return;
+      if (!mounted ||
+          _finishing ||
+          !_authenticationAttemptIsCurrent) {
+        return;
+      }
       if (!shouldCommitRecoveredPassword(
         action: recoveryAction,
         completedSetup: completedSetup,
