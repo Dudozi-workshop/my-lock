@@ -197,6 +197,23 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
 
+                "syncLockPresentation" -> {
+                    val objectCount = call.argument<Int>("objectCount") ?: 9
+                    val speed = call.argument<String>("speed") ?: "normal"
+                    val movementArea =
+                        call.argument<String>("movementArea") ?: "full"
+                    val movementStyle =
+                        call.argument<String>("movementStyle") ?: "floating"
+                    getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+                        .edit()
+                        .putInt("lock_object_count", objectCount)
+                        .putString("lock_speed", speed)
+                        .putString("lock_movement_area", movementArea)
+                        .putString("lock_movement_style", movementStyle)
+                        .apply()
+                    result.success(null)
+                }
+
                 "unlockGranted" -> {
                     val appId = call.argument<String>("appId")
                     getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
