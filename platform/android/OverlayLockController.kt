@@ -180,7 +180,7 @@ object OverlayLockController {
         val recoveryPanel = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
-            visibility = if (recoveryPinHash != null) View.VISIBLE else View.GONE
+            visibility = View.GONE
             setPadding(dp(28), dp(12), dp(28), dp(20))
         }
         val pinDots = TextView(context).apply {
@@ -260,7 +260,7 @@ object OverlayLockController {
             textSize = 13f
             gravity = Gravity.CENTER
             setTextColor(Color.parseColor("#FF7658D6"))
-            visibility = View.GONE
+            visibility = if (recoveryPinHash != null) View.VISIBLE else View.GONE
             isClickable = true
             setPadding(dp(12), dp(8), dp(12), dp(8))
             setOnClickListener {
@@ -275,6 +275,27 @@ object OverlayLockController {
             }
         }
         header.addView(recoveryButton)
+
+        val pinCancelButton = TextView(context).apply {
+            text = "취소"
+            textSize = 14f
+            gravity = Gravity.CENTER
+            setTextColor(Color.parseColor("#FF7658D6"))
+            isClickable = true
+            setPadding(dp(16), dp(10), dp(16), dp(10))
+            setOnClickListener {
+                pinMode = false
+                pinInput.clear()
+                pinDots.text = progressDots(0, 4)
+                subtitle.text = "도형을 순서대로 눌러 잠금을 해제하세요."
+                progress.visibility = View.VISIBLE
+                playfield.visibility = View.VISIBLE
+                recoveryPanel.visibility = View.GONE
+                recoveryButton.visibility =
+                    if (recoveryPinHash != null) View.VISIBLE else View.GONE
+            }
+        }
+        recoveryPanel.addView(pinCancelButton)
 
         val allowedTokens = buildList {
             for (tone in listOf("pink", "blue", "yellow")) {
