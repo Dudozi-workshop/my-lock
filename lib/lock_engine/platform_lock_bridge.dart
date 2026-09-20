@@ -70,7 +70,10 @@ abstract class PlatformLockBridge {
 
   Future<void> notifyUnlockGranted(String appId);
 
-  Future<void> presentLockScreen(String appId);
+  Future<void> presentLockScreen(
+    String appId, {
+    bool demoMode = false,
+  });
 
   Future<PlatformLockCapabilities> getCapabilities();
 
@@ -278,11 +281,17 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
   }
 
   @override
-  Future<void> presentLockScreen(String appId) async {
+  Future<void> presentLockScreen(
+    String appId, {
+    bool demoMode = false,
+  }) async {
     if (kIsWeb) return;
     await _invokeSafely(
       'presentLockScreen',
-      <String, Object?>{'appId': appId},
+      <String, Object?>{
+        'appId': appId,
+        'demoMode': demoMode,
+      },
     );
   }
 
@@ -400,7 +409,10 @@ class WebTestPlatformLockBridge implements PlatformLockBridge {
   Future<void> notifyUnlockGranted(String appId) async {}
 
   @override
-  Future<void> presentLockScreen(String appId) async {}
+  Future<void> presentLockScreen(
+    String appId, {
+    bool demoMode = false,
+  }) async {}
 
   @override
   Future<void> openUsageAccessSettings() async {}
