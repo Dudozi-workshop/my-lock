@@ -137,7 +137,6 @@ object OverlayLockController {
         val recoveryPinHash = preferences.getString("recovery_pin_hash", null)
         val input = mutableListOf<String>()
         val pinInput = StringBuilder()
-        var failedAttempts = 0
         var pinMode = false
 
         val root = FrameLayout(context).apply {
@@ -181,7 +180,7 @@ object OverlayLockController {
         val recoveryPanel = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
-            visibility = View.GONE
+            visibility = if (recoveryPinHash != null) View.VISIBLE else View.GONE
             setPadding(dp(28), dp(12), dp(28), dp(20))
         }
         val pinDots = TextView(context).apply {
@@ -379,12 +378,7 @@ object OverlayLockController {
                 }
                 hide()
             } else {
-                failedAttempts += 1
                 resetInput("순서가 달라요. 처음부터 다시 눌러주세요.")
-                if (failedAttempts >= 3 && recoveryPinHash != null) {
-                    recoveryButton.visibility = View.VISIBLE
-                    subtitle.text = "3회 실패했습니다. 다시 시도하거나 보조 PIN을 사용하세요."
-                }
             }
         }
 
