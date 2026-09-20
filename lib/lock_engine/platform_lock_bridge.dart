@@ -61,6 +61,8 @@ abstract class PlatformLockBridge {
     required Set<String> tones,
   });
 
+  Future<void> syncRecoveryPin(String? pin);
+
   Future<void> syncLockPresentation({
     required int objectCount,
     required String speed,
@@ -253,6 +255,15 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
   }
 
   @override
+  Future<void> syncRecoveryPin(String? pin) async {
+    if (kIsWeb) return;
+    await _invokeSafely(
+      'syncRecoveryPin',
+      <String, Object?>{'pin': pin},
+    );
+  }
+
+  @override
   Future<void> syncLockPresentation({
     required int objectCount,
     required String speed,
@@ -396,6 +407,9 @@ class WebTestPlatformLockBridge implements PlatformLockBridge {
     required Set<String> shapes,
     required Set<String> tones,
   }) async {}
+
+  @override
+  Future<void> syncRecoveryPin(String? pin) async {}
 
   @override
   Future<void> syncLockPresentation({
