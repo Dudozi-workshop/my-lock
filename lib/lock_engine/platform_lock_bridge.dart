@@ -214,14 +214,6 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
     );
   }
 
-  Future<void> syncExperimentalOverlayLock(bool enabled) async {
-    if (kIsWeb) return;
-    await _invokeSafely(
-      'syncExperimentalOverlayLock',
-      <String, Object?>{'enabled': enabled},
-    );
-  }
-
   @override
   Future<void> syncRelockPolicy(String policy) async {
     if (kIsWeb) return;
