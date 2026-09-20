@@ -1,9 +1,11 @@
 class AppAuthSession {
   bool _authenticated = false;
   bool _initialized = false;
+  int _generation = 0;
 
   bool get authenticated => _authenticated;
   bool get initialized => _initialized;
+  int get generation => _generation;
 
   void initialize({
     required bool onboardingCompleted,
@@ -22,12 +24,18 @@ class AppAuthSession {
     return onboardingCompleted && hasPassword && !_authenticated;
   }
 
-  void markAuthenticated() {
+  bool isAttemptCurrent(int generation) =>
+      _initialized && generation == _generation;
+
+  bool markAuthenticated({required int generation}) {
+    if (!isAttemptCurrent(generation)) return false;
     _authenticated = true;
+    return true;
   }
 
   void markUnauthenticated() {
     if (!_initialized) return;
     _authenticated = false;
+    _generation++;
   }
 }
