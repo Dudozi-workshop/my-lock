@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import '../../app/my_lock_settings_controller.dart';
 import '../../app/theme.dart';
 import '../../lock_engine/floating_preview.dart';
+import '../../lock_engine/models.dart';
+import '../../lock_engine/platform_lock_bridge.dart';
+import '../lock_settings/password_setup/password_setup_screen.dart';
+import '../lock_settings/recovery_pin/recovery_pin_screen.dart';
 import 'lock_mode_controller.dart';
 
 class LockModeScreen extends StatefulWidget {
@@ -12,6 +16,7 @@ class LockModeScreen extends StatefulWidget {
     this.demoMode = false,
     this.appAuthentication = false,
     this.authenticationAttemptIsCurrent,
+    this.onDeviceRecovered,
     this.onUnlocked,
   });
 
@@ -19,6 +24,7 @@ class LockModeScreen extends StatefulWidget {
   final bool demoMode;
   final bool appAuthentication;
   final bool Function()? authenticationAttemptIsCurrent;
+  final Future<void> Function()? onDeviceRecovered;
   final Future<void> Function()? onUnlocked;
 
   @override
@@ -152,6 +158,8 @@ class _LockModeScreenState extends State<LockModeScreen>
                   mismatch: _controller.mismatch,
                   showRecoveryPin: _canUseRecoveryPin,
                   onRecoveryPin: _openRecoveryPin,
+                  onDeviceRecovery:
+                      widget.appAuthentication ? _recoverWithDeviceOwner : null,
                   onClose: () => Navigator.of(context).pop(false),
                 ),
               ),
@@ -206,6 +214,58 @@ class _LockModeScreenState extends State<LockModeScreen>
       ),
       ),
     );
+  }
+
+  Future<void> _recoverWithDeviceOwner() async {
+    if (!widget.appAuthentication || _finishing) return;
+
+    final authenticated =
+        await MethodChannelPlatformLockBridge().authenticateDeviceOwner();
+    if (!authenticated || !mounted) return;
+
+    final pattern = await Navigator.of(context).push<List<LockToken>>(
+      MaterialPageRoute(
+        builder: (context) => PasswordSetupScreen(
+          selectedShapes: widget.settings.selectedShapes,
+          selectedTones: widget.settings.selectedTones,
+          recoveryMode: true,
+        ),
+      ),
+    );
+    if (pattern == null || pattern.isEmpty || !mounted) return;
+
+    final pin = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (context) => const RecoveryPinScreen(
+          recoveryMode: true,
+        ),
+      ),
+    );
+    if (pin == null || !mounted) return;
+
+    widget.settings.setPassword(pattern);
+    widget.settings.setRecoveryPin(pin);
+
+    setState(() {
+      _finishing = true;
+      _allowRoutePop = true;
+    });
+
+    final onDeviceRecovered = widget.onDeviceRecovered;
+    if (onDeviceRecovered != null) {
+      await onDeviceRecovered();
+      return;
+    }
+
+    final onUnlocked = widget.onUnlocked;
+    if (onUnlocked != null) {
+      await onUnlocked();
+      return;
+    }
+
+    if (mounted) {
+      Navigator.of(context).pop(true);
+    }
   }
 
   Future<void> _openRecoveryPin() async {
@@ -299,6 +359,7 @@ class _Header extends StatelessWidget {
     required this.mismatch,
     required this.showRecoveryPin,
     required this.onRecoveryPin,
+    required this.onDeviceRecovery,
     required this.onClose,
   });
 
@@ -309,6 +370,7 @@ class _Header extends StatelessWidget {
   final bool mismatch;
   final bool showRecoveryPin;
   final VoidCallback onRecoveryPin;
+  final VoidCallback? onDeviceRecovery;
   final VoidCallback onClose;
 
   @override
@@ -386,6 +448,13 @@ class _Header extends StatelessWidget {
               onPressed: onRecoveryPin,
               icon: const Icon(Icons.pin_rounded, size: 17),
               label: Text(appAuthentication ? 'PIN으로 인증' : '보조 PIN 사용'),
+            ),
+          ],
+          if (onDeviceRecovery != null) ...[
+            const SizedBox(height: 2),
+            TextButton(
+              onPressed: onDeviceRecovery,
+              child: const Text('비밀번호와 PIN을 모두 잊으셨나요?'),
             ),
           ],
         ],
