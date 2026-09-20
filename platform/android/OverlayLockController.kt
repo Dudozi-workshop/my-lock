@@ -111,8 +111,6 @@ object OverlayLockController {
         ).orEmpty()
         val objectCount =
             preferences.getInt("lock_object_count", 9).coerceIn(6, 12)
-        val requiredTokens =
-            preferences.getStringSet("lock_pattern_required_tokens", emptySet()).orEmpty()
         val patternSequence =
             preferences.getString("lock_pattern_sequence", "")
                 .orEmpty()
@@ -168,14 +166,81 @@ object OverlayLockController {
             addView(progress)
         }
 
+        val allowedTokens = buildList {
+            for (tone in listOf("pink", "blue", "yellow")) {
+                if (!tones.contains(tone)) continue
+                for (shape in listOf("circle", "triangle", "square")) {
+                    if (shapes.contains(shape)) add("${tone}_${shape}")
+                }
+            }
+        }.ifEmpty {
+            listOf("pink_circle", "blue_triangle", "yellow_square")
+        }
+
+        val random = Random(SystemClock.uptimeMillis())
+        val tokenIds = MutableList(objectCount) { index ->
+            allowedTokens[index % allowedTokens.size]
+        }.also { it.shuffle(random) }
+        val moving = mutableListOf<MovingToken>()
+
+        fun ensureNextPasswordTokens() {
+            if (patternSequence.isEmpty() || moving.isEmpty()) return
+
+            val upcoming = patternSequence
+                .drop(input.size)
+                .take(2)
+            if (upcoming.isEmpty()) return
+
+            val desiredCounts = upcoming
+                .groupingBy { it }
+                .eachCount()
+            val visibleCounts = moving
+                .filter { it.view.alpha > 0.05f }
+                .groupingBy { it.tokenId }
+                .eachCount()
+                .toMutableMap()
+
+            for ((requiredId, requiredCount) in desiredCounts) {
+                while ((visibleCounts[requiredId] ?: 0) < requiredCount) {
+                    val replacement = moving
+                        .filter { candidate ->
+                            candidate.tokenId != requiredId &&
+                                (visibleCounts[candidate.tokenId] ?: 0) >
+                                    (desiredCounts[candidate.tokenId] ?: 0)
+                        }
+                        .firstOrNull()
+                        ?: moving.firstOrNull { it.tokenId != requiredId }
+                        ?: break
+
+                    val oldId = replacement.tokenId
+                    visibleCounts[oldId] =
+                        ((visibleCounts[oldId] ?: 1) - 1).coerceAtLeast(0)
+                    replacement.tokenId = requiredId
+                    replacement.view.setToken(requiredId)
+                    replacement.view.alpha = 1f
+                    replacement.view.scaleX = 1f
+                    replacement.view.scaleY = 1f
+                    visibleCounts[requiredId] =
+                        (visibleCounts[requiredId] ?: 0) + 1
+                }
+            }
+        }
+
         fun resetInput(message: String) {
             input.clear()
-            progress.text = if (patternLength > 0) progressDots(0, patternLength) else ""
+            progress.text =
+                if (patternLength > 0) progressDots(0, patternLength) else ""
             subtitle.text = message
+            ensureNextPasswordTokens()
         }
 
         fun handleToken(tokenId: String, view: View) {
-            if (patternLength <= 0 || patternHash == null || input.size >= patternLength) return
+            if (
+                patternLength <= 0 ||
+                patternHash == null ||
+                input.size >= patternLength
+            ) return
+
             view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             view.animate()
                 .scaleX(1.28f)
@@ -188,10 +253,14 @@ object OverlayLockController {
                     view.alpha = 1f
                 }
                 .start()
+
             input.add(tokenId)
             progress.text = progressDots(input.size, patternLength)
-            ensureNextPasswordTokens()
-            if (input.size < patternLength) return
+
+            if (input.size < patternLength) {
+                ensureNextPasswordTokens()
+                return
+            }
 
             if (hashPattern(input) == patternHash) {
                 markUnlocked(context, appId)
@@ -201,53 +270,6 @@ object OverlayLockController {
             }
         }
 
-        val allowedTokens = buildList {
-            for (tone in listOf("pink", "blue", "yellow")) {
-                if (!tones.contains(tone)) continue
-                for (shape in listOf("circle", "triangle", "square")) {
-                    if (shapes.contains(shape)) add("${tone}_${shape}")
-                }
-            }
-        }.ifEmpty {
-            listOf("pink_circle", "blue_triangle", "yellow_square")
-        }
-
-        // Preserve only the token types used by the password, never their order.
-        // Fill the remaining slots from enabled combinations.
-        val tokenIds = requiredTokens
-            .filter { allowedTokens.contains(it) }
-            .take(objectCount)
-            .toMutableList()
-        var fillIndex = 0
-        while (tokenIds.size < objectCount) {
-            tokenIds.add(allowedTokens[fillIndex % allowedTokens.size])
-            fillIndex += 1
-        }
-        tokenIds.shuffle(random = Random(SystemClock.uptimeMillis()))
-
-        val random = Random(SystemClock.uptimeMillis())
-        val moving = mutableListOf<MovingToken>()
-
-        fun ensureNextPasswordTokens() {
-            if (patternSequence.isEmpty()) return
-            val nextIndex = input.size.coerceAtMost(patternSequence.lastIndex)
-            val nextTokenId = patternSequence[nextIndex]
-            val requiredCopies = minOf(2, objectCount)
-            val currentCopies = moving.count { it.tokenId == nextTokenId && it.view.alpha > 0.05f }
-            if (currentCopies >= requiredCopies) return
-
-            val replaceable = moving
-                .filter { it.tokenId != nextTokenId }
-                .shuffled(random)
-                .take(requiredCopies - currentCopies)
-            for (token in replaceable) {
-                token.tokenId = nextTokenId
-                token.view.setToken(nextTokenId)
-                token.view.alpha = 1f
-                token.view.scaleX = 1f
-                token.view.scaleY = 1f
-            }
-        }
         val handler = Handler(Looper.getMainLooper())
         var lastFrame = SystemClock.uptimeMillis()
 
