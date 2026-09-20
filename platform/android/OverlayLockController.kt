@@ -168,6 +168,17 @@ object OverlayLockController {
         fun handleToken(tokenId: String, view: View) {
             if (patternLength <= 0 || patternHash == null || input.size >= patternLength) return
             view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            view.animate()
+                .scaleX(1.28f)
+                .scaleY(1.28f)
+                .alpha(0f)
+                .setDuration(160L)
+                .withEndAction {
+                    view.scaleX = 1f
+                    view.scaleY = 1f
+                    view.alpha = 1f
+                }
+                .start()
             input.add(tokenId)
             progress.text = progressDots(input.size, patternLength)
             if (input.size < patternLength) return
@@ -275,6 +286,40 @@ object OverlayLockController {
                             token.vy = -token.vy
                             token.y = token.y.coerceIn(top + token.radius, height - token.radius)
                         }
+                    }
+
+                    for (i in 0 until moving.size) {
+                        for (j in i + 1 until moving.size) {
+                            val first = moving[i]
+                            val second = moving[j]
+                            val dx = second.x - first.x
+                            val dy = second.y - first.y
+                            val minDistance = (first.radius + second.radius) * 0.92f
+                            val distanceSquared = dx * dx + dy * dy
+                            if (distanceSquared <= 0.01f || distanceSquared >= minDistance * minDistance) continue
+
+                            val distance = kotlin.math.sqrt(distanceSquared)
+                            val nx = dx / distance
+                            val ny = dy / distance
+                            val overlap = minDistance - distance
+                            first.x -= nx * overlap * 0.5f
+                            first.y -= ny * overlap * 0.5f
+                            second.x += nx * overlap * 0.5f
+                            second.y += ny * overlap * 0.5f
+
+                            val firstNormal = first.vx * nx + first.vy * ny
+                            val secondNormal = second.vx * nx + second.vy * ny
+                            val impulse = secondNormal - firstNormal
+                            first.vx += impulse * nx
+                            first.vy += impulse * ny
+                            second.vx -= impulse * nx
+                            second.vy -= impulse * ny
+                        }
+                    }
+
+                    for (token in moving) {
+                        token.x = token.x.coerceIn(token.radius, width - token.radius)
+                        token.y = token.y.coerceIn(top + token.radius, height - token.radius)
                         token.view.translationX = token.x - token.radius -
                             (token.view.layoutParams as FrameLayout.LayoutParams).leftMargin
                         token.view.translationY = token.y - token.radius -
