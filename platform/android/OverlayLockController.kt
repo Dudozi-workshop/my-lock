@@ -39,7 +39,11 @@ object OverlayLockController {
 
     fun currentTarget(): String? = targetAppId
 
-    fun show(context: Context, appId: String): Boolean {
+    fun show(
+        context: Context,
+        appId: String,
+        demoMode: Boolean = false,
+    ): Boolean {
         if (!Settings.canDrawOverlays(context)) return false
         if (isVisible && targetAppId == appId) return true
 
@@ -48,7 +52,7 @@ object OverlayLockController {
         val appContext = context.applicationContext
         val manager =
             appContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val root = buildView(appContext, appId)
+        val root = buildView(appContext, appId, demoMode)
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -93,7 +97,11 @@ object OverlayLockController {
         }
     }
 
-    private fun buildView(context: Context, appId: String): View {
+    private fun buildView(
+        context: Context,
+        appId: String,
+        demoMode: Boolean,
+    ): View {
         val density = context.resources.displayMetrics.density
         fun dp(value: Int): Int = (value * density).toInt()
 
@@ -118,7 +126,7 @@ object OverlayLockController {
                 .filter { it.isNotBlank() }
         val speedName = preferences.getString("lock_speed", "normal") ?: "normal"
         val movementArea =
-            preferences.getString("lock_movement_area", "full") ?: "full"
+            preferences.getString("lock_movement_area", "lower") ?: "lower"
         val movementStyle =
             preferences.getString("lock_movement_style", "floating") ?: "floating"
         val speedMultiplier = when (speedName) {
@@ -263,7 +271,9 @@ object OverlayLockController {
             }
 
             if (hashPattern(input) == patternHash) {
-                markUnlocked(context, appId)
+                if (!demoMode) {
+                    markUnlocked(context, appId)
+                }
                 hide()
             } else {
                 resetInput("순서가 달라요. 처음부터 다시 눌러주세요.")
@@ -428,7 +438,13 @@ object OverlayLockController {
             gravity = Gravity.CENTER
             isClickable = true
             isFocusable = true
-            setOnClickListener { exitToHome(context, appId) }
+            setOnClickListener {
+                if (demoMode) {
+                    hide()
+                } else {
+                    exitToHome(context, appId)
+                }
+            }
         }
         root.addView(
             closeButton,
