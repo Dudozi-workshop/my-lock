@@ -257,7 +257,16 @@ class LockMonitorService : Service() {
             return
         }
 
-        if (packageName == foregroundPackage) return
+        if (packageName == foregroundPackage) {
+            if (
+                protectedApps.contains(packageName) &&
+                !OverlayLockController.isVisible &&
+                shouldLockInNativeFallback(packageName)
+            ) {
+                OverlayLockController.show(this, packageName)
+            }
+            return
+        }
 
         val previous = foregroundPackage
         if (previous != null && protectedApps.contains(previous)) {
