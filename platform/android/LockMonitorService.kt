@@ -273,9 +273,8 @@ class LockMonitorService : Service() {
             return
         }
 
-        val delivered = MainActivity.emitProtectedAppEntered(packageName)
-        if (!delivered && shouldLockInNativeFallback(packageName)) {
-            launchLockFallback(packageName)
+        if (shouldLockInNativeFallback(packageName)) {
+            OverlayLockController.show(this, packageName)
         }
     }
 
@@ -378,11 +377,6 @@ class LockMonitorService : Service() {
             }
             else -> leftProtectedApp
         }
-    }
-
-    private fun launchLockFallback(appId: String) {
-        if (!Settings.canDrawOverlays(this)) return
-        LockActivity.launch(this, appId)
     }
 
     private fun launchScreenLockFallback() {
