@@ -31,7 +31,7 @@ object OverlayLockController {
     private var currentDemoMode: Boolean = false
 
     val isVisible: Boolean
-        get() = overlayView != null
+        get() = overlayView?.isAttachedToWindow == true
 
     fun currentTarget(): String? = targetAppId
 
@@ -49,7 +49,9 @@ object OverlayLockController {
             return true
         }
 
-        hide()
+        if (overlayView != null && !isVisible) {
+            hide()
+        }
 
         val appContext = context.applicationContext
         val manager =
@@ -78,6 +80,10 @@ object OverlayLockController {
                 gravity = Gravity.TOP or Gravity.START
             }
 
+            val previousManager = windowManager
+            val previousView = overlayView
+            val previousEngine = flutterEngine
+
             manager.addView(view, params)
 
             windowManager = manager
@@ -86,9 +92,17 @@ object OverlayLockController {
             targetAppId = appId
             currentDemoMode = demoMode
             engine.lifecycleChannel.appIsResumed()
+
+            if (previousManager != null && previousView != null) {
+                runCatching { previousManager.removeViewImmediate(previousView) }
+                runCatching { previousView.detachFromFlutterEngine() }
+            }
+            if (previousEngine != null) {
+                runCatching { previousEngine.lifecycleChannel.appIsDetached() }
+                runCatching { previousEngine.destroy() }
+            }
             true
         }.getOrElse {
-            hide()
             false
         }
     }
