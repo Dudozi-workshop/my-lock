@@ -35,8 +35,9 @@ cp "$TMP/analysis_options.yaml" "$ROOT/analysis_options.yaml"
 
 flutter pub get
 
-# Launcher icon generation is kept outside CI bootstrap.
-# A damaged branding source must never block functional APK builds.
+if [[ ",$PLATFORMS," == *",android,"* ]]; then
+  dart run flutter_launcher_icons
+fi
 
 flutter analyze
 flutter test
