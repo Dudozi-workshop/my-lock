@@ -39,10 +39,10 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
   }
 
   List<LockToken> get _availableTokens => [
-        for (final tone in ShapeTone.values)
-          if (widget.selectedTones.contains(tone))
-            for (final shape in ShapeKind.values)
-              if (widget.selectedShapes.contains(shape))
+        for (final shape in ShapeKind.values)
+          if (widget.selectedShapes.contains(shape))
+            for (final tone in ShapeTone.values)
+              if (widget.selectedTones.contains(tone))
                 LockToken(shape: shape, tone: tone),
       ];
 
