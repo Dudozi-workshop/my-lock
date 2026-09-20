@@ -22,7 +22,7 @@ class LockMonitorService : Service() {
         private const val channelId = "my_lock_monitor"
         private const val notificationId = 1201
         private const val pollIntervalMs = 150L
-        private const val overlayExitConfirmMs = 450L
+        private const val overlayExitConfirmMs = 300L
         private const val preferencesName = "my_lock_native"
         private const val protectedAppsKey = "protected_apps"
         private const val experimentalScreenLockKey = "experimental_screen_lock"
