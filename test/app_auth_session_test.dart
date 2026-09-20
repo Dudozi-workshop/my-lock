@@ -30,6 +30,21 @@ void main() {
       );
     });
 
+    test('relocks after the app session leaves foreground', () {
+      final session = AppAuthSession()
+        ..initialize(onboardingCompleted: true, hasPassword: true)
+        ..markAuthenticated()
+        ..markUnauthenticated();
+
+      expect(
+        session.requiresAuthentication(
+          onboardingCompleted: true,
+          hasPassword: true,
+        ),
+        isTrue,
+      );
+    });
+
     test('does not gate onboarding or users without a password', () {
       final onboarding = AppAuthSession()
         ..initialize(onboardingCompleted: false, hasPassword: false);
