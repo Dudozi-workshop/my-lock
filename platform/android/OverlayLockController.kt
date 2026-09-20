@@ -113,6 +113,11 @@ object OverlayLockController {
             preferences.getInt("lock_object_count", 9).coerceIn(6, 12)
         val requiredTokens =
             preferences.getStringSet("lock_pattern_required_tokens", emptySet()).orEmpty()
+        val patternSequence =
+            preferences.getString("lock_pattern_sequence", "")
+                .orEmpty()
+                .split("|")
+                .filter { it.isNotBlank() }
         val speedName = preferences.getString("lock_speed", "normal") ?: "normal"
         val movementArea =
             preferences.getString("lock_movement_area", "full") ?: "full"
@@ -185,6 +190,7 @@ object OverlayLockController {
                 .start()
             input.add(tokenId)
             progress.text = progressDots(input.size, patternLength)
+            ensureNextPasswordTokens()
             if (input.size < patternLength) return
 
             if (hashPattern(input) == patternHash) {
@@ -221,6 +227,27 @@ object OverlayLockController {
 
         val random = Random(SystemClock.uptimeMillis())
         val moving = mutableListOf<MovingToken>()
+
+        fun ensureNextPasswordTokens() {
+            if (patternSequence.isEmpty()) return
+            val nextIndex = input.size.coerceAtMost(patternSequence.lastIndex)
+            val nextTokenId = patternSequence[nextIndex]
+            val requiredCopies = minOf(2, objectCount)
+            val currentCopies = moving.count { it.tokenId == nextTokenId && it.view.alpha > 0.05f }
+            if (currentCopies >= requiredCopies) return
+
+            val replaceable = moving
+                .filter { it.tokenId != nextTokenId }
+                .shuffled(random)
+                .take(requiredCopies - currentCopies)
+            for (token in replaceable) {
+                token.tokenId = nextTokenId
+                token.view.setToken(nextTokenId)
+                token.view.alpha = 1f
+                token.view.scaleX = 1f
+                token.view.scaleY = 1f
+            }
+        }
         val handler = Handler(Looper.getMainLooper())
         var lastFrame = SystemClock.uptimeMillis()
 
@@ -307,6 +334,7 @@ object OverlayLockController {
                     },
                 )
             }
+            ensureNextPasswordTokens()
 
             val frame = object : Runnable {
                 override fun run() {
@@ -391,7 +419,7 @@ object OverlayLockController {
     }
 
     private data class MovingToken(
-        val tokenId: String,
+        var tokenId: String,
         val view: View,
         var x: Float,
         var y: Float,
@@ -402,8 +430,8 @@ object OverlayLockController {
 
     private class FloatingTokenView(
         context: Context,
-        private val tokenShape: String,
-        private val tone: String,
+        private var tokenShape: String,
+        private var tone: String,
     ) : View(context) {
         private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -412,6 +440,13 @@ object OverlayLockController {
         }
         private val highlightPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.argb(107, 255, 255, 255)
+        }
+
+        fun setToken(tokenId: String) {
+            val parts = tokenId.split("_", limit = 2)
+            tone = parts.firstOrNull() ?: "pink"
+            tokenShape = parts.getOrNull(1) ?: "circle"
+            invalidate()
         }
 
         override fun onDraw(canvas: Canvas) {
