@@ -10,10 +10,12 @@ class PasswordSetupScreen extends StatefulWidget {
     super.key,
     required this.selectedShapes,
     required this.selectedTones,
+    this.recoveryMode = false,
   });
 
   final Set<ShapeKind> selectedShapes;
   final Set<ShapeTone> selectedTones;
+  final bool recoveryMode;
 
   @override
   State<PasswordSetupScreen> createState() => _PasswordSetupScreenState();
@@ -56,9 +58,9 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
       appBar: AppBar(
         backgroundColor: appBackground,
         surfaceTintColor: Colors.transparent,
-        title: const Text(
-          '비밀번호',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          widget.recoveryMode ? '새 비밀번호 설정' : '비밀번호',
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: SafeArea(
@@ -72,6 +74,7 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
                 count: _controller.input.length,
                 targetCount: confirming ? _controller.pattern.length : null,
                 mismatch: _controller.mismatch,
+                recoveryMode: widget.recoveryMode,
               ),
             ),
             Padding(
@@ -246,18 +249,22 @@ class _Header extends StatelessWidget {
     required this.count,
     required this.targetCount,
     required this.mismatch,
+    required this.recoveryMode,
   });
 
   final bool confirming;
   final int count;
   final int? targetCount;
   final bool mismatch;
+  final bool recoveryMode;
 
   @override
   Widget build(BuildContext context) {
     final title = confirming
         ? '같은 순서로 다시 눌러주세요.'
-        : '2~6개의 도형을 순서대로 눌러주세요.';
+        : recoveryMode
+            ? '새 비밀번호를 2~6개의 도형으로 설정하세요.'
+            : '2~6개의 도형을 순서대로 눌러주세요.';
     final helper = confirming
         ? '$count / ${targetCount ?? 0}'
         : '$count / ${PasswordSetupController.maxLength} · 최소 ${PasswordSetupController.minLength}개';
