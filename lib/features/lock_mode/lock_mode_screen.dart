@@ -10,11 +10,13 @@ class LockModeScreen extends StatefulWidget {
     super.key,
     required this.settings,
     this.demoMode = false,
+    this.appAuthentication = false,
     this.onUnlocked,
   });
 
   final MyLockSettingsController settings;
   final bool demoMode;
+  final bool appAuthentication;
   final Future<void> Function()? onUnlocked;
 
   @override
@@ -26,8 +28,7 @@ class _LockModeScreenState extends State<LockModeScreen> {
   bool _finishing = false;
   bool _allowRoutePop = false;
 
-  bool get _canUseRecoveryPin =>
-      widget.settings.recoveryPinReady && _controller.failedAttempts >= 3;
+  bool get _canUseRecoveryPin => widget.settings.recoveryPinReady;
 
   @override
   void initState() {
@@ -101,6 +102,7 @@ class _LockModeScreenState extends State<LockModeScreen> {
                 top: 12,
                 child: _Header(
                   demoMode: widget.demoMode,
+                  appAuthentication: widget.appAuthentication,
                   progress: _controller.progress,
                   passwordLength: _controller.passwordLength,
                   mismatch: _controller.mismatch,
@@ -238,6 +240,7 @@ class _LockModeScreenState extends State<LockModeScreen> {
 class _Header extends StatelessWidget {
   const _Header({
     required this.demoMode,
+    required this.appAuthentication,
     required this.progress,
     required this.passwordLength,
     required this.mismatch,
@@ -247,6 +250,7 @@ class _Header extends StatelessWidget {
   });
 
   final bool demoMode;
+  final bool appAuthentication;
   final int progress;
   final int passwordLength;
   final bool mismatch;
@@ -293,7 +297,9 @@ class _Header extends StatelessWidget {
           Text(
             mismatch
                 ? '순서가 달라요. 처음부터 다시 눌러주세요.'
-                : '도형을 순서대로 눌러 잠금을 해제하세요.',
+                : appAuthentication
+                    ? 'MY LOCK을 열려면 인증하세요.'
+                    : '도형을 순서대로 눌러 잠금을 해제하세요.',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: mismatch ? const Color(0xFFD94262) : secondaryInk,
