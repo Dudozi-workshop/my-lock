@@ -295,7 +295,10 @@ class _FakeBridge implements PlatformLockBridge {
   Future<void> notifyUnlockGranted(String appId) async {}
 
   @override
-  Future<void> presentLockScreen(String appId) async {
+  Future<void> presentLockScreen(
+    String appId, {
+    bool demoMode = false,
+  }) async {
     presentedApps.add(appId);
   }
 
@@ -341,6 +344,9 @@ class _FakeBridge implements PlatformLockBridge {
     required Set<String> shapes,
     required Set<String> tones,
   }) async {}
+
+  @override
+  Future<void> syncRecoveryPin(String? pin) async {}
 
   @override
   Future<void> syncLockPresentation({
