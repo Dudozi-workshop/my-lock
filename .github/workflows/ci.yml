@@ -76,64 +76,64 @@ jobs:
           path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
           if-no-files-found: error
 
-      - name: Email latest APK
+      - name: Publish latest APK download
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          set -e
+          APK="build/app/outputs/flutter-apk/app-arm64-v8a-release.apk"
+          TAG="latest-apk"
+          NAME="MY LOCK Latest APK"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK#my-lock-latest.apk" --clobber
+          else
+            gh release create "$TAG" "$APK#my-lock-latest.apk" --title "$NAME" --notes "Latest MY LOCK Android APK. Commit: $COMMIT_SHA"
+          fi
+
+      - name: Email APK download link
         if: ${{ success() }}
         env:
           SMTP_USERNAME: ${{ secrets.APK_MAIL_USERNAME }}
           SMTP_APP_PASSWORD: ${{ secrets.APK_MAIL_APP_PASSWORD }}
           RECIPIENT: rlatkd5959@gmail.com
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          APK_URL: https://github.com/${{ github.repository }}/releases/download/latest-apk/my-lock-latest.apk
           COMMIT_SHA: ${{ github.sha }}
           BUILD_TIME: ${{ github.event.head_commit.timestamp }}
-          APK_PATH: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
         run: |
           python3 - <<'PY'
           import os
           import smtplib
+          from datetime import datetime, timezone, timedelta
           from email.message import EmailMessage
-          from pathlib import Path
 
           username = os.environ.get("SMTP_USERNAME", "")
           password = os.environ.get("SMTP_APP_PASSWORD", "")
           if not username or not password:
               raise SystemExit("APK mail secrets are not configured")
 
-          recipient = os.environ["RECIPIENT"]
-          run_url = os.environ["RUN_URL"]
           commit_sha = os.environ["COMMIT_SHA"]
           build_time = os.environ.get("BUILD_TIME", "")
-          from datetime import datetime, timezone, timedelta
+          apk_url = os.environ["APK_URL"]
+          run_url = os.environ["RUN_URL"]
           try:
               dt = datetime.fromisoformat(build_time.replace("Z", "+00:00"))
-              kst = dt.astimezone(timezone(timedelta(hours=9)))
-              display_time = kst.strftime("%Y-%m-%d %H:%M KST")
+              display_time = dt.astimezone(timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M KST")
           except Exception:
               display_time = build_time or "unknown"
-          apk_path = Path(os.environ["APK_PATH"])
-          if not apk_path.is_file():
-              raise SystemExit(f"Built APK not found: {apk_path}")
-
-          short_sha = commit_sha[:8]
-          safe_time = display_time.replace("-", "").replace(":", "").replace(" ", "-").replace("KST", "KST")
-          attachment_name = f"my-lock-{safe_time}-{short_sha}-arm64-release.apk"
 
           msg = EmailMessage()
           msg["From"] = username
-          msg["To"] = recipient
-          msg["Subject"] = f"MY LOCK 최신 APK | {display_time} | {short_sha}"
+          msg["To"] = os.environ["RECIPIENT"]
+          msg["Subject"] = f"MY LOCK 최신 APK | {display_time} | {commit_sha[:8]}"
           msg.set_content(
-              "이 메일에 첨부된 APK는 아래 커밋에서 직접 빌드된 파일입니다.\n\n"
+              "MY LOCK 최신 Android APK 빌드가 완료되었습니다.\n\n"
               f"최종 수정: {display_time}\n"
               f"커밋: {commit_sha}\n"
-              f"파일명: {attachment_name}\n"
+              f"바로 다운로드: {apk_url}\n"
               f"빌드 상세: {run_url}\n\n"
-              "이전 Google Drive 고정 링크는 사용하지 않습니다."
-          )
-          msg.add_attachment(
-              apk_path.read_bytes(),
-              maintype="application",
-              subtype="vnd.android.package-archive",
-              filename=attachment_name,
+              "위 다운로드 주소는 항상 최신 APK 파일로 갱신됩니다."
           )
 
           with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
