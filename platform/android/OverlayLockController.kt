@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
+import java.security.MessageDigest
 import android.provider.Settings
 import android.view.Gravity
 import android.view.KeyEvent
@@ -14,6 +15,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.GridLayout
 
 object OverlayLockController {
     private const val preferencesName = "my_lock_native"
@@ -85,6 +87,20 @@ object OverlayLockController {
         val density = context.resources.displayMetrics.density
         fun dp(value: Int): Int = (value * density).toInt()
 
+        val preferences =
+            context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+        val patternLength = preferences.getInt("lock_pattern_length", 0)
+        val patternHash = preferences.getString("lock_pattern_hash", null)
+        val shapes = preferences.getStringSet(
+            "lock_pattern_shapes",
+            setOf("circle", "triangle", "square"),
+        ).orEmpty()
+        val tones = preferences.getStringSet(
+            "lock_pattern_tones",
+            setOf("pink", "blue", "yellow"),
+        ).orEmpty()
+        val input = mutableListOf<String>()
+
         val root = FrameLayout(context).apply {
             setPadding(dp(20), dp(20), dp(20), dp(20))
             background = buildBackground(context)
@@ -106,20 +122,90 @@ object OverlayLockController {
         }
 
         val subtitle = TextView(context).apply {
-            text = "Overlay Test\n홈/최근 앱을 눌러도 잠금이 유지되는지 확인해 주세요."
+            text = if (patternLength > 0 && patternHash != null) {
+                "설정한 순서대로 도형을 눌러주세요."
+            } else {
+                "비밀번호 설정이 필요합니다."
+            }
             setTextColor(Color.parseColor("#FF6D647A"))
             textSize = 14f
             gravity = Gravity.CENTER
-            setPadding(0, dp(12), 0, dp(28))
+            setPadding(0, dp(12), 0, dp(12))
         }
 
-        val unlockButton = Button(context).apply {
-            text = "테스트 해제"
-            textSize = 15f
-            setOnClickListener {
+        val progress = TextView(context).apply {
+            text = if (patternLength > 0) "0 / $patternLength" else ""
+            setTextColor(Color.parseColor("#FF6D647A"))
+            textSize = 13f
+            gravity = Gravity.CENTER
+            setPadding(0, 0, 0, dp(20))
+        }
+
+        val grid = GridLayout(context).apply {
+            columnCount = 3
+            rowCount = 3
+            alignmentMode = GridLayout.ALIGN_BOUNDS
+            useDefaultMargins = true
+        }
+
+        fun resetInput(message: String? = null) {
+            input.clear()
+            progress.text = if (patternLength > 0) "0 / $patternLength" else ""
+            if (message != null) subtitle.text = message
+        }
+
+        fun handleToken(tokenId: String) {
+            if (patternLength <= 0 || patternHash == null) return
+            if (input.size >= patternLength) return
+
+            input.add(tokenId)
+            progress.text = "${input.size} / $patternLength"
+            if (input.size < patternLength) return
+
+            if (hashPattern(input) == patternHash) {
                 markUnlocked(context, appId)
                 hide()
+            } else {
+                resetInput("일치하지 않습니다. 다시 입력하세요.")
             }
+        }
+
+        for (tone in listOf("pink", "blue", "yellow")) {
+            if (!tones.contains(tone)) continue
+            for (shape in listOf("circle", "triangle", "square")) {
+                if (!shapes.contains(shape)) continue
+                val tokenId = "${tone}_${shape}"
+                val tokenView = TextView(context).apply {
+                    text = shapeSymbol(shape)
+                    textSize = 32f
+                    gravity = Gravity.CENTER
+                    setTextColor(toneColor(tone))
+                    background = GradientDrawable().apply {
+                        shape = GradientDrawable.RECTANGLE
+                        cornerRadius = dp(18).toFloat()
+                        setColor(Color.parseColor("#F7F5FA"))
+                        setStroke(dp(1), Color.parseColor("#E3DFEA"))
+                    }
+                    isClickable = true
+                    isFocusable = true
+                    setOnClickListener { handleToken(tokenId) }
+                }
+                grid.addView(
+                    tokenView,
+                    GridLayout.LayoutParams().apply {
+                        width = dp(82)
+                        height = dp(82)
+                        setMargins(dp(4), dp(4), dp(4), dp(4))
+                    },
+                )
+            }
+        }
+
+        val clearButton = Button(context).apply {
+            text = "다시 입력"
+            textSize = 14f
+            isEnabled = patternLength > 0
+            setOnClickListener { resetInput("설정한 순서대로 도형을 눌러주세요.") }
         }
 
         val closeButton = TextView(context).apply {
@@ -134,26 +220,15 @@ object OverlayLockController {
             }
         }
 
+        centerContent.addView(title)
+        centerContent.addView(subtitle)
+        centerContent.addView(progress)
+        centerContent.addView(grid)
         centerContent.addView(
-            title,
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-            ),
-        )
-        centerContent.addView(
-            subtitle,
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-            ),
-        )
-        centerContent.addView(
-            unlockButton,
-            LinearLayout.LayoutParams(
-                dp(180),
-                dp(52),
-            ),
+            clearButton,
+            LinearLayout.LayoutParams(dp(180), dp(52)).apply {
+                topMargin = dp(20)
+            },
         )
 
         root.addView(
@@ -164,17 +239,30 @@ object OverlayLockController {
                 Gravity.CENTER,
             ),
         )
-
         root.addView(
             closeButton,
-            FrameLayout.LayoutParams(
-                dp(56),
-                dp(56),
-                Gravity.TOP or Gravity.END,
-            ),
+            FrameLayout.LayoutParams(dp(56), dp(56), Gravity.TOP or Gravity.END),
         )
-
         return root
+    }
+
+    private fun hashPattern(tokenIds: List<String>): String {
+        val payload = tokenIds.joinToString(separator = "|")
+        return MessageDigest.getInstance("SHA-256")
+            .digest(payload.toByteArray(Charsets.UTF_8))
+            .joinToString(separator = "") { byte -> "%02x".format(byte) }
+    }
+
+    private fun shapeSymbol(shape: String): String = when (shape) {
+        "triangle" -> "▲"
+        "square" -> "■"
+        else -> "●"
+    }
+
+    private fun toneColor(tone: String): Int = when (tone) {
+        "blue" -> Color.parseColor("#3F6FEA")
+        "yellow" -> Color.parseColor("#F0A632")
+        else -> Color.parseColor("#E656AB")
     }
 
     private fun exitToHome(context: Context, appId: String) {
