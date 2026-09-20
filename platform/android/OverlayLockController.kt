@@ -186,9 +186,8 @@ object OverlayLockController {
             listOf("pink_circle", "blue_triangle", "yellow_square")
         }
 
-        val requiredCounts = mutableMapOf<String, Int>()
-        // The hash intentionally does not expose the original sequence. Ensure each
-        // configured token type remains available by cycling all allowed tokens.
+        // The hash intentionally does not expose the original sequence. Cycle the
+        // enabled token types so the playfield remains usable without storing plaintext.
         val tokenIds = MutableList(objectCount) { index ->
             allowedTokens[index % allowedTokens.size]
         }
