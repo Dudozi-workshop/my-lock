@@ -220,6 +220,33 @@ object OverlayLockController {
                 FrameLayout.LayoutParams.MATCH_PARENT,
             ),
         )
+        playfield.setOnTouchListener { _, event ->
+            if (event.action != android.view.MotionEvent.ACTION_DOWN) {
+                return@setOnTouchListener true
+            }
+
+            var closest: MovingToken? = null
+            var closestDistanceSquared = Float.MAX_VALUE
+            for (token in moving) {
+                val dx = event.x - token.x
+                val dy = event.y - token.y
+                val distanceSquared = dx * dx + dy * dy
+                val maxDistance = token.radius
+                if (
+                    distanceSquared <= maxDistance * maxDistance &&
+                    distanceSquared < closestDistanceSquared
+                ) {
+                    closest = token
+                    closestDistanceSquared = distanceSquared
+                }
+            }
+
+            closest?.let { token ->
+                handleToken(token.tokenId, token.view)
+            }
+            true
+        }
+
         root.addView(
             header,
             FrameLayout.LayoutParams(
@@ -240,9 +267,8 @@ object OverlayLockController {
                 val tone = parts.firstOrNull() ?: "pink"
                 val shape = parts.getOrNull(1) ?: "circle"
                 val view = FloatingTokenView(context, shape, tone).apply {
-                    isClickable = true
-                    isFocusable = true
-                    setOnClickListener { handleToken(tokenId, this) }
+                    isClickable = false
+                    isFocusable = false
                 }
                 val size = (radius * 2).toInt()
                 val x = radius + random.nextFloat() * (width - radius * 2).coerceAtLeast(1f)
@@ -251,6 +277,7 @@ object OverlayLockController {
                 val angle = random.nextFloat() * Math.PI.toFloat() * 2f
                 val baseSpeed = minOf(width, height) * 0.10f * speedMultiplier
                 val token = MovingToken(
+                    tokenId = tokenId,
                     view = view,
                     x = x,
                     y = y,
@@ -351,6 +378,7 @@ object OverlayLockController {
     }
 
     private data class MovingToken(
+        val tokenId: String,
         val view: View,
         var x: Float,
         var y: Float,
@@ -364,7 +392,6 @@ object OverlayLockController {
         private val tokenShape: String,
         private val tone: String,
     ) : View(context) {
-        private val hitScale = 1.22f
         private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE
@@ -372,15 +399,6 @@ object OverlayLockController {
         }
         private val highlightPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.argb(107, 255, 255, 255)
-        }
-
-        override fun pointInView(localX: Float, localY: Float, slop: Float): Boolean {
-            val extraX = width * (hitScale - 1f) * 0.5f
-            val extraY = height * (hitScale - 1f) * 0.5f
-            return localX >= -extraX - slop &&
-                localY >= -extraY - slop &&
-                localX < width + extraX + slop &&
-                localY < height + extraY + slop
         }
 
         override fun onDraw(canvas: Canvas) {
