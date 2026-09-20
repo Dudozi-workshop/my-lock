@@ -3,20 +3,20 @@ import 'package:my_lock/features/lock_mode/pin_failure_policy.dart';
 
 void main() {
   group('overlay PIN recovery policy', () {
-    test('does not offer recovery before five failures', () {
+    test('does not offer recovery before three failures', () {
       expect(
         shouldOfferOverlayRecovery(
-          failedAttempts: 4,
+          failedAttempts: 2,
           appAuthentication: false,
         ),
         isFalse,
       );
     });
 
-    test('offers recovery after five overlay PIN failures', () {
+    test('offers recovery after three overlay PIN failures', () {
       expect(
         shouldOfferOverlayRecovery(
-          failedAttempts: 5,
+          failedAttempts: 3,
           appAuthentication: false,
         ),
         isTrue,
@@ -26,7 +26,7 @@ void main() {
     test('does not use overlay failure policy for MyLock app auth', () {
       expect(
         shouldOfferOverlayRecovery(
-          failedAttempts: 5,
+          failedAttempts: 3,
           appAuthentication: true,
         ),
         isFalse,
