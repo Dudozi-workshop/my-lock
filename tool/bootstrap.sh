@@ -35,9 +35,9 @@ cp "$TMP/analysis_options.yaml" "$ROOT/analysis_options.yaml"
 
 flutter pub get
 
-# Launcher icon generation is intentionally skipped in CI bootstrap.
-# flutter create already provides a valid launcher icon; branding can be
-# regenerated separately once the source PNG is repaired.
+if [[ ",$PLATFORMS," == *",android,"* ]]; then
+  dart run flutter_launcher_icons
+fi
 
 flutter analyze
 flutter test
