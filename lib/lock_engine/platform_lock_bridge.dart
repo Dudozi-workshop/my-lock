@@ -289,3 +289,96 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
     }
   }
 }
+
+class WebTestPlatformLockBridge implements PlatformLockBridge {
+  final StreamController<PlatformLockEvent> _events =
+      StreamController<PlatformLockEvent>.broadcast();
+
+  bool _started = false;
+
+  @override
+  Stream<PlatformLockEvent> get events => _events.stream;
+
+  @override
+  Future<void> start() async {
+    _started = true;
+  }
+
+  @override
+  Future<void> stop() async {
+    if (!_started) return;
+    _started = false;
+    await _events.close();
+  }
+
+  @override
+  Future<PlatformLockCapabilities> getCapabilities() async {
+    return const PlatformLockCapabilities(
+      nativeBridgeAvailable: true,
+      usageAccessGranted: true,
+      overlayGranted: true,
+      monitorServiceRunning: true,
+    );
+  }
+
+  void simulateProtectedAppEnter(String appId) {
+    if (!_started || appId.isEmpty) return;
+    _events.add(
+      PlatformLockEvent(
+        PlatformLockEventType.protectedAppEntered,
+        appId: appId,
+      ),
+    );
+  }
+
+  void simulateProtectedAppExit(String appId) {
+    if (!_started || appId.isEmpty) return;
+    _events.add(
+      PlatformLockEvent(
+        PlatformLockEventType.protectedAppExited,
+        appId: appId,
+      ),
+    );
+  }
+
+  void simulateScreenOff() {
+    if (!_started) return;
+    _events.add(const PlatformLockEvent(PlatformLockEventType.screenOff));
+  }
+
+  void simulateScreenOn() {
+    if (!_started) return;
+    _events.add(const PlatformLockEvent(PlatformLockEventType.screenOn));
+  }
+
+  @override
+  Future<void> syncProtectedApps(Set<String> appIds) async {}
+
+  @override
+  Future<void> syncExperimentalScreenLock(bool enabled) async {}
+
+  @override
+  Future<void> syncRelockPolicy(String policy) async {}
+
+  @override
+  Future<void> syncLockBackground(String background) async {}
+
+  @override
+  Future<void> syncLockPattern({
+    required List<String> tokenIds,
+    required Set<String> shapes,
+    required Set<String> tones,
+  }) async {}
+
+  @override
+  Future<void> notifyUnlockGranted(String appId) async {}
+
+  @override
+  Future<void> presentLockScreen(String appId) async {}
+
+  @override
+  Future<void> openUsageAccessSettings() async {}
+
+  @override
+  Future<void> openOverlaySettings() async {}
+}
