@@ -19,7 +19,7 @@ import sys
 path = Path(sys.argv[1])
 text = path.read_text()
 
-text = text.replace('android:label="my_lock"', 'android:label="MY LOCK"')
+text = text.replace('android:label="my_lock"', 'android:label="MyLock"')
 
 permissions = [
     '<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />',

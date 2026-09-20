@@ -34,6 +34,11 @@ cp "$TMP/pubspec.yaml" "$ROOT/pubspec.yaml"
 cp "$TMP/analysis_options.yaml" "$ROOT/analysis_options.yaml"
 
 flutter pub get
+
+if [[ ",$PLATFORMS," == *",android,"* ]]; then
+  dart run flutter_launcher_icons
+fi
+
 flutter analyze
 flutter test
 
