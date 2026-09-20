@@ -28,10 +28,12 @@ class LockModeScreen extends StatefulWidget {
   State<LockModeScreen> createState() => _LockModeScreenState();
 }
 
-class _LockModeScreenState extends State<LockModeScreen> {
+class _LockModeScreenState extends State<LockModeScreen>
+    with WidgetsBindingObserver {
   late final LockModeController _controller;
   bool _finishing = false;
   bool _allowRoutePop = false;
+  bool _recoverySheetOpen = false;
 
   bool get _canUseRecoveryPin => widget.settings.recoveryPinReady;
 
@@ -41,6 +43,7 @@ class _LockModeScreenState extends State<LockModeScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     final password = widget.settings.password;
     assert(password != null && password.length >= 2);
     _controller = LockModeController(password!)..addListener(_refresh);
@@ -82,7 +85,32 @@ class _LockModeScreenState extends State<LockModeScreen> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!widget.appAuthentication) return;
+    if (state != AppLifecycleState.paused &&
+        state != AppLifecycleState.hidden &&
+        state != AppLifecycleState.inactive) {
+      return;
+    }
+
+    _controller.reset();
+
+    if (_recoverySheetOpen && mounted) {
+      Navigator.of(context, rootNavigator: true).maybePop(false);
+      _recoverySheetOpen = false;
+    }
+
+    if (mounted) {
+      setState(() {
+        _finishing = false;
+        _allowRoutePop = false;
+      });
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller
       ..removeListener(_refresh)
       ..dispose();
@@ -189,6 +217,7 @@ class _LockModeScreenState extends State<LockModeScreen> {
     var input = '';
     var mismatch = false;
 
+    _recoverySheetOpen = true;
     final unlocked = await showModalBottomSheet<bool>(
       context: context,
       isDismissible: true,
@@ -241,6 +270,8 @@ class _LockModeScreenState extends State<LockModeScreen> {
         );
       },
     );
+
+    _recoverySheetOpen = false;
 
     if (unlocked != true ||
         !mounted ||
