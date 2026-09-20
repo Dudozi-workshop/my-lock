@@ -25,6 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 20
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -105,7 +107,7 @@ jobs:
           curl --fail --location --retry 3 --retry-delay 2 --output /tmp/my-lock-arm64-release.apk "$APK_URL"
           test -s /tmp/my-lock-arm64-release.apk
 
-      - name: Email ARM64 APK download link
+      - name: Email ARM64 APK with change summary
         if: ${{ success() }}
         env:
           SMTP_USERNAME: ${{ secrets.APK_MAIL_USERNAME }}
@@ -115,6 +117,8 @@ jobs:
           APK_URL: https://github.com/${{ github.repository }}/releases/download/latest-apk/my-lock-arm64-release.apk
           COMMIT_SHA: ${{ github.sha }}
           BUILD_TIME: ${{ github.event.head_commit.timestamp }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          APK_PATH: dist/my-lock-arm64-release.apk
         run: |
           python3 - <<'PY'
           import os
@@ -131,6 +135,8 @@ jobs:
           build_time = os.environ.get("BUILD_TIME", "")
           apk_url = os.environ["APK_URL"]
           run_url = os.environ["RUN_URL"]
+          commit_message = os.environ.get("COMMIT_MESSAGE", "").strip() or "변경 내역 없음"
+          apk_path = os.environ["APK_PATH"]
           try:
               dt = datetime.fromisoformat(build_time.replace("Z", "+00:00"))
               display_time = dt.astimezone(timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M KST")
