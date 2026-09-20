@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/theme.dart';
+import '../../../lock_engine/effects.dart';
 import '../../../lock_engine/floating_preview.dart';
+import '../background/background_style.dart';
 import '../../../lock_engine/models.dart';
 
 class ShapeStylePreview extends StatelessWidget {
@@ -9,10 +11,22 @@ class ShapeStylePreview extends StatelessWidget {
     super.key,
     required this.shapes,
     required this.tones,
+    required this.background,
+    required this.movementStyle,
+    required this.popStyle,
+    required this.objectCount,
+    required this.speed,
+    required this.movementArea,
   });
 
   final Set<ShapeKind> shapes;
   final Set<ShapeTone> tones;
+  final LockBackground background;
+  final MovementStyle movementStyle;
+  final PopStyle popStyle;
+  final int objectCount;
+  final FloatingSpeed speed;
+  final MovementArea movementArea;
 
   @override
   Widget build(BuildContext context) {
@@ -21,15 +35,7 @@ class ShapeStylePreview extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFFFF4FB),
-            Color(0xFFF1EEFF),
-            Color(0xFFECF7FF),
-          ],
-        ),
+        gradient: background.gradient,
         border: Border.all(color: const Color(0xFFE9E4F3)),
       ),
       child: Stack(
@@ -38,6 +44,11 @@ class ShapeStylePreview extends StatelessWidget {
             child: FloatingPreview(
               selectedShapes: shapes,
               selectedTones: tones,
+              movementStyle: movementStyle,
+              popStyle: popStyle,
+              objectCount: objectCount,
+              speed: speed,
+              movementArea: movementArea,
             ),
           ),
           Positioned(
