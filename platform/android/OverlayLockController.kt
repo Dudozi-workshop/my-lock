@@ -111,6 +111,8 @@ object OverlayLockController {
         ).orEmpty()
         val objectCount =
             preferences.getInt("lock_object_count", 9).coerceIn(6, 12)
+        val requiredTokens =
+            preferences.getStringSet("lock_pattern_required_tokens", emptySet()).orEmpty()
         val speedName = preferences.getString("lock_speed", "normal") ?: "normal"
         val movementArea =
             preferences.getString("lock_movement_area", "full") ?: "full"
@@ -202,11 +204,18 @@ object OverlayLockController {
             listOf("pink_circle", "blue_triangle", "yellow_square")
         }
 
-        // The hash intentionally does not expose the original sequence. Cycle the
-        // enabled token types so the playfield remains usable without storing plaintext.
-        val tokenIds = MutableList(objectCount) { index ->
-            allowedTokens[index % allowedTokens.size]
+        // Preserve only the token types used by the password, never their order.
+        // Fill the remaining slots from enabled combinations.
+        val tokenIds = requiredTokens
+            .filter { allowedTokens.contains(it) }
+            .take(objectCount)
+            .toMutableList()
+        var fillIndex = 0
+        while (tokenIds.size < objectCount) {
+            tokenIds.add(allowedTokens[fillIndex % allowedTokens.size])
+            fillIndex += 1
         }
+        tokenIds.shuffle(random = Random(SystemClock.uptimeMillis()))
 
         val random = Random(SystemClock.uptimeMillis())
         val moving = mutableListOf<MovingToken>()
