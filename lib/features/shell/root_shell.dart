@@ -21,7 +21,7 @@ class RootShell extends StatefulWidget {
   State<RootShell> createState() => _RootShellState();
 }
 
-class _RootShellState extends State<RootShell> {
+class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
   int _index = 0;
   late final MyLockSettingsController _settings;
   late final LockRuntimeCoordinator _runtime;
@@ -34,6 +34,7 @@ class _RootShellState extends State<RootShell> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _settings = MyLockSettingsController()..addListener(_refreshSettings);
     if (kIsWeb) {
       _webBridge = WebTestPlatformLockBridge();
@@ -81,7 +82,22 @@ class _RootShellState extends State<RootShell> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!_settings.loaded || !_settings.onboardingCompleted || _settings.password == null) return;
+
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+      _appAuth.markUnauthenticated();
+      return;
+    }
+
+    if (state == AppLifecycleState.resumed && mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     unawaited(_lockRequestSubscription?.cancel());
     unawaited(_runtime.stop());
     _settings.removeListener(_refreshSettings);
