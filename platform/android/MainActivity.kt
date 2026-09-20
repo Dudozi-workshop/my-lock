@@ -13,6 +13,7 @@ import android.os.Process
 import android.provider.Settings
 import android.util.Base64
 import java.io.ByteArrayOutputStream
+import java.security.MessageDigest
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -171,6 +172,31 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
 
+                "syncLockPattern" -> {
+                    val tokenIds = call.argument<List<String>>("tokenIds").orEmpty()
+                    val shapes = call.argument<List<String>>("shapes").orEmpty()
+                    val tones = call.argument<List<String>>("tones").orEmpty()
+                    val preferences =
+                        getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+
+                    if (tokenIds.isEmpty()) {
+                        preferences.edit()
+                            .remove("lock_pattern_hash")
+                            .remove("lock_pattern_length")
+                            .putStringSet("lock_pattern_shapes", shapes.toSet())
+                            .putStringSet("lock_pattern_tones", tones.toSet())
+                            .apply()
+                    } else {
+                        preferences.edit()
+                            .putString("lock_pattern_hash", hashPattern(tokenIds))
+                            .putInt("lock_pattern_length", tokenIds.size)
+                            .putStringSet("lock_pattern_shapes", shapes.toSet())
+                            .putStringSet("lock_pattern_tones", tones.toSet())
+                            .apply()
+                    }
+                    result.success(null)
+                }
+
                 "unlockGranted" -> {
                     val appId = call.argument<String>("appId")
                     getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
@@ -190,6 +216,13 @@ class MainActivity : FlutterActivity() {
     override fun onDestroy() {
         lockChannel = null
         super.onDestroy()
+    }
+
+    private fun hashPattern(tokenIds: List<String>): String {
+        val payload = tokenIds.joinToString(separator = "|")
+        return MessageDigest.getInstance("SHA-256")
+            .digest(payload.toByteArray(Charsets.UTF_8))
+            .joinToString(separator = "") { byte -> "%02x".format(byte) }
     }
 
     private fun updateMonitorServiceState() {
