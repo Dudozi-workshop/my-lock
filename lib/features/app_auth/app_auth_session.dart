@@ -25,4 +25,9 @@ class AppAuthSession {
   void markAuthenticated() {
     _authenticated = true;
   }
+
+  void markUnauthenticated() {
+    if (!_initialized) return;
+    _authenticated = false;
+  }
 }
