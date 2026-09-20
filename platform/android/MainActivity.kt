@@ -198,6 +198,22 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
 
+                "syncRecoveryPin" -> {
+                    val pin = call.argument<String>("pin")
+                    val preferences =
+                        getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+                    if (pin != null && pin.matches(Regex("^\\d{4}$"))) {
+                        preferences.edit()
+                            .putString("recovery_pin_hash", hashText(pin))
+                            .apply()
+                    } else {
+                        preferences.edit()
+                            .remove("recovery_pin_hash")
+                            .apply()
+                    }
+                    result.success(null)
+                }
+
                 "syncLockPresentation" -> {
                     val objectCount = call.argument<Int>("objectCount") ?: 9
                     val speed = call.argument<String>("speed") ?: "normal"
@@ -236,12 +252,13 @@ class MainActivity : FlutterActivity() {
         super.onDestroy()
     }
 
-    private fun hashPattern(tokenIds: List<String>): String {
-        val payload = tokenIds.joinToString(separator = "|")
-        return MessageDigest.getInstance("SHA-256")
-            .digest(payload.toByteArray(Charsets.UTF_8))
+    private fun hashPattern(tokenIds: List<String>): String =
+        hashText(tokenIds.joinToString(separator = "|"))
+
+    private fun hashText(value: String): String =
+        MessageDigest.getInstance("SHA-256")
+            .digest(value.toByteArray(Charsets.UTF_8))
             .joinToString(separator = "") { byte -> "%02x".format(byte) }
-    }
 
     private fun updateMonitorServiceState() {
         val preferences =
