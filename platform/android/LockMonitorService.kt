@@ -229,10 +229,9 @@ class LockMonitorService : Service() {
         if (packageName == this.packageName) return
 
         val protectedApps = protectedApps()
-        val overlayEnabled = true
         val overlayTarget = OverlayLockController.currentTarget()
 
-        if (overlayEnabled && OverlayLockController.isVisible && overlayTarget != null) {
+        if (OverlayLockController.isVisible && overlayTarget != null) {
             if (packageName == overlayTarget) {
                 cancelPendingOverlayExit()
                 foregroundPackage = packageName
@@ -241,6 +240,9 @@ class LockMonitorService : Service() {
 
             if (protectedApps.contains(packageName)) {
                 cancelPendingOverlayExit()
+                if (overlayTarget != packageName) {
+                    markProtectedAppExited(overlayTarget)
+                }
                 foregroundPackage = packageName
                 if (shouldLockInNativeFallback(packageName)) {
                     OverlayLockController.show(this, packageName)
@@ -265,14 +267,7 @@ class LockMonitorService : Service() {
         foregroundPackage = packageName
         if (!protectedApps.contains(packageName)) return
 
-        if (overlayEnabled) {
-            cancelPendingOverlayExit()
-            if (shouldLockInNativeFallback(packageName)) {
-                OverlayLockController.show(this, packageName)
-            }
-            return
-        }
-
+        cancelPendingOverlayExit()
         if (shouldLockInNativeFallback(packageName)) {
             OverlayLockController.show(this, packageName)
         }
