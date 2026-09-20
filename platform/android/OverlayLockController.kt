@@ -134,7 +134,11 @@ object OverlayLockController {
             "fast" -> 1.75f
             else -> 1.15f
         }
+        val recoveryPinHash = preferences.getString("recovery_pin_hash", null)
         val input = mutableListOf<String>()
+        val pinInput = StringBuilder()
+        var failedAttempts = 0
+        var pinMode = false
 
         val root = FrameLayout(context).apply {
             background = buildBackground(context)
@@ -173,6 +177,105 @@ object OverlayLockController {
             addView(subtitle)
             addView(progress)
         }
+
+        val recoveryPanel = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            visibility = View.GONE
+            setPadding(dp(28), dp(12), dp(28), dp(20))
+        }
+        val pinDots = TextView(context).apply {
+            text = progressDots(0, 4)
+            setTextColor(Color.parseColor("#FF7658D6"))
+            textSize = 18f
+            gravity = Gravity.CENTER
+        }
+        recoveryPanel.addView(pinDots)
+
+        fun finishRecoveryUnlock() {
+            if (!demoMode) {
+                markUnlocked(context, appId)
+            }
+            hide()
+        }
+
+        fun submitPinDigit(digit: Int) {
+            if (!pinMode || pinInput.length >= 4) return
+            pinInput.append(digit)
+            pinDots.text = progressDots(pinInput.length, 4)
+            if (pinInput.length < 4) return
+
+            if (hashText(pinInput.toString()) == recoveryPinHash) {
+                finishRecoveryUnlock()
+            } else {
+                pinInput.clear()
+                pinDots.text = progressDots(0, 4)
+                subtitle.text = "PIN이 일치하지 않습니다. 다시 입력하세요."
+            }
+        }
+
+        val pinRows = listOf(
+            listOf(1, 2, 3),
+            listOf(4, 5, 6),
+            listOf(7, 8, 9),
+            listOf(-1, 0, -2),
+        )
+        for (rowValues in pinRows) {
+            val row = LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER
+            }
+            for (value in rowValues) {
+                val key = TextView(context).apply {
+                    text = when (value) {
+                        -1 -> ""
+                        -2 -> "⌫"
+                        else -> value.toString()
+                    }
+                    textSize = 22f
+                    gravity = Gravity.CENTER
+                    setTextColor(Color.parseColor("#FF2A2238"))
+                    isClickable = value != -1
+                    setOnClickListener {
+                        when {
+                            value >= 0 -> submitPinDigit(value)
+                            value == -2 && pinInput.isNotEmpty() -> {
+                                pinInput.deleteCharAt(pinInput.lastIndex)
+                                pinDots.text = progressDots(pinInput.length, 4)
+                            }
+                        }
+                    }
+                }
+                row.addView(
+                    key,
+                    LinearLayout.LayoutParams(dp(72), dp(54)).apply {
+                        setMargins(dp(4), dp(4), dp(4), dp(4))
+                    },
+                )
+            }
+            recoveryPanel.addView(row)
+        }
+
+        val recoveryButton = TextView(context).apply {
+            text = "보조 PIN 사용"
+            textSize = 13f
+            gravity = Gravity.CENTER
+            setTextColor(Color.parseColor("#FF7658D6"))
+            visibility = View.GONE
+            isClickable = true
+            setPadding(dp(12), dp(8), dp(12), dp(8))
+            setOnClickListener {
+                pinMode = true
+                pinInput.clear()
+                pinDots.text = progressDots(0, 4)
+                subtitle.text = "설정한 4자리 보조 PIN을 입력하세요."
+                progress.visibility = View.GONE
+                playfield.visibility = View.GONE
+                recoveryPanel.visibility = View.VISIBLE
+                visibility = View.GONE
+            }
+        }
+        header.addView(recoveryButton)
 
         val allowedTokens = buildList {
             for (tone in listOf("pink", "blue", "yellow")) {
@@ -276,7 +379,12 @@ object OverlayLockController {
                 }
                 hide()
             } else {
+                failedAttempts += 1
                 resetInput("순서가 달라요. 처음부터 다시 눌러주세요.")
+                if (failedAttempts >= 3 && recoveryPinHash != null) {
+                    recoveryButton.visibility = View.VISIBLE
+                    subtitle.text = "3회 실패했습니다. 다시 시도하거나 보조 PIN을 사용하세요."
+                }
             }
         }
 
@@ -316,6 +424,15 @@ object OverlayLockController {
             }
             true
         }
+
+        root.addView(
+            recoveryPanel,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER,
+            ),
+        )
 
         root.addView(
             header,
@@ -565,12 +682,13 @@ object OverlayLockController {
         List(total) { index -> if (index < progress) "●" else "○" }
             .joinToString(separator = "  ")
 
-    private fun hashPattern(tokenIds: List<String>): String {
-        val payload = tokenIds.joinToString(separator = "|")
-        return MessageDigest.getInstance("SHA-256")
-            .digest(payload.toByteArray(Charsets.UTF_8))
+    private fun hashPattern(tokenIds: List<String>): String =
+        hashText(tokenIds.joinToString(separator = "|"))
+
+    private fun hashText(value: String): String =
+        MessageDigest.getInstance("SHA-256")
+            .digest(value.toByteArray(Charsets.UTF_8))
             .joinToString(separator = "") { byte -> "%02x".format(byte) }
-    }
 
     private fun exitToHome(context: Context, appId: String) {
         forceRelock(context, appId)
