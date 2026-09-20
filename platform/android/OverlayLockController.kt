@@ -5,17 +5,22 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
+import android.view.HapticFeedbackConstants
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.random.Random
 import java.security.MessageDigest
 import android.provider.Settings
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
-import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.GridLayout
 
 object OverlayLockController {
     private const val preferencesName = "my_lock_native"
@@ -99,111 +104,186 @@ object OverlayLockController {
             "lock_pattern_tones",
             setOf("pink", "blue", "yellow"),
         ).orEmpty()
+        val objectCount =
+            preferences.getInt("lock_object_count", 9).coerceIn(6, 12)
+        val speedName = preferences.getString("lock_speed", "normal") ?: "normal"
+        val movementArea =
+            preferences.getString("lock_movement_area", "full") ?: "full"
+        val speedMultiplier = when (speedName) {
+            "slow" -> 0.65f
+            "fast" -> 1.75f
+            else -> 1.15f
+        }
         val input = mutableListOf<String>()
 
         val root = FrameLayout(context).apply {
-            setPadding(dp(20), dp(20), dp(20), dp(20))
             background = buildBackground(context)
             isClickable = true
             isFocusable = true
         }
-
-        val centerContent = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-        }
-
-        val title = TextView(context).apply {
-            text = "MY LOCK"
-            setTextColor(Color.parseColor("#FF2A2238"))
-            textSize = 28f
-            gravity = Gravity.CENTER
-            setTypeface(typeface, android.graphics.Typeface.BOLD)
-        }
+        val playfield = FrameLayout(context)
 
         val subtitle = TextView(context).apply {
             text = if (patternLength > 0 && patternHash != null) {
-                "설정한 순서대로 도형을 눌러주세요."
+                "도형을 순서대로 눌러 잠금을 해제하세요."
             } else {
                 "비밀번호 설정이 필요합니다."
             }
             setTextColor(Color.parseColor("#FF6D647A"))
-            textSize = 14f
+            textSize = 12f
             gravity = Gravity.CENTER
-            setPadding(0, dp(12), 0, dp(12))
         }
-
         val progress = TextView(context).apply {
-            text = if (patternLength > 0) "0 / $patternLength" else ""
-            setTextColor(Color.parseColor("#FF6D647A"))
-            textSize = 13f
+            text = if (patternLength > 0) progressDots(0, patternLength) else ""
+            setTextColor(Color.parseColor("#FF7658D6"))
+            textSize = 18f
             gravity = Gravity.CENTER
-            setPadding(0, 0, 0, dp(20))
+        }
+        val header = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setPadding(dp(64), dp(24), dp(64), dp(12))
+            addView(TextView(context).apply {
+                text = "MY LOCK"
+                setTextColor(Color.parseColor("#FF2A2238"))
+                textSize = 17f
+                gravity = Gravity.CENTER
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+            })
+            addView(subtitle)
+            addView(progress)
         }
 
-        val grid = GridLayout(context).apply {
-            columnCount = 3
-            rowCount = 3
-            alignmentMode = GridLayout.ALIGN_BOUNDS
-            useDefaultMargins = true
-        }
-
-        fun resetInput(message: String? = null) {
+        fun resetInput(message: String) {
             input.clear()
-            progress.text = if (patternLength > 0) "0 / $patternLength" else ""
-            if (message != null) subtitle.text = message
+            progress.text = if (patternLength > 0) progressDots(0, patternLength) else ""
+            subtitle.text = message
         }
 
-        fun handleToken(tokenId: String) {
-            if (patternLength <= 0 || patternHash == null) return
-            if (input.size >= patternLength) return
-
+        fun handleToken(tokenId: String, view: View) {
+            if (patternLength <= 0 || patternHash == null || input.size >= patternLength) return
+            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             input.add(tokenId)
-            progress.text = "${input.size} / $patternLength"
+            progress.text = progressDots(input.size, patternLength)
             if (input.size < patternLength) return
 
             if (hashPattern(input) == patternHash) {
                 markUnlocked(context, appId)
                 hide()
             } else {
-                resetInput("일치하지 않습니다. 다시 입력하세요.")
+                resetInput("순서가 달라요. 처음부터 다시 눌러주세요.")
             }
         }
 
-        for (tone in listOf("pink", "blue", "yellow")) {
-            if (!tones.contains(tone)) continue
-            for (shape in listOf("circle", "triangle", "square")) {
-                if (!shapes.contains(shape)) continue
-                val tokenId = "${tone}_${shape}"
-                val tokenView = TextView(context).apply {
+        val allowedTokens = buildList {
+            for (tone in listOf("pink", "blue", "yellow")) {
+                if (!tones.contains(tone)) continue
+                for (shape in listOf("circle", "triangle", "square")) {
+                    if (shapes.contains(shape)) add("${tone}_${shape}")
+                }
+            }
+        }.ifEmpty {
+            listOf("pink_circle", "blue_triangle", "yellow_square")
+        }
+
+        val requiredCounts = mutableMapOf<String, Int>()
+        // The hash intentionally does not expose the original sequence. Ensure each
+        // configured token type remains available by cycling all allowed tokens.
+        val tokenIds = MutableList(objectCount) { index ->
+            allowedTokens[index % allowedTokens.size]
+        }
+
+        val random = Random(SystemClock.uptimeMillis())
+        val moving = mutableListOf<MovingToken>()
+        val handler = Handler(Looper.getMainLooper())
+        var lastFrame = SystemClock.uptimeMillis()
+
+        root.addView(
+            playfield,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            ),
+        )
+        root.addView(
+            header,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                dp(120),
+                Gravity.TOP,
+            ),
+        )
+
+        root.post {
+            val width = root.width.toFloat()
+            val height = root.height.toFloat()
+            val top = if (movementArea == "lower") height * 0.40f else dp(120).toFloat()
+            val radius = (minOf(width, height) * 0.078f).coerceIn(dp(28).toFloat(), dp(40).toFloat())
+
+            tokenIds.forEachIndexed { index, tokenId ->
+                val parts = tokenId.split("_", limit = 2)
+                val tone = parts.firstOrNull() ?: "pink"
+                val shape = parts.getOrNull(1) ?: "circle"
+                val view = TextView(context).apply {
                     text = shapeSymbol(shape)
-                    textSize = 32f
+                    textSize = 42f
                     gravity = Gravity.CENTER
                     setTextColor(toneColor(tone))
-                    background = GradientDrawable().apply {
-                        this.shape = GradientDrawable.RECTANGLE
-                        cornerRadius = dp(18).toFloat()
-                        setColor(Color.parseColor("#F7F5FA"))
-                        setStroke(dp(1), Color.parseColor("#E3DFEA"))
-                    }
                     isClickable = true
                     isFocusable = true
-                    setOnClickListener { handleToken(tokenId) }
+                    setOnClickListener { handleToken(tokenId, this) }
                 }
-                val gridParams = GridLayout.LayoutParams().apply {
-                    this.width = dp(82)
-                    this.height = dp(82)
-                    setMargins(dp(4), dp(4), dp(4), dp(4))
-                }
-                grid.addView(tokenView, gridParams)
+                val size = (radius * 2).toInt()
+                val x = radius + random.nextFloat() * (width - radius * 2).coerceAtLeast(1f)
+                val y = top + radius +
+                    random.nextFloat() * (height - top - radius * 2).coerceAtLeast(1f)
+                val angle = random.nextFloat() * Math.PI.toFloat() * 2f
+                val baseSpeed = minOf(width, height) * 0.10f * speedMultiplier
+                val token = MovingToken(
+                    view = view,
+                    x = x,
+                    y = y,
+                    vx = cos(angle) * baseSpeed,
+                    vy = sin(angle) * baseSpeed,
+                    radius = radius,
+                )
+                moving.add(token)
+                playfield.addView(
+                    view,
+                    FrameLayout.LayoutParams(size, size).apply {
+                        leftMargin = (x - radius).toInt()
+                        topMargin = (y - radius).toInt()
+                    },
+                )
             }
-        }
 
-        val clearButton = Button(context).apply {
-            text = "다시 입력"
-            textSize = 14f
-            isEnabled = patternLength > 0
-            setOnClickListener { resetInput("설정한 순서대로 도형을 눌러주세요.") }
+            val frame = object : Runnable {
+                override fun run() {
+                    if (overlayView !== root) return
+                    val now = SystemClock.uptimeMillis()
+                    val dt = ((now - lastFrame) / 1000f).coerceIn(0f, 0.035f)
+                    lastFrame = now
+
+                    for (token in moving) {
+                        token.x += token.vx * dt
+                        token.y += token.vy * dt
+                        if (token.x - token.radius <= 0f || token.x + token.radius >= width) {
+                            token.vx = -token.vx
+                            token.x = token.x.coerceIn(token.radius, width - token.radius)
+                        }
+                        if (token.y - token.radius <= top || token.y + token.radius >= height) {
+                            token.vy = -token.vy
+                            token.y = token.y.coerceIn(top + token.radius, height - token.radius)
+                        }
+                        token.view.translationX = token.x - token.radius -
+                            (token.view.layoutParams as FrameLayout.LayoutParams).leftMargin
+                        token.view.translationY = token.y - token.radius -
+                            (token.view.layoutParams as FrameLayout.LayoutParams).topMargin
+                    }
+                    handler.postDelayed(this, 16L)
+                }
+            }
+            handler.post(frame)
         }
 
         val closeButton = TextView(context).apply {
@@ -213,36 +293,30 @@ object OverlayLockController {
             gravity = Gravity.CENTER
             isClickable = true
             isFocusable = true
-            setOnClickListener {
-                exitToHome(context, appId)
-            }
+            setOnClickListener { exitToHome(context, appId) }
         }
-
-        centerContent.addView(title)
-        centerContent.addView(subtitle)
-        centerContent.addView(progress)
-        centerContent.addView(grid)
-        centerContent.addView(
-            clearButton,
-            LinearLayout.LayoutParams(dp(180), dp(52)).apply {
-                topMargin = dp(20)
-            },
-        )
-
-        root.addView(
-            centerContent,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER,
-            ),
-        )
         root.addView(
             closeButton,
-            FrameLayout.LayoutParams(dp(56), dp(56), Gravity.TOP or Gravity.END),
+            FrameLayout.LayoutParams(dp(56), dp(56), Gravity.TOP or Gravity.END).apply {
+                topMargin = dp(12)
+                rightMargin = dp(10)
+            },
         )
         return root
     }
+
+    private data class MovingToken(
+        val view: View,
+        var x: Float,
+        var y: Float,
+        var vx: Float,
+        var vy: Float,
+        val radius: Float,
+    )
+
+    private fun progressDots(progress: Int, total: Int): String =
+        List(total) { index -> if (index < progress) "●" else "○" }
+            .joinToString(separator = "  ")
 
     private fun hashPattern(tokenIds: List<String>): String {
         val payload = tokenIds.joinToString(separator = "|")
