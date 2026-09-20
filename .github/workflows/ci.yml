@@ -51,11 +51,52 @@ jobs:
         run: flutter build apk --debug
 
       - name: Upload debug APK
+        id: upload_apk
         uses: actions/upload-artifact@v4
         with:
           name: my-lock-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
+
+      - name: Email APK download notice
+        if: ${{ success() && secrets.APK_MAIL_APP_PASSWORD != '' }}
+        env:
+          SMTP_USERNAME: ${{ secrets.APK_MAIL_USERNAME }}
+          SMTP_APP_PASSWORD: ${{ secrets.APK_MAIL_APP_PASSWORD }}
+          RECIPIENT: rlatkd5959@gmail.com
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ARTIFACT_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import smtplib
+          from email.message import EmailMessage
+
+          username = os.environ["SMTP_USERNAME"]
+          password = os.environ["SMTP_APP_PASSWORD"]
+          recipient = os.environ["RECIPIENT"]
+          run_url = os.environ["RUN_URL"]
+          artifact_url = os.environ["ARTIFACT_URL"]
+          commit_sha = os.environ["COMMIT_SHA"]
+
+          msg = EmailMessage()
+          msg["From"] = username
+          msg["To"] = recipient
+          msg["Subject"] = "MY LOCK 새 APK 빌드 완료"
+          msg.set_content(
+              "MY LOCK Android APK 빌드가 완료되었습니다.\n\n"
+              f"커밋: {commit_sha[:8]}\n"
+              f"APK 다운로드: {artifact_url}\n"
+              f"빌드 상세: {run_url}\n\n"
+              "GitHub Actions의 my-lock-debug-apk 아티팩트에서 app-debug.apk를 받을 수 있습니다.\n"
+              "APK 파일 크기가 Gmail 첨부 한도보다 커서 다운로드 링크로 전달합니다."
+          )
+
+          with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+              smtp.login(username, password)
+              smtp.send_message(msg)
+          PY
 
   ios:
     if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.target == 'ios' || github.event.inputs.target == 'all') }}
