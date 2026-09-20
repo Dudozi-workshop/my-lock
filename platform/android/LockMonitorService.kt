@@ -51,6 +51,8 @@ class LockMonitorService : Service() {
     private var lastQueryAt = 0L
     private var lastHeartbeatAt = 0L
     private var foregroundPackage: String? = null
+    private var pendingOverlayExitPackage: String? = null
+    private var pendingOverlayExitAt = 0L
 
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
