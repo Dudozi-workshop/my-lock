@@ -51,6 +51,7 @@ class LockRuntimeCoordinator {
     await _syncExperimentalOverlayLock();
     await _bridge.syncRelockPolicy(_settings.relockPolicy.name);
     await _bridge.syncLockBackground(_settings.background.name);
+    await _syncLockPattern();
   }
 
   Future<void> stop() async {
@@ -79,6 +80,16 @@ class LockRuntimeCoordinator {
     _syncExperimentalOverlayLock();
     _bridge.syncRelockPolicy(_settings.relockPolicy.name);
     _bridge.syncLockBackground(_settings.background.name);
+    _syncLockPattern();
+  }
+
+  Future<void> _syncLockPattern() async {
+    await _bridge.syncLockPattern(
+      tokenIds: _settings.password?.map((token) => token.id).toList() ??
+          const <String>[],
+      shapes: _settings.selectedShapes.map((value) => value.name).toSet(),
+      tones: _settings.selectedTones.map((value) => value.name).toSet(),
+    );
   }
 
   Future<void> _syncExperimentalOverlayLock() async {
