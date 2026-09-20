@@ -172,12 +172,17 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
           onboardingCompleted: _settings.onboardingCompleted,
           hasPassword: _settings.password != null,
         )) {
+          final authGeneration = _appAuth.generation;
           return LockModeScreen(
             settings: _settings,
             appAuthentication: true,
+            authenticationAttemptIsCurrent: () =>
+                _appAuth.isAttemptCurrent(authGeneration),
             onUnlocked: () async {
-              _appAuth.markAuthenticated();
-              if (mounted) setState(() {});
+              final authenticated = _appAuth.markAuthenticated(
+                generation: authGeneration,
+              );
+              if (authenticated && mounted) setState(() {});
             },
           );
         }
