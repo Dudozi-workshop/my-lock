@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ANDROID="$ROOT/android"
 MAIN_DIR="$ANDROID/app/src/main/kotlin/com/mylock/app/my_lock"
 MANIFEST="$ANDROID/app/src/main/AndroidManifest.xml"
+APP_GRADLE="$ANDROID/app/build.gradle.kts"
 mkdir -p "$MAIN_DIR"
 cp "$ROOT/platform/android/MainActivity.kt" "$MAIN_DIR/MainActivity.kt"
 cp "$ROOT/platform/android/LockActivity.kt" "$MAIN_DIR/LockActivity.kt"
@@ -93,5 +94,21 @@ if 'android:name=".BootReceiver"' not in text:
 path.write_text(text)
 PY
 
+python3 - "$APP_GRADLE" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+text = path.read_text()
+dependency = '    implementation("androidx.biometric:biometric:1.1.0")'
+
+if dependency not in text:
+    if 'dependencies {' in text:
+        text = text.replace('dependencies {', 'dependencies {\n' + dependency, 1)
+    else:
+        text += '\n\ndependencies {\n' + dependency + '\n}\n'
+
+path.write_text(text)
+PY
 
 echo "Applied MY LOCK Android native bridge."
