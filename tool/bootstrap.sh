@@ -36,17 +36,7 @@ cp "$TMP/analysis_options.yaml" "$ROOT/analysis_options.yaml"
 flutter pub get
 
 if [[ ",$PLATFORMS," == *",android,"* ]]; then
-  if [[ -f "$ROOT/assets/branding/mylock_launcher.png" ]] &&
-     head -c 8 "$ROOT/assets/branding/mylock_launcher.png" | grep -q 
-flutter analyze
-flutter test
-
-echo "MY LOCK bootstrap complete for: $PLATFORMS"
-\x89PNG\r\n\x1a\n'; then
-    dart run flutter_launcher_icons
-  else
-    echo "Skipping launcher icon generation: invalid or unavailable PNG asset."
-  fi
+  dart run flutter_launcher_icons
 fi
 
 flutter analyze
