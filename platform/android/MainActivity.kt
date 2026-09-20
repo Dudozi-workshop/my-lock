@@ -3,6 +3,7 @@ package com.mylock.app.my_lock
 import android.app.AppOpsManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
@@ -231,29 +232,37 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun loadLockableApps(): List<Map<String, String>> {
-        val installedApps = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            packageManager.getInstalledApplications(
-                android.content.pm.PackageManager.ApplicationInfoFlags.of(0L),
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            packageManager.getInstalledApplications(0)
+        val launcherIntent = Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_LAUNCHER)
         }
 
-        return installedApps
+        val launchableActivities =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.queryIntentActivities(
+                    launcherIntent,
+                    PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_ALL.toLong()),
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                packageManager.queryIntentActivities(
+                    launcherIntent,
+                    PackageManager.MATCH_ALL,
+                )
+            }
+
+        return launchableActivities
             .asSequence()
-            .filter { it.enabled }
-            .filter { it.packageName != packageName }
-            .mapNotNull { appInfo ->
-                val packageId = appInfo.packageName
+            .filter { it.activityInfo?.applicationInfo?.enabled == true }
+            .filter { it.activityInfo?.packageName != packageName }
+            .mapNotNull { resolveInfo ->
+                val activityInfo = resolveInfo.activityInfo ?: return@mapNotNull null
+                val packageId = activityInfo.packageName
                 val name = runCatching {
-                    packageManager.getApplicationLabel(appInfo).toString()
+                    resolveInfo.loadLabel(packageManager).toString()
                 }.getOrNull()?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
 
                 val icon = runCatching {
-                    encodeDrawableToBase64(
-                        packageManager.getApplicationIcon(appInfo),
-                    )
+                    encodeDrawableToBase64(resolveInfo.loadIcon(packageManager))
                 }.getOrNull()
 
                 buildMap<String, String> {
