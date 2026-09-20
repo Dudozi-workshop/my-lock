@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../app/my_lock_settings_controller.dart';
 import '../../app/theme.dart';
 import '../../lock_engine/floating_preview.dart';
+import '../../lock_engine/models.dart';
+import '../lock_settings/password_setup/password_setup_screen.dart';
 import 'lock_mode_controller.dart';
 
 class LockModeScreen extends StatefulWidget {
@@ -224,6 +226,20 @@ class _LockModeScreenState extends State<LockModeScreen> {
     );
 
     if (unlocked != true || !mounted || _finishing) return;
+
+    if (widget.appAuthentication) {
+      final pattern = await Navigator.of(context).push<List<LockToken>>(
+        MaterialPageRoute(
+          builder: (context) => PasswordSetupScreen(
+            selectedShapes: widget.settings.selectedShapes,
+            selectedTones: widget.settings.selectedTones,
+          ),
+        ),
+      );
+      if (pattern == null || pattern.isEmpty || !mounted || _finishing) return;
+      widget.settings.setPassword(pattern);
+    }
+
     setState(() {
       _finishing = true;
       _allowRoutePop = true;
@@ -367,9 +383,9 @@ class _RecoveryPinSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            const Text(
               '보조 PIN',
-              style: const TextStyle(
+              style: TextStyle(
                 color: ink,
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
