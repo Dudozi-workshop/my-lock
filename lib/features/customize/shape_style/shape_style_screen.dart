@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/theme.dart';
+import '../../../lock_engine/effects.dart';
 import '../../../lock_engine/models.dart';
+import '../background/background_style.dart';
 import 'shape_style_controller.dart';
 import 'shape_style_preview.dart';
 import 'tabs/color_tab.dart';
@@ -13,11 +15,23 @@ class ShapeStyleScreen extends StatefulWidget {
     super.key,
     required this.selectedShapes,
     required this.selectedTones,
+    required this.background,
+    required this.movementStyle,
+    required this.popStyle,
+    required this.objectCount,
+    required this.speed,
+    required this.movementArea,
     required this.onChanged,
   });
 
   final Set<ShapeKind> selectedShapes;
   final Set<ShapeTone> selectedTones;
+  final LockBackground background;
+  final MovementStyle movementStyle;
+  final PopStyle popStyle;
+  final int objectCount;
+  final FloatingSpeed speed;
+  final MovementArea movementArea;
   final ShapeStyleChanged onChanged;
 
   @override
@@ -72,6 +86,12 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
               child: ShapeStylePreview(
                 shapes: _controller.shapes,
                 tones: _controller.tones,
+                background: widget.background,
+                movementStyle: widget.movementStyle,
+                popStyle: widget.popStyle,
+                objectCount: widget.objectCount,
+                speed: widget.speed,
+                movementArea: widget.movementArea,
               ),
             ),
             Padding(
