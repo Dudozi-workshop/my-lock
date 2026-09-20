@@ -8,6 +8,7 @@ import '../../lock_engine/platform_lock_bridge.dart';
 import '../lock_settings/password_setup/password_setup_screen.dart';
 import '../lock_settings/recovery_pin/recovery_pin_screen.dart';
 import 'lock_mode_controller.dart';
+import 'pin_failure_policy.dart';
 
 class LockModeScreen extends StatefulWidget {
   const LockModeScreen({
@@ -17,6 +18,7 @@ class LockModeScreen extends StatefulWidget {
     this.appAuthentication = false,
     this.authenticationAttemptIsCurrent,
     this.onDeviceRecovered,
+    this.onOpenAppRecovery,
     this.onUnlocked,
   });
 
@@ -25,6 +27,7 @@ class LockModeScreen extends StatefulWidget {
   final bool appAuthentication;
   final bool Function()? authenticationAttemptIsCurrent;
   final Future<void> Function()? onDeviceRecovered;
+  final Future<void> Function()? onOpenAppRecovery;
   final Future<void> Function()? onUnlocked;
 
   @override
@@ -37,6 +40,7 @@ class _LockModeScreenState extends State<LockModeScreen>
   bool _finishing = false;
   bool _allowRoutePop = false;
   bool _recoverySheetOpen = false;
+  int _recoveryPinFailures = 0;
 
   bool get _canUseRecoveryPin => widget.settings.recoveryPinReady;
 
@@ -275,6 +279,7 @@ class _LockModeScreenState extends State<LockModeScreen>
 
     var input = '';
     var mismatch = false;
+    var pinFailures = _recoveryPinFailures;
 
     _recoverySheetOpen = true;
     final unlocked = await showModalBottomSheet<bool>(
@@ -295,8 +300,11 @@ class _LockModeScreenState extends State<LockModeScreen>
               if (input.length == 4) {
                 final correct = widget.settings.verifyRecoveryPin(input);
                 if (correct) {
+                  _recoveryPinFailures = 0;
                   Navigator.of(sheetContext).pop(true);
                 } else {
+                  pinFailures++;
+                  _recoveryPinFailures = pinFailures;
                   Future<void>.delayed(
                     const Duration(milliseconds: 120),
                     () {
@@ -322,8 +330,16 @@ class _LockModeScreenState extends State<LockModeScreen>
             return _RecoveryPinSheet(
               length: input.length,
               mismatch: mismatch,
+              failedAttempts: pinFailures,
+              appAuthentication: widget.appAuthentication,
               onDigit: addDigit,
               onBackspace: removeLast,
+              onOpenAppRecovery: widget.onOpenAppRecovery == null
+                  ? null
+                  : () async {
+                      Navigator.of(sheetContext).pop(false);
+                      await widget.onOpenAppRecovery!();
+                    },
             );
           },
         );
@@ -469,14 +485,20 @@ class _RecoveryPinSheet extends StatelessWidget {
   const _RecoveryPinSheet({
     required this.length,
     required this.mismatch,
+    required this.failedAttempts,
+    required this.appAuthentication,
     required this.onDigit,
     required this.onBackspace,
+    required this.onOpenAppRecovery,
   });
 
   final int length;
   final bool mismatch;
+  final int failedAttempts;
+  final bool appAuthentication;
   final ValueChanged<int> onDigit;
   final VoidCallback onBackspace;
+  final Future<void> Function()? onOpenAppRecovery;
 
   @override
   Widget build(BuildContext context) {
@@ -531,6 +553,16 @@ class _RecoveryPinSheet extends StatelessWidget {
                 ],
               ],
             ),
+            if (shouldOfferOverlayRecovery(
+              failedAttempts: failedAttempts,
+              appAuthentication: appAuthentication,
+            )) ...[
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: onOpenAppRecovery,
+                child: const Text('비밀번호와 PIN을 모두 잊으셨나요?'),
+              ),
+            ],
             const SizedBox(height: 22),
             _RecoveryNumberPad(
               onDigit: onDigit,
