@@ -181,7 +181,7 @@ object OverlayLockController {
                     gravity = Gravity.CENTER
                     setTextColor(toneColor(tone))
                     background = GradientDrawable().apply {
-                        shape = GradientDrawable.RECTANGLE
+                        this.shape = GradientDrawable.RECTANGLE
                         cornerRadius = dp(18).toFloat()
                         setColor(Color.parseColor("#F7F5FA"))
                         setStroke(dp(1), Color.parseColor("#E3DFEA"))
