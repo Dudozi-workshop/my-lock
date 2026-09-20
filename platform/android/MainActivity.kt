@@ -14,11 +14,14 @@ import android.provider.Settings
 import android.util.Base64
 import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
-import io.flutter.embedding.android.FlutterActivity
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-class MainActivity : FlutterActivity() {
+class MainActivity : FlutterFragmentActivity() {
     companion object {
         private const val channelName = "com.mylock.app/lock"
         private const val preferencesName = "my_lock_native"
@@ -103,6 +106,10 @@ class MainActivity : FlutterActivity() {
                     )
                     startActivity(intent)
                     result.success(null)
+                }
+
+                "authenticateDeviceOwner" -> {
+                    authenticateDeviceOwner(result)
                 }
 
                 "presentLockScreen" -> {
@@ -252,6 +259,43 @@ class MainActivity : FlutterActivity() {
         super.onDestroy()
     }
 
+    private fun authenticateDeviceOwner(result: MethodChannel.Result) {
+        val authenticators =
+            BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                BiometricManager.Authenticators.DEVICE_CREDENTIAL
+        val manager = BiometricManager.from(this)
+        if (manager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_SUCCESS) {
+            result.success(false)
+            return
+        }
+
+        val executor = ContextCompat.getMainExecutor(this)
+        val prompt = BiometricPrompt(
+            this,
+            executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(
+                    authenticationResult: BiometricPrompt.AuthenticationResult,
+                ) {
+                    result.success(true)
+                }
+
+                override fun onAuthenticationError(
+                    errorCode: Int,
+                    errString: CharSequence,
+                ) {
+                    result.success(false)
+                }
+            },
+        )
+        val info = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("MY LOCK 복구")
+            .setSubtitle("기기 소유자 인증 후 잠금 정보를 다시 설정합니다.")
+            .setAllowedAuthenticators(authenticators)
+            .build()
+        prompt.authenticate(info)
+    }
+
     private fun hashPattern(tokenIds: List<String>): String =
         hashText(tokenIds.joinToString(separator = "|"))
 
@@ -387,3 +431,5 @@ class MainActivity : FlutterActivity() {
         return mode == AppOpsManager.MODE_ALLOWED
     }
 }
+
+
