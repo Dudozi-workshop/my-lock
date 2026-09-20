@@ -41,7 +41,7 @@ class _RecoveryPinScreenState extends State<RecoveryPinScreen> {
               Text(
                 _mismatch
                     ? 'PIN이 일치하지 않습니다. 다시 입력하세요.'
-                    : '그래픽 비밀번호를 잊었을 때 사용하는 복구 수단입니다.',
+                    : '그래픽 비밀번호 대신 MY LOCK을 열 때 사용할 수 있습니다.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: _mismatch
