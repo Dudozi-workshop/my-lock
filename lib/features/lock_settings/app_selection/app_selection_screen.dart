@@ -30,14 +30,31 @@ class AppSelectionScreen extends StatefulWidget {
   State<AppSelectionScreen> createState() => _AppSelectionScreenState();
 }
 
-class _AppSelectionScreenState extends State<AppSelectionScreen> {
+class _AppSelectionScreenState extends State<AppSelectionScreen>
+    with SingleTickerProviderStateMixin {
   static const _demoApps = <LockableApp>[
-    LockableApp(id: 'instagram', name: 'Instagram', icon: Icons.photo_camera_outlined),
-    LockableApp(id: 'kakao', name: '카카오톡', icon: Icons.chat_bubble_outline_rounded),
-    LockableApp(id: 'gallery', name: '갤러리', icon: Icons.photo_library_outlined),
+    LockableApp(
+      id: 'instagram',
+      name: 'Instagram',
+      icon: Icons.photo_camera_outlined,
+    ),
+    LockableApp(
+      id: 'kakao',
+      name: '카카오톡',
+      icon: Icons.chat_bubble_outline_rounded,
+    ),
+    LockableApp(
+      id: 'gallery',
+      name: '갤러리',
+      icon: Icons.photo_library_outlined,
+    ),
     LockableApp(id: 'messages', name: '메시지', icon: Icons.sms_outlined),
     LockableApp(id: 'browser', name: '브라우저', icon: Icons.language_rounded),
-    LockableApp(id: 'youtube', name: 'YouTube', icon: Icons.play_circle_outline_rounded),
+    LockableApp(
+      id: 'youtube',
+      name: 'YouTube',
+      icon: Icons.play_circle_outline_rounded,
+    ),
     LockableApp(id: 'notes', name: '메모', icon: Icons.note_alt_outlined),
     LockableApp(id: 'mail', name: '메일', icon: Icons.mail_outline_rounded),
   ];
@@ -45,6 +62,7 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
   final PlatformAppCatalog _catalog = PlatformAppCatalog();
 
   late final Set<String> _selectedIds;
+  late final TabController _tabController;
   List<LockableApp> _apps = const <LockableApp>[];
   bool _loading = true;
   bool _usingDemoApps = false;
@@ -54,7 +72,14 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
   void initState() {
     super.initState();
     _selectedIds = Set<String>.from(widget.initialSelectedIds);
+    _tabController = TabController(length: 2, vsync: this);
     _loadApps();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadApps() async {
@@ -94,20 +119,13 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _apps.where((app) {
-      final q = _query.trim().toLowerCase();
-      return q.isEmpty ||
-          app.name.toLowerCase().contains(q) ||
-          app.id.toLowerCase().contains(q);
-    }).toList();
-
     return Scaffold(
       backgroundColor: appBackground,
       appBar: AppBar(
         backgroundColor: appBackground,
         surfaceTintColor: Colors.transparent,
         title: const Text(
-          '잠글 앱',
+          '보안 앱 설정',
           style: TextStyle(fontWeight: FontWeight.w800),
         ),
         actions: [
@@ -117,13 +135,27 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
           ),
           const SizedBox(width: 8),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: TabBar(
+              controller: _tabController,
+              indicatorSize: TabBarIndicatorSize.tab,
+              tabs: [
+                Tab(text: '보안 중  ${_selectedIds.length}'),
+                const Tab(text: '전체 앱'),
+              ],
+            ),
+          ),
+        ),
       ),
       body: SafeArea(
         top: false,
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
               child: TextField(
                 onChanged: (value) => setState(() => _query = value),
                 decoration: InputDecoration(
@@ -139,25 +171,6 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-              child: Row(
-                children: [
-                  Text(
-                    '선택된 앱 ${_selectedIds.length}개',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                  const Spacer(),
-                  if (_selectedIds.isNotEmpty)
-                    TextButton(
-                      onPressed: () => setState(_selectedIds.clear),
-                      child: const Text('전체 해제'),
-                    ),
-                ],
-              ),
-            ),
             Expanded(
               child: _loading
                   ? const Center(
@@ -166,89 +179,12 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
                         strokeWidth: 2.4,
                       ),
                     )
-                  : ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
-                      itemCount: filtered.length,
-                      separatorBuilder: (_, __) =>
-                          const SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        final app = filtered[index];
-                        final selected = _selectedIds.contains(app.id);
-
-                        return Material(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: () => _toggle(app.id),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 12,
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 44,
-                                    height: 44,
-                                    decoration: BoxDecoration(
-                                      color: brandLavender,
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    child: app.iconBytes != null
-                                        ? ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: Image.memory(
-                                              app.iconBytes!,
-                                              fit: BoxFit.cover,
-                                              gaplessPlayback: true,
-                                            ),
-                                          )
-                                        : Icon(
-                                            app.icon ?? Icons.apps_rounded,
-                                            color: brandPurple,
-                                          ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          app.name,
-                                          style: const TextStyle(
-                                            color: ink,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                        if (!_usingDemoApps) ...[
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            app.id,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              color: secondaryInk,
-                                              fontSize: 10,
-                                            ),
-                                          ),
-                                        ],
-                                      ],
-                                    ),
-                                  ),
-                                  Switch.adaptive(
-                                    value: selected,
-                                    onChanged: (_) => _toggle(app.id),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+                  : TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildAppList(onlySelected: true),
+                        _buildAppList(onlySelected: false),
+                      ],
                     ),
             ),
             if (_usingDemoApps)
@@ -261,7 +197,7 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: const Text(
-                  '웹 미리보기에서는 데모 앱 목록을 사용합니다. Android 앱에서는 실제 설치 앱 목록을 불러옵니다.',
+                  '웹 미리보기에서는 데모 앱 목록을 사용합니다. Android 앱에서는 실제 실행 가능한 앱만 불러옵니다.',
                   style: TextStyle(
                     color: Color(0xFF665C8F),
                     fontSize: 12,
@@ -271,6 +207,103 @@ class _AppSelectionScreenState extends State<AppSelectionScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildAppList({required bool onlySelected}) {
+    final q = _query.trim().toLowerCase();
+    final filtered = _apps.where((app) {
+      if (onlySelected && !_selectedIds.contains(app.id)) {
+        return false;
+      }
+
+      return q.isEmpty ||
+          app.name.toLowerCase().contains(q) ||
+          app.id.toLowerCase().contains(q);
+    }).toList();
+
+    if (onlySelected && filtered.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Text(
+            _selectedIds.isEmpty
+                ? '현재 보안 중인 앱이 없습니다.\n전체 앱 탭에서 보호할 앱을 선택해 주세요.'
+                : '검색 조건에 맞는 보안 앱이 없습니다.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: secondaryInk,
+              fontSize: 14,
+              height: 1.5,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+      itemCount: filtered.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      itemBuilder: (context, index) {
+        final app = filtered[index];
+        final selected = _selectedIds.contains(app.id);
+
+        return Material(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () => _toggle(app.id),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: brandLavender,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: app.iconBytes != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.memory(
+                              app.iconBytes!,
+                              fit: BoxFit.cover,
+                              gaplessPlayback: true,
+                            ),
+                          )
+                        : Icon(
+                            app.icon ?? Icons.apps_rounded,
+                            color: brandPurple,
+                          ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      app.name,
+                      style: const TextStyle(
+                        color: ink,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Switch.adaptive(
+                    value: selected,
+                    onChanged: (_) => _toggle(app.id),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
