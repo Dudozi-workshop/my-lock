@@ -88,12 +88,35 @@ class _NativePermissionsScreenState extends State<NativePermissionsScreen>
                   ),
                 ),
               )
-            else if (kIsWeb || capabilities?.nativeBridgeAvailable != true)
+            else if (kIsWeb) ...[
+              const _PermissionCard(
+                icon: Icons.query_stats_rounded,
+                title: '앱 사용 정보 접근',
+                body: 'WEB TEST에서는 허용 상태로 시뮬레이션합니다.',
+                granted: true,
+                onTap: null,
+              ),
+              const SizedBox(height: 10),
+              const _PermissionCard(
+                icon: Icons.layers_rounded,
+                title: '다른 앱 위에 표시',
+                body: 'WEB TEST에서는 허용 상태로 시뮬레이션합니다.',
+                granted: true,
+                onTap: null,
+              ),
+              const SizedBox(height: 18),
               const _InfoCard(
-                icon: Icons.language_rounded,
-                title: '웹 미리보기',
+                icon: Icons.science_outlined,
+                title: 'WEB TEST 권한 시뮬레이션 ON',
                 body:
-                    '웹에서는 실제 기기 권한을 사용할 수 없습니다. Android 앱 빌드에서 권한 상태를 확인할 수 있습니다.',
+                    '실제 Android 권한은 사용하지 않습니다. 잠금 설정 화면의 WEB TEST에서 앱 진입·종료와 화면 ON/OFF 흐름을 검증할 수 있습니다.',
+              ),
+            ]
+            else if (capabilities?.nativeBridgeAvailable != true)
+              const _InfoCard(
+                icon: Icons.info_outline_rounded,
+                title: '기기 연동 준비 전',
+                body: 'Android 설치본에서 권한 상태를 확인할 수 있습니다.',
               )
             else ...[
               _PermissionCard(
