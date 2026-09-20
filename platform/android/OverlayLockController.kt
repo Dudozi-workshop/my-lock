@@ -330,7 +330,12 @@ object OverlayLockController {
             val width = root.width.toFloat()
             val height = root.height.toFloat()
             val top = if (movementArea == "lower") height * 0.40f else dp(120).toFloat()
-            val radius = (minOf(width, height) * 0.078f).coerceIn(dp(28).toFloat(), dp(40).toFloat())
+            val horizontalInset =
+                if (movementArea == "lower") width * 0.09f else 0f
+            val radius = (minOf(width, height) * 0.078f)
+                .coerceIn(dp(28).toFloat(), dp(40).toFloat())
+            val leftBound = horizontalInset + radius
+            val rightBound = width - horizontalInset - radius
 
             tokenIds.forEachIndexed { index, tokenId ->
                 val parts = tokenId.split("_", limit = 2)
@@ -341,7 +346,8 @@ object OverlayLockController {
                     isFocusable = false
                 }
                 val size = (radius * 2).toInt()
-                val x = radius + random.nextFloat() * (width - radius * 2).coerceAtLeast(1f)
+                val x = leftBound +
+                    random.nextFloat() * (rightBound - leftBound).coerceAtLeast(1f)
                 val y = top + radius +
                     random.nextFloat() * (height - top - radius * 2).coerceAtLeast(1f)
                 val angle = random.nextFloat() * Math.PI.toFloat() * 2f
@@ -378,9 +384,9 @@ object OverlayLockController {
                     for (token in moving) {
                         token.x += token.vx * dt
                         token.y += token.vy * dt
-                        if (token.x - token.radius <= 0f || token.x + token.radius >= width) {
+                        if (token.x <= leftBound || token.x >= rightBound) {
                             token.vx = -token.vx
-                            token.x = token.x.coerceIn(token.radius, width - token.radius)
+                            token.x = token.x.coerceIn(leftBound, rightBound)
                         }
                         if (token.y - token.radius <= top || token.y + token.radius >= height) {
                             token.vy = -token.vy
@@ -418,7 +424,7 @@ object OverlayLockController {
                     }
 
                     for (token in moving) {
-                        token.x = token.x.coerceIn(token.radius, width - token.radius)
+                        token.x = token.x.coerceIn(leftBound, rightBound)
                         token.y = token.y.coerceIn(top + token.radius, height - token.radius)
                         token.view.translationX = token.x - token.radius -
                             (token.view.layoutParams as FrameLayout.LayoutParams).leftMargin
