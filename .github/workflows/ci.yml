@@ -41,6 +41,12 @@ jobs:
           PLATFORMS: android
         run: bash tool/bootstrap.sh
 
+      - name: Analyze Flutter code
+        run: flutter analyze
+
+      - name: Run Flutter tests
+        run: flutter test
+
       - name: Restore stable debug signing key
         uses: actions/cache@v4
         with:
@@ -76,7 +82,7 @@ jobs:
           username = os.environ.get("SMTP_USERNAME", "")
           password = os.environ.get("SMTP_APP_PASSWORD", "")
           if not username or not password:
-              raise SystemExit(0)
+              raise SystemExit("APK mail secrets are not configured")
           recipient = os.environ["RECIPIENT"]
           run_url = os.environ["RUN_URL"]
           artifact_url = os.environ["ARTIFACT_URL"]
@@ -118,6 +124,12 @@ jobs:
         env:
           PLATFORMS: ios
         run: bash tool/bootstrap.sh
+
+      - name: Analyze Flutter code
+        run: flutter analyze
+
+      - name: Run Flutter tests
+        run: flutter test
 
       - name: Compile iOS without signing
         run: flutter build ios --debug --no-codesign
