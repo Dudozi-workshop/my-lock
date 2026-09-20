@@ -48,7 +48,6 @@ class LockRuntimeCoordinator {
     await _bridge.syncExperimentalScreenLock(
       _settings.experimentalScreenLock,
     );
-    await _syncExperimentalOverlayLock();
     await _bridge.syncRelockPolicy(_settings.relockPolicy.name);
     await _bridge.syncLockBackground(_settings.background.name);
     await _syncLockPattern();
@@ -78,7 +77,6 @@ class LockRuntimeCoordinator {
     _bridge.syncExperimentalScreenLock(
       _settings.experimentalScreenLock,
     );
-    _syncExperimentalOverlayLock();
     _bridge.syncRelockPolicy(_settings.relockPolicy.name);
     _bridge.syncLockBackground(_settings.background.name);
     _syncLockPattern();
@@ -101,15 +99,6 @@ class LockRuntimeCoordinator {
       movementArea: _settings.movementArea.name,
       movementStyle: _settings.movementStyle.name,
     );
-  }
-
-  Future<void> _syncExperimentalOverlayLock() async {
-    final bridge = _bridge;
-    if (bridge is MethodChannelPlatformLockBridge) {
-      await bridge.syncExperimentalOverlayLock(
-        _settings.experimentalOverlayLock,
-      );
-    }
   }
 
   Future<void> _handleEvent(PlatformLockEvent event) async {
