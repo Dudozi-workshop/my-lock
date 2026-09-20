@@ -1,6 +1,3 @@
-const APK_ORIGIN =
-  "https://github.com/Dudozi-workshop/my-lock/releases/download/latest-debug/my-lock-latest.apk";
-
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -13,35 +10,68 @@ export default {
         });
       }
 
-      const upstream = await fetch(APK_ORIGIN, {
-        method: request.method,
-        redirect: "follow",
-        headers: {
-          "User-Agent": "MY-LOCK-APK-Downloader/1.0",
-          Accept: "application/vnd.android.package-archive,application/octet-stream,*/*",
-        },
+      if (request.method === "HEAD") {
+        const object = await env.APK_BUCKET.head("latest.apk");
+        if (object === null) {
+          return new Response("APK is not available yet.", { status: 404 });
+        }
+
+        const headers = new Headers();
+        object.writeHttpMetadata(headers);
+        headers.set("etag", object.httpEtag);
+        headers.set("Content-Type", "application/vnd.android.package-archive");
+        headers.set(
+          "Content-Disposition",
+          'attachment; filename="my-lock-latest.apk"',
+        );
+        headers.set("Content-Length", String(object.size));
+        headers.set("Accept-Ranges", "bytes");
+        headers.set("Cache-Control", "no-store, max-age=0");
+        headers.set("X-Content-Type-Options", "nosniff");
+        return new Response(null, { status: 200, headers });
+      }
+
+      const object = await env.APK_BUCKET.get("latest.apk", {
+        onlyIf: request.headers,
+        range: request.headers,
       });
 
-      if (!upstream.ok) {
-        return new Response("APK is temporarily unavailable.", {
-          status: 502,
+      if (object === null) {
+        return new Response("APK is not available yet.", {
+          status: 404,
           headers: { "Cache-Control": "no-store" },
         });
       }
 
-      const headers = new Headers(upstream.headers);
+      const headers = new Headers();
+      object.writeHttpMetadata(headers);
+      headers.set("etag", object.httpEtag);
       headers.set("Content-Type", "application/vnd.android.package-archive");
       headers.set(
         "Content-Disposition",
         'attachment; filename="my-lock-latest.apk"',
       );
+      headers.set("Accept-Ranges", "bytes");
       headers.set("Cache-Control", "no-store, max-age=0");
       headers.set("X-Content-Type-Options", "nosniff");
 
-      return new Response(request.method === "HEAD" ? null : upstream.body, {
-        status: 200,
-        headers,
-      });
+      if (!("body" in object)) {
+        return new Response(null, { status: 412, headers });
+      }
+
+      let status = 200;
+      if (object.range && request.headers.has("Range")) {
+        const start = object.range.offset ?? 0;
+        const length = object.range.length ?? object.size;
+        const end = start + length - 1;
+        headers.set("Content-Range", `bytes ${start}-${end}/${object.size}`);
+        headers.set("Content-Length", String(length));
+        status = 206;
+      } else {
+        headers.set("Content-Length", String(object.size));
+      }
+
+      return new Response(object.body, { status, headers });
     }
 
     return env.ASSETS.fetch(request);
