@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/theme.dart';
 import '../../../lock_engine/models.dart';
+import '../../../lock_engine/shape_painter.dart';
 import 'password_setup_controller.dart';
 
 class PasswordSetupScreen extends StatefulWidget {
@@ -228,7 +229,7 @@ class _TokenSelectionGrid extends StatelessWidget {
               ),
               padding: const EdgeInsets.all(8),
               child: CustomPaint(
-                painter: _TokenPainter(token),
+                painter: LockTokenPainter(token),
                 child: const SizedBox.expand(),
               ),
             ),
@@ -312,7 +313,7 @@ class _PatternSlots extends StatelessWidget {
                 ),
                 child: i < tokens.length
                     ? CustomPaint(
-                        painter: _TokenPainter(tokens[i]),
+                        painter: LockTokenPainter(tokens[i]),
                       )
                     : null,
               ),
@@ -324,58 +325,3 @@ class _PatternSlots extends StatelessWidget {
   }
 }
 
-class _TokenPainter extends CustomPainter {
-  const _TokenPainter(this.token);
-
-  final LockToken token;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = size.center(Offset.zero);
-    final radius = size.shortestSide * 0.25;
-    final paint = Paint()..color = _color(token.tone);
-
-    switch (token.shape) {
-      case ShapeKind.circle:
-        canvas.drawCircle(center, radius, paint);
-        break;
-      case ShapeKind.triangle:
-        final path = Path()
-          ..moveTo(center.dx, center.dy - radius)
-          ..lineTo(center.dx + radius, center.dy + radius * 0.85)
-          ..lineTo(center.dx - radius, center.dy + radius * 0.85)
-          ..close();
-        canvas.drawPath(path, paint);
-        break;
-      case ShapeKind.square:
-        canvas.drawRRect(
-          RRect.fromRectAndRadius(
-            Rect.fromCenter(
-              center: center,
-              width: radius * 1.65,
-              height: radius * 1.65,
-            ),
-            Radius.circular(radius * 0.3),
-          ),
-          paint,
-        );
-        break;
-    }
-  }
-
-  Color _color(ShapeTone tone) {
-    switch (tone) {
-      case ShapeTone.pink:
-        return const Color(0xFFE656AB);
-      case ShapeTone.blue:
-        return const Color(0xFF3F6FEA);
-      case ShapeTone.yellow:
-        return const Color(0xFFF0A632);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _TokenPainter oldDelegate) {
-    return oldDelegate.token.id != token.id;
-  }
-}
