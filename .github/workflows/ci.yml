@@ -87,23 +87,73 @@ jobs:
         run: |
           set -e
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
-          APK="dist/my-lock-arm64-release.apk"
-          curl --fail --show-error --silent \
-            -X POST \
-            "$SUPABASE_URL/storage/v1/object/$SUPABASE_BUCKET/$SUPABASE_OBJECT" \
-            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "Content-Type: application/vnd.android.package-archive" \
-            -H "x-upsert: true" \
-            --data-binary "@$APK"
+          npm install --no-save --no-package-lock @supabase/supabase-js@2
+          node <<'NODE'
+          const fs = require('fs');
+          const { createClient } = require('@supabase/supabase-js');
+
+          const url = process.env.SUPABASE_URL;
+          const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+          const bucket = process.env.SUPABASE_BUCKET;
+          const objectName = process.env.SUPABASE_OBJECT;
+          const apkPath = 'dist/my-lock-arm64-release.apk';
+
+          if (!url || !key || !bucket || !objectName) {
+            console.error('Supabase upload config is incomplete');
+            process.exit(1);
+          }
+
+          const supabase = createClient(url, key, {
+            auth: {
+              persistSession: false,
+              autoRefreshToken: false,
+              detectSessionInUrl: false,
+            },
+          });
+
+          (async () => {
+            const bytes = fs.readFileSync(apkPath);
+            const { data, error } = await supabase.storage
+              .from(bucket)
+              .upload(objectName, bytes, {
+                contentType: 'application/vnd.android.package-archive',
+                cacheControl: '60',
+                upsert: true,
+              });
+
+            if (error) {
+              console.error('Supabase Storage upload failed');
+              console.error(JSON.stringify({
+                name: error.name,
+                message: error.message,
+                status: error.status,
+                statusCode: error.statusCode,
+                error: error.error,
+              }, null, 2));
+              process.exit(1);
+            }
+
+            console.log('Supabase Storage upload succeeded:', data?.path || objectName);
+          })().catch((error) => {
+            console.error('Unexpected Supabase upload failure');
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
 
       - name: Verify Supabase public APK download
+        env:
+          COMMIT_SHA: ${{ github.sha }}
         run: |
           set -e
-          APK_URL="$SUPABASE_URL/storage/v1/object/public/$SUPABASE_BUCKET/$SUPABASE_OBJECT"
-          curl --fail --location --retry 3 --retry-delay 2 \
+          APK_URL="$SUPABASE_URL/storage/v1/object/public/$SUPABASE_BUCKET/$SUPABASE_OBJECT?v=$COMMIT_SHA"
+          curl --fail --show-error --location --retry 3 --retry-delay 2 \
             --output /tmp/my-lock-arm64-release.apk "$APK_URL"
           test -s /tmp/my-lock-arm64-release.apk
+          echo "Local SHA256:"
+          sha256sum dist/my-lock-arm64-release.apk
+          echo "Downloaded SHA256:"
+          sha256sum /tmp/my-lock-arm64-release.apk
           cmp --silent dist/my-lock-arm64-release.apk /tmp/my-lock-arm64-release.apk
 
       - name: Upload ARM64 release APK artifact
@@ -167,7 +217,7 @@ jobs:
           SMTP_APP_PASSWORD: ${{ secrets.APK_MAIL_APP_PASSWORD }}
           RECIPIENT: rlatkd5959@gmail.com
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          APK_URL: https://dddpxudwfsydrhfgvvyn.supabase.co/storage/v1/object/public/my-lock-apk/my-lock-arm64-release.apk
+          APK_URL: https://dddpxudwfsydrhfgvvyn.supabase.co/storage/v1/object/public/my-lock-apk/my-lock-arm64-release.apk?v=${{ github.sha }}
           COMMIT_SHA: ${{ github.sha }}
           BUILD_TIME: ${{ github.event.head_commit.timestamp }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
