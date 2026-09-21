@@ -53,6 +53,7 @@ class LockMonitorService : Service() {
     private var pendingOverlayExitPackage: String? = null
     private var pendingOverlayExitAt = 0L
     private var pendingOverlayExitRunnable: Runnable? = null
+    private var permissionsReady = true
 
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -191,7 +192,21 @@ class LockMonitorService : Service() {
 
     private fun pollForegroundApp() {
         writeHeartbeat()
-        if (!hasUsageAccess()) return
+
+        val ready = hasUsageAccess() && Settings.canDrawOverlays(this)
+        if (!ready) {
+            if (permissionsReady) {
+                OverlayLockController.hide()
+                cancelPendingOverlayExit()
+                foregroundPackage = null
+            }
+            permissionsReady = false
+            return
+        }
+        if (!permissionsReady) {
+            permissionsReady = true
+            resetForegroundState()
+        }
         if (LockActivity.lockUiVisible) {
             lastQueryAt = System.currentTimeMillis()
             return
