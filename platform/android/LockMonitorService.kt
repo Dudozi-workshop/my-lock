@@ -41,6 +41,14 @@ class LockMonitorService : Service() {
             activeInstance?.resetForegroundState()
         }
 
+        fun notifyOverlayInterrupted(appId: String) {
+            activeInstance?.handleOverlayInterrupted(appId)
+        }
+
+        fun notifyOverlayRecovered(appId: String) {
+            activeInstance?.handleOverlayRecovered(appId)
+        }
+
         private const val heartbeatIntervalMs = 2_000L
     }
 
@@ -54,7 +62,7 @@ class LockMonitorService : Service() {
     private var pendingOverlayExitAt = 0L
     private var pendingOverlayExitRunnable: Runnable? = null
     private var permissionsReady = true
-    private var protectedAppTransitionPending: String? = null
+    private var interruptedOverlayTarget: String? = null
 
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -222,19 +230,9 @@ class LockMonitorService : Service() {
         val event = UsageEvents.Event()
         var latestPackage: String? = null
         var latestTimestamp = Long.MIN_VALUE
-        val protectedApps = protectedApps()
 
         while (events.hasNextEvent()) {
             events.getNextEvent(event)
-
-            if (
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-                event.eventType == UsageEvents.Event.ACTIVITY_PAUSED &&
-                protectedApps.contains(event.packageName)
-            ) {
-                protectedAppTransitionPending = event.packageName
-            }
-
             val isForeground = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 event.eventType == UsageEvents.Event.ACTIVITY_RESUMED
             } else {
@@ -249,22 +247,11 @@ class LockMonitorService : Service() {
         }
 
         if (latestPackage != null) {
-            val returningFromSystemTransition =
-                protectedAppTransitionPending == latestPackage
-            if (returningFromSystemTransition) {
-                protectedAppTransitionPending = null
-            }
-            handleForegroundPackage(
-                latestPackage,
-                forceOverlayRefresh = returningFromSystemTransition,
-            )
+            handleForegroundPackage(latestPackage)
         }
     }
 
-    private fun handleForegroundPackage(
-        packageName: String,
-        forceOverlayRefresh: Boolean = false,
-    ) {
+    private fun handleForegroundPackage(packageName: String) {
         if (packageName == this.packageName) return
 
         val protectedApps = protectedApps()
@@ -274,13 +261,6 @@ class LockMonitorService : Service() {
             if (packageName == overlayTarget) {
                 cancelPendingOverlayExit()
                 foregroundPackage = packageName
-                if (forceOverlayRefresh) {
-                    OverlayLockController.show(
-                        this,
-                        packageName,
-                        forceRecreate = true,
-                    )
-                }
                 return
             }
 
@@ -304,17 +284,16 @@ class LockMonitorService : Service() {
         }
 
         if (packageName == foregroundPackage) {
-            if (protectedApps.contains(packageName)) {
-                if (
-                    forceOverlayRefresh ||
-                    !OverlayLockController.isVisible
-                ) {
-                    OverlayLockController.show(
-                        this,
-                        packageName,
-                        forceRecreate = true,
-                    )
-                }
+            if (
+                protectedApps.contains(packageName) &&
+                !OverlayLockController.isVisible &&
+                shouldLockInNativeFallback(packageName)
+            ) {
+                OverlayLockController.show(
+                    this,
+                    packageName,
+                    forceRecreate = true,
+                )
             }
             return
         }
@@ -330,6 +309,29 @@ class LockMonitorService : Service() {
         cancelPendingOverlayExit()
         if (shouldLockInNativeFallback(packageName)) {
             OverlayLockController.show(this, packageName)
+        }
+    }
+
+    private fun handleOverlayInterrupted(appId: String) {
+        if (OverlayLockController.currentTarget() != appId) return
+        interruptedOverlayTarget = appId
+    }
+
+    private fun handleOverlayRecovered(appId: String) {
+        if (interruptedOverlayTarget != appId) return
+        interruptedOverlayTarget = null
+
+        val latestForeground = latestForegroundPackage()
+        if (
+            protectedApps().contains(appId) &&
+            latestForeground == appId &&
+            OverlayLockController.currentTarget() == appId
+        ) {
+            OverlayLockController.show(
+                this,
+                appId,
+                forceRecreate = true,
+            )
         }
     }
 
