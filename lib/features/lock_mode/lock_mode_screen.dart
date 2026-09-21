@@ -133,30 +133,29 @@ class _LockModeScreenState extends State<LockModeScreen>
       child: Scaffold(
         body: Container(
         decoration: BoxDecoration(gradient: settings.background.gradient),
-        child: SafeArea(
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: FloatingPreview(
-                  selectedShapes: settings.selectedShapes,
-                  selectedTones: settings.selectedTones,
-                  movementStyle: settings.movementStyle,
-                  popStyle: settings.popStyle,
-                  objectCount: settings.objectCount,
-                  speed: settings.speed,
-                  movementArea: settings.movementArea,
-                  topInset: widget.appAuthentication
-                      ? 220
-                      : (_canUseRecoveryPin ? 178 : 142),
-                  requiredTokens: _controller.requiredTokens,
-                  onTokenTap: _controller.tap,
-                ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: FloatingPreview(
+                selectedShapes: settings.selectedShapes,
+                selectedTones: settings.selectedTones,
+                movementStyle: settings.movementStyle,
+                popStyle: settings.popStyle,
+                objectCount: settings.objectCount,
+                speed: settings.speed,
+                movementArea: settings.movementArea,
+                topInset: widget.appAuthentication
+                    ? 220
+                    : (_canUseRecoveryPin ? 178 : 142),
+                requiredTokens: _controller.requiredTokens,
+                onTokenTap: _controller.tap,
               ),
-              Positioned(
-                left: 20,
-                right: 20,
-                top: 12,
-                child: _Header(
+            ),
+            Positioned(
+              left: 20,
+              right: 20,
+              top: MediaQuery.paddingOf(context).top + 12,
+              child: _Header(
                   demoMode: widget.demoMode,
                   appAuthentication: widget.appAuthentication,
                   progress: _controller.progress,
@@ -214,10 +213,8 @@ class _LockModeScreenState extends State<LockModeScreen>
                     ),
                   ),
                 ),
-            ],
-          ),
+          ],
         ),
-      ),
       ),
     );
   }
