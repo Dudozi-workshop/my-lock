@@ -216,7 +216,8 @@ class _LockModeScreenState extends State<LockModeScreen>
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Future<void> _recoverWithDeviceOwner() async {
