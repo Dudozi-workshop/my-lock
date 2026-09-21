@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Process
+import android.os.PowerManager
 import android.provider.Settings
 import android.util.Base64
 import java.io.ByteArrayOutputStream
@@ -90,6 +91,8 @@ class MainActivity : FlutterFragmentActivity() {
                             "usageAccessGranted" to hasUsageAccess(),
                             "overlayGranted" to Settings.canDrawOverlays(this),
                             "monitorServiceRunning" to isMonitorServiceRunning(),
+                            "batteryOptimizationIgnored" to
+                                isBatteryOptimizationIgnored(),
                         ),
                     )
                 }
@@ -105,6 +108,11 @@ class MainActivity : FlutterFragmentActivity() {
                         Uri.parse("package:$packageName"),
                     )
                     startActivity(intent)
+                    result.success(null)
+                }
+
+                "openBatteryOptimizationSettings" -> {
+                    openBatteryOptimizationSettings()
                     result.success(null)
                 }
 
@@ -409,6 +417,23 @@ class MainActivity : FlutterFragmentActivity() {
         val stream = ByteArrayOutputStream()
         scaled.compress(Bitmap.CompressFormat.PNG, 90, stream)
         return Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP)
+    }
+
+    private fun isBatteryOptimizationIgnored(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true
+        val manager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        return manager.isIgnoringBatteryOptimizations(packageName)
+    }
+
+    private fun openBatteryOptimizationSettings() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+        val direct = Intent(
+            Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+            Uri.parse("package:$packageName"),
+        )
+        val fallback = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+        runCatching { startActivity(direct) }
+            .recoverCatching { startActivity(fallback) }
     }
 
     private fun openUsageAccessSettings() {
