@@ -54,6 +54,7 @@ class LockMonitorService : Service() {
     private var pendingOverlayExitAt = 0L
     private var pendingOverlayExitRunnable: Runnable? = null
     private var permissionsReady = true
+    private var protectedAppTransitionPending: String? = null
 
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -221,9 +222,19 @@ class LockMonitorService : Service() {
         val event = UsageEvents.Event()
         var latestPackage: String? = null
         var latestTimestamp = Long.MIN_VALUE
+        val protectedApps = protectedApps()
 
         while (events.hasNextEvent()) {
             events.getNextEvent(event)
+
+            if (
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                event.eventType == UsageEvents.Event.ACTIVITY_PAUSED &&
+                protectedApps.contains(event.packageName)
+            ) {
+                protectedAppTransitionPending = event.packageName
+            }
+
             val isForeground = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 event.eventType == UsageEvents.Event.ACTIVITY_RESUMED
             } else {
@@ -238,11 +249,22 @@ class LockMonitorService : Service() {
         }
 
         if (latestPackage != null) {
-            handleForegroundPackage(latestPackage)
+            val returningFromSystemTransition =
+                protectedAppTransitionPending == latestPackage
+            if (returningFromSystemTransition) {
+                protectedAppTransitionPending = null
+            }
+            handleForegroundPackage(
+                latestPackage,
+                forceOverlayRefresh = returningFromSystemTransition,
+            )
         }
     }
 
-    private fun handleForegroundPackage(packageName: String) {
+    private fun handleForegroundPackage(
+        packageName: String,
+        forceOverlayRefresh: Boolean = false,
+    ) {
         if (packageName == this.packageName) return
 
         val protectedApps = protectedApps()
@@ -252,6 +274,13 @@ class LockMonitorService : Service() {
             if (packageName == overlayTarget) {
                 cancelPendingOverlayExit()
                 foregroundPackage = packageName
+                if (forceOverlayRefresh) {
+                    OverlayLockController.show(
+                        this,
+                        packageName,
+                        forceRecreate = true,
+                    )
+                }
                 return
             }
 
@@ -276,7 +305,10 @@ class LockMonitorService : Service() {
 
         if (packageName == foregroundPackage) {
             if (protectedApps.contains(packageName)) {
-                if (!OverlayLockController.isVisible) {
+                if (
+                    forceOverlayRefresh ||
+                    !OverlayLockController.isVisible
+                ) {
                     OverlayLockController.show(
                         this,
                         packageName,
