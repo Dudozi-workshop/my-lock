@@ -58,7 +58,7 @@ jobs:
         if: ${{ env.MYLOCK_UPLOAD_KEYSTORE_B64 != '' && env.MYLOCK_UPLOAD_KEYSTORE_PASSWORD != '' && env.MYLOCK_UPLOAD_KEY_ALIAS != '' && env.MYLOCK_UPLOAD_KEY_PASSWORD != '' }}
         run: |
           set -e
-          echo "$MYLOCK_UPLOAD_KEYSTORE_B64" | base64 --decode > android/mylock-upload-key.jks
+          echo "$MYLOCK_UPLOAD_KEYSTORE_B64" | base64 --decode > android/app/mylock-upload-key.jks
           cat > android/key.properties <<EOF
           storePassword=$MYLOCK_UPLOAD_KEYSTORE_PASSWORD
           keyPassword=$MYLOCK_UPLOAD_KEY_PASSWORD
