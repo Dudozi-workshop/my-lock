@@ -27,6 +27,10 @@ jobs:
       SUPABASE_URL: https://dddpxudwfsydrhfgvvyn.supabase.co
       SUPABASE_BUCKET: my-lock-apk
       SUPABASE_OBJECT: my-lock-arm64-release.apk
+      MYLOCK_UPLOAD_KEYSTORE_B64: ${{ secrets.MYLOCK_UPLOAD_KEYSTORE_B64 }}
+      MYLOCK_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.MYLOCK_UPLOAD_KEYSTORE_PASSWORD }}
+      MYLOCK_UPLOAD_KEY_ALIAS: ${{ secrets.MYLOCK_UPLOAD_KEY_ALIAS }}
+      MYLOCK_UPLOAD_KEY_PASSWORD: ${{ secrets.MYLOCK_UPLOAD_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,6 +53,52 @@ jobs:
         env:
           PLATFORMS: android
         run: bash tool/bootstrap.sh
+
+      - name: Configure MyLock Play upload signing
+        if: ${{ env.MYLOCK_UPLOAD_KEYSTORE_B64 != '' && env.MYLOCK_UPLOAD_KEYSTORE_PASSWORD != '' && env.MYLOCK_UPLOAD_KEY_ALIAS != '' && env.MYLOCK_UPLOAD_KEY_PASSWORD != '' }}
+        run: |
+          set -e
+          echo "$MYLOCK_UPLOAD_KEYSTORE_B64" | base64 --decode > android/mylock-upload-key.jks
+          cat > android/key.properties <<EOF
+          storePassword=$MYLOCK_UPLOAD_KEYSTORE_PASSWORD
+          keyPassword=$MYLOCK_UPLOAD_KEY_PASSWORD
+          keyAlias=$MYLOCK_UPLOAD_KEY_ALIAS
+          storeFile=mylock-upload-key.jks
+          EOF
+          python3 - android/app/build.gradle.kts <<'PY'
+          from pathlib import Path
+          import sys
+
+          path = Path(sys.argv[1])
+          text = path.read_text()
+          header = """import java.io.FileInputStream
+          import java.util.Properties
+
+          val keystoreProperties = Properties()
+          val keystorePropertiesFile = rootProject.file("key.properties")
+          if (keystorePropertiesFile.exists()) {
+              keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+          }
+
+          """
+          if "val keystoreProperties = Properties()" not in text:
+              text = header + text
+          if 'create("release")' not in text:
+              signing = '''signingConfigs {
+              create("release") {
+                  keyAlias = keystoreProperties["keyAlias"] as String
+                  keyPassword = keystoreProperties["keyPassword"] as String
+                  storeFile = file(keystoreProperties["storeFile"] as String)
+                  storePassword = keystoreProperties["storePassword"] as String
+              }
+          }
+          
+          '''
+              text = text.replace("    buildTypes {", "    " + signing + "    buildTypes {", 1)
+          text = text.replace('signingConfig = signingConfigs.getByName("debug")', 'signingConfig = signingConfigs.getByName("release")')
+          path.write_text(text)
+          PY
+          echo "MyLock Play upload signing configured."
 
       - name: Analyze Flutter code
         run: flutter analyze
