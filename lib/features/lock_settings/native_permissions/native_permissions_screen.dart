@@ -138,6 +138,16 @@ class _NativePermissionsScreenState extends State<NativePermissionsScreen>
                     ? null
                     : _bridge.openOverlaySettings,
               ),
+              const SizedBox(height: 10),
+              _PermissionCard(
+                icon: Icons.battery_saver_rounded,
+                title: '배터리 최적화 제외',
+                body: '백그라운드 보호 서비스가 제조사 절전 정책으로 중단될 가능성을 줄입니다.',
+                granted: capabilities.batteryOptimizationIgnored,
+                onTap: capabilities.batteryOptimizationIgnored
+                    ? null
+                    : _bridge.openBatteryOptimizationSettings,
+              ),
               const SizedBox(height: 18),
               _InfoCard(
                 icon: capabilities.androidReady
@@ -147,8 +157,12 @@ class _NativePermissionsScreenState extends State<NativePermissionsScreen>
                     ? '필수 권한 준비 완료'
                     : '권한 설정이 필요합니다',
                 body: capabilities.androidReady
-                    ? '앱 사용 정보 접근과 다른 앱 위에 표시 권한이 준비되었습니다.'
-                    : '위 두 권한을 모두 허용해야 실제 앱 잠금 기능을 사용할 수 있습니다.',
+                    ? capabilities.monitorServiceRunning
+                        ? capabilities.batteryOptimizationIgnored
+                            ? '필수 권한과 보호 서비스가 정상입니다.'
+                            : '필수 권한과 보호 서비스는 정상입니다. 안정적인 백그라운드 보호를 위해 배터리 최적화 제외를 권장합니다.'
+                        : '필수 권한은 준비됐지만 보호 서비스가 동작하지 않습니다. 앱을 다시 열거나 기기 절전 설정을 확인하세요.'
+                    : '앱 사용 정보 접근과 다른 앱 위에 표시 권한을 모두 허용해야 실제 앱 잠금 기능을 사용할 수 있습니다.',
               ),
             ],
           ],
