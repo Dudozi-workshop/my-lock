@@ -4,9 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.provider.Settings
 import android.view.Gravity
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.WindowManager
 import io.flutter.FlutterInjector
 import io.flutter.embedding.android.FlutterView
@@ -83,7 +87,7 @@ object OverlayLockController {
                     }
                 },
             ).apply {
-                setBackgroundColor(Color.TRANSPARENT)
+                background = buildOverlayBackground(appContext)
                 attachToFlutterEngine(engine)
             }
 
@@ -97,10 +101,15 @@ object OverlayLockController {
                     WindowManager.LayoutParams.TYPE_PHONE
                 },
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                PixelFormat.TRANSLUCENT,
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                PixelFormat.OPAQUE,
             ).apply {
                 gravity = Gravity.TOP or Gravity.START
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    layoutInDisplayCutoutMode =
+                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                }
             }
 
             val previousManager = windowManager
@@ -108,6 +117,7 @@ object OverlayLockController {
             val previousEngine = flutterEngine
 
             manager.addView(view, params)
+            applyImmersiveSystemUi(view)
 
             windowManager = manager
             overlayView = view
@@ -219,6 +229,72 @@ object OverlayLockController {
         return engine
     }
 
+    private fun applyImmersiveSystemUi(view: View) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            view.windowInsetsController?.let { controller ->
+                controller.hide(
+                    WindowInsets.Type.statusBars() or
+                        WindowInsets.Type.navigationBars(),
+                )
+                controller.systemBarsBehavior =
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+            return
+        }
+
+        @Suppress("DEPRECATION")
+        view.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+    }
+
+    private fun buildOverlayBackground(context: Context): GradientDrawable {
+        val background = context.getSharedPreferences(
+            preferencesName,
+            Context.MODE_PRIVATE,
+        ).getString("lock_background", "softGradient")
+
+        val colors = when (background) {
+            "basicLight" -> intArrayOf(
+                Color.parseColor("#FFFFFFFF"),
+                Color.parseColor("#FFF4F3F8"),
+            )
+            "basicDark" -> intArrayOf(
+                Color.parseColor("#FF17151F"),
+                Color.parseColor("#FF302A46"),
+            )
+            "galaxy" -> intArrayOf(
+                Color.parseColor("#FF1B1640"),
+                Color.parseColor("#FF5F43C7"),
+                Color.parseColor("#FFB675D8"),
+            )
+            "ocean" -> intArrayOf(
+                Color.parseColor("#FFBDEBFF"),
+                Color.parseColor("#FF5DA9E9"),
+                Color.parseColor("#FF3566C8"),
+            )
+            "aurora" -> intArrayOf(
+                Color.parseColor("#FFBDFBE8"),
+                Color.parseColor("#FF86B6FF"),
+                Color.parseColor("#FFD6A7FF"),
+            )
+            else -> intArrayOf(
+                Color.parseColor("#FFFFF3FB"),
+                Color.parseColor("#FFF3F0FF"),
+                Color.parseColor("#FFEAF5FF"),
+            )
+        }
+
+        return GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            colors,
+        )
+    }
+
     private fun openMyLockRecovery(context: Context) {
         hide()
         LockMonitorService.resetForegroundTracking()
@@ -288,6 +364,10 @@ private class MonitoredFlutterView(
         super.onWindowFocusChanged(hasWindowFocus)
         if (!monitoringEnabled || !isAttachedToWindow) return
 
+        if (hasWindowFocus) {
+            restoreImmersiveSystemUi()
+        }
+
         if (!hasWindowFocus) {
             reportInterrupted()
         } else {
@@ -312,6 +392,29 @@ private class MonitoredFlutterView(
             reportInterrupted()
         }
         super.onDetachedFromWindow()
+    }
+
+    private fun restoreImmersiveSystemUi() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            windowInsetsController?.let { controller ->
+                controller.hide(
+                    WindowInsets.Type.statusBars() or
+                        WindowInsets.Type.navigationBars(),
+                )
+                controller.systemBarsBehavior =
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+            return
+        }
+
+        @Suppress("DEPRECATION")
+        systemUiVisibility =
+            View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
     }
 
     private fun reportInterrupted() {
