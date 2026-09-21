@@ -9,18 +9,21 @@ class PlatformLockCapabilities {
     required this.usageAccessGranted,
     required this.overlayGranted,
     required this.monitorServiceRunning,
+    required this.batteryOptimizationIgnored,
   });
 
   const PlatformLockCapabilities.web()
       : nativeBridgeAvailable = false,
         usageAccessGranted = false,
         overlayGranted = false,
-        monitorServiceRunning = false;
+        monitorServiceRunning = false,
+        batteryOptimizationIgnored = false;
 
   final bool nativeBridgeAvailable;
   final bool usageAccessGranted;
   final bool overlayGranted;
   final bool monitorServiceRunning;
+  final bool batteryOptimizationIgnored;
 
   bool get androidReady => usageAccessGranted && overlayGranted;
 }
@@ -82,6 +85,8 @@ abstract class PlatformLockBridge {
   Future<void> openUsageAccessSettings();
 
   Future<void> openOverlaySettings();
+
+  Future<void> openBatteryOptimizationSettings();
 
   Future<bool> authenticateDeviceOwner();
 }
@@ -183,6 +188,8 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
         usageAccessGranted: result?['usageAccessGranted'] == true,
         overlayGranted: result?['overlayGranted'] == true,
         monitorServiceRunning: result?['monitorServiceRunning'] == true,
+        batteryOptimizationIgnored:
+            result?['batteryOptimizationIgnored'] == true,
       );
     } on MissingPluginException {
       return const PlatformLockCapabilities.web();
@@ -201,6 +208,15 @@ class MethodChannelPlatformLockBridge implements PlatformLockBridge {
   Future<void> openOverlaySettings() async {
     if (kIsWeb) return;
     await _invokeSafely('openOverlaySettings', const <String, Object?>{});
+  }
+
+  @override
+  Future<void> openBatteryOptimizationSettings() async {
+    if (kIsWeb) return;
+    await _invokeSafely(
+      'openBatteryOptimizationSettings',
+      const <String, Object?>{},
+    );
   }
 
   @override
@@ -371,6 +387,7 @@ class WebTestPlatformLockBridge implements PlatformLockBridge {
       usageAccessGranted: true,
       overlayGranted: true,
       monitorServiceRunning: true,
+      batteryOptimizationIgnored: true,
     );
   }
 
@@ -448,6 +465,9 @@ class WebTestPlatformLockBridge implements PlatformLockBridge {
 
   @override
   Future<void> openOverlaySettings() async {}
+
+  @override
+  Future<void> openBatteryOptimizationSettings() async {}
 
   @override
   Future<bool> authenticateDeviceOwner() async => false;
