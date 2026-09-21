@@ -60,6 +60,7 @@ class LockMonitorService : Service() {
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
                     foregroundPackage = null
+                    forceRelockCurrentSession()
                     getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
                         .edit()
                         .putLong(lastScreenOffAtKey, System.currentTimeMillis())
@@ -68,6 +69,7 @@ class LockMonitorService : Service() {
                 }
                 Intent.ACTION_SCREEN_ON -> {
                     foregroundPackage = null
+                    lastQueryAt = System.currentTimeMillis() - 2_000L
                     if (experimentalScreenLockEnabled()) {
                         val delivered = MainActivity.emitScreenOn()
                         if (!delivered) {
@@ -273,12 +275,14 @@ class LockMonitorService : Service() {
         }
 
         if (packageName == foregroundPackage) {
-            if (
-                protectedApps.contains(packageName) &&
-                !OverlayLockController.isVisible &&
-                shouldLockInNativeFallback(packageName)
-            ) {
-                OverlayLockController.show(this, packageName)
+            if (protectedApps.contains(packageName)) {
+                if (!OverlayLockController.isVisible) {
+                    OverlayLockController.show(
+                        this,
+                        packageName,
+                        forceRecreate = true,
+                    )
+                }
             }
             return
         }
@@ -396,6 +400,15 @@ class LockMonitorService : Service() {
             }
             else -> leftProtectedApp
         }
+    }
+
+    private fun forceRelockCurrentSession() {
+        getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+            .edit()
+            .remove(lastUnlockedAppKey)
+            .remove(lastUnlockedAtKey)
+            .apply()
+        OverlayLockController.hide()
     }
 
     private fun launchScreenLockFallback() {
