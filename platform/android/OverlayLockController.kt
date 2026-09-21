@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.PixelFormat
 import android.provider.Settings
 import android.view.Gravity
+import android.view.View
 import android.view.WindowManager
 import io.flutter.FlutterInjector
 import io.flutter.embedding.android.FlutterView
@@ -25,7 +26,7 @@ object OverlayLockController {
     private const val preferencesName = "my_lock_native"
 
     private var windowManager: WindowManager? = null
-    private var overlayView: FlutterView? = null
+    private var overlayView: MonitoredFlutterView? = null
     private var flutterEngine: FlutterEngine? = null
     private var targetAppId: String? = null
     private var currentDemoMode: Boolean = false
@@ -64,7 +65,27 @@ object OverlayLockController {
 
         return runCatching {
             val engine = createFlutterEngine(appContext, appId, demoMode)
-            val view = FlutterView(appContext).apply {
+            val view = MonitoredFlutterView(
+                appContext,
+                onInterrupted = { interruptedView ->
+                    if (
+                        !demoMode &&
+                        overlayView === interruptedView &&
+                        targetAppId == appId
+                    ) {
+                        LockMonitorService.notifyOverlayInterrupted(appId)
+                    }
+                },
+                onRecovered = { recoveredView ->
+                    if (
+                        !demoMode &&
+                        overlayView === recoveredView &&
+                        targetAppId == appId
+                    ) {
+                        LockMonitorService.notifyOverlayRecovered(appId)
+                    }
+                },
+            ).apply {
                 setBackgroundColor(Color.TRANSPARENT)
                 attachToFlutterEngine(engine)
             }
@@ -99,6 +120,7 @@ object OverlayLockController {
             engine.lifecycleChannel.appIsResumed()
 
             if (previousManager != null && previousView != null) {
+                previousView.suppressMonitoring()
                 runCatching { previousManager.removeViewImmediate(previousView) }
                 runCatching { previousView.detachFromFlutterEngine() }
             }
@@ -123,6 +145,9 @@ object OverlayLockController {
         targetAppId = null
         currentDemoMode = false
 
+        if (view != null) {
+            view.suppressMonitoring()
+        }
         if (manager != null && view != null) {
             runCatching { manager.removeViewImmediate(view) }
         }
@@ -256,5 +281,62 @@ object OverlayLockController {
             .putLong("last_unlocked_at", System.currentTimeMillis())
             .apply()
         MainActivity.emitLockActivityUnlocked(appId)
+    }
+}
+
+
+private class MonitoredFlutterView(
+    context: Context,
+    private val onInterrupted: (MonitoredFlutterView) -> Unit,
+    private val onRecovered: (MonitoredFlutterView) -> Unit,
+) : FlutterView(context) {
+    private var monitoringEnabled = true
+    private var interrupted = false
+
+    fun suppressMonitoring() {
+        monitoringEnabled = false
+        interrupted = false
+    }
+
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus)
+        if (!monitoringEnabled || !isAttachedToWindow) return
+
+        if (!hasWindowFocus) {
+            reportInterrupted()
+        } else {
+            reportRecovered()
+        }
+    }
+
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        if (!monitoringEnabled || !isAttachedToWindow) return
+
+        if (visibility != View.VISIBLE) {
+            reportInterrupted()
+        } else {
+            reportRecovered()
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        val shouldReport = monitoringEnabled
+        if (shouldReport) {
+            reportInterrupted()
+        }
+        super.onDetachedFromWindow()
+    }
+
+    private fun reportInterrupted() {
+        if (interrupted) return
+        interrupted = true
+        onInterrupted(this)
+    }
+
+    private fun reportRecovered() {
+        if (!interrupted) return
+        interrupted = false
+        onRecovered(this)
     }
 }
