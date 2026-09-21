@@ -39,9 +39,11 @@ object OverlayLockController {
         context: Context,
         appId: String,
         demoMode: Boolean = false,
+        forceRecreate: Boolean = false,
     ): Boolean {
         if (!Settings.canDrawOverlays(context)) return false
         if (
+            !forceRecreate &&
             isVisible &&
             targetAppId == appId &&
             currentDemoMode == demoMode
@@ -54,6 +56,9 @@ object OverlayLockController {
         }
 
         val appContext = context.applicationContext
+        if (!demoMode) {
+            markLocked(appContext, appId)
+        }
         val manager =
             appContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
@@ -220,6 +225,17 @@ object OverlayLockController {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         runCatching { context.startActivity(homeIntent) }
+    }
+
+    private fun markLocked(context: Context, appId: String) {
+        val preferences =
+            context.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+        if (preferences.getString("last_unlocked_app", null) == appId) {
+            preferences.edit()
+                .remove("last_unlocked_app")
+                .remove("last_unlocked_at")
+                .apply()
+        }
     }
 
     private fun forceRelock(context: Context, appId: String) {
