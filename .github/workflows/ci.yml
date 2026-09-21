@@ -1,4 +1,4 @@
-name: MY LOCK CI
+name: MyLock CI
 
 permissions:
   contents: write
@@ -74,6 +74,26 @@ jobs:
             fi
             sleep $((attempt * 20))
           done
+
+      - name: Build MyLock Play Store AAB
+        run: |
+          set -e
+          for attempt in 1 2 3; do
+            if flutter build appbundle --release; then
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              exit 1
+            fi
+            sleep $((attempt * 20))
+          done
+
+      - name: Upload MyLock Play Store AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mylock-play-store-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
 
       - name: Prepare stable ARM64 APK filename
         run: |
@@ -183,10 +203,10 @@ jobs:
           set -e
           APK="dist/my-lock-arm64-release.apk"
           TAG="latest-apk"
-          NAME="MY LOCK Latest ARM64 APK"
+          NAME="MyLock Latest ARM64 APK"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$APK" --clobber
-            gh release edit "$TAG" --title "$NAME" --notes "Latest MY LOCK Android ARM64 release APK.\nCommit: $COMMIT_SHA"
+            gh release edit "$TAG" --title "$NAME" --notes "Latest MyLock Android ARM64 release APK.\nCommit: $COMMIT_SHA"
           else
             gh release create "$TAG" "$APK" --title "$NAME" --notes "Latest MY LOCK Android ARM64 release APK.\nCommit: $COMMIT_SHA"
           fi
@@ -256,9 +276,9 @@ jobs:
           msg = EmailMessage()
           msg["From"] = username
           msg["To"] = os.environ["RECIPIENT"]
-          msg["Subject"] = f"MY LOCK ARM64 Release APK | {display_time} | {commit_sha[:8]}"
+          msg["Subject"] = f"MyLock ARM64 Release APK | {display_time} | {commit_sha[:8]}"
           msg.set_content(
-              "MY LOCK Android ARM64 Release APK 빌드와 다운로드 검증이 완료되었습니다.\n\n"
+              "MyLock Android ARM64 Release APK 빌드와 다운로드 검증이 완료되었습니다.\n\n"
               f"빌드 시각: {display_time}\n"
               f"커밋: {commit_sha}\n\n"
               "이번 변경사항\n"
@@ -276,7 +296,7 @@ jobs:
           msg.add_alternative(f"""
           <html>
             <body style="font-family:Arial,sans-serif;line-height:1.55;color:#222">
-              <h2 style="margin-bottom:4px">MY LOCK 테스트 빌드 완료</h2>
+              <h2 style="margin-bottom:4px">MyLock 테스트 빌드 완료</h2>
               <div style="color:#666;margin-bottom:18px">{display_time} · ARM64 · Release</div>
               <h3>이번 변경사항</h3>
               <div style="margin-bottom:22px">{summary_html}</div>
