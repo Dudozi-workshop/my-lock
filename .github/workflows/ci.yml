@@ -1,11 +1,14 @@
 name: MyLock CI
 
 permissions:
-  contents: write
+  contents: read
 
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
   workflow_dispatch:
     inputs:
       target:
@@ -15,13 +18,18 @@ on:
         type: choice
         options:
           - android
+          - play
           - ios
           - all
+
+concurrency:
+  group: mylock-ci-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target || 'push' }}
+  cancel-in-progress: true
 
 jobs:
   android:
     if: ${{ github.event_name == 'push' || github.event.inputs.target == 'android' || github.event.inputs.target == 'all' }}
-    name: Android analyze, test, build
+    name: Android test and ARM64 APK
     runs-on: ubuntu-latest
     env:
       SUPABASE_URL: https://dddpxudwfsydrhfgvvyn.supabase.co
@@ -31,16 +39,18 @@ jobs:
       MYLOCK_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.MYLOCK_UPLOAD_KEYSTORE_PASSWORD }}
       MYLOCK_UPLOAD_KEY_ALIAS: ${{ secrets.MYLOCK_UPLOAD_KEY_ALIAS }}
       MYLOCK_UPLOAD_KEY_PASSWORD: ${{ secrets.MYLOCK_UPLOAD_KEY_PASSWORD }}
+
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 20
+          fetch-depth: 10
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+          cache: gradle
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -54,7 +64,7 @@ jobs:
           PLATFORMS: android
         run: bash tool/bootstrap.sh
 
-      - name: Configure MyLock Play upload signing
+      - name: Configure release signing
         if: ${{ env.MYLOCK_UPLOAD_KEYSTORE_B64 != '' && env.MYLOCK_UPLOAD_KEYSTORE_PASSWORD != '' && env.MYLOCK_UPLOAD_KEY_ALIAS != '' && env.MYLOCK_UPLOAD_KEY_PASSWORD != '' }}
         run: |
           set -e
@@ -92,195 +102,54 @@ jobs:
                   storePassword = keystoreProperties["storePassword"] as String
               }
           }
-          
+
           '''
               text = text.replace("    buildTypes {", "    " + signing + "    buildTypes {", 1)
-          text = text.replace('signingConfig = signingConfigs.getByName("debug")', 'signingConfig = signingConfigs.getByName("release")')
+          text = text.replace(
+              'signingConfig = signingConfigs.getByName("debug")',
+              'signingConfig = signingConfigs.getByName("release")',
+          )
           path.write_text(text)
           PY
-          echo "MyLock Play upload signing configured."
 
-      - name: Analyze Flutter code
+      - name: Analyze
         run: flutter analyze
 
-      - name: Run Flutter tests
+      - name: Test
         run: flutter test
 
-      - name: Restore stable debug signing key
-        uses: actions/cache@v4
-        with:
-          path: ~/.android/debug.keystore
-          key: my-lock-debug-keystore-v1
+      - name: Build ARM64 APK only
+        run: flutter build apk --release --target-platform android-arm64 --split-per-abi
 
-      - name: Build lightweight ARM64 release APK
+      - name: Prepare APK
         run: |
-          set -e
-          for attempt in 1 2 3; do
-            if flutter build apk --release --split-per-abi; then
-              exit 0
-            fi
-            if [ "$attempt" -eq 3 ]; then
-              exit 1
-            fi
-            sleep $((attempt * 20))
-          done
-
-      - name: Build MyLock Play Store AAB
-        run: |
-          set -e
-          for attempt in 1 2 3; do
-            if flutter build appbundle --release; then
-              exit 0
-            fi
-            if [ "$attempt" -eq 3 ]; then
-              exit 1
-            fi
-            sleep $((attempt * 20))
-          done
-
-      - name: Upload MyLock Play Store AAB artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mylock-play-store-aab
-          path: build/app/outputs/bundle/release/app-release.aab
-          if-no-files-found: error
-
-      - name: Prepare stable ARM64 APK filename
-        run: |
-          set -e
           mkdir -p dist
           cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk dist/my-lock-arm64-release.apk
 
-      - name: Upload latest ARM64 APK to Supabase Storage
+      - name: Upload latest APK to Supabase
         env:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -e
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
-          npm install --no-save --no-package-lock @supabase/supabase-js@2
-          node <<'NODE'
-          const fs = require('fs');
-          const { createClient } = require('@supabase/supabase-js');
+          curl --fail --show-error --silent             --request POST             --header "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"             --header "apikey: $SUPABASE_SERVICE_ROLE_KEY"             --header "Content-Type: application/vnd.android.package-archive"             --header "x-upsert: true"             --data-binary @dist/my-lock-arm64-release.apk             "$SUPABASE_URL/storage/v1/object/$SUPABASE_BUCKET/$SUPABASE_OBJECT"
 
-          const url = process.env.SUPABASE_URL;
-          const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-          const bucket = process.env.SUPABASE_BUCKET;
-          const objectName = process.env.SUPABASE_OBJECT;
-          const apkPath = 'dist/my-lock-arm64-release.apk';
-
-          if (!url || !key || !bucket || !objectName) {
-            console.error('Supabase upload config is incomplete');
-            process.exit(1);
-          }
-
-          const supabase = createClient(url, key, {
-            auth: {
-              persistSession: false,
-              autoRefreshToken: false,
-              detectSessionInUrl: false,
-            },
-          });
-
-          (async () => {
-            const bytes = fs.readFileSync(apkPath);
-            const { data, error } = await supabase.storage
-              .from(bucket)
-              .upload(objectName, bytes, {
-                contentType: 'application/vnd.android.package-archive',
-                cacheControl: '60',
-                upsert: true,
-              });
-
-            if (error) {
-              console.error('Supabase Storage upload failed');
-              console.error(JSON.stringify({
-                name: error.name,
-                message: error.message,
-                status: error.status,
-                statusCode: error.statusCode,
-                error: error.error,
-              }, null, 2));
-              process.exit(1);
-            }
-
-            console.log('Supabase Storage upload succeeded:', data?.path || objectName);
-          })().catch((error) => {
-            console.error('Unexpected Supabase upload failure');
-            console.error(error);
-            process.exit(1);
-          });
-          NODE
-
-      - name: Verify Supabase public APK download
+      - name: Verify Supabase APK
         env:
           COMMIT_SHA: ${{ github.sha }}
         run: |
           set -e
           APK_URL="$SUPABASE_URL/storage/v1/object/public/$SUPABASE_BUCKET/$SUPABASE_OBJECT?v=$COMMIT_SHA"
-          curl --fail --show-error --location --retry 3 --retry-delay 2 \
-            --output /tmp/my-lock-arm64-release.apk "$APK_URL"
-          test -s /tmp/my-lock-arm64-release.apk
-          echo "Local SHA256:"
-          sha256sum dist/my-lock-arm64-release.apk
-          echo "Downloaded SHA256:"
-          sha256sum /tmp/my-lock-arm64-release.apk
+          curl --fail --show-error --silent --location             --output /tmp/my-lock-arm64-release.apk "$APK_URL"
           cmp --silent dist/my-lock-arm64-release.apk /tmp/my-lock-arm64-release.apk
 
-      - name: Upload ARM64 release APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: my-lock-arm64-release-apk
-          path: dist/my-lock-arm64-release.apk
-          if-no-files-found: error
-
-      - name: Read previous APK build metadata
-        id: previous_apk
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -e
-          PREVIOUS_SHA=""
-          if gh release view latest-apk --json body --jq '.body' >/tmp/latest_apk_body.txt 2>/dev/null; then
-            PREVIOUS_SHA="$(grep -Eo '[0-9a-f]{40}' /tmp/latest_apk_body.txt | head -n 1 || true)"
-          fi
-          echo "previous_sha=$PREVIOUS_SHA" >> "$GITHUB_OUTPUT"
-
-      - name: Publish latest ARM64 APK download
-        env:
-          GH_TOKEN: ${{ github.token }}
-          COMMIT_SHA: ${{ github.sha }}
-        run: |
-          set -e
-          APK="dist/my-lock-arm64-release.apk"
-          TAG="latest-apk"
-          NAME="MyLock Latest ARM64 APK"
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$APK" --clobber
-            gh release edit "$TAG" --title "$NAME" --notes "Latest MyLock Android ARM64 release APK.\nCommit: $COMMIT_SHA"
-          else
-            gh release create "$TAG" "$APK" --title "$NAME" --notes "Latest MY LOCK Android ARM64 release APK.\nCommit: $COMMIT_SHA"
-          fi
-
-      - name: Build APK change summary
+      - name: Build change summary
         id: change_summary
-        env:
-          PREVIOUS_SHA: ${{ steps.previous_apk.outputs.previous_sha }}
         run: |
-          set -e
-          SUMMARY_FILE=/tmp/my-lock-change-summary.txt
-          : > "$SUMMARY_FILE"
+          git log --no-merges -n 5 --pretty='- %s' "${GITHUB_SHA}" > /tmp/my-lock-change-summary.txt
+          echo "summary_file=/tmp/my-lock-change-summary.txt" >> "$GITHUB_OUTPUT"
 
-          if [ -n "$PREVIOUS_SHA" ] && git cat-file -e "$PREVIOUS_SHA^{commit}" 2>/dev/null; then
-            git log --no-merges --pretty='- %s' "$PREVIOUS_SHA..${GITHUB_SHA}" > "$SUMMARY_FILE"
-          fi
-
-          if [ ! -s "$SUMMARY_FILE" ]; then
-            git log --no-merges -n 5 --pretty='- %s' "${GITHUB_SHA}" > "$SUMMARY_FILE"
-          fi
-
-          echo "summary_file=$SUMMARY_FILE" >> "$GITHUB_OUTPUT"
-
-      - name: Email Supabase ARM64 APK with change summary
+      - name: Email APK
         if: ${{ success() }}
         env:
           SMTP_USERNAME: ${{ secrets.APK_MAIL_USERNAME }}
@@ -290,7 +159,6 @@ jobs:
           APK_URL: https://dddpxudwfsydrhfgvvyn.supabase.co/storage/v1/object/public/my-lock-apk/my-lock-arm64-release.apk?v=${{ github.sha }}
           COMMIT_SHA: ${{ github.sha }}
           BUILD_TIME: ${{ github.event.head_commit.timestamp }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           CHANGE_SUMMARY_FILE: ${{ steps.change_summary.outputs.summary_file }}
         run: |
           python3 - <<'PY'
@@ -308,73 +176,137 @@ jobs:
           build_time = os.environ.get("BUILD_TIME", "")
           apk_url = os.environ["APK_URL"]
           run_url = os.environ["RUN_URL"]
-          commit_message = os.environ.get("COMMIT_MESSAGE", "").strip() or "변경 내역 없음"
-          change_summary_file = os.environ.get("CHANGE_SUMMARY_FILE", "")
-          try:
-              with open(change_summary_file, "r", encoding="utf-8") as f:
-                  change_summary = f.read().strip()
-          except Exception:
-              change_summary = ""
-          if not change_summary:
-              change_summary = f"- {commit_message.splitlines()[0]}"
+
+          with open(os.environ["CHANGE_SUMMARY_FILE"], "r", encoding="utf-8") as f:
+              change_summary = f.read().strip()
+
           try:
               dt = datetime.fromisoformat(build_time.replace("Z", "+00:00"))
-              display_time = dt.astimezone(timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M KST")
+              display_time = dt.astimezone(
+                  timezone(timedelta(hours=9))
+              ).strftime("%Y-%m-%d %H:%M KST")
           except Exception:
               display_time = build_time or "unknown"
 
           msg = EmailMessage()
           msg["From"] = username
           msg["To"] = os.environ["RECIPIENT"]
-          msg["Subject"] = f"MyLock ARM64 Release APK | {display_time} | {commit_sha[:8]}"
+          msg["Subject"] = f"MyLock APK | {display_time} | {commit_sha[:8]}"
           msg.set_content(
-              "MyLock Android ARM64 Release APK 빌드와 다운로드 검증이 완료되었습니다.\n\n"
+              "MyLock ARM64 APK 빌드가 완료되었습니다.\n\n"
               f"빌드 시각: {display_time}\n"
               f"커밋: {commit_sha}\n\n"
-              "이번 변경사항\n"
-              "----------------\n"
-              f"{change_summary}\n\n"
-              f"ARM64 Release APK: {apk_url}\n"
-              f"빌드 상세: {run_url}\n\n"
-              "위 APK 주소는 Supabase Storage의 최신 ARM64 Release 파일로 유지됩니다."
+              f"변경사항\n{change_summary}\n\n"
+              f"APK: {apk_url}\n"
+              f"빌드 상세: {run_url}\n"
           )
-
-          summary_html = "<br>".join(
-              line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-              for line in change_summary.splitlines()
-          )
-          msg.add_alternative(f"""
-          <html>
-            <body style="font-family:Arial,sans-serif;line-height:1.55;color:#222">
-              <h2 style="margin-bottom:4px">MyLock 테스트 빌드 완료</h2>
-              <div style="color:#666;margin-bottom:18px">{display_time} · ARM64 · Release</div>
-              <h3>이번 변경사항</h3>
-              <div style="margin-bottom:22px">{summary_html}</div>
-
-              <p>
-                <a href="{apk_url}" style="display:inline-block;padding:12px 18px;background:#111;color:#fff;text-decoration:none;border-radius:8px">
-                  ARM64 APK 다운로드
-                </a>
-              </p>
-
-              <p style="color:#666;font-size:13px">
-                위 버튼은 Supabase Storage의 최신 ARM64 Release APK로 연결됩니다.<br>
-                <a href="{run_url}">빌드 상세</a>
-              </p>
-              <p style="color:#999;font-size:12px">commit {commit_sha}</p>
-            </body>
-          </html>
-          """, subtype="html")
 
           with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
               smtp.login(username, password)
               smtp.send_message(msg)
           PY
 
+  play:
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.target == 'play' || github.event.inputs.target == 'all') }}
+    name: Play Store AAB
+    runs-on: ubuntu-latest
+    env:
+      MYLOCK_UPLOAD_KEYSTORE_B64: ${{ secrets.MYLOCK_UPLOAD_KEYSTORE_B64 }}
+      MYLOCK_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.MYLOCK_UPLOAD_KEYSTORE_PASSWORD }}
+      MYLOCK_UPLOAD_KEY_ALIAS: ${{ secrets.MYLOCK_UPLOAD_KEY_ALIAS }}
+      MYLOCK_UPLOAD_KEY_PASSWORD: ${{ secrets.MYLOCK_UPLOAD_KEY_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Bootstrap Android
+        env:
+          PLATFORMS: android
+        run: bash tool/bootstrap.sh
+
+      - name: Configure Play signing
+        run: |
+          set -e
+          test -n "$MYLOCK_UPLOAD_KEYSTORE_B64"
+          echo "$MYLOCK_UPLOAD_KEYSTORE_B64" | base64 --decode > android/app/mylock-upload-key.jks
+          cat > android/key.properties <<EOF
+          storePassword=$MYLOCK_UPLOAD_KEYSTORE_PASSWORD
+          keyPassword=$MYLOCK_UPLOAD_KEY_PASSWORD
+          keyAlias=$MYLOCK_UPLOAD_KEY_ALIAS
+          storeFile=mylock-upload-key.jks
+          EOF
+          python3 - android/app/build.gradle.kts <<'PY'
+          from pathlib import Path
+          import sys
+
+          path = Path(sys.argv[1])
+          text = path.read_text()
+          header = """import java.io.FileInputStream
+          import java.util.Properties
+
+          val keystoreProperties = Properties()
+          val keystorePropertiesFile = rootProject.file("key.properties")
+          if (keystorePropertiesFile.exists()) {
+              keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+          }
+
+          """
+          if "val keystoreProperties = Properties()" not in text:
+              text = header + text
+          if 'create("release")' not in text:
+              signing = '''signingConfigs {
+              create("release") {
+                  keyAlias = keystoreProperties["keyAlias"] as String
+                  keyPassword = keystoreProperties["keyPassword"] as String
+                  storeFile = file(keystoreProperties["storeFile"] as String)
+                  storePassword = keystoreProperties["storePassword"] as String
+              }
+          }
+
+          '''
+              text = text.replace("    buildTypes {", "    " + signing + "    buildTypes {", 1)
+          text = text.replace(
+              'signingConfig = signingConfigs.getByName("debug")',
+              'signingConfig = signingConfigs.getByName("release")',
+          )
+          path.write_text(text)
+          PY
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Build AAB
+        run: flutter build appbundle --release
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mylock-play-store-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+
   ios:
     if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.target == 'ios' || github.event.inputs.target == 'all') }}
-    name: iOS analyze, test, compile
+    name: iOS compile
     runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -390,10 +322,10 @@ jobs:
           PLATFORMS: ios
         run: bash tool/bootstrap.sh
 
-      - name: Analyze Flutter code
+      - name: Analyze
         run: flutter analyze
 
-      - name: Run Flutter tests
+      - name: Test
         run: flutter test
 
       - name: Compile iOS without signing
