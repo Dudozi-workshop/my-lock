@@ -23,6 +23,12 @@ class LockMonitorService : Service() {
         private const val notificationId = 1201
         private const val pollIntervalMs = 150L
         private const val overlayExitConfirmMs = 300L
+        private val transientSystemPackages = setOf(
+            "com.android.systemui",
+            "com.android.launcher",
+            "com.google.android.apps.nexuslauncher",
+            "com.sec.android.app.launcher",
+        )
         private const val preferencesName = "my_lock_native"
         private const val protectedAppsKey = "protected_apps"
         private const val experimentalScreenLockKey = "experimental_screen_lock"
@@ -258,6 +264,13 @@ class LockMonitorService : Service() {
         val overlayTarget = OverlayLockController.currentTarget()
 
         if (OverlayLockController.isVisible && overlayTarget != null) {
+            // Recents, Home, and system-bar transitions can briefly emit a
+            // system package while the user is still on the protected app.
+            // Keep the lock overlay alive during that transient transition.
+            if (isTransientSystemPackage(packageName)) {
+                return
+            }
+
             if (packageName == overlayTarget) {
                 cancelPendingOverlayExit()
                 foregroundPackage = packageName
@@ -333,6 +346,10 @@ class LockMonitorService : Service() {
                 forceRecreate = true,
             )
         }
+    }
+
+    private fun isTransientSystemPackage(packageName: String): Boolean {
+        return packageName in transientSystemPackages
     }
 
     private fun scheduleOverlayExit(appId: String) {
