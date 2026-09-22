@@ -21,7 +21,7 @@ class LockMonitorService : Service() {
     companion object {
         private const val channelId = "my_lock_monitor"
         private const val notificationId = 1201
-        private const val pollIntervalMs = 150L
+        private const val pollIntervalMs = 100L
         private const val overlayExitConfirmMs = 300L
         private val transientSystemPackages = setOf(
             "com.android.systemui",
@@ -300,14 +300,17 @@ class LockMonitorService : Service() {
         if (packageName == foregroundPackage) {
             if (
                 protectedApps.contains(packageName) &&
-                !OverlayLockController.isVisible &&
-                shouldLockInNativeFallback(packageName)
+                !OverlayLockController.isVisible
             ) {
-                OverlayLockController.show(
-                    this,
-                    packageName,
-                    forceRecreate = true,
-                )
+                if (shouldLockInNativeFallback(packageName)) {
+                    OverlayLockController.show(
+                        this,
+                        packageName,
+                        forceRecreate = true,
+                    )
+                } else {
+                    clearProtectedAppExit(packageName)
+                }
             }
             return
         }
