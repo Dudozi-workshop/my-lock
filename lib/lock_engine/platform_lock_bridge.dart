@@ -94,7 +94,7 @@ abstract class PlatformLockBridge {
 class MethodChannelPlatformLockBridge implements PlatformLockBridge {
   MethodChannelPlatformLockBridge({
     MethodChannel? channel,
-  }) : _channel = channel ?? const MethodChannel('com.mylock.app/lock');
+  }) : _channel = channel ?? const MethodChannel('com.dudoziworkshop.mylock/lock');
 
   final MethodChannel _channel;
   final StreamController<PlatformLockEvent> _events =
