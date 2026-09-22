@@ -258,9 +258,21 @@ class LockMonitorService : Service() {
     }
 
     private fun handleForegroundPackage(packageName: String) {
-        if (packageName == this.packageName) return
-
         val protectedApps = protectedApps()
+
+        if (packageName == this.packageName) {
+            val previous = foregroundPackage
+            if (previous != null && protectedApps.contains(previous)) {
+                markProtectedAppExited(previous)
+            }
+            foregroundPackage = packageName
+            cancelPendingOverlayExit()
+            if (OverlayLockController.isVisible) {
+                OverlayLockController.hide()
+            }
+            return
+        }
+
         val overlayTarget = OverlayLockController.currentTarget()
 
         if (OverlayLockController.isVisible && overlayTarget != null) {
