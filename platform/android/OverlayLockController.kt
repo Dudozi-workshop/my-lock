@@ -143,7 +143,21 @@ object OverlayLockController {
                 true
             } catch (error: Throwable) {
                 if (blocker != null) {
-                    runCatching { manager.removeViewImmediate(blocker) }
+                    // Never reveal the protected app because Flutter lock UI
+                    // failed to initialize. Move the user to Home first, keep
+                    // the opaque blocker briefly while that transition settles,
+                    // then release the emergency window.
+                    exitToHome(appContext, appId)
+                    blocker.postDelayed(
+                        {
+                            runCatching {
+                                if (blocker.isAttachedToWindow) {
+                                    manager.removeViewImmediate(blocker)
+                                }
+                            }
+                        },
+                        250L,
+                    )
                 }
                 throw error
             }
