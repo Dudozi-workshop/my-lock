@@ -407,14 +407,7 @@ class _Header extends StatelessWidget {
         children: [
           Row(
             children: [
-              if (demoMode || onClose != null)
-                IconButton(
-                  onPressed: onClose,
-                  visualDensity: VisualDensity.compact,
-                  icon: const Icon(Icons.close_rounded),
-                )
-              else
-                const SizedBox(width: 40),
+              const SizedBox(width: 40),
               Expanded(
                 child: Text(
                   appAuthentication ? 'MY LOCK 열기' : 'MY LOCK',
@@ -426,7 +419,14 @@ class _Header extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 40),
+              if (demoMode || onClose != null)
+                IconButton(
+                  onPressed: onClose,
+                  visualDensity: VisualDensity.compact,
+                  icon: const Icon(Icons.close_rounded),
+                )
+              else
+                const SizedBox(width: 40),
             ],
           ),
           const SizedBox(height: 5),
