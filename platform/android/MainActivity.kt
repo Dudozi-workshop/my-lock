@@ -1,4 +1,4 @@
-package com.dudoziworkshop.mylock.my_lock
+package com.dudoziworkshop.mylock
 
 import android.app.AppOpsManager
 import android.content.Context
