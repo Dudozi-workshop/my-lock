@@ -1,4 +1,4 @@
-package com.mylock.app.my_lock
+package com.dudoziworkshop.mylock.my_lock
 
 import android.content.Context
 import android.content.Intent
@@ -11,7 +11,7 @@ import io.flutter.plugin.common.MethodChannel
 
 class LockActivity : FlutterActivity() {
     companion object {
-        private const val channelName = "com.mylock.app/lock"
+        private const val channelName = "com.dudoziworkshop.mylock/lock"
         private const val preferencesName = "my_lock_native"
         private const val targetAppExtra = "lock_target_app"
         const val deviceScreenAppId = "__device_screen__"
