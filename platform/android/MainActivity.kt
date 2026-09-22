@@ -427,13 +427,7 @@ class MainActivity : FlutterFragmentActivity() {
 
     private fun openBatteryOptimizationSettings() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
-        val direct = Intent(
-            Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-            Uri.parse("package:$packageName"),
-        )
-        val fallback = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-        runCatching { startActivity(direct) }
-            .recoverCatching { startActivity(fallback) }
+        startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
     }
 
     private fun openUsageAccessSettings() {
