@@ -29,7 +29,6 @@ permissions = [
     '<uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />',
     '<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />',
     '<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />',
-    '<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />',
 ]
 
 marker = '<application'
@@ -100,6 +99,8 @@ import sys
 
 path = Path(sys.argv[1])
 text = path.read_text()
+text = text.replace('compileSdk = flutter.compileSdkVersion', 'compileSdk = 36')
+text = text.replace('targetSdk = flutter.targetSdkVersion', 'targetSdk = 36')
 dependency = '    implementation("androidx.biometric:biometric:1.1.0")'
 
 if dependency not in text:
