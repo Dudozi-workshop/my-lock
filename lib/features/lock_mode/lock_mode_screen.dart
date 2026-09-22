@@ -19,6 +19,7 @@ class LockModeScreen extends StatefulWidget {
     this.authenticationAttemptIsCurrent,
     this.onDeviceRecovered,
     this.onOpenAppRecovery,
+    this.onClose,
     this.onUnlocked,
   });
 
@@ -28,6 +29,7 @@ class LockModeScreen extends StatefulWidget {
   final bool Function()? authenticationAttemptIsCurrent;
   final Future<void> Function()? onDeviceRecovered;
   final Future<void> Function()? onOpenAppRecovery;
+  final Future<void> Function()? onClose;
   final Future<void> Function()? onUnlocked;
 
   @override
@@ -165,7 +167,14 @@ class _LockModeScreenState extends State<LockModeScreen>
                   onRecoveryPin: _openRecoveryPin,
                   onDeviceRecovery:
                       widget.appAuthentication ? _recoverWithDeviceOwner : null,
-                  onClose: () => Navigator.of(context).pop(false),
+                  onClose: () {
+                    final onClose = widget.onClose;
+                    if (onClose != null) {
+                      onClose();
+                    } else {
+                      Navigator.of(context).pop(false);
+                    }
+                  },
                 ),
               ),
               if (_controller.unlocked)
@@ -402,7 +411,7 @@ class _Header extends StatelessWidget {
         children: [
           Row(
             children: [
-              if (demoMode)
+              if (demoMode || onClose != null)
                 IconButton(
                   onPressed: onClose,
                   visualDensity: VisualDensity.compact,
