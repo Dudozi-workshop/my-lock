@@ -1,4 +1,4 @@
-package com.mylock.app.my_lock
+package com.dudoziworkshop.mylock.my_lock
 
 import android.content.Context
 import android.content.Intent
@@ -26,7 +26,7 @@ import io.flutter.plugin.common.MethodChannel
  * LockModeScreen / FloatingPreview / painters / animation engine.
  */
 object OverlayLockController {
-    private const val channelName = "com.mylock.app/lock"
+    private const val channelName = "com.dudoziworkshop.mylock/lock"
     private const val preferencesName = "my_lock_native"
 
     private var windowManager: WindowManager? = null
