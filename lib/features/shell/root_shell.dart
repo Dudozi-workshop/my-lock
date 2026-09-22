@@ -85,7 +85,9 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (!_settings.loaded || !_settings.onboardingCompleted || _settings.password == null) return;
 
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
       _appAuth.markUnauthenticated();
       return;
     }
