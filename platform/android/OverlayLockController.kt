@@ -12,7 +12,6 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
-import android.widget.FrameLayout
 import io.flutter.FlutterInjector
 import io.flutter.embedding.android.FlutterView
 import io.flutter.embedding.engine.FlutterEngine
@@ -66,27 +65,8 @@ object OverlayLockController {
             appContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
         return runCatching {
-            // Block the protected app immediately. Flutter engine startup can take
-            // noticeably longer than adding a native overlay window, so waiting for
-            // Flutter before attaching anything leaves a brief tap-through / reveal
-            // window. Keep an existing lock overlay in place during replacements;
-            // otherwise attach an opaque native blocker first.
-            val blocker = if (!isVisible) {
-                FrameLayout(appContext).apply {
-                    background = buildOverlayBackground(appContext)
-                    isClickable = true
-                    isFocusable = true
-                    setOnTouchListener { _, _ -> true }
-                    manager.addView(this, createOverlayLayoutParams())
-                    applyImmersiveSystemUi(this)
-                }
-            } else {
-                null
-            }
-
-            try {
-                val engine = createFlutterEngine(appContext, appId, demoMode)
-                val view = MonitoredFlutterView(
+            val engine = createFlutterEngine(appContext, appId, demoMode)
+            val view = MonitoredFlutterView(
                 appContext,
                 onInterrupted = { interruptedView ->
                     if (
@@ -111,56 +91,51 @@ object OverlayLockController {
                 attachToFlutterEngine(engine)
             }
 
-                val params = createOverlayLayoutParams()
+            val params = WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                } else {
+                    @Suppress("DEPRECATION")
+                    WindowManager.LayoutParams.TYPE_PHONE
+                },
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                PixelFormat.OPAQUE,
+            ).apply {
+                gravity = Gravity.TOP or Gravity.START
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    layoutInDisplayCutoutMode =
+                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                }
+            }
 
-                val previousManager = windowManager
+            val previousManager = windowManager
             val previousView = overlayView
             val previousEngine = flutterEngine
 
-                manager.addView(view, params)
-                applyImmersiveSystemUi(view)
+            manager.addView(view, params)
+            applyImmersiveSystemUi(view)
 
-                windowManager = manager
-                overlayView = view
-                flutterEngine = engine
-                targetAppId = appId
-                currentDemoMode = demoMode
-                engine.lifecycleChannel.appIsResumed()
+            windowManager = manager
+            overlayView = view
+            flutterEngine = engine
+            targetAppId = appId
+            currentDemoMode = demoMode
+            engine.lifecycleChannel.appIsResumed()
 
-                if (previousManager != null && previousView != null) {
-                    previousView.suppressMonitoring()
-                    runCatching { previousManager.removeViewImmediate(previousView) }
-                    runCatching { previousView.detachFromFlutterEngine() }
-                }
-                if (previousEngine != null) {
-                    runCatching { previousEngine.lifecycleChannel.appIsDetached() }
-                    runCatching { previousEngine.destroy() }
-                }
-
-                if (blocker != null) {
-                    runCatching { manager.removeViewImmediate(blocker) }
-                }
-                true
-            } catch (error: Throwable) {
-                if (blocker != null) {
-                    // Never reveal the protected app because Flutter lock UI
-                    // failed to initialize. Move the user to Home first, keep
-                    // the opaque blocker briefly while that transition settles,
-                    // then release the emergency window.
-                    exitToHome(appContext, appId)
-                    blocker.postDelayed(
-                        {
-                            runCatching {
-                                if (blocker.isAttachedToWindow) {
-                                    manager.removeViewImmediate(blocker)
-                                }
-                            }
-                        },
-                        250L,
-                    )
-                }
-                throw error
+            if (previousManager != null && previousView != null) {
+                previousView.suppressMonitoring()
+                runCatching { previousManager.removeViewImmediate(previousView) }
+                runCatching { previousView.detachFromFlutterEngine() }
             }
+            if (previousEngine != null) {
+                runCatching { previousEngine.lifecycleChannel.appIsDetached() }
+                runCatching { previousEngine.destroy() }
+            }
+            true
         }.getOrElse {
             false
         }
@@ -252,29 +227,6 @@ object OverlayLockController {
         )
         engine.dartExecutor.executeDartEntrypoint(entrypoint)
         return engine
-    }
-
-    private fun createOverlayLayoutParams(): WindowManager.LayoutParams {
-        return WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-            } else {
-                @Suppress("DEPRECATION")
-                WindowManager.LayoutParams.TYPE_PHONE
-            },
-            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            PixelFormat.OPAQUE,
-        ).apply {
-            gravity = Gravity.TOP or Gravity.START
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                layoutInDisplayCutoutMode =
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-            }
-        }
     }
 
     private fun applyImmersiveSystemUi(view: View) {
