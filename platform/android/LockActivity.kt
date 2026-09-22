@@ -19,14 +19,11 @@ class LockActivity : FlutterActivity() {
         @Volatile
         var lockUiVisible: Boolean = false
 
-        @Volatile
-        private var launchPending: Boolean = false
-
         fun launch(context: Context, appId: String): Boolean {
             if (appId.isBlank()) return false
-            if (lockUiVisible || launchPending) return true
+            if (lockUiVisible) return true
 
-            launchPending = true
+            lockUiVisible = true
             val intent = Intent(context, LockActivity::class.java).apply {
                 addFlags(
                     Intent.FLAG_ACTIVITY_NEW_TASK or
@@ -41,7 +38,6 @@ class LockActivity : FlutterActivity() {
                 context.startActivity(intent)
                 true
             }.getOrElse {
-                launchPending = false
                 lockUiVisible = false
                 false
             }
@@ -53,7 +49,6 @@ class LockActivity : FlutterActivity() {
     override fun getDartEntrypointFunctionName(): String = "lockMain"
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        launchPending = false
         targetAppId = intent?.getStringExtra(targetAppExtra)
         window.setBackgroundDrawable(buildImmediateBlockBackground())
         if (targetAppId == deviceScreenAppId) {
@@ -120,7 +115,6 @@ class LockActivity : FlutterActivity() {
     }
 
     override fun onDestroy() {
-        launchPending = false
         lockUiVisible = false
         super.onDestroy()
     }
