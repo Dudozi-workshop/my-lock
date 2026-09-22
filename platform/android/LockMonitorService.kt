@@ -21,7 +21,7 @@ class LockMonitorService : Service() {
     companion object {
         private const val channelId = "my_lock_monitor"
         private const val notificationId = 1201
-        private const val pollIntervalMs = 100L
+        private const val pollIntervalMs = 150L
         private const val overlayExitConfirmMs = 300L
         private val transientSystemPackages = setOf(
             "com.android.systemui",
@@ -286,7 +286,6 @@ class LockMonitorService : Service() {
                 if (shouldLockInNativeFallback(packageName)) {
                     OverlayLockController.show(this, packageName)
                 } else {
-                    clearProtectedAppExit(packageName)
                     OverlayLockController.hide()
                 }
                 return
@@ -300,17 +299,14 @@ class LockMonitorService : Service() {
         if (packageName == foregroundPackage) {
             if (
                 protectedApps.contains(packageName) &&
-                !OverlayLockController.isVisible
+                !OverlayLockController.isVisible &&
+                shouldLockInNativeFallback(packageName)
             ) {
-                if (shouldLockInNativeFallback(packageName)) {
-                    OverlayLockController.show(
-                        this,
-                        packageName,
-                        forceRecreate = true,
-                    )
-                } else {
-                    clearProtectedAppExit(packageName)
-                }
+                OverlayLockController.show(
+                    this,
+                    packageName,
+                    forceRecreate = true,
+                )
             }
             return
         }
@@ -326,11 +322,6 @@ class LockMonitorService : Service() {
         cancelPendingOverlayExit()
         if (shouldLockInNativeFallback(packageName)) {
             OverlayLockController.show(this, packageName)
-        } else {
-            // Returning inside a timed grace period resumes the unlocked
-            // session. Consume the previous exit marker so the old timer
-            // cannot expire while the user is already back in the app.
-            clearProtectedAppExit(packageName)
         }
     }
 
@@ -392,18 +383,6 @@ class LockMonitorService : Service() {
         pendingOverlayExitRunnable = null
         pendingOverlayExitPackage = null
         pendingOverlayExitAt = 0L
-    }
-
-    private fun clearProtectedAppExit(appId: String) {
-        val preferences =
-            getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
-        if (preferences.getString(lastProtectedExitAppKey, null) != appId) {
-            return
-        }
-        preferences.edit()
-            .remove(lastProtectedExitAppKey)
-            .remove(lastProtectedExitAtKey)
-            .apply()
     }
 
     private fun markProtectedAppExited(appId: String) {
