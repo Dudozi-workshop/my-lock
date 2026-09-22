@@ -19,8 +19,8 @@ cp -R "$ROOT/test" "$TMP/test"
 cd "$ROOT"
 flutter create \
   --platforms="$PLATFORMS" \
-  --project-name my_lock \
-  --org com.dudoziworkshop.mylock \
+  --project-name mylock \
+  --org com.dudoziworkshop \
   .
 
 if [[ ",$PLATFORMS," == *",android,"* ]]; then
