@@ -20,7 +20,7 @@ cd "$ROOT"
 flutter create \
   --platforms="$PLATFORMS" \
   --project-name my_lock \
-  --org com.mylock.app \
+  --org com.dudoziworkshop.mylock \
   .
 
 if [[ ",$PLATFORMS," == *",android,"* ]]; then
