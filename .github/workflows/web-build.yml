@@ -3,10 +3,22 @@ name: MY LOCK Web Build
 on:
   push:
     branches: [main]
+    paths:
+      - 'lib/**'
+      - 'assets/**'
+      - 'pubspec.yaml'
+      - 'analysis_options.yaml'
+      - 'tool/**'
+      - 'wrangler.jsonc'
+      - '.github/workflows/web-build.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: mylock-web-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   web:
