@@ -1,4 +1,4 @@
-package com.mylock.app.my_lock
+package com.dudoziworkshop.mylock.my_lock
 
 import android.app.Notification
 import android.app.NotificationChannel
