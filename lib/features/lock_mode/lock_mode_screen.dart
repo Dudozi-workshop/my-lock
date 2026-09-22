@@ -167,14 +167,10 @@ class _LockModeScreenState extends State<LockModeScreen>
                   onRecoveryPin: _openRecoveryPin,
                   onDeviceRecovery:
                       widget.appAuthentication ? _recoverWithDeviceOwner : null,
-                  onClose: () {
-                    final onClose = widget.onClose;
-                    if (onClose != null) {
-                      onClose();
-                    } else {
-                      Navigator.of(context).pop(false);
-                    }
-                  },
+                  onClose: widget.onClose ??
+                      (widget.demoMode
+                          ? () => Navigator.of(context).pop(false)
+                          : null),
                 ),
               ),
               if (_controller.unlocked)
@@ -396,7 +392,7 @@ class _Header extends StatelessWidget {
   final bool showRecoveryPin;
   final VoidCallback onRecoveryPin;
   final VoidCallback? onDeviceRecovery;
-  final VoidCallback onClose;
+  final VoidCallback? onClose;
 
   @override
   Widget build(BuildContext context) {
