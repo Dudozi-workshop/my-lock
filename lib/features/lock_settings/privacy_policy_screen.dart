@@ -64,10 +64,10 @@ class _PolicyTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: 22, bottom: 6),
+      padding: const EdgeInsets.only(top: 22, bottom: 6),
       child: Text(
         text,
-        style: TextStyle(
+        style: const TextStyle(
           color: ink,
           fontSize: 15,
           fontWeight: FontWeight.w800,
@@ -86,7 +86,7 @@ class _PolicyText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: TextStyle(
+      style: const TextStyle(
         color: secondaryInk,
         fontSize: 13,
         height: 1.55,
