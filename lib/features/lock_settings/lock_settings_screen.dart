@@ -8,6 +8,7 @@ import '../../lock_engine/models.dart';
 import '../../lock_engine/platform_lock_bridge.dart';
 import 'app_selection/app_selection_screen.dart';
 import 'native_permissions/native_permissions_screen.dart';
+import 'privacy_policy_screen.dart';
 import 'password_setup/password_setup_screen.dart';
 import 'recovery_pin/recovery_pin_screen.dart';
 import 'relock/relock_screen.dart';
@@ -193,6 +194,12 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
                 : '현재 설정으로 잠금 해제 흐름 확인',
             onTap: settings.password == null ? null : _openLockTest,
           ),
+          _SettingTile(
+            icon: Icons.privacy_tip_outlined,
+            title: '개인정보처리방침',
+            value: 'MyLock의 데이터 처리 안내',
+            onTap: _openPrivacyPolicy,
+          ),
         ],
       ),
     );
@@ -210,6 +217,14 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
     await _platformBridge.presentLockScreen(
       '__my_lock_demo__',
       demoMode: true,
+    );
+  }
+
+  Future<void> _openPrivacyPolicy() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => const PrivacyPolicyScreen(),
+      ),
     );
   }
 
