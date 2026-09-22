@@ -1,5 +1,5 @@
 name: my_lock
-version: 0.1.1+2
+version: 0.1.2+3
 publish_to: none
 
 environment:
