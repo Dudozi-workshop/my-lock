@@ -27,7 +27,7 @@ class _LockActivityHost extends StatefulWidget {
 }
 
 class _LockActivityHostState extends State<_LockActivityHost> {
-  static const _channel = MethodChannel('com.mylock.app/lock');
+  static const _channel = MethodChannel('com.dudoziworkshop.mylock/lock');
 
   late final MyLockSettingsController _settings;
   late final Future<void> _loadFuture;
