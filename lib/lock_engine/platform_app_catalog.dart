@@ -17,7 +17,7 @@ class PlatformAppInfo {
 class PlatformAppCatalog {
   PlatformAppCatalog({
     MethodChannel? channel,
-  }) : _channel = channel ?? const MethodChannel('com.mylock.app/lock');
+  }) : _channel = channel ?? const MethodChannel('com.dudoziworkshop.mylock/lock');
 
   final MethodChannel _channel;
 
