@@ -123,6 +123,10 @@ class LockMonitorService : Service() {
             registerReceiver(screenReceiver, filter)
         }
 
+        // A restarted monitor must never inherit an unlocked app session.
+        // If Android killed/recreated the service, the foreground state is no
+        // longer trustworthy, so fail closed and require authentication again.
+        clearUnlockedSession()
         lastQueryAt = System.currentTimeMillis() - 2_000L
         writeHeartbeat(force = true)
         handler.post(pollRunnable)
@@ -465,12 +469,18 @@ class LockMonitorService : Service() {
         }
     }
 
-    private fun forceRelockCurrentSession() {
+    private fun clearUnlockedSession() {
         getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
             .edit()
             .remove(lastUnlockedAppKey)
             .remove(lastUnlockedAtKey)
+            .remove(lastProtectedExitAppKey)
+            .remove(lastProtectedExitAtKey)
             .apply()
+    }
+
+    private fun forceRelockCurrentSession() {
+        clearUnlockedSession()
         OverlayLockController.hide()
     }
 
