@@ -123,10 +123,6 @@ class LockMonitorService : Service() {
             registerReceiver(screenReceiver, filter)
         }
 
-        // A restarted monitor must never inherit an unlocked app session.
-        // If Android killed/recreated the service, the foreground state is no
-        // longer trustworthy, so fail closed and require authentication again.
-        clearUnlockedSession()
         lastQueryAt = System.currentTimeMillis() - 2_000L
         writeHeartbeat(force = true)
         handler.post(pollRunnable)
@@ -262,21 +258,9 @@ class LockMonitorService : Service() {
     }
 
     private fun handleForegroundPackage(packageName: String) {
+        if (packageName == this.packageName) return
+
         val protectedApps = protectedApps()
-
-        if (packageName == this.packageName) {
-            val previous = foregroundPackage
-            if (previous != null && protectedApps.contains(previous)) {
-                markProtectedAppExited(previous)
-            }
-            foregroundPackage = packageName
-            cancelPendingOverlayExit()
-            if (OverlayLockController.isVisible) {
-                OverlayLockController.hide()
-            }
-            return
-        }
-
         val overlayTarget = OverlayLockController.currentTarget()
 
         if (OverlayLockController.isVisible && overlayTarget != null) {
@@ -469,18 +453,12 @@ class LockMonitorService : Service() {
         }
     }
 
-    private fun clearUnlockedSession() {
+    private fun forceRelockCurrentSession() {
         getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
             .edit()
             .remove(lastUnlockedAppKey)
             .remove(lastUnlockedAtKey)
-            .remove(lastProtectedExitAppKey)
-            .remove(lastProtectedExitAtKey)
             .apply()
-    }
-
-    private fun forceRelockCurrentSession() {
-        clearUnlockedSession()
         OverlayLockController.hide()
     }
 
