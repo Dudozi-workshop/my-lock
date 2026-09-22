@@ -74,7 +74,7 @@ class _NativePermissionsScreenState extends State<NativePermissionsScreen>
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
           children: [
             Text(
-              '선택한 앱을 감지하고 잠금화면을 표시하기 위해 필요한 권한입니다.',
+              '선택한 앱의 실행 상태를 기기 안에서 확인하고 잠금화면을 표시하기 위해 필요한 권한입니다. 앱 목록과 사용 정보는 잠금 기능에만 사용되며 외부로 전송하지 않습니다.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 18),
@@ -122,7 +122,7 @@ class _NativePermissionsScreenState extends State<NativePermissionsScreen>
               _PermissionCard(
                 icon: Icons.query_stats_rounded,
                 title: '앱 사용 정보 접근',
-                body: '현재 화면에 열린 앱을 감지하는 데 사용합니다.',
+                body: '보호할 앱이 현재 화면에 열렸는지 기기 안에서 확인하는 데 사용합니다. 사용 정보는 외부로 전송하지 않습니다.',
                 granted: capabilities!.usageAccessGranted,
                 onTap: capabilities.usageAccessGranted
                     ? null
@@ -132,7 +132,7 @@ class _NativePermissionsScreenState extends State<NativePermissionsScreen>
               _PermissionCard(
                 icon: Icons.layers_rounded,
                 title: '다른 앱 위에 표시',
-                body: '보호 앱 위에 MY LOCK 잠금 화면을 표시하는 데 사용합니다.',
+                body: '보호 앱 위에 MY LOCK 잠금 화면을 표시하는 데 사용합니다. 화면 내용이나 입력 내용을 읽거나 저장하지 않습니다.',
                 granted: capabilities.overlayGranted,
                 onTap: capabilities.overlayGranted
                     ? null
