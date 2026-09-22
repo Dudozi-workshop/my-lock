@@ -286,6 +286,7 @@ class LockMonitorService : Service() {
                 if (shouldLockInNativeFallback(packageName)) {
                     OverlayLockController.show(this, packageName)
                 } else {
+                    consumeTimedRelockGrace(packageName)
                     OverlayLockController.hide()
                 }
                 return
@@ -299,14 +300,17 @@ class LockMonitorService : Service() {
         if (packageName == foregroundPackage) {
             if (
                 protectedApps.contains(packageName) &&
-                !OverlayLockController.isVisible &&
-                shouldLockInNativeFallback(packageName)
+                !OverlayLockController.isVisible
             ) {
-                OverlayLockController.show(
-                    this,
-                    packageName,
-                    forceRecreate = true,
-                )
+                if (shouldLockInNativeFallback(packageName)) {
+                    OverlayLockController.show(
+                        this,
+                        packageName,
+                        forceRecreate = true,
+                    )
+                } else {
+                    consumeTimedRelockGrace(packageName)
+                }
             }
             return
         }
@@ -322,6 +326,8 @@ class LockMonitorService : Service() {
         cancelPendingOverlayExit()
         if (shouldLockInNativeFallback(packageName)) {
             OverlayLockController.show(this, packageName)
+        } else {
+            consumeTimedRelockGrace(packageName)
         }
     }
 
@@ -383,6 +389,37 @@ class LockMonitorService : Service() {
         pendingOverlayExitRunnable = null
         pendingOverlayExitPackage = null
         pendingOverlayExitAt = 0L
+    }
+
+    private fun consumeTimedRelockGrace(appId: String) {
+        val preferences =
+            getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+        val policy = preferences.getString(relockPolicyKey, "immediate")
+        if (policy != "after30Seconds" && policy != "after1Minute") {
+            return
+        }
+
+        val lastExitApp = preferences.getString(lastProtectedExitAppKey, null)
+        val lastExitAt = preferences.getLong(lastProtectedExitAtKey, 0L)
+        val lastUnlockedAt = preferences.getLong(lastUnlockedAtKey, 0L)
+        if (
+            lastExitApp != appId ||
+            lastExitAt <= 0L ||
+            lastExitAt < lastUnlockedAt
+        ) {
+            return
+        }
+
+        val graceMs =
+            if (policy == "after30Seconds") 30_000L else 60_000L
+        if (System.currentTimeMillis() - lastExitAt >= graceMs) {
+            return
+        }
+
+        preferences.edit()
+            .remove(lastProtectedExitAppKey)
+            .remove(lastProtectedExitAtKey)
+            .apply()
     }
 
     private fun markProtectedAppExited(appId: String) {
