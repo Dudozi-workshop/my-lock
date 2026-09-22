@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ANDROID="$ROOT/android"
-MAIN_DIR="$ANDROID/app/src/main/kotlin/com/mylock/app/my_lock"
+MAIN_DIR="$ANDROID/app/src/main/kotlin/com/dudoziworkshop/mylock/my_lock"
 MANIFEST="$ANDROID/app/src/main/AndroidManifest.xml"
 APP_GRADLE="$ANDROID/app/build.gradle.kts"
 mkdir -p "$MAIN_DIR"
