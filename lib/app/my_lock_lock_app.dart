@@ -62,6 +62,10 @@ class _LockActivityHostState extends State<_LockActivityHost> {
     await _channel.invokeMethod<void>('openAppRecovery');
   }
 
+  Future<void> _dismissLock() async {
+    await _channel.invokeMethod<void>('dismissLock');
+  }
+
   Future<void> _unlock() async {
     final appId = _targetAppId;
     if (appId == null) return;
@@ -102,6 +106,7 @@ class _LockActivityHostState extends State<_LockActivityHost> {
           settings: _settings,
           demoMode: _demoMode,
           onOpenAppRecovery: _demoMode ? null : _openAppRecovery,
+          onClose: _demoMode ? null : _dismissLock,
           onUnlocked: _unlock,
         );
       },
