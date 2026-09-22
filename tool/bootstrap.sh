@@ -39,7 +39,9 @@ if [[ ",$PLATFORMS," == *",android,"* ]]; then
   dart run flutter_launcher_icons
 fi
 
-flutter analyze
-flutter test
+if [[ "${RUN_CHECKS:-0}" == "1" ]]; then
+  flutter analyze
+  flutter test
+fi
 
 echo "MY LOCK bootstrap complete for: $PLATFORMS"
