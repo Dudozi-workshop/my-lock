@@ -481,4 +481,44 @@ void main() {
     expect(second.velocity.dx, greaterThan(0));
   });
 
+  test('zero gravity preserves inertial travel without downward acceleration', () {
+    final engine = FloatingEngine(seed: 26);
+    engine.resize(const Size(400, 400));
+    engine.setMovementStyle(MovementStyle.zeroGravity);
+
+    final object = engine.objects.first
+      ..position = const Offset(200, 200)
+      ..velocity = const Offset(50, -20);
+    engine.objects.removeRange(1, engine.objects.length);
+
+    final beforeDy = object.velocity.dy;
+    for (var i = 0; i < 60; i++) {
+      engine.step(1 / 60);
+    }
+
+    expect(object.velocity.dy, lessThan(0));
+    expect(object.velocity.dy.abs(), lessThan(beforeDy.abs() + 10));
+  });
+
+  test('zero gravity collision transfers momentum softly', () {
+    final engine = FloatingEngine(seed: 27);
+    engine.resize(const Size(400, 400));
+    engine.setMovementStyle(MovementStyle.zeroGravity);
+
+    final first = engine.objects[0]
+      ..radius = 40
+      ..position = const Offset(170, 200)
+      ..velocity = const Offset(60, 0);
+    final second = engine.objects[1]
+      ..radius = 40
+      ..position = const Offset(230, 200)
+      ..velocity = Offset.zero;
+    engine.objects.removeRange(2, engine.objects.length);
+
+    engine.step(1 / 120);
+
+    expect(first.velocity.dx, lessThan(60));
+    expect(second.velocity.dx, greaterThan(0));
+  });
+
 }
