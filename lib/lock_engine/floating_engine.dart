@@ -164,12 +164,42 @@ class FloatingEngine {
         _speed.multiplier;
     final angle = _random.nextDouble() * pi * 2;
 
-    return FloatingObject(
-      id: _nextId++,
+    final id = _nextId++;
+    final object = FloatingObject(
+      id: id,
       token: token,
-      position: _findSpawnPosition(radius),
+      position: _movementStyle == MovementStyle.orbit
+          ? _orbitSpawnPosition(id, radius)
+          : _findSpawnPosition(radius),
       velocity: Offset(cos(angle) * speed, sin(angle) * speed),
       radius: radius,
+    );
+
+    if (_movementStyle == MovementStyle.zeroGravity) {
+      object.angularVelocity =
+          (_random.nextDouble() * 0.9 + 0.25) * (id.isEven ? 1 : -1);
+    }
+
+    return object;
+  }
+
+  Offset _orbitSpawnPosition(int id, double radius) {
+    final center = Offset(
+      (_movementLeft + _movementRight) * 0.5,
+      _movementTop + _movementHeight * 0.5,
+    );
+    final usableWidth =
+        max(1.0, _movementRight - _movementLeft - radius * 2);
+    final usableHeight =
+        max(1.0, _movementHeight - radius * 2);
+    final ringIndex = id % 3;
+    final radiusX = usableWidth * (0.24 + ringIndex * 0.10);
+    final radiusY = usableHeight * (0.20 + ringIndex * 0.085);
+    final phase = id * 2.399963229728653;
+
+    return Offset(
+      center.dx + cos(phase) * radiusX,
+      center.dy + sin(phase) * radiusY,
     );
   }
 
@@ -214,6 +244,7 @@ class FloatingEngine {
 
       _applyExternalForce(object, dt);
       _applyStyleForce(object, dt);
+      _updateRotation(object, dt);
 
       switch (_movementStyle) {
         case MovementStyle.bounce:
@@ -467,33 +498,42 @@ class FloatingEngine {
   }
 
   void _stepOrbit(FloatingObject object, double dt) {
-    final minDimension = min(_movementRight - _movementLeft, _movementHeight);
     final center = Offset(
       (_movementLeft + _movementRight) * 0.5,
       _movementTop + _movementHeight * 0.5,
     );
-
+    final usableWidth =
+        max(1.0, _movementRight - _movementLeft - object.radius * 2);
+    final usableHeight =
+        max(1.0, _movementHeight - object.radius * 2);
     final ringIndex = object.id % 3;
-    final preferredRadius =
-        minDimension * (0.18 + ringIndex * 0.085);
     final direction = object.id.isEven ? 1.0 : -1.0;
+
+    final radiusX = usableWidth * (0.24 + ringIndex * 0.10);
+    final radiusY = usableHeight * (0.20 + ringIndex * 0.085);
     final angularSpeed =
-        (0.55 + ringIndex * 0.10) * _speed.multiplier * direction;
+        (0.48 + ringIndex * 0.08) * _speed.multiplier * direction;
     final phase = object.id * 2.399963229728653;
     final angle = phase + _elapsedSeconds * angularSpeed;
 
-    final target = center +
-        Offset(cos(angle), sin(angle)) * preferredRadius;
-    final tangent = Offset(-sin(angle), cos(angle)) * direction;
+    final target = Offset(
+      center.dx + cos(angle) * radiusX,
+      center.dy + sin(angle) * radiusY,
+    );
+
+    final tangent = Offset(
+      -sin(angle) * radiusX,
+      cos(angle) * radiusY,
+    ).normalized();
 
     final targetVelocity =
-        (target - object.position) * 3.2 +
-        tangent * (minDimension * 0.12 * _speed.multiplier);
+        (target - object.position) * 4.6 +
+        tangent *
+            (min(radiusX, radiusY) * 0.42 * _speed.multiplier * direction);
 
-    final blend = (dt * 3.8).clamp(0.0, 1.0).toDouble();
+    final blend = (dt * 5.2).clamp(0.0, 1.0).toDouble();
     object.velocity =
         object.velocity * (1.0 - blend) + targetVelocity * blend;
-
     object.position += object.velocity * dt;
     _clampInside(object);
   }
@@ -505,13 +545,13 @@ class FloatingEngine {
     // Strong vertical swell, smaller horizontal sway: visually reads as
     // buoyant underwater motion instead of generic floating.
     final verticalWave =
-        sin(phase) * minDimension * 0.055 * _speed.multiplier;
+        sin(phase) * minDimension * 0.095 * _speed.multiplier;
     final horizontalWave =
-        cos(phase * 0.46) * minDimension * 0.018 * _speed.multiplier;
+        cos(phase * 0.46) * minDimension * 0.028 * _speed.multiplier;
 
     final centerY = _movementTop + _movementHeight * 0.50;
     final buoyancy =
-        (centerY - object.position.dy) * 0.42 * _speed.multiplier;
+        (centerY - object.position.dy) * 0.58 * _speed.multiplier;
 
     final targetVelocity = Offset(
       horizontalWave,
@@ -612,6 +652,33 @@ class FloatingEngine {
 
     object.position = next;
     object.velocity = velocity;
+  }
+
+  void _updateRotation(FloatingObject object, double dt) {
+    switch (_movementStyle) {
+      case MovementStyle.zeroGravity:
+        object.rotation += object.angularVelocity * dt;
+        break;
+      case MovementStyle.orbit:
+        final center = Offset(
+          (_movementLeft + _movementRight) * 0.5,
+          _movementTop + _movementHeight * 0.5,
+        );
+        final delta = object.position - center;
+        object.rotation = atan2(delta.dy, delta.dx) + pi / 2;
+        break;
+      case MovementStyle.underwater:
+        final phase = _elapsedSeconds * 1.25 + object.id * 1.13;
+        object.rotation = sin(phase) * 0.22;
+        break;
+      case MovementStyle.floating:
+        object.rotation += sin(_elapsedSeconds * 0.55 + object.id) * 0.035 * dt;
+        break;
+      case MovementStyle.bounce:
+        final horizontal = object.velocity.dx;
+        object.rotation += horizontal.sign * min(horizontal.abs() / 180, 1.0) * 1.2 * dt;
+        break;
+    }
   }
 
   void _applyStyleForce(FloatingObject object, double dt) {
