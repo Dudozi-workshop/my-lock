@@ -542,7 +542,7 @@ void main() {
     expect(object.velocity.distance, lessThan(beforeSpeed + 20));
   });
 
-  test('orbit motion bends travel around the movement center', () {
+  test('orbit motion visibly follows a ring around the center', () {
     final engine = FloatingEngine(seed: 29);
     engine.resize(const Size(400, 400));
     engine.setMovementStyle(MovementStyle.orbit);
@@ -553,12 +553,16 @@ void main() {
       ..velocity = Offset.zero;
     engine.objects.removeRange(1, engine.objects.length);
 
-    for (var i = 0; i < 45; i++) {
+    const center = Offset(200, 200);
+    final startDistance = (object.position - center).distance;
+
+    for (var i = 0; i < 120; i++) {
       engine.step(1 / 60);
     }
 
-    expect(object.velocity.dy.abs(), greaterThan(0));
-    expect(object.velocity.dx, lessThan(0));
+    final endDistance = (object.position - center).distance;
+    expect((endDistance - startDistance).abs(), lessThan(55));
+    expect((object.position.dy - 200).abs(), greaterThan(12));
   });
 
   test('underwater collision is softer than bounce collision', () {
@@ -586,6 +590,37 @@ void main() {
     final bounce = postCollisionSpeed(MovementStyle.bounce, 31);
 
     expect(underwater, lessThan(bounce));
+  });
+
+  test('zero gravity keeps straighter momentum than floating', () {
+    double headingChange(MovementStyle style, int seed) {
+      final engine = FloatingEngine(seed: seed);
+      engine.resize(const Size(500, 500));
+      engine.setMovementStyle(style);
+      engine.setMovementArea(MovementArea.full);
+
+      final object = engine.objects.first
+        ..position = const Offset(250, 250)
+        ..velocity = const Offset(70, 15);
+      engine.objects.removeRange(1, engine.objects.length);
+
+      final before = object.velocity;
+      for (var i = 0; i < 90; i++) {
+        engine.step(1 / 60);
+      }
+
+      final after = object.velocity;
+      final beforeAngle = atan2(before.dy, before.dx);
+      final afterAngle = atan2(after.dy, after.dx);
+      return (afterAngle - beforeAngle).abs();
+    }
+
+    final zeroGravityChange =
+        headingChange(MovementStyle.zeroGravity, 32);
+    final floatingChange =
+        headingChange(MovementStyle.floating, 33);
+
+    expect(zeroGravityChange, lessThan(floatingChange));
   });
 
 }
