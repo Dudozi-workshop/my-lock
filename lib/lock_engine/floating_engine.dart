@@ -232,6 +232,14 @@ class FloatingEngine {
     }
 
     _applyPairRepulsion(dt);
+
+    // Pair corrections and reactive forces must never leave an object outside
+    // the configured lock movement region.
+    for (final object in objects) {
+      if (!object.isPopping) {
+        _clampInside(object);
+      }
+    }
   }
 
   void _applyPairRepulsion(double dt) {
