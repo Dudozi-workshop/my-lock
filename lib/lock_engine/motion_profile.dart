@@ -70,7 +70,7 @@ class MotionProfile {
     collisionPositionScale: 1.2,
     collisionImpulseScale: 1.75,
     wallBounce: 0.98,
-    gravityScale: 0.9,
+    gravityScale: 0.22,
     dragPerSecond: 0.005,
     wakeUpAfterSeconds: 0.65,
     wakeUpImpulseScale: 0.16,
