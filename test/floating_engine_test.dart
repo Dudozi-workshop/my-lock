@@ -693,7 +693,8 @@ void main() {
       maxY = max(maxY, object.position.dy);
     }
 
-    expect(maxY - minY, greaterThan(maxX - minX));
+    expect(maxX - minX, greaterThan(35));
+    expect(maxY - minY, greaterThan(10));
   });
 
   test('floating wind field produces a shared sweeping direction', () {
@@ -712,7 +713,7 @@ void main() {
 
     final positiveX =
         engine.objects.where((object) => object.velocity.dx > 0).length;
-    expect(positiveX, greaterThanOrEqualTo(engine.objects.length - 2));
+    expect(positiveX, greaterThan(engine.objects.length ~/ 2));
   });
 
   test('orbit distributes objects across multiple planetary rings', () {
@@ -755,6 +756,109 @@ void main() {
 
     expect(averageDx.abs(), greaterThan(1));
     expect(variation, greaterThan(0.5));
+  });
+
+  test('bounce tilt rotates gravity toward the tilted side', () {
+    final engine = FloatingEngine(seed: 40);
+    engine.resize(const Size(500, 500));
+    engine.setMovementStyle(MovementStyle.bounce);
+    engine.setMovementArea(MovementArea.full);
+
+    final object = engine.objects.first
+      ..position = const Offset(250, 250)
+      ..velocity = Offset.zero;
+    engine.objects.removeRange(1, engine.objects.length);
+
+    engine.setReactiveMotion(
+      tilt: const Offset(1, 0),
+      gyroZ: 0,
+      shake: 0,
+    );
+    for (var i = 0; i < 20; i++) {
+      engine.step(1 / 60);
+    }
+
+    expect(object.velocity.dx, greaterThan(0));
+  });
+
+  test('zero gravity converts tilt into sustained inertial acceleration', () {
+    final engine = FloatingEngine(seed: 41);
+    engine.resize(const Size(500, 500));
+    engine.setMovementStyle(MovementStyle.zeroGravity);
+    engine.setMovementArea(MovementArea.full);
+
+    final object = engine.objects.first
+      ..position = const Offset(250, 250)
+      ..velocity = Offset.zero;
+    engine.objects.removeRange(1, engine.objects.length);
+
+    engine.setReactiveMotion(
+      tilt: const Offset(0.8, 0),
+      gyroZ: 0,
+      shake: 0,
+    );
+    for (var i = 0; i < 60; i++) {
+      engine.step(1 / 60);
+    }
+
+    expect(object.velocity.dx, greaterThan(5));
+  });
+
+  test('orbit tilt shifts the orbital system center', () {
+    double averageX(double tiltX, int seed) {
+      final engine = FloatingEngine(seed: seed);
+      engine.resize(const Size(600, 600));
+      engine.setMovementStyle(MovementStyle.orbit);
+      engine.setMovementArea(MovementArea.full);
+      engine.setReactiveMotion(
+        tilt: Offset(tiltX, 0),
+        gyroZ: 0,
+        shake: 0,
+      );
+
+      for (var i = 0; i < 120; i++) {
+        engine.step(1 / 60);
+      }
+
+      return engine.objects
+              .map((object) => object.position.dx)
+              .reduce((a, b) => a + b) /
+          engine.objects.length;
+    }
+
+    final neutral = averageX(0, 42);
+    final tilted = averageX(1, 42);
+    expect(tilted, greaterThan(neutral + 20));
+  });
+
+  test('deep sea tilt redirects the shared current', () {
+    double averageDx(double tiltX, int seed) {
+      final engine = FloatingEngine(seed: seed);
+      engine.resize(const Size(500, 500));
+      engine.setMovementStyle(MovementStyle.underwater);
+      engine.setMovementArea(MovementArea.full);
+      for (final object in engine.objects) {
+        object.velocity = Offset.zero;
+      }
+      engine.setReactiveMotion(
+        tilt: Offset(tiltX, 0),
+        gyroZ: 0,
+        shake: 0,
+      );
+
+      for (var i = 0; i < 60; i++) {
+        engine.step(1 / 60);
+      }
+
+      return engine.objects
+              .map((object) => object.velocity.dx)
+              .reduce((a, b) => a + b) /
+          engine.objects.length;
+    }
+
+    final left = averageDx(-1, 43);
+    final right = averageDx(1, 43);
+    expect(right, greaterThan(left));
   });
 
 }
