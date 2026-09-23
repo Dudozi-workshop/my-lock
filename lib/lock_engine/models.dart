@@ -28,6 +28,8 @@ class FloatingObject {
   Offset velocity;
   double radius;
 
+  double rotation = 0;
+  double angularVelocity = 0;
   double popElapsed = -1;
 
   bool get isPopping => popElapsed >= 0;
