@@ -86,7 +86,9 @@ class MyLockSettingsController extends ChangeNotifier {
     ShapeTexture? texture,
   }) {
     if (shapes.isEmpty || tones.isEmpty) return;
-    if (setEquals(_selectedShapes, shapes) && setEquals(_selectedTones, tones)) {
+    if (setEquals(_selectedShapes, shapes) &&
+        setEquals(_selectedTones, tones) &&
+        (texture == null || texture == _texture)) {
       return;
     }
     _selectedShapes = Set<ShapeKind>.from(shapes);
