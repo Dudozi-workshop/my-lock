@@ -127,6 +127,9 @@ void main() {
   test('overlap up to ten percent is left untouched by repulsion', () {
     final engine = FloatingEngine(seed: 12);
     engine.resize(const Size(400, 400));
+    // Use a profile without autonomous drift so this test isolates only the
+    // pair-repulsion threshold.
+    engine.setMovementStyle(MovementStyle.zeroGravity);
 
     final first = engine.objects[0]
       ..radius = 40
