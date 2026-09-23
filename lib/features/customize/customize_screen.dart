@@ -92,6 +92,7 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
                           selectedTones: settings.selectedTones,
                           movementStyle: settings.movementStyle,
                           popStyle: settings.popStyle,
+                          texture: settings.texture,
                           objectCount: settings.objectCount,
                           speed: settings.speed,
                           movementArea: settings.movementArea,
@@ -177,7 +178,7 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
 
   String get _styleSummary {
     final settings = widget.settings;
-    return '도형 ${settings.selectedShapes.length}개 · 색상 ${settings.selectedTones.length}개 · Basic Glossy';
+    return '도형 ${settings.selectedShapes.length}개 · 색상 ${settings.selectedTones.length}개 · ${settings.texture.label}';
   }
 
   Future<void> _openEffects(BuildContext context) async {
@@ -190,6 +191,7 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
           selectedTones: settings.selectedTones,
           movementStyle: settings.movementStyle,
           popStyle: settings.popStyle,
+          texture: settings.texture,
           objectCount: settings.objectCount,
           speed: settings.speed,
           movementArea: settings.movementArea,
@@ -209,6 +211,7 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
           selectedTones: settings.selectedTones,
           movementStyle: settings.movementStyle,
           popStyle: settings.popStyle,
+          texture: settings.texture,
           objectCount: settings.objectCount,
           speed: settings.speed,
           movementArea: settings.movementArea,
@@ -226,20 +229,26 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
           selectedShapes: settings.selectedShapes,
           selectedTones: settings.selectedTones,
           currentPassword: settings.password,
+          texture: settings.texture,
           background: settings.background,
           movementStyle: settings.movementStyle,
           popStyle: settings.popStyle,
           objectCount: settings.objectCount,
           speed: settings.speed,
           movementArea: settings.movementArea,
-          onApply: (shapes, tones, replacementPassword) {
+          onApply: (shapes, tones, texture, replacementPassword) {
             if (replacementPassword == null) {
-              settings.setShapeStyle(shapes, tones);
+              settings.setShapeStyle(
+                shapes,
+                tones,
+                texture: texture,
+              );
             } else {
               settings.setShapeStyleAndPassword(
                 shapes,
                 tones,
                 replacementPassword,
+                texture: texture,
               );
             }
           },
