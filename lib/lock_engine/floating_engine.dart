@@ -521,10 +521,12 @@ class FloatingEngine {
       center.dy + sin(angle) * radiusY,
     );
 
-    final tangent = Offset(
+    final tangentVector = Offset(
       -sin(angle) * radiusX,
       cos(angle) * radiusY,
-    ).normalized();
+    );
+    final tangentLength = max(0.001, tangentVector.distance);
+    final tangent = tangentVector / tangentLength;
 
     final targetVelocity =
         (target - object.position) * 4.6 +
