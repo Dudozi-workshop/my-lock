@@ -224,8 +224,8 @@ void main() {
     engine.setObjectCount(12);
 
     final allTokens = [
-      for (final tone in ShapeTone.values)
-        for (final shape in ShapeKind.values)
+      for (final tone in ShapeTone.defaults)
+        for (final shape in ShapeKind.defaults)
           LockToken(shape: shape, tone: tone),
     ];
 
@@ -253,8 +253,8 @@ void main() {
     engine.setObjectCount(12);
 
     final allTokens = [
-      for (final tone in ShapeTone.values)
-        for (final shape in ShapeKind.values)
+      for (final tone in ShapeTone.defaults)
+        for (final shape in ShapeKind.defaults)
           LockToken(shape: shape, tone: tone),
     ];
     final repeated = allTokens.first;
