@@ -634,15 +634,16 @@ class FloatingEngine {
         // Bounce should preserve its collision-driven trajectory.
         break;
       case MovementStyle.zeroGravity:
-        // Barely perceptible drift prevents perfectly repetitive straight-line
-        // motion while preserving the long inertial feel.
-        final phase = _elapsedSeconds * 0.19 + object.id * 2.11;
+        // Keep almost all of the object's current momentum. A tiny lateral
+        // drift prevents perfectly straight repetition without feeling like
+        // Floating.
+        final phase = _elapsedSeconds * 0.11 + object.id * 2.11;
         final force = Offset(
-          cos(phase) * 0.55,
-          sin(phase * 0.71) * 0.45,
+          cos(phase) * 0.22,
+          sin(phase * 0.61) * 0.18,
         );
         object.velocity +=
-            force * (minDimension * 0.0025 * speedScale * dt);
+            force * (minDimension * 0.0009 * speedScale * dt);
         break;
       case MovementStyle.orbit:
       case MovementStyle.underwater:
