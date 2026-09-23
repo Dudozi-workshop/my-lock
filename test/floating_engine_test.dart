@@ -696,4 +696,65 @@ void main() {
     expect(maxY - minY, greaterThan(maxX - minX));
   });
 
+  test('floating wind field produces a shared sweeping direction', () {
+    final engine = FloatingEngine(seed: 37);
+    engine.resize(const Size(500, 500));
+    engine.setMovementStyle(MovementStyle.floating);
+    engine.setMovementArea(MovementArea.full);
+
+    for (final object in engine.objects) {
+      object.velocity = Offset.zero;
+    }
+
+    for (var i = 0; i < 60; i++) {
+      engine.step(1 / 60);
+    }
+
+    final positiveX =
+        engine.objects.where((object) => object.velocity.dx > 0).length;
+    expect(positiveX, greaterThanOrEqualTo(engine.objects.length - 2));
+  });
+
+  test('orbit distributes objects across multiple planetary rings', () {
+    final engine = FloatingEngine(seed: 38);
+    engine.resize(const Size(600, 600));
+    engine.setMovementStyle(MovementStyle.orbit);
+    engine.setMovementArea(MovementArea.full);
+
+    const center = Offset(300, 300);
+    final distances = engine.objects
+        .map((object) => (object.position - center).distance)
+        .toList()
+      ..sort();
+
+    expect(distances.last - distances.first, greaterThan(90));
+  });
+
+  test('deep sea current gives objects a coherent flow plus individual swim', () {
+    final engine = FloatingEngine(seed: 39);
+    engine.resize(const Size(500, 500));
+    engine.setMovementStyle(MovementStyle.underwater);
+    engine.setMovementArea(MovementArea.full);
+
+    for (final object in engine.objects) {
+      object.velocity = Offset.zero;
+    }
+
+    for (var i = 0; i < 120; i++) {
+      engine.step(1 / 60);
+    }
+
+    final averageDx = engine.objects
+            .map((object) => object.velocity.dx)
+            .reduce((a, b) => a + b) /
+        engine.objects.length;
+    final variation = engine.objects
+            .map((object) => (object.velocity.dx - averageDx).abs())
+            .reduce((a, b) => a + b) /
+        engine.objects.length;
+
+    expect(averageDx.abs(), greaterThan(1));
+    expect(variation, greaterThan(0.5));
+  });
+
 }
