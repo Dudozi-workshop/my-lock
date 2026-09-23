@@ -624,4 +624,76 @@ void main() {
     expect(zeroGravityChange, lessThan(floatingChange));
   });
 
+  test('orbit starts and stays on visibly wide elliptical rings', () {
+    final engine = FloatingEngine(seed: 34);
+    engine.resize(const Size(500, 500));
+    engine.setMovementStyle(MovementStyle.orbit);
+    engine.setMovementArea(MovementArea.full);
+
+    const center = Offset(250, 250);
+    final startDistances = engine.objects
+        .map((object) => (object.position - center).distance)
+        .toList();
+
+    expect(startDistances.reduce((a, b) => a + b) / startDistances.length,
+        greaterThan(85));
+
+    for (var i = 0; i < 120; i++) {
+      engine.step(1 / 60);
+    }
+
+    final endDistances = engine.objects
+        .map((object) => (object.position - center).distance)
+        .toList();
+    expect(endDistances.reduce((a, b) => a + b) / endDistances.length,
+        greaterThan(75));
+  });
+
+  test('zero gravity visibly rotates while preserving inertial drift', () {
+    final engine = FloatingEngine(seed: 35);
+    engine.resize(const Size(500, 500));
+    engine.setMovementStyle(MovementStyle.zeroGravity);
+    engine.setMovementArea(MovementArea.full);
+
+    final object = engine.objects.first
+      ..position = const Offset(250, 250)
+      ..velocity = const Offset(45, 8);
+    engine.objects.removeRange(1, engine.objects.length);
+
+    final startRotation = object.rotation;
+    for (var i = 0; i < 120; i++) {
+      engine.step(1 / 60);
+    }
+
+    expect((object.rotation - startRotation).abs(), greaterThan(0.25));
+    expect(object.velocity.dx.abs(), greaterThan(object.velocity.dy.abs()));
+  });
+
+  test('underwater emphasizes vertical movement over horizontal sway', () {
+    final engine = FloatingEngine(seed: 36);
+    engine.resize(const Size(500, 500));
+    engine.setMovementStyle(MovementStyle.underwater);
+    engine.setMovementArea(MovementArea.full);
+
+    final object = engine.objects.first
+      ..position = const Offset(250, 250)
+      ..velocity = Offset.zero;
+    engine.objects.removeRange(1, engine.objects.length);
+
+    var minX = object.position.dx;
+    var maxX = object.position.dx;
+    var minY = object.position.dy;
+    var maxY = object.position.dy;
+
+    for (var i = 0; i < 240; i++) {
+      engine.step(1 / 60);
+      minX = min(minX, object.position.dx);
+      maxX = max(maxX, object.position.dx);
+      minY = min(minY, object.position.dy);
+      maxY = max(maxY, object.position.dy);
+    }
+
+    expect(maxY - minY, greaterThan(maxX - minX));
+  });
+
 }
