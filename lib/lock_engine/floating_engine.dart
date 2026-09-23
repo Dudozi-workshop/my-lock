@@ -308,12 +308,36 @@ class FloatingEngine {
           _applyBottomHorizontalSpread(first, second, dt, minDimension);
         } else if (_movementStyle == MovementStyle.zeroGravity) {
           _applyZeroGravityMomentumTransfer(first, second, normal);
+        } else if (_movementStyle == MovementStyle.underwater) {
+          _applyUnderwaterSoftCollision(first, second, normal);
         }
 
         _clampInside(first);
         _clampInside(second);
       }
     }
+  }
+
+  void _applyUnderwaterSoftCollision(
+    FloatingObject first,
+    FloatingObject second,
+    Offset normal,
+  ) {
+    final relativeVelocity = second.velocity - first.velocity;
+    final normalSpeed =
+        relativeVelocity.dx * normal.dx + relativeVelocity.dy * normal.dy;
+    if (normalSpeed >= 0) return;
+
+    const restitution = 0.22;
+    final impulseMagnitude = -(1 + restitution) * normalSpeed * 0.5;
+    final impulse = normal * impulseMagnitude;
+
+    first.velocity -= impulse;
+    second.velocity += impulse;
+
+    // Water-like contact should visibly slow both bodies after touching.
+    first.velocity *= 0.94;
+    second.velocity *= 0.94;
   }
 
   void _applyZeroGravityMomentumTransfer(
@@ -541,8 +565,48 @@ class FloatingEngine {
             force * (minDimension * 0.0025 * speedScale * dt);
         break;
       case MovementStyle.orbit:
+        final center = Offset(
+          (_movementLeft + _movementRight) * 0.5,
+          _movementTop + _movementHeight * 0.5,
+        );
+        final toCenter = center - object.position;
+        final distance = max(1.0, toCenter.distance);
+        final radial = toCenter / distance;
+        final tangent = Offset(-radial.dy, radial.dx);
+        final orbitDirection = object.id.isEven ? 1.0 : -1.0;
+        final preferredRadius =
+            min(_movementRight - _movementLeft, _movementHeight) *
+                (0.18 + (object.id % 3) * 0.07);
+        final radialError = distance - preferredRadius;
+
+        object.velocity += tangent *
+            (minDimension * 0.032 * orbitDirection * speedScale * dt);
+        object.velocity += radial *
+            (radialError * 0.32 * speedScale * dt);
+
+        final orbitPhase = _elapsedSeconds * 0.22 + object.id * 1.37;
+        object.velocity += Offset(
+              cos(orbitPhase),
+              sin(orbitPhase * 0.73),
+            ) *
+            (minDimension * 0.0018 * speedScale * dt);
+        break;
       case MovementStyle.underwater:
-        // Dedicated trajectories are added when these store motions unlock.
+        final phase = _elapsedSeconds * 0.95 + object.id * 1.41;
+        final current = Offset(
+          cos(phase * 0.55) * 0.45,
+          sin(phase) + sin(phase * 0.37) * 0.35,
+        );
+        object.velocity +=
+            current * (minDimension * 0.018 * speedScale * dt);
+
+        final verticalCenter = _movementTop + _movementHeight * 0.52;
+        final buoyancyOffset = (verticalCenter - object.position.dy) /
+            max(1.0, _movementHeight);
+        object.velocity += Offset(
+          0,
+          buoyancyOffset * minDimension * 0.014 * speedScale * dt,
+        );
         break;
     }
   }
