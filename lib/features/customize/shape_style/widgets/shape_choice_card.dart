@@ -24,6 +24,7 @@ class ShapeChoiceCard extends StatelessWidget {
     return ChoiceCard(
       selected: selected,
       onTap: onTap,
+      badge: kind.premium ? 'PLUS' : null,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
