@@ -245,6 +245,11 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (context) => ScreenBehaviorScreen(
+          selectedShapes: settings.selectedShapes,
+          selectedTones: settings.selectedTones,
+          movementStyle: settings.movementStyle,
+          popStyle: settings.popStyle,
+          texture: settings.texture,
           objectCount: settings.objectCount,
           speed: settings.speed,
           movementArea: settings.movementArea,
