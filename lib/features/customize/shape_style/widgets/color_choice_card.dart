@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme.dart';
 import '../../../../lock_engine/models.dart';
+import '../../../../lock_engine/shape_painter.dart';
 import 'choice_card.dart';
 
 class ColorChoiceCard extends StatelessWidget {
@@ -9,14 +10,12 @@ class ColorChoiceCard extends StatelessWidget {
     super.key,
     required this.tone,
     required this.label,
-    required this.color,
     required this.selected,
     required this.onTap,
   });
 
   final ShapeTone tone;
   final String label;
-  final Color color;
   final bool selected;
   final VoidCallback onTap;
 
@@ -28,22 +27,13 @@ class ColorChoiceCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color,
-              boxShadow: [
-                BoxShadow(
-                  color: color.withValues(alpha: 0.28),
-                  blurRadius: 14,
-                  offset: const Offset(0, 7),
-                ),
-              ],
+          CustomPaint(
+            size: const Size(58, 58),
+            painter: LockTokenPainter(
+              LockToken(shape: ShapeKind.circle, tone: tone),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             label,
             style: const TextStyle(
