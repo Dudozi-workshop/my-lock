@@ -29,6 +29,13 @@ class LockMonitorService : Service() {
             "com.google.android.apps.nexuslauncher",
             "com.sec.android.app.launcher",
         )
+        private val protectedSessionSystemPackages = setOf(
+            "com.android.documentsui",
+            "com.google.android.documentsui",
+            "com.android.providers.media",
+            "com.android.providers.media.module",
+            "com.google.android.providers.media.module",
+        )
         private const val preferencesName = "my_lock_native"
         private const val protectedAppsKey = "protected_apps"
         private const val experimentalScreenLockKey = "experimental_screen_lock"
@@ -263,9 +270,13 @@ class LockMonitorService : Service() {
         if (packageName == this.packageName) {
             val previous = foregroundPackage
             if (previous != null && protectedApps.contains(previous)) {
-                markProtectedAppExited(previous)
+                persistProtectedAppExit(previous)
             }
             foregroundPackage = packageName
+            return
+        }
+
+        if (isProtectedSessionSystemPackage(packageName)) {
             return
         }
 
@@ -366,6 +377,12 @@ class LockMonitorService : Service() {
         return packageName in transientSystemPackages
     }
 
+    private fun isProtectedSessionSystemPackage(packageName: String): Boolean {
+        return packageName in protectedSessionSystemPackages ||
+            packageName.contains("photopicker", ignoreCase = true) ||
+            packageName.contains("documentsui", ignoreCase = true)
+    }
+
     private fun scheduleOverlayExit(appId: String) {
         if (pendingOverlayExitPackage == appId) return
 
@@ -430,12 +447,16 @@ class LockMonitorService : Service() {
             .apply()
     }
 
-    private fun markProtectedAppExited(appId: String) {
+    private fun persistProtectedAppExit(appId: String) {
         getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
             .edit()
             .putString(lastProtectedExitAppKey, appId)
             .putLong(lastProtectedExitAtKey, System.currentTimeMillis())
             .apply()
+    }
+
+    private fun markProtectedAppExited(appId: String) {
+        persistProtectedAppExit(appId)
         MainActivity.emitProtectedAppExited(appId)
     }
 
