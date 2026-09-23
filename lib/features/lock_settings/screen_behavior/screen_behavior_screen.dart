@@ -8,12 +8,22 @@ import '../../../lock_engine/models.dart';
 class ScreenBehaviorScreen extends StatefulWidget {
   const ScreenBehaviorScreen({
     super.key,
+    required this.selectedShapes,
+    required this.selectedTones,
+    required this.movementStyle,
+    required this.popStyle,
+    required this.texture,
     required this.objectCount,
     required this.speed,
     required this.movementArea,
     required this.onChanged,
   });
 
+  final Set<ShapeKind> selectedShapes;
+  final Set<ShapeTone> selectedTones;
+  final MovementStyle movementStyle;
+  final PopStyle popStyle;
+  final ShapeTexture texture;
   final int objectCount;
   final FloatingSpeed speed;
   final MovementArea movementArea;
@@ -77,8 +87,11 @@ class _ScreenBehaviorScreenState extends State<ScreenBehaviorScreen> {
                 children: [
                   Positioned.fill(
                     child: FloatingPreview(
-                      selectedShapes: ShapeKind.values.toSet(),
-                      selectedTones: ShapeTone.values.toSet(),
+                      selectedShapes: widget.selectedShapes,
+                      selectedTones: widget.selectedTones,
+                      movementStyle: widget.movementStyle,
+                      popStyle: widget.popStyle,
+                      texture: widget.texture,
                       objectCount: _objectCount,
                       speed: _speed,
                       movementArea: _movementArea,
