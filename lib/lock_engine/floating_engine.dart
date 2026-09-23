@@ -219,9 +219,11 @@ class FloatingEngine {
         case MovementStyle.bounce:
           _stepBounce(object, dt);
           break;
+        case MovementStyle.zeroGravity:
+          _stepZeroGravity(object, dt);
+          break;
         case MovementStyle.floating:
         case MovementStyle.orbit:
-        case MovementStyle.zeroGravity:
         case MovementStyle.underwater:
           _stepFloating(object, dt);
           break;
@@ -304,12 +306,35 @@ class FloatingEngine {
         if (_movementStyle == MovementStyle.bounce) {
           _applyElasticPairCollision(first, second, normal);
           _applyBottomHorizontalSpread(first, second, dt, minDimension);
+        } else if (_movementStyle == MovementStyle.zeroGravity) {
+          _applyZeroGravityMomentumTransfer(first, second, normal);
         }
 
         _clampInside(first);
         _clampInside(second);
       }
     }
+  }
+
+  void _applyZeroGravityMomentumTransfer(
+    FloatingObject first,
+    FloatingObject second,
+    Offset normal,
+  ) {
+    final relativeVelocity = second.velocity - first.velocity;
+    final normalSpeed =
+        relativeVelocity.dx * normal.dx + relativeVelocity.dy * normal.dy;
+
+    if (normalSpeed >= 0) return;
+
+    // A soft near-elastic transfer makes contact feel like drifting bodies
+    // exchanging momentum rather than rubber balls snapping apart.
+    const restitution = 0.72;
+    final impulseMagnitude = -(1 + restitution) * normalSpeed * 0.5;
+    final impulse = normal * impulseMagnitude;
+
+    first.velocity -= impulse;
+    second.velocity += impulse;
   }
 
   void _applyElasticPairCollision(
@@ -413,6 +438,43 @@ class FloatingEngine {
     object.velocity = velocity;
   }
 
+  void _stepZeroGravity(FloatingObject object, double dt) {
+    final profile = MotionProfile.forStyle(_movementStyle);
+    var next = object.position + object.velocity * dt;
+    var velocity = object.velocity;
+
+    if (next.dx - object.radius <= _movementLeft) {
+      next = Offset(_movementLeft + object.radius, next.dy);
+      velocity = Offset(
+        velocity.dx.abs() * profile.wallBounce,
+        velocity.dy,
+      );
+    } else if (next.dx + object.radius >= _movementRight) {
+      next = Offset(_movementRight - object.radius, next.dy);
+      velocity = Offset(
+        -velocity.dx.abs() * profile.wallBounce,
+        velocity.dy,
+      );
+    }
+
+    if (next.dy - object.radius <= _movementTop) {
+      next = Offset(next.dx, _movementTop + object.radius);
+      velocity = Offset(
+        velocity.dx,
+        velocity.dy.abs() * profile.wallBounce,
+      );
+    } else if (next.dy + object.radius >= _area.height) {
+      next = Offset(next.dx, _area.height - object.radius);
+      velocity = Offset(
+        velocity.dx,
+        -velocity.dy.abs() * profile.wallBounce,
+      );
+    }
+
+    object.position = next;
+    object.velocity = velocity;
+  }
+
   void _stepBounce(FloatingObject object, double dt) {
     final minDimension = min(_area.width, _area.height);
     final profile = MotionProfile.forStyle(_movementStyle);
@@ -467,8 +529,18 @@ class FloatingEngine {
       case MovementStyle.bounce:
         // Bounce should preserve its collision-driven trajectory.
         break;
-      case MovementStyle.orbit:
       case MovementStyle.zeroGravity:
+        // Barely perceptible drift prevents perfectly repetitive straight-line
+        // motion while preserving the long inertial feel.
+        final phase = _elapsedSeconds * 0.19 + object.id * 2.11;
+        final force = Offset(
+          cos(phase) * 0.55,
+          sin(phase * 0.71) * 0.45,
+        );
+        object.velocity +=
+            force * (minDimension * 0.0025 * speedScale * dt);
+        break;
+      case MovementStyle.orbit:
       case MovementStyle.underwater:
         // Dedicated trajectories are added when these store motions unlock.
         break;
