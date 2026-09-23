@@ -15,6 +15,7 @@ class MyLockStoredSettings {
     required this.background,
     required this.movementStyle,
     required this.popStyle,
+    this.texture = ShapeTexture.glossy,
     required this.password,
     this.recoveryPin,
     required this.selectedAppIds,
@@ -32,6 +33,7 @@ class MyLockStoredSettings {
   final LockBackground background;
   final MovementStyle movementStyle;
   final PopStyle popStyle;
+  final ShapeTexture texture;
   final List<LockToken>? password;
   final String? recoveryPin;
   final Set<String> selectedAppIds;
@@ -66,6 +68,7 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
   static const _backgroundKey = 'background';
   static const _movementKey = 'movement_style';
   static const _popKey = 'pop_style';
+  static const _textureKey = 'shape_texture';
   static const _appsKey = 'selected_app_ids';
   static const _objectCountKey = 'object_count';
   static const _speedKey = 'floating_speed';
@@ -95,8 +98,8 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
     final recoveryPinRaw = await _secureStorage.read(key: _recoveryPinKey);
 
     return MyLockStoredSettings(
-      selectedShapes: shapes.isEmpty ? ShapeKind.values.toSet() : shapes,
-      selectedTones: tones.isEmpty ? ShapeTone.values.toSet() : tones,
+      selectedShapes: shapes.isEmpty ? ShapeKind.defaults : shapes,
+      selectedTones: tones.isEmpty ? ShapeTone.defaults : tones,
       background: _enumOrDefault(
         LockBackground.values,
         await _preferences.getString(_backgroundKey),
@@ -111,6 +114,11 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
         PopStyle.values,
         await _preferences.getString(_popKey),
         PopStyle.basicPop,
+      ),
+      texture: _enumOrDefault(
+        ShapeTexture.values,
+        await _preferences.getString(_textureKey),
+        ShapeTexture.glossy,
       ),
       password: _decodePassword(passwordRaw),
       recoveryPin: _normalizeRecoveryPin(recoveryPinRaw),
@@ -158,6 +166,7 @@ class MyLockSettingsStore implements MyLockSettingsPersistence {
       _preferences.setString(_backgroundKey, settings.background.name),
       _preferences.setString(_movementKey, settings.movementStyle.name),
       _preferences.setString(_popKey, settings.popStyle.name),
+      _preferences.setString(_textureKey, settings.texture.name),
       _preferences.setStringList(
         _appsKey,
         settings.selectedAppIds.toList(),
