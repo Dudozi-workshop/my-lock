@@ -295,6 +295,7 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
         builder: (context) => PasswordSetupScreen(
           selectedShapes: widget.settings.selectedShapes,
           selectedTones: widget.settings.selectedTones,
+          texture: widget.settings.texture,
         ),
       ),
     );
