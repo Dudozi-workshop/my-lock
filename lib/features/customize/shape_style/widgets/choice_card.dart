@@ -8,11 +8,13 @@ class ChoiceCard extends StatelessWidget {
     required this.selected,
     required this.onTap,
     required this.child,
+    this.badge,
   });
 
   final bool selected;
   final VoidCallback onTap;
   final Widget child;
+  final String? badge;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,29 @@ class ChoiceCard extends StatelessWidget {
           child: Stack(
             children: [
               Positioned.fill(child: child),
+              if (badge != null)
+                Positioned(
+                  top: 9,
+                  left: 9,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: brandLavender,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                    child: Text(
+                      badge!,
+                      style: const TextStyle(
+                        color: brandPurple,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
               if (selected)
                 const Positioned(
                   top: 10,
