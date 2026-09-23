@@ -12,8 +12,8 @@ class MyLockSettingsController extends ChangeNotifier {
 
   final MyLockSettingsPersistence _store;
 
-  Set<ShapeKind> _selectedShapes = ShapeKind.values.toSet();
-  Set<ShapeTone> _selectedTones = ShapeTone.values.toSet();
+  Set<ShapeKind> _selectedShapes = Set<ShapeKind>.from(ShapeKind.defaults);
+  Set<ShapeTone> _selectedTones = Set<ShapeTone>.from(ShapeTone.defaults);
   LockBackground _background = LockBackground.softGradient;
   MovementStyle _movementStyle = MovementStyle.floating;
   PopStyle _popStyle = PopStyle.basicPop;
