@@ -185,7 +185,13 @@ class _EffectsScreenState extends State<EffectsScreen> {
 
   void _selectMovement(MovementStyle style) {
     if (style.locked) {
-      _showLocked(style.label);
+      setState(() => _movement = style);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${style.label} 모션 미리보기 · 상품 적용은 잠금 상태입니다.'),
+          duration: const Duration(milliseconds: 1400),
+        ),
+      );
       return;
     }
     setState(() => _movement = style);
