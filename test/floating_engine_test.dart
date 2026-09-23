@@ -441,4 +441,41 @@ void main() {
     expect(bounceSpeed, greaterThan(floatingSpeed));
   });
 
+  test('floating style adds gentle wandering force', () {
+    final engine = FloatingEngine(seed: 24);
+    engine.resize(const Size(400, 400));
+
+    final object = engine.objects.first
+      ..position = const Offset(200, 200)
+      ..velocity = Offset.zero;
+    engine.objects.removeRange(1, engine.objects.length);
+
+    for (var i = 0; i < 30; i++) {
+      engine.step(1 / 60);
+    }
+
+    expect(object.velocity.distance, greaterThan(0));
+  });
+
+  test('bounce head-on collision reverses travel direction', () {
+    final engine = FloatingEngine(seed: 25);
+    engine.resize(const Size(400, 400));
+    engine.setMovementStyle(MovementStyle.bounce);
+
+    final first = engine.objects[0]
+      ..radius = 40
+      ..position = const Offset(170, 200)
+      ..velocity = const Offset(70, 0);
+    final second = engine.objects[1]
+      ..radius = 40
+      ..position = const Offset(230, 200)
+      ..velocity = const Offset(-70, 0);
+    engine.objects.removeRange(2, engine.objects.length);
+
+    engine.step(1 / 120);
+
+    expect(first.velocity.dx, lessThan(0));
+    expect(second.velocity.dx, greaterThan(0));
+  });
+
 }
