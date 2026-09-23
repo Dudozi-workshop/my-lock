@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'effects.dart';
 import 'models.dart';
+import 'motion_profile.dart';
 
 class FloatingEngine {
   FloatingEngine({int seed = 4921}) : _random = Random(seed);
@@ -13,6 +14,7 @@ class FloatingEngine {
 
   final Random _random;
   final List<FloatingObject> objects = [];
+  final Map<int, double> _idleSeconds = <int, double>{};
 
   Size _area = Size.zero;
   int _nextId = 0;
@@ -21,6 +23,7 @@ class FloatingEngine {
   FloatingSpeed _speed = FloatingSpeed.normal;
   double _topInset = 0;
   int _objectCount = defaultObjectCount;
+  Offset _externalForce = Offset.zero;
   List<LockToken> _allowedTokens = List<LockToken>.from(defaultTokens);
   List<LockToken> _requiredTokens = <LockToken>[];
 
@@ -75,7 +78,23 @@ class FloatingEngine {
   void setMovementStyle(MovementStyle style) {
     if (_movementStyle == style) return;
     _movementStyle = style;
+    _idleSeconds.clear();
     if (_area != Size.zero) _seedObjects();
+  }
+
+  /// Applies normalized external motion input for future reactive modes.
+  ///
+  /// Values are clamped to -1..1 so sensor wiring can pass tilt/gyro force
+  /// without exposing raw device units to the physics engine.
+  void setExternalForce(Offset force) {
+    _externalForce = Offset(
+      force.dx.clamp(-1.0, 1.0).toDouble(),
+      force.dy.clamp(-1.0, 1.0).toDouble(),
+    );
+  }
+
+  void clearExternalForce() {
+    _externalForce = Offset.zero;
   }
 
   void setMovementArea(MovementArea area) {
@@ -124,6 +143,7 @@ class FloatingEngine {
 
   void _seedObjects() {
     objects.clear();
+    _idleSeconds.clear();
     if (_allowedTokens.isEmpty || _area == Size.zero) return;
 
     for (var i = 0; i < _objectCount; i++) {
@@ -136,12 +156,10 @@ class FloatingEngine {
   FloatingObject _spawn(LockToken token) {
     final minDimension = min(_area.width, _area.height);
     final radius = minDimension * (0.072 + _random.nextDouble() * 0.018);
-    final speedScale =
-        _movementStyle == MovementStyle.bounce ? 0.13 : 0.085;
-    final speedRange =
-        _movementStyle == MovementStyle.bounce ? 0.06 : 0.055;
+    final profile = MotionProfile.forStyle(_movementStyle);
     final speed = minDimension *
-        (speedScale + _random.nextDouble() * speedRange) *
+        (profile.spawnSpeedBase +
+            _random.nextDouble() * profile.spawnSpeedRange) *
         _speed.multiplier;
     final angle = _random.nextDouble() * pi * 2;
 
@@ -191,6 +209,8 @@ class FloatingEngine {
         continue;
       }
 
+      _applyExternalForce(object, dt);
+
       switch (_movementStyle) {
         case MovementStyle.bounce:
           _stepBounce(object, dt);
@@ -202,6 +222,9 @@ class FloatingEngine {
           _stepFloating(object, dt);
           break;
       }
+
+      _applyDragAndWakeUp(object, dt);
+      _limitVelocity(object);
     }
 
     _applyPairRepulsion(dt);
@@ -251,12 +274,18 @@ class FloatingEngine {
           acceleration = minDimension * (0.22 + 0.24 * t);
         }
 
-        final correction = normal * (excess * response * 0.5);
+        final profile = MotionProfile.forStyle(_movementStyle);
+        final correction = normal *
+            (excess * response * profile.collisionPositionScale * 0.5);
         first.position -= correction;
         second.position += correction;
 
-        final impulse =
-            normal * (acceleration * _speed.multiplier * dt * 0.5);
+        final impulse = normal *
+            (acceleration *
+                profile.collisionImpulseScale *
+                _speed.multiplier *
+                dt *
+                0.5);
         first.velocity -= impulse;
         second.velocity += impulse;
 
@@ -321,18 +350,30 @@ class FloatingEngine {
 
     if (next.dx - object.radius <= _movementLeft) {
       next = Offset(_movementLeft + object.radius, next.dy);
-      velocity = Offset(velocity.dx.abs(), velocity.dy);
+      velocity = Offset(
+        velocity.dx.abs() * MotionProfile.forStyle(_movementStyle).wallBounce,
+        velocity.dy,
+      );
     } else if (next.dx + object.radius >= _movementRight) {
       next = Offset(_movementRight - object.radius, next.dy);
-      velocity = Offset(-velocity.dx.abs(), velocity.dy);
+      velocity = Offset(
+        -velocity.dx.abs() * MotionProfile.forStyle(_movementStyle).wallBounce,
+        velocity.dy,
+      );
     }
 
     if (next.dy - object.radius <= _movementTop) {
       next = Offset(next.dx, _movementTop + object.radius);
-      velocity = Offset(velocity.dx, velocity.dy.abs());
+      velocity = Offset(
+        velocity.dx,
+        velocity.dy.abs() * MotionProfile.forStyle(_movementStyle).wallBounce,
+      );
     } else if (next.dy + object.radius >= _area.height) {
       next = Offset(next.dx, _area.height - object.radius);
-      velocity = Offset(velocity.dx, -velocity.dy.abs());
+      velocity = Offset(
+        velocity.dx,
+        -velocity.dy.abs() * MotionProfile.forStyle(_movementStyle).wallBounce,
+      );
     }
 
     object.position = next;
@@ -341,7 +382,9 @@ class FloatingEngine {
 
   void _stepBounce(FloatingObject object, double dt) {
     final minDimension = min(_area.width, _area.height);
-    final gravity = minDimension * 0.9 * _speed.multiplier;
+    final profile = MotionProfile.forStyle(_movementStyle);
+    final gravity =
+        minDimension * profile.gravityScale * _speed.multiplier;
     var velocity = Offset(
       object.velocity.dx,
       object.velocity.dy + gravity * dt,
@@ -359,7 +402,7 @@ class FloatingEngine {
     if (next.dy + object.radius >= _area.height) {
       next = Offset(next.dx, _area.height - object.radius);
       final rebound = max(
-        velocity.dy.abs() * 0.82,
+        velocity.dy.abs() * profile.wallBounce,
         minDimension * 0.24 * _speed.multiplier,
       );
       velocity = Offset(velocity.dx, -rebound);
@@ -370,6 +413,55 @@ class FloatingEngine {
 
     object.position = next;
     object.velocity = velocity;
+  }
+
+  void _applyExternalForce(FloatingObject object, double dt) {
+    if (_externalForce == Offset.zero) return;
+
+    final minDimension = min(_area.width, _area.height);
+    final profile = MotionProfile.forStyle(_movementStyle);
+    final acceleration =
+        minDimension * profile.externalForceScale * _speed.multiplier;
+
+    object.velocity += _externalForce * (acceleration * dt);
+  }
+
+  void _applyDragAndWakeUp(FloatingObject object, double dt) {
+    final minDimension = min(_area.width, _area.height);
+    final profile = MotionProfile.forStyle(_movementStyle);
+
+    if (profile.dragPerSecond > 0) {
+      final drag = max(0.0, 1.0 - profile.dragPerSecond * dt);
+      object.velocity *= drag;
+    }
+
+    final minSpeed =
+        minDimension * profile.minSpeedScale * _speed.multiplier;
+    if (object.velocity.distance >= minSpeed) {
+      _idleSeconds[object.id] = 0.0;
+      return;
+    }
+
+    final idle = (_idleSeconds[object.id] ?? 0.0) + dt;
+    _idleSeconds[object.id] = idle;
+    if (idle < profile.wakeUpAfterSeconds) return;
+
+    final angle = _random.nextDouble() * pi * 2;
+    final impulse =
+        minDimension * profile.wakeUpImpulseScale * _speed.multiplier;
+    object.velocity += Offset(cos(angle), sin(angle)) * impulse;
+    _idleSeconds[object.id] = 0.0;
+  }
+
+  void _limitVelocity(FloatingObject object) {
+    final minDimension = min(_area.width, _area.height);
+    final profile = MotionProfile.forStyle(_movementStyle);
+    final maxSpeed =
+        minDimension * profile.maxSpeedScale * _speed.multiplier;
+    final current = object.velocity.distance;
+    if (current <= maxSpeed || current <= 0) return;
+
+    object.velocity = object.velocity / current * maxSpeed;
   }
 
   LockToken? tap(Offset localPosition) {
@@ -445,12 +537,10 @@ class FloatingEngine {
 
     final token = _allowedTokens[_random.nextInt(_allowedTokens.length)];
     final minDimension = min(_area.width, _area.height);
-    final speedScale =
-        _movementStyle == MovementStyle.bounce ? 0.13 : 0.085;
-    final speedRange =
-        _movementStyle == MovementStyle.bounce ? 0.06 : 0.055;
+    final profile = MotionProfile.forStyle(_movementStyle);
     final speed = minDimension *
-        (speedScale + _random.nextDouble() * speedRange) *
+        (profile.spawnSpeedBase +
+            _random.nextDouble() * profile.spawnSpeedRange) *
         _speed.multiplier;
     final angle = _random.nextDouble() * pi * 2;
 
