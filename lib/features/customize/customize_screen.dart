@@ -225,13 +225,24 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
         builder: (context) => ShapeStyleScreen(
           selectedShapes: settings.selectedShapes,
           selectedTones: settings.selectedTones,
+          currentPassword: settings.password,
           background: settings.background,
           movementStyle: settings.movementStyle,
           popStyle: settings.popStyle,
           objectCount: settings.objectCount,
           speed: settings.speed,
           movementArea: settings.movementArea,
-          onChanged: settings.setShapeStyle,
+          onApply: (shapes, tones, replacementPassword) {
+            if (replacementPassword == null) {
+              settings.setShapeStyle(shapes, tones);
+            } else {
+              settings.setShapeStyleAndPassword(
+                shapes,
+                tones,
+                replacementPassword,
+              );
+            }
+          },
         ),
       ),
     );

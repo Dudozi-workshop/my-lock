@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../app/theme.dart';
 import '../../../lock_engine/effects.dart';
 import '../../../lock_engine/models.dart';
+import '../../lock_settings/password_setup/password_setup_screen.dart';
 import '../background/background_style.dart';
 import 'shape_style_controller.dart';
 import 'shape_style_preview.dart';
@@ -15,24 +16,26 @@ class ShapeStyleScreen extends StatefulWidget {
     super.key,
     required this.selectedShapes,
     required this.selectedTones,
+    required this.currentPassword,
     required this.background,
     required this.movementStyle,
     required this.popStyle,
     required this.objectCount,
     required this.speed,
     required this.movementArea,
-    required this.onChanged,
+    required this.onApply,
   });
 
   final Set<ShapeKind> selectedShapes;
   final Set<ShapeTone> selectedTones;
+  final List<LockToken>? currentPassword;
   final LockBackground background;
   final MovementStyle movementStyle;
   final PopStyle popStyle;
   final int objectCount;
   final FloatingSpeed speed;
   final MovementArea movementArea;
-  final ShapeStyleChanged onChanged;
+  final ShapeStyleApplied onApply;
 
   @override
   State<ShapeStyleScreen> createState() => _ShapeStyleScreenState();
@@ -50,11 +53,35 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
     _controller = ShapeStyleController(
       initialShapes: widget.selectedShapes,
       initialTones: widget.selectedTones,
-      onChanged: widget.onChanged,
     )..addListener(_refresh);
   }
 
   void _refresh() => setState(() {});
+
+  bool get _passwordChangeRequired {
+    final password = widget.currentPassword;
+    if (password == null || password.isEmpty) return false;
+
+    return password.any(
+      (token) =>
+          !_controller.shapes.contains(token.shape) ||
+          !_controller.tones.contains(token.tone),
+    );
+  }
+
+  String get _passwordChangeMessage {
+    final password = widget.currentPassword;
+    if (password == null) return '사용 중인 항목이 변경됐어요.';
+
+    final shapeChanged =
+        password.any((token) => !_controller.shapes.contains(token.shape));
+    final toneChanged =
+        password.any((token) => !_controller.tones.contains(token.tone));
+
+    if (toneChanged && !shapeChanged) return '사용 중인 색상이 변경됐어요.';
+    if (shapeChanged && !toneChanged) return '사용 중인 도형이 변경됐어요.';
+    return '사용 중인 항목이 변경됐어요.';
+  }
 
   @override
   void dispose() {
@@ -67,6 +94,9 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
 
   @override
   Widget build(BuildContext context) {
+    final needsPasswordChange =
+        _controller.hasChanges && _passwordChangeRequired;
+
     return Scaffold(
       backgroundColor: appBackground,
       appBar: AppBar(
@@ -79,6 +109,7 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
       ),
       body: SafeArea(
         top: false,
+        bottom: false,
         child: Column(
           children: [
             Padding(
@@ -118,7 +149,92 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
           ],
         ),
       ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (needsPasswordChange) ...[
+                const Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      size: 16,
+                      color: Color(0xFFD06B40),
+                    ),
+                    SizedBox(width: 6),
+                    Text(
+                      '비밀번호 변경 필요',
+                      style: TextStyle(
+                        color: Color(0xFFD06B40),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+              ],
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(54),
+                  backgroundColor: brandPurple,
+                  disabledBackgroundColor: const Color(0xFFD8D3EB),
+                ),
+                onPressed: _controller.hasChanges ? _applyChanges : null,
+                child: const Text('적용'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
+  }
+
+  Future<void> _applyChanges() async {
+    List<LockToken>? replacementPassword;
+
+    if (_passwordChangeRequired) {
+      final shouldChange = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('비밀번호 변경 필요'),
+          content: Text(_passwordChangeMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('취소'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('변경하기'),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldChange != true || !mounted) return;
+
+      replacementPassword = await Navigator.of(context).push<List<LockToken>>(
+        MaterialPageRoute(
+          builder: (context) => PasswordSetupScreen(
+            selectedShapes: _controller.shapes,
+            selectedTones: _controller.tones,
+          ),
+        ),
+      );
+
+      if (replacementPassword == null || !mounted) return;
+    }
+
+    widget.onApply(
+      _controller.shapes,
+      _controller.tones,
+      replacementPassword,
+    );
+    _controller.markApplied();
   }
 }
 

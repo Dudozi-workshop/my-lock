@@ -88,6 +88,22 @@ class MyLockSettingsController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setShapeStyleAndPassword(
+    Set<ShapeKind> shapes,
+    Set<ShapeTone> tones,
+    List<LockToken> password,
+  ) {
+    if (shapes.isEmpty || tones.isEmpty) return;
+    if (password.length < 2 || password.length > 6) return;
+
+    _selectedShapes = Set<ShapeKind>.from(shapes);
+    _selectedTones = Set<ShapeTone>.from(tones);
+    _password = List<LockToken>.from(password);
+    _persistPreferences();
+    _store.savePassword(_password!);
+    notifyListeners();
+  }
+
   void setBackground(LockBackground background) {
     if (_background == background) return;
     _background = background;

@@ -7,25 +7,39 @@ typedef ShapeStyleChanged = void Function(
   Set<ShapeTone> tones,
 );
 
+typedef ShapeStyleApplied = void Function(
+  Set<ShapeKind> shapes,
+  Set<ShapeTone> tones,
+  List<LockToken>? replacementPassword,
+);
+
 class ShapeStyleController extends ChangeNotifier {
   ShapeStyleController({
     required Set<ShapeKind> initialShapes,
     required Set<ShapeTone> initialTones,
-    required this.onChanged,
   })  : _shapes = initialShapes.isEmpty
             ? {ShapeKind.circle}
             : Set<ShapeKind>.from(initialShapes),
         _tones = initialTones.isEmpty
             ? {ShapeTone.pink}
+            : Set<ShapeTone>.from(initialTones),
+        _savedShapes = initialShapes.isEmpty
+            ? {ShapeKind.circle}
+            : Set<ShapeKind>.from(initialShapes),
+        _savedTones = initialTones.isEmpty
+            ? {ShapeTone.pink}
             : Set<ShapeTone>.from(initialTones);
-
-  final ShapeStyleChanged onChanged;
 
   final Set<ShapeKind> _shapes;
   final Set<ShapeTone> _tones;
+  Set<ShapeKind> _savedShapes;
+  Set<ShapeTone> _savedTones;
 
   Set<ShapeKind> get shapes => Set<ShapeKind>.unmodifiable(_shapes);
   Set<ShapeTone> get tones => Set<ShapeTone>.unmodifiable(_tones);
+
+  bool get hasChanges =>
+      !setEquals(_shapes, _savedShapes) || !setEquals(_tones, _savedTones);
 
   void toggleShape(ShapeKind kind) {
     if (_shapes.contains(kind) && _shapes.length == 1) return;
@@ -33,7 +47,7 @@ class ShapeStyleController extends ChangeNotifier {
     if (!_shapes.add(kind)) {
       _shapes.remove(kind);
     }
-    _emit();
+    notifyListeners();
   }
 
   void toggleTone(ShapeTone tone) {
@@ -42,11 +56,12 @@ class ShapeStyleController extends ChangeNotifier {
     if (!_tones.add(tone)) {
       _tones.remove(tone);
     }
-    _emit();
+    notifyListeners();
   }
 
-  void _emit() {
-    onChanged(shapes, tones);
+  void markApplied() {
+    _savedShapes = Set<ShapeKind>.from(_shapes);
+    _savedTones = Set<ShapeTone>.from(_tones);
     notifyListeners();
   }
 }
