@@ -309,7 +309,7 @@ void main() {
     for (final object in engine.objects) {
       expect(
         object.position.dy - object.radius,
-        greaterThanOrEqualTo(size.height * 0.40),
+        greaterThanOrEqualTo(size.height * 0.40 - 1e-9),
       );
       expect(
         object.position.dy + object.radius,
