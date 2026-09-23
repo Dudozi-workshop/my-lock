@@ -1,7 +1,11 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 
 import 'effects.dart';
 import 'floating_engine.dart';
@@ -44,6 +48,12 @@ class _FloatingPreviewState extends State<FloatingPreview>
   final FloatingEngine _engine = FloatingEngine();
   Duration _previous = Duration.zero;
   Size _lastSize = Size.zero;
+  StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
+  StreamSubscription<GyroscopeEvent>? _gyroscopeSubscription;
+  StreamSubscription<UserAccelerometerEvent>? _userAccelerometerSubscription;
+  Offset _tilt = Offset.zero;
+  double _gyroZ = 0;
+  double _shake = 0;
 
   @override
   void initState() {
@@ -57,6 +67,65 @@ class _FloatingPreviewState extends State<FloatingPreview>
       ..setTopInset(widget.topInset)
       ..setRequiredTokens(widget.requiredTokens);
     _ticker = createTicker(_onTick)..start();
+    _startMotionSensors();
+  }
+
+  void _startMotionSensors() {
+    try {
+      _accelerometerSubscription = accelerometerEventStream(
+        samplingPeriod: SensorInterval.gameInterval,
+      ).listen(
+        (event) {
+          final nextTilt = Offset(
+            (-event.x / 9.81).clamp(-1.0, 1.0).toDouble(),
+            (event.y / 9.81).clamp(-1.0, 1.0).toDouble(),
+          );
+          _tilt = Offset(
+            _tilt.dx * 0.82 + nextTilt.dx * 0.18,
+            _tilt.dy * 0.82 + nextTilt.dy * 0.18,
+          );
+          _pushReactiveMotion();
+        },
+        onError: (_) {},
+        cancelOnError: false,
+      );
+
+      _gyroscopeSubscription = gyroscopeEventStream(
+        samplingPeriod: SensorInterval.gameInterval,
+      ).listen(
+        (event) {
+          _gyroZ = _gyroZ * 0.78 + event.z * 0.22;
+          _pushReactiveMotion();
+        },
+        onError: (_) {},
+        cancelOnError: false,
+      );
+
+      _userAccelerometerSubscription = userAccelerometerEventStream(
+        samplingPeriod: SensorInterval.gameInterval,
+      ).listen(
+        (event) {
+          final magnitude = sqrt(
+            event.x * event.x + event.y * event.y + event.z * event.z,
+          );
+          final normalized = ((magnitude - 0.8) / 7.0).clamp(0.0, 1.0).toDouble();
+          _shake = max(_shake * 0.82, normalized);
+          _pushReactiveMotion();
+        },
+        onError: (_) {},
+        cancelOnError: false,
+      );
+    } catch (_) {
+      _engine.clearReactiveMotion();
+    }
+  }
+
+  void _pushReactiveMotion() {
+    _engine.setReactiveMotion(
+      tilt: _tilt,
+      gyroZ: _gyroZ,
+      shake: _shake,
+    );
   }
 
   @override
@@ -101,6 +170,9 @@ class _FloatingPreviewState extends State<FloatingPreview>
 
   @override
   void dispose() {
+    _accelerometerSubscription?.cancel();
+    _gyroscopeSubscription?.cancel();
+    _userAccelerometerSubscription?.cancel();
     _ticker.dispose();
     super.dispose();
   }
