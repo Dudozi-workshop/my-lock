@@ -30,6 +30,7 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
   StreamSubscription<LockRequest>? _lockRequestSubscription;
   late final Future<void> _loadFuture;
   final AppAuthSession _appAuth = AppAuthSession();
+  Timer? _inactiveRelockTimer;
 
   @override
   void initState() {
@@ -83,20 +84,46 @@ class _RootShellState extends State<RootShell> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!_settings.loaded || !_settings.onboardingCompleted || _settings.password == null) return;
+    if (!_settings.loaded ||
+        !_settings.onboardingCompleted ||
+        _settings.password == null) {
+      return;
+    }
 
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+    if (state == AppLifecycleState.inactive) {
+      _inactiveRelockTimer?.cancel();
+      _inactiveRelockTimer = Timer(
+        const Duration(milliseconds: 700),
+        () {
+          if (WidgetsBinding.instance.lifecycleState !=
+              AppLifecycleState.inactive) {
+            return;
+          }
+          _appAuth.markUnauthenticated();
+        },
+      );
+      return;
+    }
+
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.detached) {
+      _inactiveRelockTimer?.cancel();
+      _inactiveRelockTimer = null;
       _appAuth.markUnauthenticated();
       return;
     }
 
-    if (state == AppLifecycleState.resumed && mounted) {
-      setState(() {});
+    if (state == AppLifecycleState.resumed) {
+      _inactiveRelockTimer?.cancel();
+      _inactiveRelockTimer = null;
+      if (mounted) setState(() {});
     }
   }
 
   @override
   void dispose() {
+    _inactiveRelockTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     unawaited(_lockRequestSubscription?.cancel());
     unawaited(_runtime.stop());
