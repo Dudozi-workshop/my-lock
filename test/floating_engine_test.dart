@@ -129,7 +129,7 @@ void main() {
     engine.resize(const Size(400, 400));
     // Use a profile without autonomous drift so this test isolates only the
     // pair-repulsion threshold.
-    engine.setMovementStyle(MovementStyle.zeroGravity);
+    engine.setMovementStyle(MovementStyle.orbit);
 
     final first = engine.objects[0]
       ..radius = 40
@@ -485,6 +485,7 @@ void main() {
     final engine = FloatingEngine(seed: 26);
     engine.resize(const Size(400, 400));
     engine.setMovementStyle(MovementStyle.zeroGravity);
+    engine.setMovementArea(MovementArea.full);
 
     final object = engine.objects.first
       ..position = const Offset(200, 200)
