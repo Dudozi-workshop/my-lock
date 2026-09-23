@@ -436,7 +436,7 @@ class FloatingEngine {
       next = Offset(next.dx, _area.height - object.radius);
       final rebound = max(
         velocity.dy.abs() * profile.wallBounce,
-        minDimension * 0.24 * _speed.multiplier,
+        minDimension * 0.46 * _speed.multiplier,
       );
       velocity = Offset(velocity.dx, -rebound);
     } else if (next.dy - object.radius <= _movementTop) {
