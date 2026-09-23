@@ -80,13 +80,18 @@ class MyLockSettingsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setShapeStyle(Set<ShapeKind> shapes, Set<ShapeTone> tones) {
+  void setShapeStyle(
+    Set<ShapeKind> shapes,
+    Set<ShapeTone> tones, {
+    ShapeTexture? texture,
+  }) {
     if (shapes.isEmpty || tones.isEmpty) return;
     if (setEquals(_selectedShapes, shapes) && setEquals(_selectedTones, tones)) {
       return;
     }
     _selectedShapes = Set<ShapeKind>.from(shapes);
     _selectedTones = Set<ShapeTone>.from(tones);
+    if (texture != null) _texture = texture;
     _persistPreferences();
     notifyListeners();
   }
@@ -94,13 +99,15 @@ class MyLockSettingsController extends ChangeNotifier {
   void setShapeStyleAndPassword(
     Set<ShapeKind> shapes,
     Set<ShapeTone> tones,
-    List<LockToken> password,
-  ) {
+    List<LockToken> password, {
+    ShapeTexture? texture,
+  }) {
     if (shapes.isEmpty || tones.isEmpty) return;
     if (password.length < 2 || password.length > 6) return;
 
     _selectedShapes = Set<ShapeKind>.from(shapes);
     _selectedTones = Set<ShapeTone>.from(tones);
+    if (texture != null) _texture = texture;
     _password = List<LockToken>.from(password);
     _persistPreferences();
     _store.savePassword(_password!);
