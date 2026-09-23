@@ -24,42 +24,29 @@ class ColorTab extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 14),
-        Row(
-          children: [
-            Expanded(
-              child: ColorChoiceCard(
-                tone: ShapeTone.pink,
-                label: '핑크',
-                color: const Color(0xFFFF79C6),
-                selected: selectedTones.contains(ShapeTone.pink),
-                onTap: () => onToggle(ShapeTone.pink),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: ColorChoiceCard(
-                tone: ShapeTone.blue,
-                label: '블루',
-                color: const Color(0xFF65A7FF),
-                selected: selectedTones.contains(ShapeTone.blue),
-                onTap: () => onToggle(ShapeTone.blue),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: ColorChoiceCard(
-                tone: ShapeTone.yellow,
-                label: '옐로우',
-                color: const Color(0xFFFFCD58),
-                selected: selectedTones.contains(ShapeTone.yellow),
-                onTap: () => onToggle(ShapeTone.yellow),
-              ),
-            ),
-          ],
+        GridView.builder(
+          itemCount: ShapeTone.values.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1.12,
+          ),
+          itemBuilder: (context, index) {
+            final tone = ShapeTone.values[index];
+            return ColorChoiceCard(
+              tone: tone,
+              label: tone.label,
+              selected: selectedTones.contains(tone),
+              onTap: () => onToggle(tone),
+            );
+          },
         ),
         const SizedBox(height: 20),
         const FreedomNote(
-          text: '색상도 자유롭게 조합할 수 있습니다. 최소 한 가지 색상은 유지됩니다.',
+          text: '색상도 자유롭게 조합할 수 있습니다. 확장 색상은 현재 개발 버전에서 직접 적용해 테스트할 수 있습니다.',
         ),
       ],
     );
