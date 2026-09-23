@@ -538,9 +538,13 @@ class FloatingEngine {
   }
 
   void _stepOrbit(FloatingObject object, double dt) {
-    final center = Offset(
+    final baseCenter = Offset(
       (_movementLeft + _movementRight) * 0.5,
       _movementTop + _movementHeight * 0.5,
+    );
+    final center = baseCenter + Offset(
+      _tilt.dx * (_movementRight - _movementLeft) * 0.12,
+      _tilt.dy * _movementHeight * 0.10,
     );
     final usableWidth =
         max(1.0, _movementRight - _movementLeft - object.radius * 2);
