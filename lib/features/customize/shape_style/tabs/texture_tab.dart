@@ -41,6 +41,7 @@ class TextureTab extends StatelessWidget {
             return ChoiceCard(
               selected: selectedTexture == texture,
               onTap: () => onSelect(texture),
+              badge: texture.premium ? 'PLUS' : null,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
