@@ -19,6 +19,7 @@ class EffectsScreen extends StatefulWidget {
     required this.selectedTones,
     required this.movementStyle,
     required this.popStyle,
+    required this.texture,
     required this.objectCount,
     required this.speed,
     required this.movementArea,
@@ -30,6 +31,7 @@ class EffectsScreen extends StatefulWidget {
   final Set<ShapeTone> selectedTones;
   final MovementStyle movementStyle;
   final PopStyle popStyle;
+  final ShapeTexture texture;
   final int objectCount;
   final FloatingSpeed speed;
   final MovementArea movementArea;
@@ -135,6 +137,7 @@ class _EffectsScreenState extends State<EffectsScreen> {
               selectedTones: widget.selectedTones,
               movementStyle: _movement,
               popStyle: _popStyle,
+              texture: widget.texture,
               objectCount: widget.objectCount,
               speed: widget.speed,
               movementArea: widget.movementArea,
