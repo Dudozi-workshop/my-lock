@@ -143,6 +143,7 @@ class _LockModeScreenState extends State<LockModeScreen>
                 selectedTones: settings.selectedTones,
                 movementStyle: settings.movementStyle,
                 popStyle: settings.popStyle,
+                texture: settings.texture,
                 objectCount: settings.objectCount,
                 speed: settings.speed,
                 movementArea: settings.movementArea,
@@ -237,6 +238,7 @@ class _LockModeScreenState extends State<LockModeScreen>
         builder: (context) => PasswordSetupScreen(
           selectedShapes: widget.settings.selectedShapes,
           selectedTones: widget.settings.selectedTones,
+          texture: widget.settings.texture,
           recoveryMode: true,
         ),
       ),
