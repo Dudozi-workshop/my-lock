@@ -17,6 +17,7 @@ class ShapeStyleScreen extends StatefulWidget {
     required this.selectedShapes,
     required this.selectedTones,
     required this.currentPassword,
+    required this.texture,
     required this.background,
     required this.movementStyle,
     required this.popStyle,
@@ -29,6 +30,7 @@ class ShapeStyleScreen extends StatefulWidget {
   final Set<ShapeKind> selectedShapes;
   final Set<ShapeTone> selectedTones;
   final List<LockToken>? currentPassword;
+  final ShapeTexture texture;
   final LockBackground background;
   final MovementStyle movementStyle;
   final PopStyle popStyle;
@@ -53,6 +55,7 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
     _controller = ShapeStyleController(
       initialShapes: widget.selectedShapes,
       initialTones: widget.selectedTones,
+      initialTexture: widget.texture,
     )..addListener(_refresh);
   }
 
@@ -120,6 +123,7 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
                 background: widget.background,
                 movementStyle: widget.movementStyle,
                 popStyle: widget.popStyle,
+                texture: _controller.texture,
                 objectCount: widget.objectCount,
                 speed: widget.speed,
                 movementArea: widget.movementArea,
@@ -142,7 +146,10 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
                     selectedTones: _controller.tones,
                     onToggle: _controller.toggleTone,
                   ),
-                  const TextureTab(),
+                  TextureTab(
+                    selectedTexture: _controller.texture,
+                    onSelect: _controller.selectTexture,
+                  ),
                 ],
               ),
             ),
@@ -222,6 +229,7 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
           builder: (context) => PasswordSetupScreen(
             selectedShapes: _controller.shapes,
             selectedTones: _controller.tones,
+            texture: _controller.texture,
           ),
         ),
       );
@@ -232,6 +240,7 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
     widget.onApply(
       _controller.shapes,
       _controller.tones,
+      _controller.texture,
       replacementPassword,
     );
     _controller.markApplied();
