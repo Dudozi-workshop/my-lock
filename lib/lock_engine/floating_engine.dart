@@ -24,6 +24,7 @@ class FloatingEngine {
   double _topInset = 0;
   int _objectCount = defaultObjectCount;
   Offset _externalForce = Offset.zero;
+  double _elapsedSeconds = 0;
   List<LockToken> _allowedTokens = List<LockToken>.from(defaultTokens);
   List<LockToken> _requiredTokens = <LockToken>[];
 
@@ -200,6 +201,8 @@ class FloatingEngine {
   void step(double dt) {
     if (_area == Size.zero || dt <= 0) return;
 
+    _elapsedSeconds += dt;
+
     for (final object in List<FloatingObject>.from(objects)) {
       if (object.isPopping) {
         object.popElapsed += dt;
@@ -210,6 +213,7 @@ class FloatingEngine {
       }
 
       _applyExternalForce(object, dt);
+      _applyStyleForce(object, dt);
 
       switch (_movementStyle) {
         case MovementStyle.bounce:
@@ -290,6 +294,7 @@ class FloatingEngine {
         second.velocity += impulse;
 
         if (_movementStyle == MovementStyle.bounce) {
+          _applyElasticPairCollision(first, second, normal);
           _applyBottomHorizontalSpread(first, second, dt, minDimension);
         }
 
@@ -297,6 +302,26 @@ class FloatingEngine {
         _clampInside(second);
       }
     }
+  }
+
+  void _applyElasticPairCollision(
+    FloatingObject first,
+    FloatingObject second,
+    Offset normal,
+  ) {
+    final relativeVelocity = second.velocity - first.velocity;
+    final normalSpeed =
+        relativeVelocity.dx * normal.dx + relativeVelocity.dy * normal.dy;
+
+    // Positive means the pair is already separating.
+    if (normalSpeed >= 0) return;
+
+    final restitution = MotionProfile.forStyle(_movementStyle).wallBounce;
+    final impulseMagnitude = -(1 + restitution) * normalSpeed * 0.5;
+    final impulse = normal * impulseMagnitude;
+
+    first.velocity -= impulse;
+    second.velocity += impulse;
   }
 
   void _applyBottomHorizontalSpread(
@@ -393,10 +418,10 @@ class FloatingEngine {
 
     if (next.dx - object.radius <= _movementLeft) {
       next = Offset(_movementLeft + object.radius, next.dy);
-      velocity = Offset(velocity.dx.abs(), velocity.dy);
+      velocity = Offset(velocity.dx.abs() * profile.wallBounce, velocity.dy);
     } else if (next.dx + object.radius >= _movementRight) {
       next = Offset(_movementRight - object.radius, next.dy);
-      velocity = Offset(-velocity.dx.abs(), velocity.dy);
+      velocity = Offset(-velocity.dx.abs() * profile.wallBounce, velocity.dy);
     }
 
     if (next.dy + object.radius >= _area.height) {
@@ -408,11 +433,38 @@ class FloatingEngine {
       velocity = Offset(velocity.dx, -rebound);
     } else if (next.dy - object.radius <= _movementTop) {
       next = Offset(next.dx, _movementTop + object.radius);
-      velocity = Offset(velocity.dx, velocity.dy.abs());
+      velocity = Offset(velocity.dx, velocity.dy.abs() * profile.wallBounce);
     }
 
     object.position = next;
     object.velocity = velocity;
+  }
+
+  void _applyStyleForce(FloatingObject object, double dt) {
+    final minDimension = min(_area.width, _area.height);
+    final speedScale = _speed.multiplier;
+
+    switch (_movementStyle) {
+      case MovementStyle.floating:
+        // A slow, deterministic wandering force keeps Floating alive without
+        // looking jittery or changing direction abruptly.
+        final phase = _elapsedSeconds * 0.72 + object.id * 1.73;
+        final force = Offset(
+          cos(phase) + sin(phase * 0.47) * 0.45,
+          sin(phase * 0.83) + cos(phase * 0.39) * 0.35,
+        );
+        object.velocity +=
+            force * (minDimension * 0.012 * speedScale * dt);
+        break;
+      case MovementStyle.bounce:
+        // Bounce should preserve its collision-driven trajectory.
+        break;
+      case MovementStyle.orbit:
+      case MovementStyle.zeroGravity:
+      case MovementStyle.underwater:
+        // Dedicated trajectories are added when these store motions unlock.
+        break;
+    }
   }
 
   void _applyExternalForce(FloatingObject object, double dt) {
