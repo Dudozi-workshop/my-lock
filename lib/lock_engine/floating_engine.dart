@@ -24,6 +24,9 @@ class FloatingEngine {
   double _topInset = 0;
   int _objectCount = defaultObjectCount;
   Offset _externalForce = Offset.zero;
+  Offset _tilt = Offset.zero;
+  double _gyroZ = 0;
+  double _shakeStrength = 0;
   double _elapsedSeconds = 0;
   List<LockToken> _allowedTokens = List<LockToken>.from(defaultTokens);
   List<LockToken> _requiredTokens = <LockToken>[];
@@ -96,6 +99,32 @@ class FloatingEngine {
 
   void clearExternalForce() {
     _externalForce = Offset.zero;
+  }
+
+  /// Feeds normalized device motion into the active motion personality.
+  ///
+  /// [tilt] is clamped to -1..1 per axis, [gyroZ] to -3..3 rad/s, and
+  /// [shake] to 0..1. Each MovementStyle interprets these values differently.
+  void setReactiveMotion({
+    required Offset tilt,
+    required double gyroZ,
+    required double shake,
+  }) {
+    _tilt = Offset(
+      tilt.dx.clamp(-1.0, 1.0).toDouble(),
+      tilt.dy.clamp(-1.0, 1.0).toDouble(),
+    );
+    _gyroZ = gyroZ.clamp(-3.0, 3.0).toDouble();
+    _shakeStrength = max(
+      _shakeStrength,
+      shake.clamp(0.0, 1.0).toDouble(),
+    );
+  }
+
+  void clearReactiveMotion() {
+    _tilt = Offset.zero;
+    _gyroZ = 0;
+    _shakeStrength = 0;
   }
 
   void setMovementArea(MovementArea area) {
@@ -184,9 +213,13 @@ class FloatingEngine {
   }
 
   Offset _orbitSpawnPosition(int id, double radius) {
-    final center = Offset(
+    final baseCenter = Offset(
       (_movementLeft + _movementRight) * 0.5,
       _movementTop + _movementHeight * 0.5,
+    );
+    final center = baseCenter + Offset(
+      _tilt.dx * (_movementRight - _movementLeft) * 0.12,
+      _tilt.dy * _movementHeight * 0.10,
     );
     final usableWidth =
         max(1.0, _movementRight - _movementLeft - radius * 2);
@@ -237,6 +270,7 @@ class FloatingEngine {
     if (_area == Size.zero || dt <= 0) return;
 
     _elapsedSeconds += dt;
+    _shakeStrength = max(0.0, _shakeStrength - dt * 2.6);
 
     for (final object in List<FloatingObject>.from(objects)) {
       if (object.isPopping) {
@@ -248,6 +282,7 @@ class FloatingEngine {
       }
 
       _applyExternalForce(object, dt);
+      _applyReactiveForce(object, dt);
       _applyStyleForce(object, dt);
       _updateRotation(object, dt);
 
@@ -517,8 +552,10 @@ class FloatingEngine {
     final slotsOnRing = max(1, (_objectCount / 3).ceil());
 
     // Planetary feel: inner orbit is fastest, outer orbit slowest.
+    final gyroFactor =
+        (1.0 + (_gyroZ * 0.16)).clamp(0.45, 1.75).toDouble();
     final angularSpeed =
-        (0.82 - ringIndex * 0.16) * _speed.multiplier;
+        (0.82 - ringIndex * 0.16) * _speed.multiplier * gyroFactor;
     final phase =
         (slotIndex / slotsOnRing) * pi * 2 + ringIndex * (pi / 6);
     final angle = phase + _elapsedSeconds * angularSpeed;
@@ -545,8 +582,8 @@ class FloatingEngine {
     // 70% global current: slow current direction changes across the whole scene.
     final currentPhase = _elapsedSeconds * 0.24;
     final currentDirection = Offset(
-      cos(currentPhase) + sin(currentPhase * 0.47) * 0.45,
-      sin(currentPhase * 0.73) * 0.72,
+      cos(currentPhase) + sin(currentPhase * 0.47) * 0.45 + _tilt.dx * 1.15,
+      sin(currentPhase * 0.73) * 0.72 + _tilt.dy * 0.85,
     );
     final currentLength = max(0.001, currentDirection.distance);
     final current = currentDirection / currentLength *
@@ -554,9 +591,11 @@ class FloatingEngine {
 
     // 30% individual swim: each body gently weaves across the current.
     final swimPhase = _elapsedSeconds * 1.35 + object.id * 1.17;
+    final vortexPhase = swimPhase + _gyroZ * 0.35;
     final swim = Offset(
-      cos(swimPhase * 0.62) * minDimension * 0.013,
-      sin(swimPhase) * minDimension * 0.032,
+      cos(vortexPhase * 0.62) * minDimension * 0.013 -
+          _gyroZ * minDimension * 0.006,
+      sin(vortexPhase) * minDimension * 0.032,
     ) * _speed.multiplier;
 
     final centerY = _movementTop + _movementHeight * 0.52;
@@ -630,10 +669,14 @@ class FloatingEngine {
     final profile = MotionProfile.forStyle(_movementStyle);
     final gravity =
         minDimension * profile.gravityScale * _speed.multiplier;
-    var velocity = Offset(
-      object.velocity.dx,
-      object.velocity.dy + gravity * dt,
+    final gravityVector = Offset(
+      _tilt.dx * 1.35,
+      1.0 + _tilt.dy * 0.75,
     );
+    final gravityLength = max(0.001, gravityVector.distance);
+    final gravityDirection = gravityVector / gravityLength;
+    var velocity =
+        object.velocity + gravityDirection * (gravity * dt);
     var next = object.position + velocity * dt;
 
     if (next.dx - object.radius <= _movementLeft) {
@@ -658,6 +701,76 @@ class FloatingEngine {
 
     object.position = next;
     object.velocity = velocity;
+  }
+
+  void _applyReactiveForce(FloatingObject object, double dt) {
+    final minDimension = min(_area.width, _area.height);
+    if (_tilt == Offset.zero && _gyroZ == 0 && _shakeStrength <= 0) return;
+
+    switch (_movementStyle) {
+      case MovementStyle.floating:
+        // Tilt steers the wind field; shaking creates a brief gust burst.
+        final gust = _tilt *
+            (minDimension *
+                (0.085 + _shakeStrength * 0.16) *
+                _speed.multiplier *
+                dt);
+        final burstAngle = object.id * 1.73 + _elapsedSeconds * 0.7;
+        final burst = Offset(cos(burstAngle), sin(burstAngle)) *
+            (minDimension *
+                0.06 *
+                _shakeStrength *
+                _speed.multiplier *
+                dt);
+        object.velocity += gust + burst;
+        break;
+
+      case MovementStyle.bounce:
+        // Bounce handles tilt as gravity direction inside _stepBounce.
+        // Shake adds an immediate upward/sideways kick.
+        if (_shakeStrength > 0) {
+          final angle = object.id * 2.17 + _elapsedSeconds;
+          object.velocity += Offset(
+                cos(angle),
+                -0.65 - sin(angle).abs() * 0.35,
+              ) *
+              (minDimension *
+                  0.18 *
+                  _shakeStrength *
+                  _speed.multiplier *
+                  dt *
+                  12);
+        }
+        break;
+
+      case MovementStyle.orbit:
+        // Orbit consumes tilt as center-axis displacement and gyro as
+        // angular-speed modulation in _stepOrbit.
+        break;
+
+      case MovementStyle.zeroGravity:
+        // Tiny sustained acceleration is highly visible in near-zero drag.
+        object.velocity += _tilt *
+            (minDimension * 0.045 * _speed.multiplier * dt);
+        if (_shakeStrength > 0) {
+          final angle = object.id * 2.41 + _elapsedSeconds * 0.3;
+          object.velocity += Offset(cos(angle), sin(angle)) *
+              (minDimension *
+                  0.11 *
+                  _shakeStrength *
+                  _speed.multiplier *
+                  dt *
+                  10);
+          object.angularVelocity +=
+              _gyroZ * 0.04 + _shakeStrength * (object.id.isEven ? 0.08 : -0.08);
+        }
+        break;
+
+      case MovementStyle.underwater:
+        // Deep Sea consumes tilt/gyro as current direction and vortex terms
+        // inside _stepUnderwater.
+        break;
+    }
   }
 
   void _updateRotation(FloatingObject object, double dt) {
