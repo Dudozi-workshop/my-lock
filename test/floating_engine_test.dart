@@ -382,4 +382,63 @@ void main() {
       ),
     );
   });
+  test('stalled floating object wakes up automatically', () {
+    final engine = FloatingEngine(seed: 20);
+    engine.resize(const Size(400, 400));
+
+    final object = engine.objects.first
+      ..position = const Offset(200, 200)
+      ..velocity = Offset.zero;
+    engine.objects.removeRange(1, engine.objects.length);
+
+    for (var i = 0; i < 90; i++) {
+      engine.step(1 / 60);
+    }
+
+    expect(object.velocity.distance, greaterThan(0));
+  });
+
+  test('external force accelerates objects in the requested direction', () {
+    final engine = FloatingEngine(seed: 21);
+    engine.resize(const Size(400, 400));
+
+    final object = engine.objects.first
+      ..position = const Offset(200, 200)
+      ..velocity = Offset.zero;
+    engine.objects.removeRange(1, engine.objects.length);
+
+    engine.setExternalForce(const Offset(1, 0));
+    for (var i = 0; i < 10; i++) {
+      engine.step(1 / 60);
+    }
+
+    expect(object.velocity.dx, greaterThan(0));
+  });
+
+  test('bounce collision applies stronger impulse than floating', () {
+    double collisionSpeed(MovementStyle style, int seed) {
+      final engine = FloatingEngine(seed: seed);
+      engine.resize(const Size(400, 400));
+      engine.setMovementStyle(style);
+
+      final first = engine.objects[0]
+        ..radius = 40
+        ..position = const Offset(160, 200)
+        ..velocity = Offset.zero;
+      final second = engine.objects[1]
+        ..radius = 40
+        ..position = const Offset(215, 200)
+        ..velocity = Offset.zero;
+      engine.objects.removeRange(2, engine.objects.length);
+
+      engine.step(1 / 60);
+      return first.velocity.distance + second.velocity.distance;
+    }
+
+    final floatingSpeed = collisionSpeed(MovementStyle.floating, 22);
+    final bounceSpeed = collisionSpeed(MovementStyle.bounce, 23);
+
+    expect(bounceSpeed, greaterThan(floatingSpeed));
+  });
+
 }
