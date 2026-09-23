@@ -84,7 +84,7 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
                   ),
                 ),
                 const Text(
-                  '상점에서 해제',
+                  'PLUS · 키샤드 연동 예정',
                   style: TextStyle(
                     fontSize: 12,
                     color: secondaryInk,
@@ -180,18 +180,19 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
   }
 
   void _select(LockBackground item) {
+    setState(() => _selected = item);
+    widget.onChanged(item);
+
     if (item.locked) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${item.label} 배경은 상점 아이템입니다.'),
-          duration: const Duration(milliseconds: 1400),
+          content: Text(
+            '${item.label} PLUS 배경 · 개발 버전에서는 적용 가능하며 키샤드 소유권은 추후 연결됩니다.',
+          ),
+          duration: const Duration(milliseconds: 1500),
         ),
       );
-      return;
     }
-
-    setState(() => _selected = item);
-    widget.onChanged(item);
   }
 
   Widget _buildPhotoTile() {
@@ -294,9 +295,9 @@ class _BackgroundTile extends StatelessWidget {
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
-                                Icons.lock_rounded,
+                                Icons.workspace_premium_rounded,
                                 size: 17,
-                                color: ink,
+                                color: brandPurple,
                               ),
                             ),
                           ),
