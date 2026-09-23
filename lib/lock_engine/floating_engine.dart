@@ -192,10 +192,15 @@ class FloatingEngine {
         max(1.0, _movementRight - _movementLeft - radius * 2);
     final usableHeight =
         max(1.0, _movementHeight - radius * 2);
+
     final ringIndex = id % 3;
-    final radiusX = usableWidth * (0.24 + ringIndex * 0.10);
-    final radiusY = usableHeight * (0.20 + ringIndex * 0.085);
-    final phase = id * 2.399963229728653;
+    final slotIndex = id ~/ 3;
+    final slotsOnRing = max(1, (_objectCount / 3).ceil());
+    final phase =
+        (slotIndex / slotsOnRing) * pi * 2 + ringIndex * (pi / 6);
+
+    final radiusX = usableWidth * (0.22 + ringIndex * 0.105);
+    final radiusY = usableHeight * (0.18 + ringIndex * 0.09);
 
     return Offset(
       center.dx + cos(phase) * radiusX,
@@ -506,34 +511,28 @@ class FloatingEngine {
         max(1.0, _movementRight - _movementLeft - object.radius * 2);
     final usableHeight =
         max(1.0, _movementHeight - object.radius * 2);
-    final ringIndex = object.id % 3;
-    final direction = object.id.isEven ? 1.0 : -1.0;
 
-    final radiusX = usableWidth * (0.24 + ringIndex * 0.10);
-    final radiusY = usableHeight * (0.20 + ringIndex * 0.085);
+    final ringIndex = object.id % 3;
+    final slotIndex = object.id ~/ 3;
+    final slotsOnRing = max(1, (_objectCount / 3).ceil());
+
+    // Planetary feel: inner orbit is fastest, outer orbit slowest.
     final angularSpeed =
-        (0.48 + ringIndex * 0.08) * _speed.multiplier * direction;
-    final phase = object.id * 2.399963229728653;
+        (0.82 - ringIndex * 0.16) * _speed.multiplier;
+    final phase =
+        (slotIndex / slotsOnRing) * pi * 2 + ringIndex * (pi / 6);
     final angle = phase + _elapsedSeconds * angularSpeed;
 
+    final radiusX = usableWidth * (0.22 + ringIndex * 0.105);
+    final radiusY = usableHeight * (0.18 + ringIndex * 0.09);
     final target = Offset(
       center.dx + cos(angle) * radiusX,
       center.dy + sin(angle) * radiusY,
     );
 
-    final tangentVector = Offset(
-      -sin(angle) * radiusX,
-      cos(angle) * radiusY,
-    );
-    final tangentLength = max(0.001, tangentVector.distance);
-    final tangent = tangentVector / tangentLength;
-
-    final targetVelocity =
-        (target - object.position) * 4.6 +
-        tangent *
-            (min(radiusX, radiusY) * 0.42 * _speed.multiplier * direction);
-
-    final blend = (dt * 5.2).clamp(0.0, 1.0).toDouble();
+    // Strong spring-to-orbit makes the rings visually obvious after collision.
+    final targetVelocity = (target - object.position) * 6.2;
+    final blend = (dt * 7.0).clamp(0.0, 1.0).toDouble();
     object.velocity =
         object.velocity * (1.0 - blend) + targetVelocity * blend;
     object.position += object.velocity * dt;
@@ -542,25 +541,30 @@ class FloatingEngine {
 
   void _stepUnderwater(FloatingObject object, double dt) {
     final minDimension = min(_area.width, _area.height);
-    final phase = _elapsedSeconds * 1.15 + object.id * 1.31;
 
-    // Strong vertical swell, smaller horizontal sway: visually reads as
-    // buoyant underwater motion instead of generic floating.
-    final verticalWave =
-        sin(phase) * minDimension * 0.095 * _speed.multiplier;
-    final horizontalWave =
-        cos(phase * 0.46) * minDimension * 0.028 * _speed.multiplier;
-
-    final centerY = _movementTop + _movementHeight * 0.50;
-    final buoyancy =
-        (centerY - object.position.dy) * 0.58 * _speed.multiplier;
-
-    final targetVelocity = Offset(
-      horizontalWave,
-      verticalWave + buoyancy,
+    // 70% global current: slow current direction changes across the whole scene.
+    final currentPhase = _elapsedSeconds * 0.24;
+    final currentDirection = Offset(
+      cos(currentPhase) + sin(currentPhase * 0.47) * 0.45,
+      sin(currentPhase * 0.73) * 0.72,
     );
+    final currentLength = max(0.001, currentDirection.distance);
+    final current = currentDirection / currentLength *
+        (minDimension * 0.055 * _speed.multiplier);
 
-    final blend = (dt * 2.6).clamp(0.0, 1.0).toDouble();
+    // 30% individual swim: each body gently weaves across the current.
+    final swimPhase = _elapsedSeconds * 1.35 + object.id * 1.17;
+    final swim = Offset(
+      cos(swimPhase * 0.62) * minDimension * 0.013,
+      sin(swimPhase) * minDimension * 0.032,
+    ) * _speed.multiplier;
+
+    final centerY = _movementTop + _movementHeight * 0.52;
+    final buoyancy =
+        Offset(0, (centerY - object.position.dy) * 0.28 * _speed.multiplier);
+
+    final targetVelocity = current + swim + buoyancy;
+    final blend = (dt * 1.9).clamp(0.0, 1.0).toDouble();
     object.velocity =
         object.velocity * (1.0 - blend) + targetVelocity * blend;
 
@@ -569,14 +573,14 @@ class FloatingEngine {
     if (next.dx - object.radius <= _movementLeft ||
         next.dx + object.radius >= _movementRight) {
       object.velocity =
-          Offset(-object.velocity.dx * 0.55, object.velocity.dy);
+          Offset(-object.velocity.dx * 0.38, object.velocity.dy);
       next = object.position + object.velocity * dt;
     }
 
     if (next.dy - object.radius <= _movementTop ||
         next.dy + object.radius >= _area.height) {
       object.velocity =
-          Offset(object.velocity.dx, -object.velocity.dy * 0.45);
+          Offset(object.velocity.dx, -object.velocity.dy * 0.32);
       next = object.position + object.velocity * dt;
     }
 
@@ -689,15 +693,27 @@ class FloatingEngine {
 
     switch (_movementStyle) {
       case MovementStyle.floating:
-        // A slow, deterministic wandering force keeps Floating alive without
-        // looking jittery or changing direction abruptly.
-        final phase = _elapsedSeconds * 0.72 + object.id * 1.73;
-        final force = Offset(
-          cos(phase) + sin(phase * 0.47) * 0.45,
-          sin(phase * 0.83) + cos(phase * 0.39) * 0.35,
+        // Wind field: a shared gust sweeps every body in the same direction,
+        // while per-object turbulence prevents them moving like a rigid pack.
+        final gustPhase = _elapsedSeconds * 0.42;
+        final gustPulse =
+            0.55 + 0.45 * pow((sin(_elapsedSeconds * 0.78) + 1) * 0.5, 3);
+        final gustDirection = Offset(
+          cos(gustPhase) + 0.55,
+          sin(gustPhase * 0.63) * 0.62,
         );
-        object.velocity +=
-            force * (minDimension * 0.012 * speedScale * dt);
+        final gustLength = max(0.001, gustDirection.distance);
+        final gust = gustDirection / gustLength *
+            (minDimension * 0.12 * speedScale * gustPulse);
+
+        final turbulencePhase =
+            _elapsedSeconds * 1.18 + object.id * 1.61;
+        final turbulence = Offset(
+          cos(turbulencePhase) * minDimension * 0.018,
+          sin(turbulencePhase * 0.81) * minDimension * 0.022,
+        ) * speedScale;
+
+        object.velocity += (gust + turbulence) * dt;
         break;
       case MovementStyle.bounce:
         // Bounce should preserve its collision-driven trajectory.
