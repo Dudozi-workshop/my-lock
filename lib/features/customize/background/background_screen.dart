@@ -14,6 +14,7 @@ class BackgroundScreen extends StatefulWidget {
     required this.selectedTones,
     required this.movementStyle,
     required this.popStyle,
+    required this.texture,
     required this.objectCount,
     required this.speed,
     required this.movementArea,
@@ -25,6 +26,7 @@ class BackgroundScreen extends StatefulWidget {
   final Set<ShapeTone> selectedTones;
   final MovementStyle movementStyle;
   final PopStyle popStyle;
+  final ShapeTexture texture;
   final int objectCount;
   final FloatingSpeed speed;
   final MovementArea movementArea;
@@ -122,6 +124,7 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
               selectedTones: widget.selectedTones,
               movementStyle: widget.movementStyle,
               popStyle: widget.popStyle,
+              texture: widget.texture,
               objectCount: widget.objectCount,
               speed: widget.speed,
               movementArea: widget.movementArea,
