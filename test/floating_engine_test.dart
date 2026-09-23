@@ -522,4 +522,70 @@ void main() {
     expect(second.velocity.dx, greaterThan(0));
   });
 
+  test('underwater motion adds vertical current and damping', () {
+    final engine = FloatingEngine(seed: 28);
+    engine.resize(const Size(400, 400));
+    engine.setMovementStyle(MovementStyle.underwater);
+    engine.setMovementArea(MovementArea.full);
+
+    final object = engine.objects.first
+      ..position = const Offset(200, 200)
+      ..velocity = const Offset(60, 0);
+    engine.objects.removeRange(1, engine.objects.length);
+
+    final beforeSpeed = object.velocity.distance;
+    for (var i = 0; i < 60; i++) {
+      engine.step(1 / 60);
+    }
+
+    expect(object.velocity.dy.abs(), greaterThan(0));
+    expect(object.velocity.distance, lessThan(beforeSpeed + 20));
+  });
+
+  test('orbit motion bends travel around the movement center', () {
+    final engine = FloatingEngine(seed: 29);
+    engine.resize(const Size(400, 400));
+    engine.setMovementStyle(MovementStyle.orbit);
+    engine.setMovementArea(MovementArea.full);
+
+    final object = engine.objects.first
+      ..position = const Offset(300, 200)
+      ..velocity = Offset.zero;
+    engine.objects.removeRange(1, engine.objects.length);
+
+    for (var i = 0; i < 45; i++) {
+      engine.step(1 / 60);
+    }
+
+    expect(object.velocity.dy.abs(), greaterThan(0));
+    expect(object.velocity.dx, lessThan(0));
+  });
+
+  test('underwater collision is softer than bounce collision', () {
+    double postCollisionSpeed(MovementStyle style, int seed) {
+      final engine = FloatingEngine(seed: seed);
+      engine.resize(const Size(400, 400));
+      engine.setMovementStyle(style);
+      engine.setMovementArea(MovementArea.full);
+
+      final first = engine.objects[0]
+        ..radius = 40
+        ..position = const Offset(170, 200)
+        ..velocity = const Offset(60, 0);
+      final second = engine.objects[1]
+        ..radius = 40
+        ..position = const Offset(230, 200)
+        ..velocity = const Offset(-60, 0);
+      engine.objects.removeRange(2, engine.objects.length);
+
+      engine.step(1 / 120);
+      return first.velocity.distance + second.velocity.distance;
+    }
+
+    final underwater = postCollisionSpeed(MovementStyle.underwater, 30);
+    final bounce = postCollisionSpeed(MovementStyle.bounce, 31);
+
+    expect(underwater, lessThan(bounce));
+  });
+
 }
