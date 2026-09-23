@@ -17,6 +17,7 @@ class MyLockSettingsController extends ChangeNotifier {
   LockBackground _background = LockBackground.softGradient;
   MovementStyle _movementStyle = MovementStyle.floating;
   PopStyle _popStyle = PopStyle.basicPop;
+  ShapeTexture _texture = ShapeTexture.glossy;
 
   List<LockToken>? _password;
   String? _recoveryPin;
@@ -37,6 +38,7 @@ class MyLockSettingsController extends ChangeNotifier {
   LockBackground get background => _background;
   MovementStyle get movementStyle => _movementStyle;
   PopStyle get popStyle => _popStyle;
+  ShapeTexture get texture => _texture;
 
   List<LockToken>? get password =>
       _password == null ? null : List.unmodifiable(_password!);
@@ -61,6 +63,7 @@ class MyLockSettingsController extends ChangeNotifier {
     _background = stored.background;
     _movementStyle = stored.movementStyle;
     _popStyle = stored.popStyle;
+    _texture = stored.texture;
     _password = stored.password == null
         ? null
         : List<LockToken>.from(stored.password!);
@@ -101,6 +104,13 @@ class MyLockSettingsController extends ChangeNotifier {
     _password = List<LockToken>.from(password);
     _persistPreferences();
     _store.savePassword(_password!);
+    notifyListeners();
+  }
+
+  void setTexture(ShapeTexture texture) {
+    if (_texture == texture) return;
+    _texture = texture;
+    _persistPreferences();
     notifyListeners();
   }
 
@@ -197,6 +207,7 @@ class MyLockSettingsController extends ChangeNotifier {
         background: _background,
         movementStyle: _movementStyle,
         popStyle: _popStyle,
+        texture: _texture,
         password: _password,
         recoveryPin: _recoveryPin,
         selectedAppIds: _selectedAppIds,
