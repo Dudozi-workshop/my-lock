@@ -163,8 +163,14 @@ class FloatingShapePainter extends CustomPainter {
     required double opacity,
   }) {
     final radius = object.radius * scale;
-    final path = _shapePath(object.token.shape, object.position, radius);
     final colors = _toneColors(object.token.tone);
+
+    canvas.save();
+    canvas.translate(object.position.dx, object.position.dy);
+    canvas.rotate(object.rotation);
+    canvas.translate(-object.position.dx, -object.position.dy);
+
+    final path = _shapePath(object.token.shape, object.position, radius);
 
     canvas.drawShadow(
       path,
@@ -205,6 +211,8 @@ class FloatingShapePainter extends CustomPainter {
       ),
       highlight,
     );
+
+    canvas.restore();
   }
 
   void _paintPopParticles(
