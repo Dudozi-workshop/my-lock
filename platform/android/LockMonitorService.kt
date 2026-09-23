@@ -242,6 +242,7 @@ class LockMonitorService : Service() {
 
         val event = UsageEvents.Event()
         var latestPackage: String? = null
+        var latestClassName: String? = null
         var latestTimestamp = Long.MIN_VALUE
 
         while (events.hasNextEvent()) {
@@ -256,15 +257,19 @@ class LockMonitorService : Service() {
             if (isForeground && event.timeStamp >= latestTimestamp) {
                 latestTimestamp = event.timeStamp
                 latestPackage = event.packageName
+                latestClassName = event.className
             }
         }
 
         if (latestPackage != null) {
-            handleForegroundPackage(latestPackage)
+            handleForegroundPackage(latestPackage, latestClassName)
         }
     }
 
-    private fun handleForegroundPackage(packageName: String) {
+    private fun handleForegroundPackage(
+        packageName: String,
+        className: String?,
+    ) {
         val protectedApps = protectedApps()
 
         if (packageName == this.packageName) {
@@ -276,7 +281,7 @@ class LockMonitorService : Service() {
             return
         }
 
-        if (isProtectedSessionSystemPackage(packageName)) {
+        if (isProtectedSessionSystemActivity(packageName, className)) {
             return
         }
 
@@ -377,10 +382,38 @@ class LockMonitorService : Service() {
         return packageName in transientSystemPackages
     }
 
-    private fun isProtectedSessionSystemPackage(packageName: String): Boolean {
-        return packageName in protectedSessionSystemPackages ||
+    private fun isProtectedSessionSystemActivity(
+        packageName: String,
+        className: String?,
+    ): Boolean {
+        if (
+            packageName in protectedSessionSystemPackages ||
             packageName.contains("photopicker", ignoreCase = true) ||
             packageName.contains("documentsui", ignoreCase = true)
+        ) {
+            return true
+        }
+
+        val activity = className.orEmpty()
+        if (
+            packageName == "android" &&
+            (
+                activity.contains("chooser", ignoreCase = true) ||
+                    activity.contains("resolver", ignoreCase = true)
+            )
+        ) {
+            return true
+        }
+
+        if (packageName == "com.sec.android.gallery3d") {
+            return activity.contains("picker", ignoreCase = true) ||
+                activity.contains("select", ignoreCase = true) ||
+                activity.contains("chooser", ignoreCase = true) ||
+                activity.contains("attach", ignoreCase = true) ||
+                activity.contains("external", ignoreCase = true)
+        }
+
+        return false
     }
 
     private fun scheduleOverlayExit(appId: String) {
