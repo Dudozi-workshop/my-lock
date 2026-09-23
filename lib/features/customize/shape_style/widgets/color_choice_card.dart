@@ -24,6 +24,7 @@ class ColorChoiceCard extends StatelessWidget {
     return ChoiceCard(
       selected: selected,
       onTap: onTap,
+      badge: tone.premium ? 'PLUS' : null,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
