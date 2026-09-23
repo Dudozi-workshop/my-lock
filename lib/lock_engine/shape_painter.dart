@@ -358,7 +358,6 @@ class FloatingShapePainter extends CustomPainter {
     required double opacity,
   }) {
     final radius = object.radius * scale;
-    final colors = _toneColors(object.token.tone);
 
     canvas.save();
     canvas.translate(object.position.dx, object.position.dy);
