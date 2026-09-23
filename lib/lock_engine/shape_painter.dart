@@ -81,9 +81,9 @@ Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
       final path = Path()
         ..moveTo(center.dx, center.dy + radius * 0.82)
         ..cubicTo(
-          center.dx - radius * 1.22,
+          center.dx - radius * 0.96,
           center.dy + radius * 0.10,
-          center.dx - radius * 0.92,
+          center.dx - radius * 0.82,
           center.dy - radius * 0.74,
           center.dx - radius * 0.38,
           center.dy - radius * 0.62,
@@ -105,9 +105,9 @@ Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
           center.dy - radius * 0.62,
         )
         ..cubicTo(
-          center.dx + radius * 0.92,
+          center.dx + radius * 0.82,
           center.dy - radius * 0.74,
-          center.dx + radius * 1.22,
+          center.dx + radius * 0.96,
           center.dy + radius * 0.10,
           center.dx,
           center.dy + radius * 0.82,
@@ -288,6 +288,8 @@ void _paintStyledShape(
       ..color = Colors.white.withValues(
         alpha: (texture == ShapeTexture.glass ? 0.58 : 0.40) * opacity,
       );
+    canvas.save();
+    canvas.clipPath(path);
     canvas.drawOval(
       Rect.fromCenter(
         center: center.translate(-radius * 0.26, -radius * 0.28),
@@ -296,6 +298,7 @@ void _paintStyledShape(
       ),
       highlight,
     );
+    canvas.restore();
   }
 }
 
