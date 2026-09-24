@@ -382,50 +382,76 @@ void _paintCrystalShape(
   canvas.clipPath(path);
   canvas.drawPath(path, Paint()..color = mid.withValues(alpha: opacity));
 
-  final topLeft = point(0, 0);
-  final top = point(0.50, 0);
-  final topRight = point(1, 0);
-  final right = point(1, 0.50);
-  final bottomRight = point(1, 1);
-  final bottom = point(0.50, 1);
-  final bottomLeft = point(0, 1);
-  final left = point(0, 0.50);
-  final a = point(0.31, 0.30);
-  final b = point(0.66, 0.29);
-  final c = point(0.79, 0.60);
-  final d = point(0.50, 0.77);
-  final e = point(0.21, 0.59);
+  // Wide illustrated silhouettes need facets along the body instead of a
+  // central radial pattern that would cut the animal in two.
+  if (bounds.width > bounds.height * 1.65) {
+    facet([point(0, 0), point(.33, 0), point(.42, .36), point(.12, .53)],
+        Color.lerp(colors.$1, pale, .32)!);
+    facet([point(.33, 0), point(.70, 0), point(.77, .35), point(.42, .36)],
+        Color.lerp(colors.$1, colors.$2, .28)!);
+    facet([point(.70, 0), point(1, 0), point(1, .52), point(.77, .35)],
+        Color.lerp(colors.$2, deep, .27)!);
+    facet([point(0, .56), point(.12, .53), point(.34, .62), point(.25, 1)],
+        Color.lerp(colors.$1, colors.$2, .20)!);
+    facet([point(.25, 1), point(.34, .62), point(.59, .69), point(.62, 1)],
+        Color.lerp(colors.$1, pale, .38)!);
+    facet([point(.62, 1), point(.59, .69), point(.80, .57), point(1, 1)],
+        Color.lerp(colors.$2, deep, .16)!);
+    facet([point(.12, .53), point(.42, .36), point(.52, .51), point(.34, .62)],
+        Color.lerp(colors.$1, pale, .62)!);
+    facet([point(.42, .36), point(.77, .35), point(.63, .53), point(.52, .51)],
+        Color.lerp(colors.$1, pale, .22)!);
+    facet([point(.52, .51), point(.63, .53), point(.59, .69), point(.34, .62)],
+        Color.lerp(colors.$1, colors.$2, .18)!);
+    facet([point(.77, .35), point(1, .52), point(.80, .57), point(.63, .53)],
+        Color.lerp(colors.$2, pale, .22)!);
+  } else {
+    final topLeft = point(0, 0);
+    final top = point(.50, 0);
+    final topRight = point(1, 0);
+    final right = point(1, .50);
+    final bottomRight = point(1, 1);
+    final bottom = point(.50, 1);
+    final bottomLeft = point(0, 1);
+    final left = point(0, .50);
+    final a = point(.29, .32);
+    final b = point(.54, .27);
+    final c = point(.73, .37);
+    final d = point(.77, .62);
+    final e = point(.51, .73);
+    final f = point(.25, .62);
+    final hub = point(.50, .50);
 
-  // Large, flat planes retain their contrast when reduced to 58 logical px.
-  facet([topLeft, top, a, left], Color.lerp(colors.$1, pale, 0.35)!);
-  facet([top, topRight, right, b], Color.lerp(colors.$1, deep, 0.34)!);
-  facet([top, b, a], pale);
-  facet([left, a, e, bottomLeft], Color.lerp(colors.$1, deep, 0.18)!);
-  facet([b, right, bottomRight, c], Color.lerp(colors.$2, deep, 0.30)!);
-  facet([bottomLeft, e, d, bottom], Color.lerp(colors.$1, pale, 0.22)!);
-  facet([c, bottomRight, bottom, d], Color.lerp(colors.$2, pale, 0.17)!);
-  facet([a, b, d], Color.lerp(colors.$1, Colors.white, 0.70)!);
-  facet([a, d, e], Color.lerp(colors.$1, pale, 0.30)!);
-  facet([b, c, d], Color.lerp(colors.$1, colors.$2, 0.50)!);
+    facet([topLeft, top, b, a, left], Color.lerp(colors.$1, pale, .30)!);
+    facet([top, topRight, right, c, b],
+        Color.lerp(colors.$1, deep, .35)!);
+    facet([left, a, f, bottomLeft],
+        Color.lerp(colors.$1, deep, .18)!);
+    facet([c, right, bottomRight, d],
+        Color.lerp(colors.$2, deep, .30)!);
+    facet([bottomLeft, f, e, bottom],
+        Color.lerp(colors.$1, pale, .25)!);
+    facet([d, bottomRight, bottom, e],
+        Color.lerp(colors.$2, pale, .18)!);
 
-  // A few crisp refraction seams read as cut crystal, without fine noise.
+    // Small adjacent planes replace the oversized white center of v1.
+    facet([a, b, hub], Color.lerp(colors.$1, pale, .66)!);
+    facet([b, c, hub], Color.lerp(colors.$1, pale, .37)!);
+    facet([c, d, hub], Color.lerp(colors.$1, colors.$2, .52)!);
+    facet([d, e, hub], Color.lerp(colors.$1, pale, .42)!);
+    facet([e, f, hub], Color.lerp(colors.$1, colors.$2, .22)!);
+    facet([f, a, hub], Color.lerp(colors.$1, pale, .28)!);
+  }
+
+  // Fine seams accent only the largest changes in plane direction.
   final seam = Paint()
     ..style = PaintingStyle.stroke
-    ..strokeWidth = max(0.55, radius * 0.026)
-    ..color = Colors.white.withValues(alpha: 0.56 * opacity);
-  canvas.drawPath(
-    Path()
-      ..moveTo(a.dx, a.dy)
-      ..lineTo(b.dx, b.dy)
-      ..lineTo(c.dx, c.dy),
-    seam,
-  );
-  canvas.drawPath(
-    Path()
-      ..moveTo(e.dx, e.dy)
-      ..lineTo(d.dx, d.dy),
-    seam,
-  );
+    ..strokeWidth = max(0.45, radius * 0.020)
+    ..color = Colors.white.withValues(alpha: 0.42 * opacity);
+  final seamPoints = bounds.width > bounds.height * 1.65
+      ? [point(.12, .53), point(.42, .36), point(.77, .35)]
+      : [point(.29, .32), point(.54, .27), point(.73, .37)];
+  canvas.drawPath(Path()..addPolygon(seamPoints, false), seam);
 
   canvas.restore();
 
