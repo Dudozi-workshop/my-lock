@@ -348,8 +348,7 @@ void _paintGlassStructure(
   canvas.save();
   canvas.clipPath(path);
 
-  // Thick optical shell: a slightly displaced back rim is the main cue that
-  // this is glass, not a flat translucent fill.
+  // Optical thickness: the rear rim is offset from the front silhouette.
   canvas.save();
   canvas.translate(radius * 0.055, radius * 0.070);
   final backFace = Paint()
@@ -362,19 +361,38 @@ void _paintGlassStructure(
   final innerTint = Paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = max(2.2, radius * 0.13)
-    ..color = darkColor.withValues(alpha: 0.22 * opacity);
+    ..color = darkColor.withValues(alpha: 0.20 * opacity);
   canvas.drawPath(path, innerTint);
 
   final innerLight = Paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = max(1.1, radius * 0.052)
-    ..color = Colors.white.withValues(alpha: 0.74 * opacity);
+    ..color = Colors.white.withValues(alpha: 0.76 * opacity);
   canvas.drawPath(path, innerLight);
 
-  // Broad lens highlight. Keep this soft and continuous so the material reads
-  // as glass instead of a faceted crystal.
+  // Refracted inner contours follow the source silhouette. Unlike a fixed
+  // stripe, this works for circles and irregular illustrated shapes alike.
+  final refractedDark = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = max(1.0, radius * 0.055)
+    ..color = darkColor.withValues(alpha: 0.14 * opacity);
+  final refractedLight = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = max(0.9, radius * 0.040)
+    ..color = Colors.white.withValues(alpha: 0.26 * opacity);
+
+  canvas.drawPath(
+    path.shift(Offset(radius * 0.065, radius * 0.050)),
+    refractedDark,
+  );
+  canvas.drawPath(
+    path.shift(Offset(-radius * 0.050, -radius * 0.040)),
+    refractedLight,
+  );
+
+  // Broad lens highlight gives the body a transparent volume without faceting.
   final lensHighlight = Paint()
-    ..color = Colors.white.withValues(alpha: 0.17 * opacity);
+    ..color = Colors.white.withValues(alpha: 0.16 * opacity);
   canvas.drawOval(
     Rect.fromCenter(
       center: p(-0.22, -0.34),
@@ -384,44 +402,8 @@ void _paintGlassStructure(
     lensHighlight,
   );
 
-  // Refraction band: one dark line and one light line travel together.
-  // At 55-75 logical px this survives down-sampling better than tiny facets.
-  final refractDark = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = max(1.4, radius * 0.090)
-    ..strokeCap = StrokeCap.round
-    ..color = darkColor.withValues(alpha: 0.14 * opacity);
-  final refractLight = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = max(1.0, radius * 0.052)
-    ..strokeCap = StrokeCap.round
-    ..color = Colors.white.withValues(alpha: 0.34 * opacity);
-
-  final darkBand = Path()
-    ..moveTo(p(-0.92, 0.22).dx, p(-0.92, 0.22).dy)
-    ..cubicTo(
-      p(-0.42, -0.02).dx,
-      p(-0.42, -0.02).dy,
-      p(0.10, 0.16).dx,
-      p(0.10, 0.16).dy,
-      p(0.88, -0.16).dx,
-      p(0.88, -0.16).dy,
-    );
-  final lightBand = Path()
-    ..moveTo(p(-0.92, 0.10).dx, p(-0.92, 0.10).dy)
-    ..cubicTo(
-      p(-0.42, -0.12).dx,
-      p(-0.42, -0.12).dy,
-      p(0.08, 0.07).dx,
-      p(0.08, 0.07).dy,
-      p(0.86, -0.25).dx,
-      p(0.86, -0.25).dy,
-    );
-  canvas.drawPath(darkBand, refractDark);
-  canvas.drawPath(lightBand, refractLight);
-
-  // Crisp top reflection and a smaller lower glint establish the viewing
-  // direction without creating a generic glossy bubble.
+  // Primary specular reflection. Curved rather than circular so Glass remains
+  // distinct from Basic Glossy.
   final sharpHighlight = Paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = max(1.5, radius * 0.068)
@@ -446,7 +428,7 @@ void _paintGlassStructure(
     ..style = PaintingStyle.stroke
     ..strokeWidth = max(0.9, radius * 0.035)
     ..strokeCap = StrokeCap.round
-    ..color = lightColor.withValues(alpha: 0.42 * opacity);
+    ..color = lightColor.withValues(alpha: 0.38 * opacity);
   canvas.drawLine(p(0.36, 0.56), p(0.68, 0.36), lowerGlint);
 
   canvas.restore();
