@@ -3,16 +3,17 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'effects.dart';
+import 'dolphin_mask_canvas.dart';
 import 'models.dart';
 import 'shape_geometry.dart';
 
 class LockTokenPainter extends CustomPainter {
-  const LockTokenPainter(
+  LockTokenPainter(
     this.token, {
     this.texture = ShapeTexture.glossy,
     this.blueprintOverride,
     this.accentLightness = 0.48,
-  });
+  }) : super(repaint: DolphinMaskCanvasCache.instance);
 
   final LockToken token;
   final ShapeTexture texture;
@@ -28,6 +29,21 @@ class LockTokenPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
     final radius = size.shortestSide * 0.31;
+
+    // Production/App Exact uses the raster-mask dolphin. Shape Lab draft
+    // blueprints remain available for direct A/B comparison.
+    if (token.shape == ShapeKind.dolphin && blueprintOverride == null) {
+      final painted = paintDolphinMaskCanvas(
+        canvas,
+        center: center,
+        radius: radius,
+        tone: token.tone,
+        texture: texture,
+        opacity: 1,
+      );
+      if (painted) return;
+    }
+
     final illustrated = blueprintOverride?.build(center, radius) ??
         buildIllustratedShapeGeometry(token.shape, center, radius);
     if (illustrated != null) {
@@ -603,11 +619,11 @@ void _paintIllustratedShape(
 }
 
 class FloatingShapePainter extends CustomPainter {
-  const FloatingShapePainter({
+  FloatingShapePainter({
     required this.objects,
     this.popStyle = PopStyle.basicPop,
     this.texture = ShapeTexture.glossy,
-  });
+  }) : super(repaint: DolphinMaskCanvasCache.instance);
 
   final List<FloatingObject> objects;
   final PopStyle popStyle;
@@ -666,6 +682,21 @@ class FloatingShapePainter extends CustomPainter {
     canvas.translate(object.position.dx, object.position.dy);
     canvas.rotate(object.rotation);
     canvas.translate(-object.position.dx, -object.position.dy);
+
+    if (object.token.shape == ShapeKind.dolphin) {
+      final painted = paintDolphinMaskCanvas(
+        canvas,
+        center: object.position,
+        radius: radius,
+        tone: object.token.tone,
+        texture: texture,
+        opacity: opacity,
+      );
+      if (painted) {
+        canvas.restore();
+        return;
+      }
+    }
 
     final illustrated = buildIllustratedShapeGeometry(
       object.token.shape,
