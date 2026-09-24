@@ -11,7 +11,6 @@ void main() {
     ShapeTexture.glass,
   ];
   const previewSizes = <double>[55, 65, 75];
-  const previewDevicePixelRatio = 6.0;
 
   group('shape preview export', () {
     for (final shape in ShapeKind.values) {
@@ -20,9 +19,6 @@ void main() {
           testWidgets(
             '${shape.name} ${texture.name} ${logicalSize.toInt()} logical px',
             (tester) async {
-              tester.view.devicePixelRatio = previewDevicePixelRatio;
-              addTearDown(tester.view.resetDevicePixelRatio);
-
               final size = Size.square(logicalSize);
               await tester.binding.setSurfaceSize(size);
               addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -59,7 +55,7 @@ void main() {
               await expectLater(
                 find.byKey(previewKey),
                 matchesGoldenFile(
-                  'goldens/${shape.name}_${texture.name}_${px}px_dpr6.png',
+                  'goldens/${shape.name}_${texture.name}_${px}px_actual.png',
                 ),
               );
             },
