@@ -213,7 +213,7 @@ void main() {
 
 Future<void> _waitForDolphinMasks(WidgetTester tester) async {
   final cache = DolphinMaskCanvasCache.instance;
-  await cache.ensureLoadedAsync();
+  await tester.runAsync(cache.ensureLoadedAsync);
   await tester.pump();
   expect(cache.ready, isTrue, reason: 'Dolphin alpha masks failed to decode');
 }
