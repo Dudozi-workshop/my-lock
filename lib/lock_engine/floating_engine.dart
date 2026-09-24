@@ -273,6 +273,8 @@ class FloatingEngine {
     _shakeStrength = max(0.0, _shakeStrength - dt * 2.6);
 
     for (final object in List<FloatingObject>.from(objects)) {
+      object.spritePhase += dt;
+
       if (object.isPopping) {
         object.popElapsed += dt;
         if (object.popElapsed >= popDuration) {
