@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_scene/scene.dart';
 import 'package:vector_math/vector_math.dart' as vm;
@@ -35,26 +36,36 @@ void _applyMaterialPreset(
     case Sphere3DMaterialPreset.matte:
       material
         ..metallicFactor = 0.0
-        ..roughnessFactor = 0.86
-        ..specular = 0.38
+        ..roughnessFactor = 1.0
+        ..specular = 0.08
         ..clearcoat = 0.0
-        ..clearcoatRoughness = 0.65;
+        ..clearcoatRoughness = 1.0
+        ..transmission = 0.0
+        ..thickness = 0.0
+        ..ior = 1.45;
       break;
     case Sphere3DMaterialPreset.softGlossy:
       material
-        ..metallicFactor = 0.01
-        ..roughnessFactor = 0.14
+        ..metallicFactor = 0.0
+        ..roughnessFactor = 0.18
         ..specular = 1.0
-        ..clearcoat = 0.96
-        ..clearcoatRoughness = 0.055;
+        ..clearcoat = 0.98
+        ..clearcoatRoughness = 0.045
+        ..transmission = 0.0
+        ..thickness = 0.0
+        ..ior = 1.45;
       break;
     case Sphere3DMaterialPreset.glassyGloss:
       material
         ..metallicFactor = 0.0
-        ..roughnessFactor = 0.045
+        ..roughnessFactor = 0.025
         ..specular = 1.0
         ..clearcoat = 1.0
-        ..clearcoatRoughness = 0.018;
+        ..clearcoatRoughness = 0.012
+        ..transmission = 0.34
+        ..thickness = 0.42
+        ..ior = 1.47
+        ..attenuationDistance = 2.4;
       break;
   }
 }
@@ -67,9 +78,11 @@ void _configureStudioScene(
   // left null. Add one analytic key light so clearcoat/specular movement reads
   // clearly while keeping shadows off for lock-screen performance.
   scene
-    ..exposure = 1.10
-    ..environmentIntensity = 1.28
-    ..renderScale = runtimeOptimized ? 0.86 : 1.0
+    ..exposure = 1.08
+    ..environmentIntensity = runtimeOptimized ? 1.38 : 1.62
+    ..renderScale = runtimeOptimized
+        ? (kIsWeb ? 0.62 : 0.82)
+        : 1.0
     ..directionalLight = DirectionalLight(
       direction: vm.Vector3(-0.46, -0.72, 0.56),
       color: vm.Vector3(1.0, 0.96, 0.92),
@@ -141,7 +154,7 @@ class _GlossySphere3DState extends State<GlossySphere3D> {
       final sphere = Node(
         name: 'mylock_3d_poc_sphere',
         mesh: Mesh(
-          IcosphereGeometry(radius: 0.82, subdivisions: 3),
+          IcosphereGeometry(radius: 0.70, subdivisions: 3),
           material,
         ),
       )
@@ -276,8 +289,8 @@ class FloatingSphere3DScene extends StatefulWidget {
 class _FloatingSphere3DSceneState extends State<FloatingSphere3DScene> {
   final Scene _scene = Scene();
   final List<Node> _nodes = <Node>[];
-  final List<PhysicallyBasedMaterial> _materials =
-      <PhysicallyBasedMaterial>[];
+  final Map<ShapeTone, PhysicallyBasedMaterial> _toneMaterials =
+      <ShapeTone, PhysicallyBasedMaterial>{};
 
   bool _ready = false;
   Object? _error;
@@ -301,22 +314,30 @@ class _FloatingSphere3DSceneState extends State<FloatingSphere3DScene> {
     try {
       await Scene.initializeStaticResources();
 
-      final geometry = IcosphereGeometry(radius: 0.82, subdivisions: 2);
+      final geometry = IcosphereGeometry(
+        radius: 0.82,
+        subdivisions: kIsWeb ? 1 : 2,
+      );
       final preset = sphere3DPresetForTexture(widget.texture);
 
-      for (var i = 0; i < widget.maxObjects; i++) {
+      for (final tone in ShapeTone.values) {
         final material = PhysicallyBasedMaterial()
-          ..baseColorFactor = _toneVector(ShapeTone.blue);
+          ..baseColorFactor = _toneVector(tone);
         _applyMaterialPreset(material, preset);
+        _toneMaterials[tone] = material;
+      }
 
+      final defaultMaterial = _toneMaterials[ShapeTone.blue]!;
+      for (var i = 0; i < widget.maxObjects; i++) {
         final node = Node(
           name: 'mylock_3d_runtime_$i',
-          mesh: Mesh(geometry, material),
+          mesh: Mesh(geometry, defaultMaterial),
         )
           ..position = vm.Vector3(0, 0, 0)
-          ..scale = vm.Vector3.all(0.001);
+          ..scale = vm.Vector3.all(1.0)
+          ..castsShadows = false
+          ..visible = false;
 
-        _materials.add(material);
         _nodes.add(node);
         _scene.add(node);
       }
@@ -340,7 +361,7 @@ class _FloatingSphere3DSceneState extends State<FloatingSphere3DScene> {
 
   void _applyPresetToAll() {
     final preset = sphere3DPresetForTexture(widget.texture);
-    for (final material in _materials) {
+    for (final material in _toneMaterials.values) {
       _applyMaterialPreset(material, preset);
     }
   }
@@ -363,9 +384,11 @@ class _FloatingSphere3DSceneState extends State<FloatingSphere3DScene> {
       final node = _nodes[i];
 
       if (i >= dolphins.length) {
-        node.scale = vm.Vector3.all(0.001);
+        node.visible = false;
         continue;
       }
+
+      node.visible = true;
 
       final object = dolphins[i];
       final normalizedX = object.position.dx / size.width - 0.5;
@@ -375,7 +398,7 @@ class _FloatingSphere3DSceneState extends State<FloatingSphere3DScene> {
       final worldY = -normalizedY * worldHeight;
 
       final diameterFraction = (object.radius * 2) / minDimension;
-      var worldScale = diameterFraction * worldHeight * 0.72;
+      var worldScale = diameterFraction * worldHeight * 0.44;
 
       if (object.isPopping) {
         final progress =
@@ -392,7 +415,11 @@ class _FloatingSphere3DSceneState extends State<FloatingSphere3DScene> {
         )
         ..scale = vm.Vector3.all(worldScale);
 
-      _materials[i].baseColorFactor = _toneVector(object.token.tone);
+      final material = _toneMaterials[object.token.tone]!;
+      final primitive = node.mesh!.primitives.first;
+      if (!identical(primitive.material, material)) {
+        primitive.material = material;
+      }
     }
   }
 
@@ -416,9 +443,7 @@ class _FloatingSphere3DSceneState extends State<FloatingSphere3DScene> {
           target: vm.Vector3(0, 0, 0),
           fovRadiansY: 39 * math.pi / 180,
         ),
-        onTick: (elapsed, deltaSeconds) {
-          _syncObjects();
-        },
+        onTick: (elapsed, deltaSeconds) {},
       ),
     );
   }
