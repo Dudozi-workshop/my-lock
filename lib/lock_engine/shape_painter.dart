@@ -355,102 +355,103 @@ void _paintCrystalShape(
   required double opacity,
 }) {
   final colors = _tokenToneColors(tone);
-  final bounds = Rect.fromCircle(center: center, radius: radius);
-  final rimTint = tone == ShapeTone.white
-      ? const Color(0xFFDDE8F6)
-      : Color.lerp(colors.$1, Colors.white, 0.48)!;
+  // Facets follow the silhouette's own bounds, so the same surface also works
+  // on wide illustrated shapes. The silhouette remains the only outer edge.
+  final bounds = path.getBounds();
+  final pale = Color.lerp(colors.$1, Colors.white, 0.76)!;
+  final mid = Color.lerp(colors.$1, colors.$2, 0.28)!;
+  final deep = Color.lerp(colors.$2, Colors.black, 0.20)!;
+  Offset point(double x, double y) => Offset(
+        bounds.left + bounds.width * x,
+        bounds.top + bounds.height * y,
+      );
+
+  void facet(List<Offset> points, Color color) {
+    final face = Path()..addPolygon(points, true);
+    canvas.drawPath(face, Paint()..color = color.withValues(alpha: opacity));
+  }
 
   canvas.drawShadow(
     path,
-    colors.$2.withValues(alpha: 0.15 * opacity),
-    10,
+    colors.$2.withValues(alpha: 0.28 * opacity),
+    8,
     true,
   );
 
   canvas.save();
   canvas.clipPath(path);
+  canvas.drawPath(path, Paint()..color = mid.withValues(alpha: opacity));
 
-  final body = Paint()
-    ..shader = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        Colors.white.withValues(alpha: 0.28 * opacity),
-        colors.$1.withValues(alpha: 0.46 * opacity),
-        colors.$1.withValues(alpha: 0.30 * opacity),
-        colors.$2.withValues(alpha: 0.48 * opacity),
-      ],
-      stops: const [0.0, 0.30, 0.62, 1.0],
-    ).createShader(bounds);
-  canvas.drawPath(path, body);
+  final topLeft = point(0, 0);
+  final top = point(0.50, 0);
+  final topRight = point(1, 0);
+  final right = point(1, 0.50);
+  final bottomRight = point(1, 1);
+  final bottom = point(0.50, 1);
+  final bottomLeft = point(0, 1);
+  final left = point(0, 0.50);
+  final a = point(0.31, 0.30);
+  final b = point(0.66, 0.29);
+  final c = point(0.79, 0.60);
+  final d = point(0.50, 0.77);
+  final e = point(0.21, 0.59);
 
-  final edgeDepth = Paint()
-    ..shader = RadialGradient(
-      center: const Alignment(-0.18, -0.20),
-      radius: 1.05,
-      colors: [
-        Colors.transparent,
-        colors.$1.withValues(alpha: 0.10 * opacity),
-        colors.$2.withValues(alpha: 0.30 * opacity),
-      ],
-      stops: const [0.0, 0.66, 1.0],
-    ).createShader(bounds);
-  canvas.drawPath(path, edgeDepth);
+  // Large, flat planes retain their contrast when reduced to 58 logical px.
+  facet([topLeft, top, a, left], Color.lerp(colors.$1, pale, 0.35)!);
+  facet([top, topRight, right, b], Color.lerp(colors.$1, deep, 0.34)!);
+  facet([top, b, a], pale);
+  facet([left, a, e, bottomLeft], Color.lerp(colors.$1, deep, 0.18)!);
+  facet([b, right, bottomRight, c], Color.lerp(colors.$2, deep, 0.30)!);
+  facet([bottomLeft, e, d, bottom], Color.lerp(colors.$1, pale, 0.22)!);
+  facet([c, bottomRight, bottom, d], Color.lerp(colors.$2, pale, 0.17)!);
+  facet([a, b, d], Color.lerp(colors.$1, Colors.white, 0.70)!);
+  facet([a, d, e], Color.lerp(colors.$1, pale, 0.30)!);
+  facet([b, c, d], Color.lerp(colors.$1, colors.$2, 0.50)!);
 
-  final refraction = Paint()
-    ..shader = LinearGradient(
-      begin: const Alignment(-1.0, -0.55),
-      end: const Alignment(0.85, 1.0),
-      colors: [
-        Colors.transparent,
-        Colors.white.withValues(alpha: 0.04 * opacity),
-        Colors.white.withValues(alpha: 0.34 * opacity),
-        Colors.white.withValues(alpha: 0.08 * opacity),
-        Colors.transparent,
-      ],
-      stops: const [0.14, 0.34, 0.47, 0.58, 0.78],
-    ).createShader(bounds);
-  canvas.drawRect(bounds.inflate(radius * 0.20), refraction);
-
-  final glint = Paint()
-    ..color = Colors.white.withValues(alpha: 0.62 * opacity);
-  canvas.drawOval(
-    Rect.fromCenter(
-      center: center.translate(-radius * 0.30, -radius * 0.31),
-      width: radius * 0.42,
-      height: radius * 0.15,
-    ),
-    glint,
+  // A few crisp refraction seams read as cut crystal, without fine noise.
+  final seam = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = max(0.55, radius * 0.026)
+    ..color = Colors.white.withValues(alpha: 0.56 * opacity);
+  canvas.drawPath(
+    Path()
+      ..moveTo(a.dx, a.dy)
+      ..lineTo(b.dx, b.dy)
+      ..lineTo(c.dx, c.dy),
+    seam,
   );
-
-  final caustic = Paint()
-    ..color = rimTint.withValues(alpha: 0.24 * opacity);
-  canvas.drawOval(
-    Rect.fromCenter(
-      center: center.translate(radius * 0.20, radius * 0.29),
-      width: radius * 0.64,
-      height: radius * 0.18,
-    ),
-    caustic,
+  canvas.drawPath(
+    Path()
+      ..moveTo(e.dx, e.dy)
+      ..lineTo(d.dx, d.dy),
+    seam,
   );
 
   canvas.restore();
 
-  final coloredRim = Paint()
+  final outerRim = Paint()
     ..style = PaintingStyle.stroke
     ..strokeJoin = StrokeJoin.round
     ..strokeCap = StrokeCap.round
-    ..strokeWidth = max(2.2, radius * 0.082)
-    ..color = rimTint.withValues(alpha: 0.50 * opacity);
-  canvas.drawPath(path, coloredRim);
+    ..strokeWidth = max(1.1, radius * 0.055)
+    ..color = deep.withValues(alpha: 0.75 * opacity);
+  canvas.drawPath(path, outerRim);
 
-  final clearRim = Paint()
+  final litRim = Paint()
     ..style = PaintingStyle.stroke
     ..strokeJoin = StrokeJoin.round
     ..strokeCap = StrokeCap.round
-    ..strokeWidth = max(1.15, radius * 0.034)
-    ..color = Colors.white.withValues(alpha: 0.88 * opacity);
-  canvas.drawPath(path, clearRim);
+    ..strokeWidth = max(0.65, radius * 0.026)
+    ..shader = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Colors.white.withValues(alpha: 0.98 * opacity),
+        pale.withValues(alpha: 0.75 * opacity),
+        Colors.white.withValues(alpha: 0.08 * opacity),
+      ],
+    ).createShader(bounds);
+  canvas.drawPath(path, litRim);
 }
 
 void _paintIllustratedShape(
