@@ -39,13 +39,29 @@ jobs:
       - name: Run app tests
         run: flutter test test
 
-      - name: Render shape previews from production painter
+      - name: Render actual-size previews from production painter
         run: flutter test --update-goldens preview_test/shape_preview_golden_test.dart
 
-      - name: Upload exact-render previews
+      - name: Build 6x inspection previews
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          mkdir -p preview_test/enlarged
+          for file in preview_test/goldens/*_actual.png; do
+            base="$(basename "$file" .png)"
+            convert "$file" -filter point -resize 600% "preview_test/enlarged/${base}_x6.png"
+          done
+
+          montage             preview_test/enlarged/dolphin_glossy_55px_actual_x6.png             preview_test/enlarged/dolphin_glossy_65px_actual_x6.png             preview_test/enlarged/dolphin_glossy_75px_actual_x6.png             -tile 3x1 -geometry +24+24 -background '#F4F5F8'             preview_test/enlarged/dolphin_glossy_sizes_x6.png
+
+          montage             preview_test/enlarged/dolphin_glass_55px_actual_x6.png             preview_test/enlarged/dolphin_glass_65px_actual_x6.png             preview_test/enlarged/dolphin_glass_75px_actual_x6.png             -tile 3x1 -geometry +24+24 -background '#F4F5F8'             preview_test/enlarged/dolphin_glass_sizes_x6.png
+
+      - name: Upload Shape Lab previews
         uses: actions/upload-artifact@v4
         with:
-          name: my-lock-shape-preview-dpr6
-          path: preview_test/goldens/*.png
+          name: my-lock-shape-preview
+          path: |
+            preview_test/goldens/*.png
+            preview_test/enlarged/*.png
           if-no-files-found: error
           retention-days: 14
