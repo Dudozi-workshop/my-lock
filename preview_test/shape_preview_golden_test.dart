@@ -1,10 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:my_lock/lock_engine/models.dart';
+import 'package:my_lock/lock_engine/crystal_sprite.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(CrystalSprite.load);
 
   group('shape preview export', () {
     for (final shape in ShapeKind.values) {
