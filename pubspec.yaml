@@ -21,6 +21,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/shapes/dolphin/
+    - assets/shapes/dolphin_sprite/
 
 flutter_launcher_icons:
   android: true
