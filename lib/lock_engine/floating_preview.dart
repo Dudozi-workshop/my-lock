@@ -190,17 +190,10 @@ class _FloatingPreviewState extends State<FloatingPreview>
           _engine.resize(size);
         }
 
-        FloatingObject? threeDPocObject;
-        for (final object in _engine.objects) {
-          if (!object.isPopping && object.token.shape == ShapeKind.dolphin) {
-            threeDPocObject = object;
-            break;
-          }
-        }
-
-        final hiddenIds = threeDPocObject == null
-            ? const <int>{}
-            : <int>{threeDPocObject.id};
+        final dolphinIds = _engine.objects
+            .where((object) => object.token.shape == ShapeKind.dolphin)
+            .map((object) => object.id)
+            .toSet();
 
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -220,22 +213,18 @@ class _FloatingPreviewState extends State<FloatingPreview>
                   objects: _engine.objects,
                   popStyle: widget.popStyle,
                   texture: widget.texture,
-                  hiddenObjectIds: hiddenIds,
+                  hiddenObjectIds: dolphinIds,
                 ),
                 child: const SizedBox.expand(),
               ),
-              if (threeDPocObject != null)
-                Positioned(
-                  left: threeDPocObject.position.dx -
-                      threeDPocObject.radius * 1.16,
-                  top: threeDPocObject.position.dy -
-                      threeDPocObject.radius * 1.16,
-                  width: threeDPocObject.radius * 2.32,
-                  height: threeDPocObject.radius * 2.32,
+              if (dolphinIds.isNotEmpty)
+                Positioned.fill(
                   child: RepaintBoundary(
-                    child: GlossySphere3D(
-                      key: ValueKey('3d-poc-${threeDPocObject.id}'),
-                      tone: threeDPocObject.token.tone,
+                    child: FloatingSphere3DScene(
+                      objects: _engine.objects,
+                      viewportSize: size,
+                      texture: widget.texture,
+                      maxObjects: 12,
                     ),
                   ),
                 ),
