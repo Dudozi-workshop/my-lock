@@ -239,11 +239,11 @@ void _paintStyledShape(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Colors.white.withValues(alpha: 0.34 * opacity),
-          colors.$1.withValues(alpha: 0.58 * opacity),
-          colors.$2.withValues(alpha: 0.68 * opacity),
+          Colors.white.withValues(alpha: 0.24 * opacity),
+          colors.$1.withValues(alpha: 0.42 * opacity),
+          colors.$2.withValues(alpha: 0.50 * opacity),
         ],
-        stops: const [0.0, 0.46, 1.0],
+        stops: const [0.0, 0.48, 1.0],
       ).createShader(bounds);
       break;
     case ShapeTexture.metal:
@@ -345,139 +345,109 @@ void _paintGlassStructure(
   Offset p(double x, double y) =>
       center + Offset(radius * x, radius * y);
 
-  final mediumDetail = radius >= 19.0;
-  final highDetail = radius >= 22.0;
-
   canvas.save();
   canvas.clipPath(path);
 
-  // Back-face tint: a slightly offset dark rim makes the token read as a
-  // piece of thick glass instead of a translucent flat fill.
+  // Thick optical shell: a slightly displaced back rim is the main cue that
+  // this is glass, not a flat translucent fill.
   canvas.save();
-  canvas.translate(radius * 0.045, radius * 0.055);
+  canvas.translate(radius * 0.055, radius * 0.070);
   final backFace = Paint()
     ..style = PaintingStyle.stroke
-    ..strokeWidth = max(2.8, radius * 0.20)
-    ..color = darkColor.withValues(alpha: 0.28 * opacity);
+    ..strokeWidth = max(2.8, radius * 0.18)
+    ..color = darkColor.withValues(alpha: 0.22 * opacity);
   canvas.drawPath(path, backFace);
   canvas.restore();
 
-  final innerRimDark = Paint()
+  final innerTint = Paint()
     ..style = PaintingStyle.stroke
-    ..strokeWidth = max(2.4, radius * 0.15)
-    ..color = darkColor.withValues(alpha: 0.30 * opacity);
-  canvas.drawPath(path, innerRimDark);
+    ..strokeWidth = max(2.2, radius * 0.13)
+    ..color = darkColor.withValues(alpha: 0.22 * opacity);
+  canvas.drawPath(path, innerTint);
 
-  final innerRimLight = Paint()
+  final innerLight = Paint()
     ..style = PaintingStyle.stroke
-    ..strokeWidth = max(1.4, radius * 0.065)
-    ..color = Colors.white.withValues(alpha: 0.72 * opacity);
-  canvas.drawPath(path, innerRimLight);
+    ..strokeWidth = max(1.1, radius * 0.052)
+    ..color = Colors.white.withValues(alpha: 0.74 * opacity);
+  canvas.drawPath(path, innerLight);
 
-  // Large facets carry the material identity at small lock-screen sizes.
-  final facetLight = Paint()
-    ..color = Colors.white.withValues(alpha: 0.32 * opacity);
-  final facetTint = Paint()
-    ..color = lightColor.withValues(alpha: 0.30 * opacity);
-  final facetShade = Paint()
-    ..color = darkColor.withValues(alpha: 0.34 * opacity);
-  final facetDeep = Paint()
-    ..color = darkColor.withValues(alpha: 0.24 * opacity);
-
-  canvas.drawPath(
-    Path()
-      ..moveTo(p(-0.90, -0.50).dx, p(-0.90, -0.50).dy)
-      ..lineTo(p(-0.08, -0.16).dx, p(-0.08, -0.16).dy)
-      ..lineTo(p(-0.54, 0.48).dx, p(-0.54, 0.48).dy)
-      ..close(),
-    facetLight,
-  );
-  canvas.drawPath(
-    Path()
-      ..moveTo(p(-0.08, -0.16).dx, p(-0.08, -0.16).dy)
-      ..lineTo(p(0.86, -0.48).dx, p(0.86, -0.48).dy)
-      ..lineTo(p(0.48, 0.28).dx, p(0.48, 0.28).dy)
-      ..close(),
-    facetTint,
-  );
-  canvas.drawPath(
-    Path()
-      ..moveTo(p(-0.54, 0.48).dx, p(-0.54, 0.48).dy)
-      ..lineTo(p(-0.08, -0.16).dx, p(-0.08, -0.16).dy)
-      ..lineTo(p(0.48, 0.28).dx, p(0.48, 0.28).dy)
-      ..lineTo(p(0.02, 0.86).dx, p(0.02, 0.86).dy)
-      ..close(),
-    facetShade,
+  // Broad lens highlight. Keep this soft and continuous so the material reads
+  // as glass instead of a faceted crystal.
+  final lensHighlight = Paint()
+    ..color = Colors.white.withValues(alpha: 0.17 * opacity);
+  canvas.drawOval(
+    Rect.fromCenter(
+      center: p(-0.22, -0.34),
+      width: radius * 1.58,
+      height: radius * 0.66,
+    ),
+    lensHighlight,
   );
 
-  if (mediumDetail) {
-    canvas.drawPath(
-      Path()
-        ..moveTo(p(-0.08, -0.16).dx, p(-0.08, -0.16).dy)
-        ..lineTo(p(0.48, 0.28).dx, p(0.48, 0.28).dy)
-        ..lineTo(p(0.12, 0.04).dx, p(0.12, 0.04).dy)
-        ..close(),
-      facetLight,
-    );
-  }
-
-  if (highDetail) {
-    canvas.drawPath(
-      Path()
-        ..moveTo(p(0.48, 0.28).dx, p(0.48, 0.28).dy)
-        ..lineTo(p(0.94, 0.06).dx, p(0.94, 0.06).dy)
-        ..lineTo(p(0.72, 0.64).dx, p(0.72, 0.64).dy)
-        ..close(),
-      facetDeep,
-    );
-  }
-
-  // Dual refraction seams: white catches light, dark gives the cut depth.
-  final seamDark = Paint()
+  // Refraction band: one dark line and one light line travel together.
+  // At 55-75 logical px this survives down-sampling better than tiny facets.
+  final refractDark = Paint()
     ..style = PaintingStyle.stroke
-    ..strokeWidth = max(1.0, radius * 0.045)
+    ..strokeWidth = max(1.4, radius * 0.090)
     ..strokeCap = StrokeCap.round
-    ..strokeJoin = StrokeJoin.round
-    ..color = darkColor.withValues(alpha: 0.34 * opacity);
-  final seamLight = Paint()
+    ..color = darkColor.withValues(alpha: 0.14 * opacity);
+  final refractLight = Paint()
     ..style = PaintingStyle.stroke
-    ..strokeWidth = max(0.7, radius * 0.024)
+    ..strokeWidth = max(1.0, radius * 0.052)
     ..strokeCap = StrokeCap.round
-    ..strokeJoin = StrokeJoin.round
-    ..color = Colors.white.withValues(alpha: 0.72 * opacity);
+    ..color = Colors.white.withValues(alpha: 0.34 * opacity);
 
-  final mainSeams = Path()
-    ..moveTo(p(-0.90, -0.50).dx, p(-0.90, -0.50).dy)
-    ..lineTo(p(-0.08, -0.16).dx, p(-0.08, -0.16).dy)
-    ..lineTo(p(0.86, -0.48).dx, p(0.86, -0.48).dy)
-    ..moveTo(p(-0.08, -0.16).dx, p(-0.08, -0.16).dy)
-    ..lineTo(p(0.02, 0.86).dx, p(0.02, 0.86).dy);
-  canvas.drawPath(mainSeams, seamDark);
-  canvas.drawPath(mainSeams, seamLight);
+  final darkBand = Path()
+    ..moveTo(p(-0.92, 0.22).dx, p(-0.92, 0.22).dy)
+    ..cubicTo(
+      p(-0.42, -0.02).dx,
+      p(-0.42, -0.02).dy,
+      p(0.10, 0.16).dx,
+      p(0.10, 0.16).dy,
+      p(0.88, -0.16).dx,
+      p(0.88, -0.16).dy,
+    );
+  final lightBand = Path()
+    ..moveTo(p(-0.92, 0.10).dx, p(-0.92, 0.10).dy)
+    ..cubicTo(
+      p(-0.42, -0.12).dx,
+      p(-0.42, -0.12).dy,
+      p(0.08, 0.07).dx,
+      p(0.08, 0.07).dy,
+      p(0.86, -0.25).dx,
+      p(0.86, -0.25).dy,
+    );
+  canvas.drawPath(darkBand, refractDark);
+  canvas.drawPath(lightBand, refractLight);
 
-  if (mediumDetail) {
-    final extraSeam = Path()
-      ..moveTo(p(-0.54, 0.48).dx, p(-0.54, 0.48).dy)
-      ..lineTo(p(0.48, 0.28).dx, p(0.48, 0.28).dy);
-    canvas.drawPath(extraSeam, seamDark);
-    canvas.drawPath(extraSeam, seamLight);
-  }
-
-  // Sharp top reflection: intentionally angular rather than glossy/round.
+  // Crisp top reflection and a smaller lower glint establish the viewing
+  // direction without creating a generic glossy bubble.
   final sharpHighlight = Paint()
     ..style = PaintingStyle.stroke
-    ..strokeWidth = max(1.5, radius * 0.07)
+    ..strokeWidth = max(1.5, radius * 0.068)
     ..strokeCap = StrokeCap.round
-    ..strokeJoin = StrokeJoin.miter
-    ..color = Colors.white.withValues(alpha: 0.92 * opacity);
+    ..color = Colors.white.withValues(alpha: 0.94 * opacity);
 
   canvas.drawPath(
     Path()
-      ..moveTo(p(-0.68, -0.42).dx, p(-0.68, -0.42).dy)
-      ..lineTo(p(-0.30, -0.64).dx, p(-0.30, -0.64).dy)
-      ..lineTo(p(0.12, -0.56).dx, p(0.12, -0.56).dy),
+      ..moveTo(p(-0.66, -0.42).dx, p(-0.66, -0.42).dy)
+      ..cubicTo(
+        p(-0.46, -0.60).dx,
+        p(-0.46, -0.60).dy,
+        p(-0.18, -0.67).dx,
+        p(-0.18, -0.67).dy,
+        p(0.12, -0.56).dx,
+        p(0.12, -0.56).dy,
+      ),
     sharpHighlight,
   );
+
+  final lowerGlint = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = max(0.9, radius * 0.035)
+    ..strokeCap = StrokeCap.round
+    ..color = lightColor.withValues(alpha: 0.42 * opacity);
+  canvas.drawLine(p(0.36, 0.56), p(0.68, 0.36), lowerGlint);
 
   canvas.restore();
 }
