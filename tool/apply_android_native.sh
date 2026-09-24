@@ -77,6 +77,14 @@ service = '''        <service
 if 'android:name=".LockMonitorService"' not in text:
     text = text.replace('</application>', service + '    </application>', 1)
 
+flutter_gpu = '''        <meta-data
+            android:name="io.flutter.embedding.android.EnableFlutterGPU"
+            android:value="true" />
+'''
+
+if 'io.flutter.embedding.android.EnableFlutterGPU' not in text:
+    text = text.replace('</application>', flutter_gpu + '    </application>', 1)
+
 receiver = '''        <receiver
             android:name=".BootReceiver"
             android:enabled="true"
