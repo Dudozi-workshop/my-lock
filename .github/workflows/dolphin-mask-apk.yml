@@ -1,4 +1,5 @@
 name: Dolphin Mask PoC APK
+# Branch-only installable build for on-device QA.
 
 permissions:
   contents: read
