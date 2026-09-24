@@ -764,15 +764,18 @@ class FloatingShapePainter extends CustomPainter {
     required this.objects,
     this.popStyle = PopStyle.basicPop,
     this.texture = ShapeTexture.glossy,
+    this.hiddenObjectIds = const <int>{},
   }) : super(repaint: DolphinMaskCanvasCache.instance);
 
   final List<FloatingObject> objects;
   final PopStyle popStyle;
   final ShapeTexture texture;
+  final Set<int> hiddenObjectIds;
 
   @override
   void paint(Canvas canvas, Size size) {
     for (final object in objects) {
+      if (hiddenObjectIds.contains(object.id)) continue;
       final progress = object.isPopping
           ? (object.popElapsed / 0.18).clamp(0.0, 1.0).toDouble()
           : 0.0;
