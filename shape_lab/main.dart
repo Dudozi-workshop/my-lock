@@ -51,7 +51,6 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
   double bodyDepth = 1.0;
   double tailScale = 1.0;
   bool accentEnabled = true;
-  bool mouthClosed = true;
   double accentSize = 1.0;
   double accentY = 0.0;
   double accentLightness = 0.48;
@@ -68,7 +67,6 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
       bodyDepth = 1.0;
       tailScale = 1.0;
       accentEnabled = true;
-      mouthClosed = true;
       accentSize = 1.0;
       accentY = 0.0;
       accentLightness = 0.48;
@@ -104,33 +102,30 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
             bodyDepth: bodyDepth,
             tailScale: tailScale,
             accentEnabled: accentEnabled,
-            mouthClosed: mouthClosed,
             accentSize: accentSize,
             accentY: accentY,
           )
         : null;
 
-    final closedOnlyBlueprint = shape == ShapeKind.dolphin
+    final silhouetteOnlyBlueprint = shape == ShapeKind.dolphin
         ? _buildDolphinDraftBlueprint(
             forehead: forehead,
             snout: snout,
             bodyDepth: bodyDepth,
             tailScale: tailScale,
             accentEnabled: false,
-            mouthClosed: true,
             accentSize: accentSize,
             accentY: accentY,
           )
         : null;
 
-    final closedAccentBlueprint = shape == ShapeKind.dolphin
+    final accentMapBlueprint = shape == ShapeKind.dolphin
         ? _buildDolphinDraftBlueprint(
             forehead: forehead,
             snout: snout,
             bodyDepth: bodyDepth,
             tailScale: tailScale,
             accentEnabled: true,
-            mouthClosed: true,
             accentSize: accentSize,
             accentY: accentY,
           )
@@ -141,7 +136,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
         'shape': shape.name,
         'tone': tone.name,
         'surface': texture.name,
-        'mouthClosed': mouthClosed,
+        'accentMap': 'dolphin-v1',
         'accentEnabled': accentEnabled,
         'accentSize': double.parse(accentSize.toStringAsFixed(3)),
         'accentY': double.parse(accentY.toStringAsFixed(2)),
@@ -354,7 +349,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '바로 비교',
+                                      'Accent Map 비교',
                                       style: TextStyle(
                                         color: textColor,
                                         fontWeight: FontWeight.w800,
@@ -362,7 +357,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                                     ),
                                     const SizedBox(height: 3),
                                     Text(
-                                      '셋 다 실제 LockTokenPainter 렌더. 마음에 드는 안을 누르면 Draft에 바로 적용.',
+                                      '외곽은 동일하게 유지하고 내부 Accent 영역만 켜고 끕니다.',
                                       style: TextStyle(color: muted, fontSize: 13),
                                     ),
                                   ],
@@ -379,9 +374,8 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                           LayoutBuilder(
                             builder: (context, inner) {
                               final width = inner.maxWidth;
-                              final itemWidth = width < 620
-                                  ? width
-                                  : (width - 24) / 3;
+                              final itemWidth =
+                                  width < 520 ? width : (width - 12) / 2;
                               return Wrap(
                                 spacing: 12,
                                 runSpacing: 12,
@@ -389,46 +383,13 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                                   SizedBox(
                                     width: itemWidth,
                                     child: _VariantCard(
-                                      title: '현재',
-                                      subtitle: '기존 실루엣',
-                                      selected: draftMode &&
-                                          !mouthClosed &&
-                                          !accentEnabled,
+                                      title: 'Silhouette',
+                                      subtitle: '외곽만 확인',
+                                      selected: draftMode && !accentEnabled,
                                       onTap: draftMode
-                                          ? () => setState(() {
-                                                mouthClosed = false;
-                                                accentEnabled = false;
-                                              })
-                                          : null,
-                                      child: _TokenPreview(
-                                        shape: shape,
-                                        tone: tone,
-                                        texture: texture,
-                                        background: pageColor,
-                                        transform: const _DraftTransform(
-                                          enabled: false,
-                                          overallScale: 1,
-                                          scaleX: 1,
-                                          scaleY: 1,
-                                          offsetX: 0,
-                                          offsetY: 0,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: itemWidth,
-                                    child: _VariantCard(
-                                      title: '입 틈 메움',
-                                      subtitle: '외곽만 정리',
-                                      selected: draftMode &&
-                                          mouthClosed &&
-                                          !accentEnabled,
-                                      onTap: draftMode
-                                          ? () => setState(() {
-                                                mouthClosed = true;
-                                                accentEnabled = false;
-                                              })
+                                          ? () => setState(
+                                                () => accentEnabled = false,
+                                              )
                                           : null,
                                       child: _TokenPreview(
                                         shape: shape,
@@ -436,7 +397,8 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                                         texture: texture,
                                         background: pageColor,
                                         transform: transform,
-                                        blueprintOverride: closedOnlyBlueprint,
+                                        blueprintOverride:
+                                            silhouetteOnlyBlueprint,
                                         accentLightness: accentLightness,
                                       ),
                                     ),
@@ -444,16 +406,13 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                                   SizedBox(
                                     width: itemWidth,
                                     child: _VariantCard(
-                                      title: '입 틈 + 배색',
-                                      subtitle: '현재 작업안',
-                                      selected: draftMode &&
-                                          mouthClosed &&
-                                          accentEnabled,
+                                      title: 'Accent Map',
+                                      subtitle: '입 · 배 · 앞/뒤 지느러미',
+                                      selected: draftMode && accentEnabled,
                                       onTap: draftMode
-                                          ? () => setState(() {
-                                                mouthClosed = true;
-                                                accentEnabled = true;
-                                              })
+                                          ? () => setState(
+                                                () => accentEnabled = true,
+                                              )
                                           : null,
                                       child: _TokenPreview(
                                         shape: shape,
@@ -461,7 +420,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                                         texture: texture,
                                         background: pageColor,
                                         transform: transform,
-                                        blueprintOverride: closedAccentBlueprint,
+                                        blueprintOverride: accentMapBlueprint,
                                         accentLightness: accentLightness,
                                       ),
                                     ),
@@ -619,7 +578,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Dolphin Details',
+                            'Dolphin Accent Map',
                             style: TextStyle(
                               color: textColor,
                               fontWeight: FontWeight.w700,
@@ -628,27 +587,21 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                           const SizedBox(height: 4),
                           Text(
                             draftMode
-                                ? '자주 확인할 내부 표현만 앞에 배치. 아직 본앱에는 반영되지 않음.'
-                                : 'Draft를 켜면 입 닫기와 Belly Accent를 바로 비교할 수 있음.',
+                                ? '입 · 배 · 앞지느러미 · 뒷지느러미를 하나의 몸체 안에서 구분. 입은 별도 테두리를 사용하지 않음.'
+                                : 'Draft를 켜면 Accent Map을 조정할 수 있음.',
                             style: TextStyle(color: muted, fontSize: 13),
                           ),
                           const SizedBox(height: 8),
                           SwitchListTile(
                             contentPadding: EdgeInsets.zero,
-                            title: const Text('입 틈 메우기'),
-                            subtitle: const Text('레퍼런스의 입쪽 빈 틈을 메운 실루엣 비교'),
-                            value: mouthClosed,
-                            onChanged: draftMode
-                                ? (value) => setState(() => mouthClosed = value)
-                                : null,
-                          ),
-                          SwitchListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: const Text('배 Accent'),
-                            subtitle: const Text('선택 색상에서 자동으로 연한 톤 파생'),
+                            title: const Text('Accent Map'),
+                            subtitle: const Text(
+                              '선택 색상에서 파생된 내부 구조와 깊이 표현',
+                            ),
                             value: accentEnabled,
                             onChanged: draftMode
-                                ? (value) => setState(() => accentEnabled = value)
+                                ? (value) =>
+                                    setState(() => accentEnabled = value)
                                 : null,
                           ),
                           _LabSlider(
@@ -657,7 +610,8 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                             min: 0.70,
                             max: 1.30,
                             enabled: draftMode && accentEnabled,
-                            onChanged: (value) => setState(() => accentSize = value),
+                            onChanged: (value) =>
+                                setState(() => accentSize = value),
                           ),
                           _LabSlider(
                             label: '배 위치',
@@ -666,10 +620,11 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                             max: 6,
                             enabled: draftMode && accentEnabled,
                             decimals: 1,
-                            onChanged: (value) => setState(() => accentY = value),
+                            onChanged: (value) =>
+                                setState(() => accentY = value),
                           ),
                           _LabSlider(
-                            label: '배 밝기',
+                            label: 'Accent 밝기',
                             value: accentLightness,
                             min: 0.18,
                             max: 0.72,
@@ -826,20 +781,17 @@ ShapeBlueprint _buildDolphinDraftBlueprint({
   required double bodyDepth,
   required double tailScale,
   required bool accentEnabled,
-  required bool mouthClosed,
   required double accentSize,
   required double accentY,
 }) {
   final source = shapeBlueprintFor(ShapeKind.dolphin)!;
-  final body = source.parts.firstWhere(
-    (part) => part.role == ShapePartRole.body,
-  );
 
   Offset tune(Offset point) {
     var x = point.dx;
     var y = point.dy;
 
-    // Head is on the left side of the approved trace.
+    // Head is on the left side of the approved trace. Apply the same
+    // deformation to body and Accent Map so internal regions stay registered.
     if (x <= 48 && y <= 39) {
       final influence = ((48 - x) / 40).clamp(0.0, 1.0);
       y -= forehead * influence;
@@ -850,14 +802,10 @@ ShapeBlueprint _buildDolphinDraftBlueprint({
       x -= snout * influence;
     }
 
-    // Body depth adjustment keeps the dorsal profile mostly stable and moves
-    // the lower half around the design center.
     if (x >= 30 && x <= 76 && y >= 46) {
       y = 50 + (y - 50) * bodyDepth;
     }
 
-    // Tail is transformed around the peduncle so the connection point stays
-    // stable while the flukes gain/lose visual mass.
     if (x >= 75) {
       x = 75 + (x - 75) * tailScale;
       y = 56 + (y - 56) * tailScale;
@@ -866,61 +814,48 @@ ShapeBlueprint _buildDolphinDraftBlueprint({
     return Offset(x, y);
   }
 
-  final tunedBody = body.points.map(tune).toList(growable: false);
+  final parts = <ShapeTracePart>[];
 
-  // The traced reference contains a narrow inner-mouth loop at indices 5..10.
-  // Close-mouth preview removes only that loop and keeps the approved outer
-  // snout/head contour intact.
-  final bodyPoints = mouthClosed
-      ? <Offset>[
-          ...tunedBody.take(5),
-          ...tunedBody.skip(11),
-        ]
-      : tunedBody;
+  for (final sourcePart in source.parts) {
+    final isAccentPart =
+        sourcePart.role.isLightAccent || sourcePart.role.isDepthAccent;
+    if (isAccentPart && !accentEnabled) continue;
 
-  final parts = <ShapeTracePart>[
-    ShapeTracePart(
-      role: ShapePartRole.body,
-      points: bodyPoints,
-    ),
-  ];
+    var points = sourcePart.points.map(tune).toList(growable: false);
 
-  if (accentEnabled) {
-    const baseAccent = <Offset>[
-      Offset(29, 49),
-      Offset(35, 52),
-      Offset(42, 55),
-      Offset(51, 57.5),
-      Offset(61, 58.5),
-      Offset(70, 57),
-      Offset(74, 55),
-      Offset(71, 60),
-      Offset(64, 63),
-      Offset(55, 64),
-      Offset(45, 63),
-      Offset(36, 60),
-      Offset(30, 56),
-    ];
-
-    final accentCenter = Offset(51, 56 + accentY);
-    final accentPoints = baseAccent.map((point) {
-      final moved = Offset(point.dx, point.dy + accentY);
-      return Offset(
-        accentCenter.dx + (moved.dx - accentCenter.dx) * accentSize,
-        accentCenter.dy + (moved.dy - accentCenter.dy) * accentSize,
-      );
-    }).toList(growable: false);
+    // Belly sizing/position is intentionally local. Mouth and fin regions
+    // remain locked to the approved map while the belly can still be tuned.
+    if (sourcePart.role == ShapePartRole.bellyAccent && points.isNotEmpty) {
+      final center = points.fold<Offset>(
+            Offset.zero,
+            (sum, point) => sum + point,
+          ) /
+          points.length.toDouble();
+      points = points
+          .map(
+            (point) => Offset(
+              center.dx + (point.dx - center.dx) * accentSize,
+              center.dy +
+                  (point.dy - center.dy) * accentSize +
+                  accentY,
+            ),
+          )
+          .toList(growable: false);
+    }
 
     parts.add(
       ShapeTracePart(
-        role: ShapePartRole.accent,
-        points: accentPoints,
+        role: sourcePart.role,
+        points: points,
+        smooth: sourcePart.smooth,
       ),
     );
   }
 
   return ShapeBlueprint(
     kind: ShapeKind.dolphin,
+    viewBox: source.viewBox,
+    designCenter: source.designCenter,
     referenceRadius: source.referenceRadius,
     opticalBounds: source.opticalBounds,
     parts: parts,
