@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
 import 'effects.dart';
-import 'baked_sphere_sprite.dart';
+import 'baked_dolphin_sprite.dart';
 import 'floating_engine.dart';
 import 'models.dart';
 import 'shape_painter.dart';
@@ -221,7 +221,7 @@ class _FloatingPreviewState extends State<FloatingPreview>
                 Positioned.fill(
                   child: RepaintBoundary(
                     child: CustomPaint(
-                      painter: BakedSphereSpritePainter(
+                      painter: BakedDolphinSpritePainter(
                         objects: _engine.objects,
                         animationSeconds:
                             _previous.inMicroseconds /
