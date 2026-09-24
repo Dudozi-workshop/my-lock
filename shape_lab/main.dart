@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_lock/lock_engine/models.dart';
+import 'package:my_lock/lock_engine/dolphin_mask_renderer.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 import 'package:my_lock/lock_engine/shape_geometry.dart';
 
@@ -336,6 +337,84 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                   ),
 
                   if (shape == ShapeKind.dolphin) ...[
+                    const SizedBox(height: 16),
+                    _Panel(
+                      color: cardColor,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Raster Mask PoC',
+                            style: TextStyle(
+                              color: textColor,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            'SVG/Path 없이 Body · Mouth · Belly 마스크를 합성하고 동일 색상/재질을 적용합니다.',
+                            style: TextStyle(color: muted, fontSize: 13),
+                          ),
+                          const SizedBox(height: 16),
+                          LayoutBuilder(
+                            builder: (context, inner) {
+                              final width = inner.maxWidth;
+                              final itemWidth =
+                                  width < 680 ? width : (width - 24) / 3;
+                              return Wrap(
+                                spacing: 12,
+                                runSpacing: 12,
+                                children: [
+                                  SizedBox(
+                                    width: itemWidth,
+                                    child: _MaskPocCard(
+                                      title: 'Composite',
+                                      subtitle: 'Body + Mouth + Belly',
+                                      child: DolphinMaskRenderer(
+                                        tone: tone,
+                                        texture: texture,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: itemWidth,
+                                    child: _MaskPocCard(
+                                      title: 'Body',
+                                      subtitle: '실루엣/재질 확인',
+                                      child: DolphinMaskRenderer(
+                                        tone: tone,
+                                        texture: texture,
+                                        showMouthAccent: false,
+                                        showBellyAccent: false,
+                                        showEye: false,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: itemWidth,
+                                    child: _MaskPocCard(
+                                      title: 'Accent only',
+                                      subtitle: 'Mouth + Belly',
+                                      child: DolphinMaskRenderer(
+                                        tone: tone,
+                                        texture: ShapeTexture.matte,
+                                        showBody: false,
+                                        showEye: false,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 14),
+                          Text(
+                            '현재는 PoC용 256px alpha mask를 코드에 내장. 채택 시 별도 에셋 파일로 이동합니다.',
+                            style: TextStyle(color: muted, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     _Panel(
                       color: cardColor,
@@ -1022,6 +1101,53 @@ class _CompareToken extends StatelessWidget {
         const SizedBox(height: 6),
         Text(label, style: const TextStyle(fontSize: 12)),
       ],
+    );
+  }
+}
+
+class _MaskPocCard extends StatelessWidget {
+  const _MaskPocCard({
+    required this.title,
+    required this.subtitle,
+    required this.child,
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0x247B8190)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          children: [
+            SizedBox.square(
+              dimension: 180,
+              child: child,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
