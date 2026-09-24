@@ -798,6 +798,7 @@ class FloatingShapePainter extends CustomPainter {
   }) : super(repaint: Listenable.merge([
           DolphinMaskCanvasCache.instance,
           DolphinSpriteCache.instance,
+          DolphinTripoBakedCache.instance,
         ]));
 
   final List<FloatingObject> objects;
