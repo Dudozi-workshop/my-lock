@@ -1416,7 +1416,7 @@ class _DropdownField<T> extends StatelessWidget {
     return SizedBox(
       width: 185,
       child: DropdownButtonFormField<T>(
-        value: value,
+        initialValue: value,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
