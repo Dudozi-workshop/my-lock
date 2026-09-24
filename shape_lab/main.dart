@@ -192,7 +192,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '기본값은 본앱과 동일한 APP EXACT 렌더 · Dolphin Soft 3D Gloss v1',
+                              'APP EXACT + Baked Sprite PoC · 3D 제작 후 2D 런타임 경로 검증',
                               style: TextStyle(color: muted, fontSize: 14),
                             ),
                           ],
@@ -447,7 +447,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '실제 잠금화면 동작 크기 · Single Scene 3D PoC',
+                          '실제 잠금화면 동작 크기 · Baked Sprite PoC',
                           style: TextStyle(
                             color: textColor,
                             fontWeight: FontWeight.w800,
@@ -456,7 +456,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'FloatingEngine은 그대로 두고 Dolphin 슬롯 전체를 SceneView 1개 안의 3D 노드로 렌더합니다. 6/9/12개를 바꿔 렉 차이를 직접 비교해보세요.',
+                          'FloatingEngine은 그대로 두고 Dolphin 슬롯은 실시간 3D 대신 12-frame baked sprite로 렌더합니다. 6/9/12개를 바꿔 실시간 3D 대비 렉 차이를 확인해보세요.',
                           style: TextStyle(color: muted, fontSize: 13),
                         ),
                         const SizedBox(height: 14),
