@@ -143,7 +143,140 @@ Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
           ),
         );
       return Path.combine(PathOperation.difference, outer, cutout);
+    case ShapeKind.dolphin:
+      return _dolphinPath(center, radius);
   }
+}
+
+Path _dolphinPath(Offset center, double radius) {
+  double x(double value) => center.dx + radius * value;
+  double y(double value) => center.dy + radius * value;
+
+  // One closed contour only. Color, surface, highlights and shadows are
+  // applied later by _paintStyledShape, exactly like the existing shapes.
+  return Path()
+    ..moveTo(x(0.98), y(-0.08))
+    // Forehead and upper body.
+    ..cubicTo(
+      x(0.86),
+      y(-0.24),
+      x(0.68),
+      y(-0.39),
+      x(0.46),
+      y(-0.45),
+    )
+    ..cubicTo(
+      x(0.28),
+      y(-0.50),
+      x(0.12),
+      y(-0.49),
+      x(0.02),
+      y(-0.44),
+    )
+    // Dorsal fin remains part of the same outer silhouette.
+    ..cubicTo(
+      x(-0.02),
+      y(-0.57),
+      x(-0.07),
+      y(-0.72),
+      x(-0.17),
+      y(-0.80),
+    )
+    ..cubicTo(
+      x(-0.18),
+      y(-0.62),
+      x(-0.24),
+      y(-0.49),
+      x(-0.34),
+      y(-0.42),
+    )
+    // Back into the tail stock.
+    ..cubicTo(
+      x(-0.50),
+      y(-0.34),
+      x(-0.63),
+      y(-0.24),
+      x(-0.72),
+      y(-0.12),
+    )
+    // Upper tail lobe.
+    ..cubicTo(
+      x(-0.83),
+      y(-0.17),
+      x(-0.96),
+      y(-0.22),
+      x(-1.02),
+      y(-0.16),
+    )
+    ..cubicTo(
+      x(-0.97),
+      y(-0.05),
+      x(-0.87),
+      y(0.02),
+      x(-0.73),
+      y(0.04),
+    )
+    // Tail notch and lower lobe.
+    ..cubicTo(
+      x(-0.70),
+      y(0.05),
+      x(-0.68),
+      y(0.06),
+      x(-0.66),
+      y(0.08),
+    )
+    ..cubicTo(
+      x(-0.82),
+      y(0.13),
+      x(-0.96),
+      y(0.24),
+      x(-0.94),
+      y(0.31),
+    )
+    ..cubicTo(
+      x(-0.78),
+      y(0.28),
+      x(-0.67),
+      y(0.16),
+      x(-0.61),
+      y(0.09),
+    )
+    // Lower body.
+    ..cubicTo(
+      x(-0.34),
+      y(0.23),
+      x(-0.06),
+      y(0.34),
+      x(0.18),
+      y(0.28),
+    )
+    // Pectoral fin is also contained in the same contour.
+    ..cubicTo(
+      x(0.21),
+      y(0.40),
+      x(0.23),
+      y(0.57),
+      x(0.30),
+      y(0.64),
+    )
+    ..cubicTo(
+      x(0.39),
+      y(0.54),
+      x(0.43),
+      y(0.38),
+      x(0.40),
+      y(0.25),
+    )
+    // Belly and short dolphin beak.
+    ..cubicTo(
+      x(0.62),
+      y(0.20),
+      x(0.82),
+      y(0.10),
+      x(0.98),
+      y(-0.08),
+    )
+    ..close();
 }
 
 (Color, Color) _tokenToneColors(ShapeTone tone) {
