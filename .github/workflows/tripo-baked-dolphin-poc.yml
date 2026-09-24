@@ -32,6 +32,11 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Generate fallback dolphin sprites
+        run: |
+          python3 -m pip install --disable-pip-version-check pillow
+          python3 tool/generate_dolphin_sprite.py
+
       - name: Bootstrap Android
         env:
           PLATFORMS: android
