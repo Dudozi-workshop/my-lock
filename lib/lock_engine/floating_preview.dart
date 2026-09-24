@@ -9,6 +9,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 
 import 'effects.dart';
 import 'floating_engine.dart';
+import 'glossy_sphere_3d.dart';
 import 'models.dart';
 import 'shape_painter.dart';
 
@@ -189,6 +190,18 @@ class _FloatingPreviewState extends State<FloatingPreview>
           _engine.resize(size);
         }
 
+        FloatingObject? threeDPocObject;
+        for (final object in _engine.objects) {
+          if (!object.isPopping && object.token.shape == ShapeKind.dolphin) {
+            threeDPocObject = object;
+            break;
+          }
+        }
+
+        final hiddenIds = threeDPocObject == null
+            ? const <int>{}
+            : <int>{threeDPocObject.id};
+
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapDown: (details) {
@@ -199,13 +212,34 @@ class _FloatingPreviewState extends State<FloatingPreview>
               setState(() {});
             }
           },
-          child: CustomPaint(
-            painter: FloatingShapePainter(
-              objects: _engine.objects,
-              popStyle: widget.popStyle,
-              texture: widget.texture,
-            ),
-            child: const SizedBox.expand(),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              CustomPaint(
+                painter: FloatingShapePainter(
+                  objects: _engine.objects,
+                  popStyle: widget.popStyle,
+                  texture: widget.texture,
+                  hiddenObjectIds: hiddenIds,
+                ),
+                child: const SizedBox.expand(),
+              ),
+              if (threeDPocObject != null)
+                Positioned(
+                  left: threeDPocObject.position.dx -
+                      threeDPocObject.radius * 1.16,
+                  top: threeDPocObject.position.dy -
+                      threeDPocObject.radius * 1.16,
+                  width: threeDPocObject.radius * 2.32,
+                  height: threeDPocObject.radius * 2.32,
+                  child: RepaintBoundary(
+                    child: GlossySphere3D(
+                      key: ValueKey('3d-poc-${threeDPocObject.id}'),
+                      tone: threeDPocObject.token.tone,
+                    ),
+                  ),
+                ),
+            ],
           ),
         );
       },
