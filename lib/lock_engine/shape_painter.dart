@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'effects.dart';
 import 'dolphin_mask_canvas.dart';
+import 'dolphin_visual_renderer_v2.dart';
 import 'models.dart';
 import 'shape_geometry.dart';
 
@@ -33,7 +34,7 @@ class LockTokenPainter extends CustomPainter {
     // Production/App Exact uses the raster-mask dolphin. Shape Lab draft
     // blueprints remain available for direct A/B comparison.
     if (token.shape == ShapeKind.dolphin && blueprintOverride == null) {
-      final painted = paintDolphinMaskCanvas(
+      final painted = paintDolphinVisualV2(
         canvas,
         center: center,
         radius: radius,
@@ -825,7 +826,7 @@ class FloatingShapePainter extends CustomPainter {
     canvas.translate(-object.position.dx, -object.position.dy);
 
     if (object.token.shape == ShapeKind.dolphin) {
-      final painted = paintDolphinMaskCanvas(
+      final painted = paintDolphinVisualV2(
         canvas,
         center: object.position,
         radius: radius,
