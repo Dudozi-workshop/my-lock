@@ -1,0 +1,51 @@
+name: MY LOCK Shape Lab Preview
+
+on:
+  push:
+    branches:
+      - feat/composite-shape-renderer
+    paths:
+      - 'lib/lock_engine/**'
+      - 'preview_test/**'
+      - 'pubspec.yaml'
+      - '.github/workflows/composite-shape-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mylock-shape-lab-preview
+  cancel-in-progress: true
+
+jobs:
+  render:
+    name: Render exact Flutter shape previews
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run app tests
+        run: flutter test test
+
+      - name: Render shape previews from production painter
+        run: flutter test --update-goldens preview_test/shape_preview_golden_test.dart
+
+      - name: Upload exact-render previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-lock-shape-preview
+          path: preview_test/goldens/*.png
+          if-no-files-found: error
+          retention-days: 14
