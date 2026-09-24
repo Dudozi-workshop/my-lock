@@ -8,8 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
 import 'effects.dart';
+import 'baked_sphere_sprite.dart';
 import 'floating_engine.dart';
-import 'glossy_sphere_3d.dart';
 import 'models.dart';
 import 'shape_painter.dart';
 
@@ -220,11 +220,14 @@ class _FloatingPreviewState extends State<FloatingPreview>
               if (dolphinIds.isNotEmpty)
                 Positioned.fill(
                   child: RepaintBoundary(
-                    child: FloatingSphere3DScene(
-                      objects: _engine.objects,
-                      viewportSize: size,
-                      texture: widget.texture,
-                      maxObjects: 12,
+                    child: CustomPaint(
+                      painter: BakedSphereSpritePainter(
+                        objects: _engine.objects,
+                        animationSeconds:
+                            _previous.inMicroseconds /
+                                Duration.microsecondsPerSecond,
+                      ),
+                      child: const SizedBox.expand(),
                     ),
                   ),
                 ),
