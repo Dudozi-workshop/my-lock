@@ -37,6 +37,7 @@ void main() {
     expect(ShapeKind.defaults.every((item) => !item.premium), isTrue);
     expect(ShapeTone.defaults.every((item) => !item.premium), isTrue);
     expect(ShapeTexture.glossy.premium, isFalse);
+    expect(ShapeKind.dolphin.premium, isTrue);
     expect(
       ShapeTexture.values.where((item) => item.premium).length,
       greaterThan(0),
