@@ -7,8 +7,8 @@ import 'package:flutter/services.dart';
 import 'models.dart';
 
 const int bakedDolphinFrameCount = 24;
-const double _sourceSize = 512;
 const int _frameSize = 160;
+const double _frameSizeD = 160.0;
 const Rect _sourceCrop = Rect.fromLTRB(18, 68, 493, 447);
 
 class BakedDolphinSpriteCache extends ChangeNotifier {
@@ -74,7 +74,7 @@ class BakedDolphinSpriteCache extends ChangeNotifier {
   Future<ui.Image> _renderBodyFrame(double phase) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    final frameBounds = Offset.zero & Size.square(_frameSize.toDouble());
+    const frameBounds = Rect.fromLTWH(0, 0, _frameSizeD, _frameSizeD);
 
     canvas.saveLayer(frameBounds, Paint());
 
@@ -129,7 +129,7 @@ class BakedDolphinSpriteCache extends ChangeNotifier {
   Future<ui.Image> _renderAccentFrame(double phase) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    final frameBounds = const Offset(0, 0) & const Size.square(_frameSize.toDouble());
+    const frameBounds = Rect.fromLTWH(0, 0, _frameSizeD, _frameSizeD);
 
     canvas.saveLayer(frameBounds, Paint());
 
@@ -163,8 +163,6 @@ class BakedDolphinSpriteCache extends ChangeNotifier {
     double phase,
   ) {
     final src = _sourceCrop;
-    final dst = Rect.fromLTWH(0, 0, _frameSize.toDouble(), _frameSize.toDouble());
-
     // Main body stays stable. A generous overlap hides the tail seam.
     final mainSource = Rect.fromLTRB(
       128,
@@ -176,8 +174,8 @@ class BakedDolphinSpriteCache extends ChangeNotifier {
     final mainDst = Rect.fromLTRB(
       mainLeft - 5,
       0,
-      _frameSize.toDouble(),
-      _frameSize.toDouble(),
+      _frameSizeD,
+      _frameSizeD,
     );
 
     canvas.drawImageRect(
@@ -198,12 +196,12 @@ class BakedDolphinSpriteCache extends ChangeNotifier {
       0,
       0,
       tailWidth,
-      _frameSize.toDouble(),
+      _frameSizeD,
     );
 
-    final pivot = Offset(
-      _frameSize * 0.31,
-      _frameSize * 0.58,
+    const pivot = Offset(
+      _frameSizeD * 0.31,
+      _frameSizeD * 0.58,
     );
     final swayRadians = math.sin(phase) * 0.095;
 
@@ -224,12 +222,7 @@ class BakedDolphinSpriteCache extends ChangeNotifier {
     canvas.drawImageRect(
       image,
       _sourceCrop,
-      Rect.fromLTWH(
-        0,
-        0,
-        _frameSize.toDouble(),
-        _frameSize.toDouble(),
-      ),
+      const Rect.fromLTWH(0, 0, _frameSizeD, _frameSizeD),
       Paint()..filterQuality = FilterQuality.high,
     );
   }
