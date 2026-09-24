@@ -96,8 +96,8 @@ bool paintDolphinMaskCanvas(
   // wider than tall; only the alpha silhouette is visible.
   final dst = Rect.fromCenter(
     center: center,
-    width: radius * 3.30,
-    height: radius * 2.50,
+    width: radius * 2.88,
+    height: radius * 2.62,
   );
   final src = Rect.fromLTWH(
     0,
@@ -175,7 +175,6 @@ bool paintDolphinMaskCanvas(
     );
   }
 
-  _paintEye(canvas, dst, opacity);
   return true;
 }
 
@@ -356,25 +355,6 @@ void _paintSpecular(
   canvas.restore();
 }
 
-void _paintEye(Canvas canvas, Rect dst, double opacity) {
-  final eyeCenter = Offset(
-    dst.left + dst.width * 0.73,
-    dst.top + dst.height * 0.435,
-  );
-  final eyeRadius = dst.width * 0.014;
-
-  canvas.drawCircle(
-    eyeCenter,
-    eyeRadius,
-    Paint()..color = const Color(0xFF11131A).withValues(alpha: opacity),
-  );
-  canvas.drawCircle(
-    eyeCenter.translate(-eyeRadius * .25, -eyeRadius * .28),
-    eyeRadius * .30,
-    Paint()..color = Colors.white.withValues(alpha: opacity),
-  );
-}
-
 Gradient _bodyGradient(
   ShapeTexture texture,
   Color light,
@@ -383,14 +363,16 @@ Gradient _bodyGradient(
   switch (texture) {
     case ShapeTexture.glossy:
       return RadialGradient(
-        center: const Alignment(-0.40, -0.50),
-        radius: 1.20,
+        center: const Alignment(-0.38, -0.46),
+        radius: 1.18,
         colors: [
           Colors.white,
+          Color.lerp(light, Colors.white, 0.46)!,
           light,
+          Color.lerp(light, dark, 0.34)!,
           dark,
         ],
-        stops: const [0.0, 0.40, 1.0],
+        stops: const [0.0, 0.16, 0.48, 0.76, 1.0],
       );
     case ShapeTexture.jelly:
       return RadialGradient(
