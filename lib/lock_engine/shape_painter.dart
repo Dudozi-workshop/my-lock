@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'effects.dart';
+import 'crystal_sprite.dart';
 import 'models.dart';
 import 'shape_geometry.dart';
 
@@ -212,14 +213,26 @@ void _paintStyledShape(
 
   if (texture == ShapeTexture.glass) {
     if (crystalKind == ShapeKind.circle) {
-      _paintRoundCutCrystal(
-        canvas,
-        path: path,
-        center: center,
-        radius: radius,
-        tone: tone,
-        opacity: opacity,
-      );
+      final sprite = tone == ShapeTone.blue ? CrystalSprite.blueCircle : null;
+      if (sprite != null) {
+        canvas.drawImageRect(
+          sprite,
+          Rect.fromLTWH(0, 0, sprite.width.toDouble(), sprite.height.toDouble()),
+          bounds,
+          Paint()
+            ..filterQuality = FilterQuality.high
+            ..color = Colors.white.withValues(alpha: opacity),
+        );
+      } else {
+        _paintRoundCutCrystal(
+          canvas,
+          path: path,
+          center: center,
+          radius: radius,
+          tone: tone,
+          opacity: opacity,
+        );
+      }
     } else {
       _paintCrystalShape(
         canvas,
