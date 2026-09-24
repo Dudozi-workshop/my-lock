@@ -8,7 +8,8 @@ enum ShapeKind {
   heart('하트', true),
   diamond('다이아', true),
   hexagon('육각형', true),
-  crescent('달', true);
+  crescent('달', true),
+  dolphin('돌고래', true);
 
   const ShapeKind(this.label, this.premium);
 
