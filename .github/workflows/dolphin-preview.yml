@@ -1,0 +1,58 @@
+name: MY LOCK Dolphin Branch Preview
+
+on:
+  push:
+    branches:
+      - feat/dolphin-shape-static
+    paths:
+      - 'lib/**'
+      - 'assets/**'
+      - 'pubspec.yaml'
+      - 'analysis_options.yaml'
+      - 'tool/**'
+      - 'wrangler.jsonc'
+      - '.github/workflows/dolphin-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mylock-dolphin-preview
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Build and deploy Dolphin preview
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Build web
+        run: bash tool/build_web.sh
+
+      - name: Upload web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-lock-dolphin-preview-web
+          path: build/web
+          if-no-files-found: error
+
+      - name: Deploy branch preview to Cloudflare Worker
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config wrangler.jsonc --name my-lock-dolphin-preview
