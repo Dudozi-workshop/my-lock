@@ -1,19 +1,12 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import 'dolphin_mask_assets.dart';
 import 'models.dart';
 
-/// Raster-mask renderer used by Shape Lab to validate complex illustrated
-/// shapes without requiring a hand-authored SVG/Path.
-///
-/// All mask assets share the same 1024 x 1024 coordinate space:
-/// - body: full dolphin silhouette
-/// - mouth accent: lower snout only
-/// - belly accent: lower belly band only
-///
-/// The renderer recolors the masks at runtime so shape, palette and material
-/// remain separate product dimensions.
 class DolphinMaskRenderer extends StatelessWidget {
   const DolphinMaskRenderer({
     super.key,
@@ -24,12 +17,6 @@ class DolphinMaskRenderer extends StatelessWidget {
     this.showBellyAccent = true,
     this.showEye = true,
   });
-
-  static const bodyAsset = 'assets/shapes/dolphin/dolphin_body.png';
-  static const mouthAsset =
-      'assets/shapes/dolphin/dolphin_mouth_accent.png';
-  static const bellyAsset =
-      'assets/shapes/dolphin/dolphin_belly_accent.png';
 
   final ShapeTone tone;
   final ShapeTexture texture;
@@ -50,28 +37,26 @@ class DolphinMaskRenderer extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         if (showBody) ...[
-          // Soft halo. It is intentionally subtle; the PoC validates that the
-          // alpha mask survives material rendering and motion-scale changes.
           Opacity(
-            opacity: texture == ShapeTexture.matte ? 0.12 : 0.22,
+            opacity: texture == ShapeTexture.matte ? 0.10 : 0.20,
             child: ImageFiltered(
               imageFilter: ui.ImageFilter.blur(sigmaX: 2.2, sigmaY: 2.2),
               child: _solidMask(
-                asset: bodyAsset,
+                data: _decodedBody,
                 color: Colors.white,
               ),
             ),
           ),
-          _gradientMask(asset: bodyAsset, gradient: bodyGradient),
+          _gradientMask(data: _decodedBody, gradient: bodyGradient),
         ],
         if (showBellyAccent)
           _solidMask(
-            asset: bellyAsset,
+            data: _decodedBelly,
             color: belly.withValues(alpha: _accentAlpha(texture, false)),
           ),
         if (showMouthAccent)
           _solidMask(
-            asset: mouthAsset,
+            data: _decodedMouth,
             color: mouth.withValues(alpha: _accentAlpha(texture, true)),
           ),
         if (showBody && texture != ShapeTexture.matte)
@@ -134,14 +119,18 @@ class DolphinMaskRenderer extends StatelessWidget {
   }
 }
 
+final Uint8List _decodedBody = base64Decode(dolphinBodyPngBase64);
+final Uint8List _decodedMouth = base64Decode(dolphinMouthPngBase64);
+final Uint8List _decodedBelly = base64Decode(dolphinBellyPngBase64);
+
 Widget _solidMask({
-  required String asset,
+  required Uint8List data,
   required Color color,
 }) {
   return ColorFiltered(
     colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-    child: Image.asset(
-      asset,
+    child: Image.memory(
+      data,
       fit: BoxFit.contain,
       filterQuality: FilterQuality.high,
       isAntiAlias: true,
@@ -151,14 +140,14 @@ Widget _solidMask({
 }
 
 Widget _gradientMask({
-  required String asset,
+  required Uint8List data,
   required Gradient gradient,
 }) {
   return ShaderMask(
     blendMode: BlendMode.srcIn,
     shaderCallback: gradient.createShader,
-    child: Image.asset(
-      asset,
+    child: Image.memory(
+      data,
       fit: BoxFit.contain,
       filterQuality: FilterQuality.high,
       isAntiAlias: true,
