@@ -60,8 +60,8 @@ class DolphinMaskCanvasCache extends ChangeNotifier {
     );
     final codec = await ui.instantiateImageCodec(
       bytes,
-      targetWidth: 256,
-      targetHeight: 256,
+      targetWidth: 512,
+      targetHeight: 512,
     );
     final frame = await codec.getNextFrame();
     codec.dispose();
@@ -376,14 +376,15 @@ Gradient _bodyGradient(
       );
     case ShapeTexture.jelly:
       return RadialGradient(
-        center: const Alignment(-0.34, -0.45),
-        radius: 1.16,
+        center: const Alignment(-0.30, -0.42),
+        radius: 1.12,
         colors: [
-          Colors.white.withValues(alpha: 0.88),
-          light.withValues(alpha: 0.90),
-          dark.withValues(alpha: 0.94),
+          Color.lerp(light, Colors.white, 0.66)!.withValues(alpha: 0.94),
+          light.withValues(alpha: 0.92),
+          Color.lerp(light, dark, 0.48)!.withValues(alpha: 0.94),
+          dark.withValues(alpha: 0.96),
         ],
-        stops: const [0.0, 0.42, 1.0],
+        stops: const [0.0, 0.36, 0.74, 1.0],
       );
     case ShapeTexture.glass:
       return LinearGradient(
