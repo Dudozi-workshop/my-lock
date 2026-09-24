@@ -54,7 +54,7 @@ class BakedSphereSpriteCache extends ChangeNotifier {
   Future<ui.Image> _renderBody() async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    const size = Size.square(_bakedSphereFrameSize.toDouble());
+    final size = Size.square(_bakedSphereFrameSize.toDouble());
     final bounds = Offset.zero & size;
 
     final sphere = Rect.fromCenter(
@@ -105,8 +105,6 @@ class BakedSphereSpriteCache extends ChangeNotifier {
   Future<ui.Image> _renderSpecularFrame(int frame) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    const size = Size.square(_bakedSphereFrameSize.toDouble());
-
     final phase = frame / bakedSphereFrameCount * math.pi * 2;
     final dx = math.sin(phase) * 4.2;
     final dy = math.cos(phase) * 2.2;
