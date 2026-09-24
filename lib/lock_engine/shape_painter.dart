@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'effects.dart';
 import 'models.dart';
+import 'shape_geometry.dart';
 
 class LockTokenPainter extends CustomPainter {
   const LockTokenPainter(
@@ -18,6 +19,21 @@ class LockTokenPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
     final radius = size.shortestSide * 0.31;
+    final illustrated =
+        buildIllustratedShapeGeometry(token.shape, center, radius);
+    if (illustrated != null) {
+      _paintIllustratedShape(
+        canvas,
+        geometry: illustrated,
+        center: center,
+        radius: radius,
+        tone: token.tone,
+        texture: texture,
+        opacity: 1,
+      );
+      return;
+    }
+
     final path = _tokenShapePath(token.shape, center, radius);
     _paintStyledShape(
       canvas,
@@ -143,6 +159,8 @@ Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
           ),
         );
       return Path.combine(PathOperation.difference, outer, cutout);
+    case ShapeKind.dolphin:
+      return buildIllustratedShapeGeometry(kind, center, radius)!.combinedPath;
   }
 }
 
@@ -302,6 +320,68 @@ void _paintStyledShape(
   }
 }
 
+void _paintIllustratedShape(
+  Canvas canvas, {
+  required IllustratedShapeGeometry geometry,
+  required Offset center,
+  required double radius,
+  required ShapeTone tone,
+  required ShapeTexture texture,
+  required double opacity,
+}) {
+  // First render the union silhouette through the existing material pipeline.
+  // This keeps illustrated shapes visually consistent with the basic catalog.
+  _paintStyledShape(
+    canvas,
+    path: geometry.combinedPath,
+    center: center,
+    radius: radius,
+    tone: tone,
+    texture: texture,
+    opacity: opacity,
+  );
+
+  final colors = _tokenToneColors(tone);
+  final shadeAlpha = switch (texture) {
+    ShapeTexture.glass => 0.08,
+    ShapeTexture.jelly => 0.10,
+    ShapeTexture.glossy => 0.12,
+    ShapeTexture.matte => 0.08,
+    ShapeTexture.metal => 0.18,
+    ShapeTexture.chrome => 0.20,
+    ShapeTexture.hologram => 0.10,
+  };
+
+  // Separate geometry parts are allowed internally, but they must still read
+  // as one object. A light shared tint gives fins/tail depth without visible
+  // seams or fixed artwork colors.
+  final appendagePaint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = colors.$2.withValues(alpha: shadeAlpha * opacity);
+
+  for (final part in geometry.parts) {
+    if (part.role == ShapePartRole.body) continue;
+    canvas.drawPath(part.path, appendagePaint);
+  }
+
+  if (texture == ShapeTexture.matte) return;
+
+  // Small per-part highlights make Glass/Jelly/Metal more expressive while
+  // preserving the selected palette color as the shape identity.
+  final partHighlight = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = max(0.9, radius * 0.025)
+    ..strokeCap = StrokeCap.round
+    ..color = Colors.white.withValues(
+      alpha: (texture == ShapeTexture.glass ? 0.32 : 0.18) * opacity,
+    );
+
+  for (final part in geometry.parts) {
+    if (part.role == ShapePartRole.body) continue;
+    canvas.drawPath(part.path, partHighlight);
+  }
+}
+
 class FloatingShapePainter extends CustomPainter {
   const FloatingShapePainter({
     required this.objects,
@@ -367,17 +447,34 @@ class FloatingShapePainter extends CustomPainter {
     canvas.rotate(object.rotation);
     canvas.translate(-object.position.dx, -object.position.dy);
 
-    final path = _shapePath(object.token.shape, object.position, radius);
-
-    _paintStyledShape(
-      canvas,
-      path: path,
-      center: object.position,
-      radius: radius,
-      tone: object.token.tone,
-      texture: texture,
-      opacity: opacity,
+    final illustrated = buildIllustratedShapeGeometry(
+      object.token.shape,
+      object.position,
+      radius,
     );
+
+    if (illustrated != null) {
+      _paintIllustratedShape(
+        canvas,
+        geometry: illustrated,
+        center: object.position,
+        radius: radius,
+        tone: object.token.tone,
+        texture: texture,
+        opacity: opacity,
+      );
+    } else {
+      final path = _shapePath(object.token.shape, object.position, radius);
+      _paintStyledShape(
+        canvas,
+        path: path,
+        center: object.position,
+        radius: radius,
+        tone: object.token.tone,
+        texture: texture,
+        opacity: opacity,
+      );
+    }
 
     canvas.restore();
   }
