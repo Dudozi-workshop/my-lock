@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
+import 'package:my_lock/lock_engine/shape_geometry.dart';
 
 void main() {
   runApp(const ShapeLabApp());
@@ -44,6 +45,15 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
   double offsetX = 0.0;
   double offsetY = 0.0;
 
+  double forehead = 0.0;
+  double snout = 0.0;
+  double bodyDepth = 1.0;
+  double tailScale = 1.0;
+  bool accentEnabled = false;
+  double accentSize = 1.0;
+  double accentY = 0.0;
+  double accentLightness = 0.48;
+
   void resetDraft() {
     setState(() {
       overallScale = 1.0;
@@ -51,6 +61,14 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
       scaleY = 1.0;
       offsetX = 0.0;
       offsetY = 0.0;
+      forehead = 0.0;
+      snout = 0.0;
+      bodyDepth = 1.0;
+      tailScale = 1.0;
+      accentEnabled = false;
+      accentSize = 1.0;
+      accentY = 0.0;
+      accentLightness = 0.48;
     });
   }
 
@@ -75,6 +93,18 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
       offsetX: offsetX,
       offsetY: offsetY,
     );
+
+    final draftBlueprint = draftMode && shape == ShapeKind.dolphin
+        ? _buildDolphinDraftBlueprint(
+            forehead: forehead,
+            snout: snout,
+            bodyDepth: bodyDepth,
+            tailScale: tailScale,
+            accentEnabled: accentEnabled,
+            accentSize: accentSize,
+            accentY: accentY,
+          )
+        : null;
 
     return Scaffold(
       backgroundColor: pageColor,
@@ -189,6 +219,8 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                                       texture: texture,
                                       background: pageColor,
                                       transform: transform,
+                                      blueprintOverride: draftBlueprint,
+                                      accentLightness: accentLightness,
                                     ),
                                   ),
                                 ),
@@ -218,6 +250,8 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                                 texture: texture,
                                 background: pageColor,
                                 transform: transform,
+                                blueprintOverride: draftBlueprint,
+                                accentLightness: accentLightness,
                               ),
                             ),
                             const SizedBox(height: 14),
@@ -287,12 +321,110 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                               texture: texture,
                               background: pageColor,
                               transform: transform,
+                              blueprintOverride: draftBlueprint,
+                              accentLightness: accentLightness,
                             ),
                           ],
                         ),
                       ],
                     ),
                   ),
+
+                  if (shape == ShapeKind.dolphin) ...[
+                    const SizedBox(height: 16),
+                    _Panel(
+                      color: cardColor,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Dolphin Shape Controls',
+                            style: TextStyle(
+                              color: textColor,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            draftMode
+                                ? '여기 값은 Shape Lab 초안에만 적용. APP EXACT/본앱 코드는 바뀌지 않음.'
+                                : 'Draft를 켜면 돌고래 실루엣을 즉시 조정할 수 있음.',
+                            style: TextStyle(color: muted, fontSize: 13),
+                          ),
+                          const SizedBox(height: 12),
+                          _LabSlider(
+                            label: 'Forehead',
+                            value: forehead,
+                            min: -5,
+                            max: 5,
+                            enabled: draftMode,
+                            decimals: 1,
+                            onChanged: (value) => setState(() => forehead = value),
+                          ),
+                          _LabSlider(
+                            label: 'Snout',
+                            value: snout,
+                            min: -6,
+                            max: 6,
+                            enabled: draftMode,
+                            decimals: 1,
+                            onChanged: (value) => setState(() => snout = value),
+                          ),
+                          _LabSlider(
+                            label: 'Body depth',
+                            value: bodyDepth,
+                            min: 0.82,
+                            max: 1.18,
+                            enabled: draftMode,
+                            onChanged: (value) => setState(() => bodyDepth = value),
+                          ),
+                          _LabSlider(
+                            label: 'Tail',
+                            value: tailScale,
+                            min: 0.78,
+                            max: 1.25,
+                            enabled: draftMode,
+                            onChanged: (value) => setState(() => tailScale = value),
+                          ),
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text('Belly Accent'),
+                            subtitle: const Text('선택 색상에서 자동으로 연한 톤 파생'),
+                            value: accentEnabled,
+                            onChanged: draftMode
+                                ? (value) => setState(() => accentEnabled = value)
+                                : null,
+                          ),
+                          _LabSlider(
+                            label: 'Accent size',
+                            value: accentSize,
+                            min: 0.70,
+                            max: 1.30,
+                            enabled: draftMode && accentEnabled,
+                            onChanged: (value) => setState(() => accentSize = value),
+                          ),
+                          _LabSlider(
+                            label: 'Accent Y',
+                            value: accentY,
+                            min: -6,
+                            max: 6,
+                            enabled: draftMode && accentEnabled,
+                            decimals: 1,
+                            onChanged: (value) => setState(() => accentY = value),
+                          ),
+                          _LabSlider(
+                            label: 'Accent light',
+                            value: accentLightness,
+                            min: 0.18,
+                            max: 0.72,
+                            enabled: draftMode && accentEnabled,
+                            onChanged: (value) =>
+                                setState(() => accentLightness = value),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
 
                   const SizedBox(height: 16),
                   _Panel(
@@ -390,6 +522,101 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
   }
 }
 
+
+ShapeBlueprint _buildDolphinDraftBlueprint({
+  required double forehead,
+  required double snout,
+  required double bodyDepth,
+  required double tailScale,
+  required bool accentEnabled,
+  required double accentSize,
+  required double accentY,
+}) {
+  final source = shapeBlueprintFor(ShapeKind.dolphin)!;
+  final body = source.parts.firstWhere(
+    (part) => part.role == ShapePartRole.body,
+  );
+
+  Offset tune(Offset point) {
+    var x = point.dx;
+    var y = point.dy;
+
+    // Head is on the left side of the approved trace.
+    if (x <= 48 && y <= 39) {
+      final influence = ((48 - x) / 40).clamp(0.0, 1.0);
+      y -= forehead * influence;
+    }
+
+    if (x <= 27 && y >= 36 && y <= 53) {
+      final influence = ((27 - x) / 19).clamp(0.0, 1.0);
+      x -= snout * influence;
+    }
+
+    // Body depth adjustment keeps the dorsal profile mostly stable and moves
+    // the lower half around the design center.
+    if (x >= 30 && x <= 76 && y >= 46) {
+      y = 50 + (y - 50) * bodyDepth;
+    }
+
+    // Tail is transformed around the peduncle so the connection point stays
+    // stable while the flukes gain/lose visual mass.
+    if (x >= 75) {
+      x = 75 + (x - 75) * tailScale;
+      y = 56 + (y - 56) * tailScale;
+    }
+
+    return Offset(x, y);
+  }
+
+  final parts = <ShapeTracePart>[
+    ShapeTracePart(
+      role: ShapePartRole.body,
+      points: body.points.map(tune).toList(growable: false),
+    ),
+  ];
+
+  if (accentEnabled) {
+    const baseAccent = <Offset>[
+      Offset(29, 49),
+      Offset(35, 52),
+      Offset(42, 55),
+      Offset(51, 57.5),
+      Offset(61, 58.5),
+      Offset(70, 57),
+      Offset(74, 55),
+      Offset(71, 60),
+      Offset(64, 63),
+      Offset(55, 64),
+      Offset(45, 63),
+      Offset(36, 60),
+      Offset(30, 56),
+    ];
+
+    final accentCenter = Offset(51, 56 + accentY);
+    final accentPoints = baseAccent.map((point) {
+      final moved = Offset(point.dx, point.dy + accentY);
+      return Offset(
+        accentCenter.dx + (moved.dx - accentCenter.dx) * accentSize,
+        accentCenter.dy + (moved.dy - accentCenter.dy) * accentSize,
+      );
+    }).toList(growable: false);
+
+    parts.add(
+      ShapeTracePart(
+        role: ShapePartRole.accent,
+        points: accentPoints,
+      ),
+    );
+  }
+
+  return ShapeBlueprint(
+    kind: ShapeKind.dolphin,
+    referenceRadius: source.referenceRadius,
+    opticalBounds: source.opticalBounds,
+    parts: parts,
+  );
+}
+
 class _DraftTransform {
   const _DraftTransform({
     required this.enabled,
@@ -415,6 +642,8 @@ class _TokenPreview extends StatelessWidget {
     required this.texture,
     required this.background,
     required this.transform,
+    this.blueprintOverride,
+    this.accentLightness = 0.48,
   });
 
   final ShapeKind shape;
@@ -422,6 +651,8 @@ class _TokenPreview extends StatelessWidget {
   final ShapeTexture texture;
   final Color background;
   final _DraftTransform transform;
+  final ShapeBlueprint? blueprintOverride;
+  final double accentLightness;
 
   @override
   Widget build(BuildContext context) {
@@ -433,6 +664,8 @@ class _TokenPreview extends StatelessWidget {
           token: token,
           texture: texture,
           transform: transform,
+          blueprintOverride: blueprintOverride,
+          accentLightness: accentLightness,
         ),
       ),
     );
@@ -444,15 +677,24 @@ class _ShapeLabPainter extends CustomPainter {
     required this.token,
     required this.texture,
     required this.transform,
+    this.blueprintOverride,
+    this.accentLightness = 0.48,
   });
 
   final LockToken token;
   final ShapeTexture texture;
   final _DraftTransform transform;
+  final ShapeBlueprint? blueprintOverride;
+  final double accentLightness;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final delegate = LockTokenPainter(token, texture: texture);
+    final delegate = LockTokenPainter(
+      token,
+      texture: texture,
+      blueprintOverride: blueprintOverride,
+      accentLightness: accentLightness,
+    );
     if (!transform.enabled) {
       delegate.paint(canvas, size);
       return;
@@ -482,7 +724,9 @@ class _ShapeLabPainter extends CustomPainter {
         oldDelegate.transform.scaleX != transform.scaleX ||
         oldDelegate.transform.scaleY != transform.scaleY ||
         oldDelegate.transform.offsetX != transform.offsetX ||
-        oldDelegate.transform.offsetY != transform.offsetY;
+        oldDelegate.transform.offsetY != transform.offsetY ||
+        oldDelegate.blueprintOverride != blueprintOverride ||
+        oldDelegate.accentLightness != accentLightness;
   }
 }
 
@@ -501,6 +745,8 @@ class _CompareToken extends StatelessWidget {
       offsetX: 0,
       offsetY: 0,
     ),
+    this.blueprintOverride,
+    this.accentLightness = 0.48,
   });
 
   final String label;
@@ -509,6 +755,8 @@ class _CompareToken extends StatelessWidget {
   final ShapeTexture texture;
   final Color background;
   final _DraftTransform transform;
+  final ShapeBlueprint? blueprintOverride;
+  final double accentLightness;
 
   @override
   Widget build(BuildContext context) {
@@ -522,6 +770,8 @@ class _CompareToken extends StatelessWidget {
             texture: texture,
             background: background,
             transform: transform,
+            blueprintOverride: blueprintOverride,
+            accentLightness: accentLightness,
           ),
         ),
         const SizedBox(height: 6),
