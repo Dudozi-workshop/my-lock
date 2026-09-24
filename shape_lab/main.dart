@@ -4,6 +4,7 @@ import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/effects.dart';
 import 'package:my_lock/lock_engine/floating_preview.dart';
 import 'package:my_lock/lock_engine/glossy_sphere_3d.dart';
+import 'package:my_lock/lock_engine/baked_dolphin_sprite.dart';
 import 'package:my_lock/lock_engine/dolphin_mask_renderer.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 import 'package:my_lock/lock_engine/shape_geometry.dart';
@@ -250,6 +251,61 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                   ),
 
                   if (shape == ShapeKind.dolphin) ...[
+                    const SizedBox(height: 16),
+                    _Panel(
+                      color: cardColor,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Dolphin Visual Check',
+                            style: TextStyle(
+                              color: textColor,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '기술 PoC와 분리된 비주얼 전용 화면입니다. 아래 큰 프리뷰로 형태/질감을 보고, 축소 샘플로 실제 잠금 크기에서 깨짐 여부를 확인합니다.',
+                            style: TextStyle(color: muted, fontSize: 13),
+                          ),
+                          const SizedBox(height: 14),
+                          Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 420),
+                              child: AspectRatio(
+                                aspectRatio: 1.15,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: BakedDolphinPreview(
+                                    tone: tone,
+                                    background: const Color(0xFF081628),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          Wrap(
+                            spacing: 14,
+                            runSpacing: 12,
+                            alignment: WrapAlignment.center,
+                            children: const [
+                              _DolphinSizeCheck(size: 160, label: '160'),
+                              _DolphinSizeCheck(size: 120, label: '120'),
+                              _DolphinSizeCheck(size: 96, label: '96'),
+                              _DolphinSizeCheck(size: 80, label: '80'),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            '판정 순서: 160px 형태 → 120/96px 질감 → 80px 실사용 가독성. 이 영역에서 괜찮아야 아래 엔진 테스트로 넘어갑니다.',
+                            style: TextStyle(color: muted, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     _Panel(
                       color: cardColor,
@@ -1441,6 +1497,42 @@ class _VariantCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DolphinSizeCheck extends StatelessWidget {
+  const _DolphinSizeCheck({
+    required this.size,
+    required this.label,
+  });
+
+  final double size;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox.square(
+          dimension: size,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: const BakedDolphinPreview(
+              tone: ShapeTone.blue,
+              background: Color(0xFF081628),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          '$label px',
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
     );
   }
 }
