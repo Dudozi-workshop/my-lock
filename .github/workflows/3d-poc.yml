@@ -1,0 +1,75 @@
+name: MY LOCK 3D PoC
+
+on:
+  push:
+    branches:
+      - feat/3d-renderer-poc
+  workflow_dispatch:
+
+concurrency:
+  group: mylock-3d-poc-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android 3D PoC
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Bootstrap Android
+        env:
+          PLATFORMS: android
+        run: bash tool/bootstrap.sh
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Build ARM64 debug APK
+        run: flutter build apk --debug --target-platform android-arm64 --split-per-abi
+
+      - name: Prepare APK
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-debug.apk dist/my-lock-3d-poc-arm64.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-lock-3d-poc-arm64
+          path: dist/my-lock-3d-poc-arm64.apk
+          retention-days: 7
+
+  web:
+    name: Web 3D PoC compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Bootstrap Web
+        env:
+          PLATFORMS: web
+        run: bash tool/bootstrap.sh
+
+      - name: Build Web
+        run: flutter build web --release
