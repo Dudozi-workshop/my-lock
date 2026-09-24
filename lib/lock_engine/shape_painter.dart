@@ -10,16 +10,25 @@ class LockTokenPainter extends CustomPainter {
   const LockTokenPainter(
     this.token, {
     this.texture = ShapeTexture.glossy,
+    this.blueprintOverride,
+    this.accentLightness = 0.48,
   });
 
   final LockToken token;
   final ShapeTexture texture;
 
+  /// Shape Lab can supply a draft blueprint while still using this exact
+  /// production painter. Normal app rendering leaves this null.
+  final ShapeBlueprint? blueprintOverride;
+
+  /// Blend amount toward white for ShapePartRole.accent.
+  final double accentLightness;
+
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
     final radius = size.shortestSide * 0.31;
-    final illustrated =
+    final illustrated = blueprintOverride?.build(center, radius) ??
         buildIllustratedShapeGeometry(token.shape, center, radius);
     if (illustrated != null) {
       _paintIllustratedShape(
@@ -30,6 +39,7 @@ class LockTokenPainter extends CustomPainter {
         tone: token.tone,
         texture: texture,
         opacity: 1,
+        accentLightness: accentLightness,
       );
       return;
     }
@@ -48,7 +58,10 @@ class LockTokenPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant LockTokenPainter oldDelegate) =>
-      oldDelegate.token.id != token.id || oldDelegate.texture != texture;
+      oldDelegate.token.id != token.id ||
+      oldDelegate.texture != texture ||
+      oldDelegate.blueprintOverride != blueprintOverride ||
+      oldDelegate.accentLightness != accentLightness;
 }
 
 Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
@@ -328,6 +341,7 @@ void _paintIllustratedShape(
   required ShapeTone tone,
   required ShapeTexture texture,
   required double opacity,
+  double accentLightness = 0.48,
 }) {
   // First render the union silhouette through the existing material pipeline.
   // This keeps illustrated shapes visually consistent with the basic catalog.
@@ -342,6 +356,39 @@ void _paintIllustratedShape(
   );
 
   final colors = _tokenToneColors(tone);
+
+  final accentAlpha = switch (texture) {
+    ShapeTexture.glossy => 0.88,
+    ShapeTexture.jelly => 0.76,
+    ShapeTexture.glass => 0.46,
+    ShapeTexture.matte => 0.90,
+    ShapeTexture.metal => 0.62,
+    ShapeTexture.chrome => 0.46,
+    ShapeTexture.hologram => 0.38,
+  };
+  final accentColor = tone == ShapeTone.white
+      ? const Color(0xFFF1F2F6)
+      : Color.lerp(
+          colors.$1,
+          Colors.white,
+          accentLightness.clamp(0.0, 0.85),
+        )!;
+
+  // Accent is a detail layer, not part of the authentication color identity.
+  // It is clipped to the silhouette and derived from the selected tone.
+  canvas.save();
+  canvas.clipPath(geometry.combinedPath);
+  for (final part in geometry.parts) {
+    if (part.role != ShapePartRole.accent) continue;
+    canvas.drawPath(
+      part.path,
+      Paint()
+        ..style = PaintingStyle.fill
+        ..color = accentColor.withValues(alpha: accentAlpha * opacity),
+    );
+  }
+  canvas.restore();
+
   final shadeAlpha = switch (texture) {
     ShapeTexture.glass => 0.08,
     ShapeTexture.jelly => 0.10,
@@ -360,7 +407,10 @@ void _paintIllustratedShape(
     ..color = colors.$2.withValues(alpha: shadeAlpha * opacity);
 
   for (final part in geometry.parts) {
-    if (part.role == ShapePartRole.body) continue;
+    if (part.role == ShapePartRole.body ||
+        part.role == ShapePartRole.accent) {
+      continue;
+    }
     canvas.drawPath(part.path, appendagePaint);
   }
 
@@ -377,7 +427,10 @@ void _paintIllustratedShape(
     );
 
   for (final part in geometry.parts) {
-    if (part.role == ShapePartRole.body) continue;
+    if (part.role == ShapePartRole.body ||
+        part.role == ShapePartRole.accent) {
+      continue;
+    }
     canvas.drawPath(part.path, partHighlight);
   }
 }
