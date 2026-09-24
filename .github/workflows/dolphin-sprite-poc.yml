@@ -1,0 +1,106 @@
+name: MY LOCK Dolphin Sprite PoC
+
+on:
+  push:
+    branches:
+      - feat/dolphin-sprite-poc
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: my-lock-dolphin-sprite-poc
+  cancel-in-progress: true
+
+jobs:
+  verify-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Generate baked dolphin sprites
+        run: |
+          python3 -m pip install --disable-pip-version-check pillow
+          python3 tool/generate_dolphin_sprite.py
+
+      - name: Bootstrap Android
+        env:
+          PLATFORMS: android
+        run: bash tool/bootstrap.sh
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Export exact previews
+        run: flutter test preview_test/shape_preview_golden_test.dart --update-goldens
+
+      - name: Upload sprite source preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: dolphin-sprite-poc-source-preview
+          path: assets/shapes/dolphin_sprite/dolphin_sprite_poc_preview.png
+          retention-days: 14
+
+      - name: Upload exact-render previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-lock-dolphin-sprite-poc-previews
+          path: preview_test/goldens
+          retention-days: 14
+
+      - name: Build ARM64 APK
+        run: flutter build apk --release --target-platform android-arm64 --split-per-abi
+
+      - name: Prepare APK
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk dist/my-lock-dolphin-sprite-poc-arm64.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-lock-dolphin-sprite-poc-arm64
+          path: dist/my-lock-dolphin-sprite-poc-arm64.apk
+          retention-days: 14
+
+  publish-release:
+    needs: verify-and-build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-lock-dolphin-sprite-poc-arm64
+          path: dist
+
+      - name: Publish direct-download release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="dolphin-sprite-poc-latest"
+          APK="dist/my-lock-dolphin-sprite-poc-arm64.apk"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" --clobber
+          else
+            gh release create "$TAG" "$APK" \
+              --target "$GITHUB_SHA" \
+              --title "MY LOCK Dolphin Sprite PoC" \
+              --notes "Baked 2.5D dolphin sprite PoC. Blue and pink glossy colors; subtle independent tail animation; existing floating physics retained." \
+              --prerelease
+          fi
