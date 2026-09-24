@@ -6,6 +6,8 @@ import 'effects.dart';
 import 'dolphin_mask_canvas.dart';
 import 'dolphin_sprite_cache.dart';
 import 'dolphin_sprite_renderer.dart';
+import 'dolphin_tripo_baked_cache.dart';
+import 'dolphin_tripo_baked_renderer.dart';
 import 'dolphin_visual_renderer_v2.dart';
 import 'models.dart';
 import 'shape_geometry.dart';
@@ -19,6 +21,7 @@ class LockTokenPainter extends CustomPainter {
   }) : super(repaint: Listenable.merge([
           DolphinMaskCanvasCache.instance,
           DolphinSpriteCache.instance,
+          DolphinTripoBakedCache.instance,
         ]));
 
   final LockToken token;
@@ -39,6 +42,16 @@ class LockTokenPainter extends CustomPainter {
     // Production/App Exact uses the raster-mask dolphin. Shape Lab draft
     // blueprints remain available for direct A/B comparison.
     if (token.shape == ShapeKind.dolphin && blueprintOverride == null) {
+      final tripoPainted = paintDolphinTripoBaked(
+        canvas,
+        center: center,
+        radius: radius,
+        tone: token.tone,
+        texture: texture,
+        opacity: 1,
+      );
+      if (tripoPainted) return;
+
       final spritePainted = paintDolphinSprite(
         canvas,
         center: center,
@@ -846,6 +859,19 @@ class FloatingShapePainter extends CustomPainter {
     canvas.translate(-object.position.dx, -object.position.dy);
 
     if (object.token.shape == ShapeKind.dolphin) {
+      final tripoPainted = paintDolphinTripoBaked(
+        canvas,
+        center: object.position,
+        radius: radius,
+        tone: object.token.tone,
+        texture: texture,
+        opacity: opacity,
+      );
+      if (tripoPainted) {
+        canvas.restore();
+        return;
+      }
+
       final spritePainted = paintDolphinSprite(
         canvas,
         center: object.position,
