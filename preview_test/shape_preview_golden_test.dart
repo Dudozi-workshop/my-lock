@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:my_lock/lock_engine/models.dart';
+import 'package:my_lock/lock_engine/dolphin_mask_canvas.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 
 void main() {
@@ -50,6 +51,9 @@ void main() {
         );
 
         await tester.pump();
+        if (shape == ShapeKind.dolphin) {
+          await _waitForDolphinMasks(tester);
+        }
 
         await expectLater(
           find.byKey(previewKey),
@@ -95,6 +99,7 @@ void main() {
         );
 
         await tester.pump();
+        await _waitForDolphinMasks(tester);
 
         await expectLater(
           find.byKey(previewKey),
@@ -140,6 +145,9 @@ void main() {
         );
 
         await tester.pump();
+        if (shape == ShapeKind.dolphin) {
+          await _waitForDolphinMasks(tester);
+        }
 
         await expectLater(
           find.byKey(previewKey),
@@ -188,6 +196,7 @@ void main() {
         );
 
         await tester.pump();
+        await _waitForDolphinMasks(tester);
 
         await expectLater(
           find.byKey(previewKey),
@@ -199,4 +208,15 @@ void main() {
     }
 
   });
+}
+
+
+Future<void> _waitForDolphinMasks(WidgetTester tester) async {
+  final cache = DolphinMaskCanvasCache.instance;
+  cache.ensureLoaded();
+  for (var i = 0; i < 30 && !cache.ready; i++) {
+    await tester.pump(const Duration(milliseconds: 16));
+  }
+  expect(cache.ready, isTrue, reason: 'Dolphin alpha masks failed to decode');
+  await tester.pump();
 }
