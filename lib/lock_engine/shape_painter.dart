@@ -358,9 +358,12 @@ void _paintCrystalShape(
   // Facets follow the silhouette's own bounds, so the same surface also works
   // on wide illustrated shapes. The silhouette remains the only outer edge.
   final bounds = path.getBounds();
+  final isWide = bounds.width > bounds.height * 1.65;
   final pale = Color.lerp(colors.$1, Colors.white, 0.76)!;
-  final mid = Color.lerp(colors.$1, colors.$2, 0.28)!;
-  final deep = Color.lerp(colors.$2, Colors.black, 0.20)!;
+  final mid = Color.lerp(colors.$1, colors.$2, isWide ? 0.28 : 0.12)!;
+  final deep = isWide
+      ? Color.lerp(colors.$2, Colors.black, 0.20)!
+      : Color.lerp(colors.$1, colors.$2, 0.72)!;
   Offset point(double x, double y) => Offset(
         bounds.left + bounds.width * x,
         bounds.top + bounds.height * y,
@@ -384,7 +387,7 @@ void _paintCrystalShape(
 
   // Wide illustrated silhouettes need facets along the body instead of a
   // central radial pattern that would cut the animal in two.
-  if (bounds.width > bounds.height * 1.65) {
+  if (isWide) {
     facet([point(0, 0), point(.33, 0), point(.42, .36), point(.12, .53)],
         Color.lerp(colors.$1, pale, .32)!);
     facet([point(.33, 0), point(.70, 0), point(.77, .35), point(.42, .36)],
@@ -428,11 +431,11 @@ void _paintCrystalShape(
     facet([left, a, f, bottomLeft],
         Color.lerp(colors.$1, deep, .18)!);
     facet([c, right, bottomRight, d],
-        Color.lerp(colors.$2, deep, .30)!);
+        Color.lerp(colors.$1, colors.$2, .58)!);
     facet([bottomLeft, f, e, bottom],
         Color.lerp(colors.$1, pale, .25)!);
     facet([d, bottomRight, bottom, e],
-        Color.lerp(colors.$2, pale, .18)!);
+        Color.lerp(colors.$1, colors.$2, .46)!);
 
     // Small adjacent planes replace the oversized white center of v1.
     facet([a, b, hub], Color.lerp(colors.$1, pale, .66)!);
@@ -448,7 +451,7 @@ void _paintCrystalShape(
     ..style = PaintingStyle.stroke
     ..strokeWidth = max(0.45, radius * 0.020)
     ..color = Colors.white.withValues(alpha: 0.42 * opacity);
-  final seamPoints = bounds.width > bounds.height * 1.65
+  final seamPoints = isWide
       ? [point(.12, .53), point(.42, .36), point(.77, .35)]
       : [point(.29, .32), point(.54, .27), point(.73, .37)];
   canvas.drawPath(Path()..addPolygon(seamPoints, false), seam);
