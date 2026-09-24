@@ -16,7 +16,7 @@ class DolphinMaskRenderer extends StatelessWidget {
     this.showBody = true,
     this.showMouthAccent = true,
     this.showBellyAccent = true,
-    this.showEye = true,
+    this.showEye = false,
   });
 
   final ShapeTone tone;
