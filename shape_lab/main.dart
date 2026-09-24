@@ -33,7 +33,8 @@ class ShapeLabPage extends StatefulWidget {
   State<ShapeLabPage> createState() => _ShapeLabPageState();
 }
 
-class _ShapeLabPageState extends State<ShapeLabPage> {
+class _ShapeLabPageState extends State<ShapeLabPage>
+    with SingleTickerProviderStateMixin {
   ShapeKind shape = ShapeKind.dolphin;
   ShapeTone tone = ShapeTone.blue;
   ShapeTexture texture = ShapeTexture.glossy;
@@ -54,6 +55,25 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
   double accentSize = 1.0;
   double accentY = 0.0;
   double accentLightness = 0.48;
+  late final AnimationController _effectController;
+
+  @override
+  void initState() {
+    super.initState();
+    _effectController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _effectController.dispose();
+    super.dispose();
+  }
+
+  bool get _isColorEffectPreview =>
+      tone == ShapeTone.dawnDew || tone == ShapeTone.fireflyLight;
 
   void resetDraft() {
     setState(() {
@@ -237,6 +257,83 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                           value: draftMode,
                           onChanged: (value) =>
                               setState(() => draftMode = value),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  _Panel(
+                    color: cardColor,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Color Effect PoC · APP EXACT',
+                          style: TextStyle(
+                            color: textColor,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '실제 LockTokenPainter · Glossy · 58×58 · 원/세모/네모',
+                          style: TextStyle(color: muted, fontSize: 13),
+                        ),
+                        const SizedBox(height: 16),
+                        AnimatedBuilder(
+                          animation: _effectController,
+                          builder: (context, _) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                for (final kind in const [
+                                  ShapeKind.circle,
+                                  ShapeKind.triangle,
+                                  ShapeKind.square,
+                                ])
+                                  Column(
+                                    children: [
+                                      SizedBox.square(
+                                        dimension: 116,
+                                        child: Center(
+                                          child: Transform.scale(
+                                            scale: 2,
+                                            child: SizedBox.square(
+                                              dimension: 58,
+                                              child: _AnimatedColorToken(
+                                                shape: kind,
+                                                tone: tone,
+                                                background: pageColor,
+                                                phase: _effectController.value,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        kind.label,
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                              ],
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          _isColorEffectPreview
+                              ? tone == ShapeTone.dawnDew
+                                  ? '새벽이슬: 굴절광 밴드 + 이슬 하이라이트가 Shape 내부에서 이동'
+                                  : '반딧불빛: 작은 황금 발광점이 Shape 내부에서 독립적으로 이동·점멸'
+                              : '색상에서 새벽이슬 또는 반딧불빛을 선택하면 애니메이션을 비교할 수 있습니다.',
+                          style: TextStyle(color: muted, fontSize: 12),
                         ),
                       ],
                     ),
@@ -878,6 +975,35 @@ class _DraftTransform {
   final double scaleY;
   final double offsetX;
   final double offsetY;
+}
+
+
+class _AnimatedColorToken extends StatelessWidget {
+  const _AnimatedColorToken({
+    required this.shape,
+    required this.tone,
+    required this.background,
+    required this.phase,
+  });
+
+  final ShapeKind shape;
+  final ShapeTone tone;
+  final Color background;
+  final double phase;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: background,
+      child: CustomPaint(
+        painter: LockTokenPainter(
+          LockToken(shape: shape, tone: tone),
+          texture: ShapeTexture.glossy,
+          effectPhase: phase,
+        ),
+      ),
+    );
+  }
 }
 
 class _TokenPreview extends StatelessWidget {
