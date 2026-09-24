@@ -357,82 +357,99 @@ void _paintIllustratedShape(
 
   final colors = _tokenToneColors(tone);
 
-  final accentAlpha = switch (texture) {
-    ShapeTexture.glossy => 0.88,
-    ShapeTexture.jelly => 0.76,
-    ShapeTexture.glass => 0.46,
-    ShapeTexture.matte => 0.90,
-    ShapeTexture.metal => 0.62,
-    ShapeTexture.chrome => 0.46,
-    ShapeTexture.hologram => 0.38,
+  // High-detail Shape Accent Map
+  // --------------------------------
+  // Accent regions describe form/depth but must still read as one object.
+  // They are always clipped to the canonical silhouette and never receive
+  // their own outline.
+  final mouthAlpha = switch (texture) {
+    ShapeTexture.glossy => 0.78,
+    ShapeTexture.jelly => 0.66,
+    ShapeTexture.glass => 0.36,
+    ShapeTexture.matte => 0.74,
+    ShapeTexture.metal => 0.54,
+    ShapeTexture.chrome => 0.40,
+    ShapeTexture.hologram => 0.30,
   };
-  final accentColor = tone == ShapeTone.white
-      ? const Color(0xFFF1F2F6)
-      : Color.lerp(
-          colors.$1,
-          Colors.white,
-          accentLightness.clamp(0.0, 0.85),
-        )!;
+  final bellyAlpha = switch (texture) {
+    ShapeTexture.glossy => 0.44,
+    ShapeTexture.jelly => 0.38,
+    ShapeTexture.glass => 0.22,
+    ShapeTexture.matte => 0.42,
+    ShapeTexture.metal => 0.34,
+    ShapeTexture.chrome => 0.28,
+    ShapeTexture.hologram => 0.20,
+  };
+  final frontFinShadeAlpha = switch (texture) {
+    ShapeTexture.glossy => 0.055,
+    ShapeTexture.jelly => 0.050,
+    ShapeTexture.glass => 0.035,
+    ShapeTexture.matte => 0.050,
+    ShapeTexture.metal => 0.075,
+    ShapeTexture.chrome => 0.080,
+    ShapeTexture.hologram => 0.045,
+  };
+  final rearFinShadeAlpha = switch (texture) {
+    ShapeTexture.glossy => 0.16,
+    ShapeTexture.jelly => 0.14,
+    ShapeTexture.glass => 0.10,
+    ShapeTexture.matte => 0.14,
+    ShapeTexture.metal => 0.20,
+    ShapeTexture.chrome => 0.22,
+    ShapeTexture.hologram => 0.12,
+  };
 
-  // Accent is a detail layer, not part of the authentication color identity.
-  // It is clipped to the silhouette and derived from the selected tone.
+  final mouthLightness =
+      (accentLightness + 0.12).clamp(0.0, 0.88).toDouble();
+  final bellyLightness =
+      (accentLightness - 0.08).clamp(0.0, 0.76).toDouble();
+
+  Color lightAccent(double lightness) {
+    if (tone == ShapeTone.white) {
+      return Color.lerp(
+        const Color(0xFFE4E6ED),
+        Colors.white,
+        lightness,
+      )!;
+    }
+    return Color.lerp(colors.$1, Colors.white, lightness)!;
+  }
+
+  final mouthPaint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = lightAccent(mouthLightness)
+        .withValues(alpha: mouthAlpha * opacity);
+  final bellyPaint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = lightAccent(bellyLightness)
+        .withValues(alpha: bellyAlpha * opacity);
+  final frontFinPaint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = colors.$2.withValues(alpha: frontFinShadeAlpha * opacity);
+  final rearFinPaint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = colors.$2.withValues(alpha: rearFinShadeAlpha * opacity);
+
   canvas.save();
   canvas.clipPath(geometry.combinedPath);
   for (final part in geometry.parts) {
-    if (part.role != ShapePartRole.accent) continue;
-    canvas.drawPath(
-      part.path,
-      Paint()
-        ..style = PaintingStyle.fill
-        ..color = accentColor.withValues(alpha: accentAlpha * opacity),
-    );
+    final paint = switch (part.role) {
+      ShapePartRole.accent => bellyPaint,
+      ShapePartRole.mouthAccent => mouthPaint,
+      ShapePartRole.bellyAccent => bellyPaint,
+      ShapePartRole.frontFinAccent => frontFinPaint,
+      ShapePartRole.rearFinAccent => rearFinPaint,
+      _ => null,
+    };
+    if (paint != null) {
+      canvas.drawPath(part.path, paint);
+    }
   }
   canvas.restore();
 
-  final shadeAlpha = switch (texture) {
-    ShapeTexture.glass => 0.08,
-    ShapeTexture.jelly => 0.10,
-    ShapeTexture.glossy => 0.12,
-    ShapeTexture.matte => 0.08,
-    ShapeTexture.metal => 0.18,
-    ShapeTexture.chrome => 0.20,
-    ShapeTexture.hologram => 0.10,
-  };
-
-  // Separate geometry parts are allowed internally, but they must still read
-  // as one object. A light shared tint gives fins/tail depth without visible
-  // seams or fixed artwork colors.
-  final appendagePaint = Paint()
-    ..style = PaintingStyle.fill
-    ..color = colors.$2.withValues(alpha: shadeAlpha * opacity);
-
-  for (final part in geometry.parts) {
-    if (part.role == ShapePartRole.body ||
-        part.role == ShapePartRole.accent) {
-      continue;
-    }
-    canvas.drawPath(part.path, appendagePaint);
-  }
-
-  if (texture == ShapeTexture.matte) return;
-
-  // Small per-part highlights make Glass/Jelly/Metal more expressive while
-  // preserving the selected palette color as the shape identity.
-  final partHighlight = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = max(0.9, radius * 0.025)
-    ..strokeCap = StrokeCap.round
-    ..color = Colors.white.withValues(
-      alpha: (texture == ShapeTexture.glass ? 0.32 : 0.18) * opacity,
-    );
-
-  for (final part in geometry.parts) {
-    if (part.role == ShapePartRole.body ||
-        part.role == ShapePartRole.accent) {
-      continue;
-    }
-    canvas.drawPath(part.path, partHighlight);
-  }
+  // Deliberately no per-part stroke/highlight here. The only outline belongs
+  // to the outer silhouette rendered by _paintStyledShape. This keeps mouth,
+  // belly and fins connected as a single glossy object.
 }
 
 class FloatingShapePainter extends CustomPainter {
