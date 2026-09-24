@@ -6,7 +6,7 @@ import 'models.dart';
 import 'motion_profile.dart';
 
 class FloatingEngine {
-  FloatingEngine({int seed = 4921}) : _random = Random(seed);
+  FloatingEngine({int? seed}) : _random = seed == null ? Random() : Random(seed);
 
   static const int defaultObjectCount = 9;
   static const Set<int> supportedObjectCounts = {6, 9, 12};

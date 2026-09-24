@@ -36,6 +36,13 @@ class LockMonitorService : Service() {
             "com.android.providers.media.module",
             "com.google.android.providers.media.module",
         )
+        private val protectedSessionCameraPackages = setOf(
+            "com.sec.android.app.camera",
+            "com.google.android.GoogleCamera",
+            "com.android.camera",
+            "com.android.camera2",
+            "org.lineageos.aperture",
+        )
         private const val preferencesName = "my_lock_native"
         private const val protectedAppsKey = "protected_apps"
         private const val experimentalScreenLockKey = "experimental_screen_lock"
@@ -285,6 +292,16 @@ class LockMonitorService : Service() {
             return
         }
 
+        if (
+            isProtectedSessionCameraActivity(packageName, className) &&
+            shouldPreserveProtectedSessionAcrossExternalActivity(
+                packageName,
+                protectedApps,
+            )
+        ) {
+            return
+        }
+
         val overlayTarget = OverlayLockController.currentTarget()
 
         if (OverlayLockController.isVisible && overlayTarget != null) {
@@ -414,6 +431,48 @@ class LockMonitorService : Service() {
         }
 
         return false
+    }
+
+    private fun isProtectedSessionCameraActivity(
+        packageName: String,
+        className: String?,
+    ): Boolean {
+        if (packageName in protectedSessionCameraPackages) {
+            return true
+        }
+
+        val activity = className.orEmpty()
+        return activity.contains("camera", ignoreCase = true) &&
+            (
+                packageName.startsWith("com.sec.android.") ||
+                    packageName.startsWith("com.google.android.") ||
+                    packageName.startsWith("com.android.")
+            )
+    }
+
+    private fun shouldPreserveProtectedSessionAcrossExternalActivity(
+        externalPackage: String,
+        protectedApps: Set<String>,
+    ): Boolean {
+        // If the utility app is explicitly protected, its own lock takes priority.
+        if (protectedApps.contains(externalPackage)) return false
+
+        val originApp = foregroundPackage ?: return false
+        if (!protectedApps.contains(originApp)) return false
+
+        val preferences =
+            getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+        val lastUnlockedApp =
+            preferences.getString(lastUnlockedAppKey, null)
+        val lastUnlockedAt =
+            preferences.getLong(lastUnlockedAtKey, 0L)
+
+        // Preserve the session only when the protected origin was already
+        // unlocked. Because foregroundPackage intentionally remains the origin,
+        // returning directly from Camera/Picker does not create a false exit.
+        // Home, Recents, another normal app, or screen-off still ends/relocks it
+        // through the existing foreground and screen-state paths.
+        return lastUnlockedApp == originApp && lastUnlockedAt > 0L
     }
 
     private fun scheduleOverlayExit(appId: String) {
