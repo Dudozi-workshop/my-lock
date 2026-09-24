@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: my-lock-visual-renderer-v2
@@ -64,3 +64,28 @@ jobs:
           name: my-lock-visual-renderer-v2-arm64
           path: dist/my-lock-visual-renderer-v2-arm64.apk
           retention-days: 14
+
+
+  publish-release:
+    needs: verify-and-build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-lock-visual-renderer-v2-arm64
+          path: dist
+
+      - name: Publish direct-download release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="visual-renderer-v2-latest"
+          APK="dist/my-lock-visual-renderer-v2-arm64.apk"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" --clobber
+          else
+            gh release create "$TAG" "$APK"               --target "$GITHUB_SHA"               --title "MY LOCK Visual Renderer v2"               --notes "Direct-download APK for Visual Renderer v2 QA."               --prerelease
+          fi
