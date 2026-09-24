@@ -57,5 +57,53 @@ void main() {
         );
       });
     }
+
+    for (final tone in const [
+      ShapeTone.pink,
+      ShapeTone.yellow,
+    ]) {
+      testWidgets('dolphin ${tone.name} exact 58 logical px', (tester) async {
+        tester.view.devicePixelRatio = 4.0;
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.binding.setSurfaceSize(const Size(58, 58));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        final previewKey =
+            ValueKey<String>('dolphin-preview-${tone.name}');
+        final token = LockToken(
+          shape: ShapeKind.dolphin,
+          tone: tone,
+        );
+
+        await tester.pumpWidget(
+          RepaintBoundary(
+            key: previewKey,
+            child: ColoredBox(
+              color: const Color(0xFFF4F5F8),
+              child: SizedBox.square(
+                dimension: 58,
+                child: CustomPaint(
+                  painter: LockTokenPainter(
+                    token,
+                    texture: ShapeTexture.glossy,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pump();
+
+        await expectLater(
+          find.byKey(previewKey),
+          matchesGoldenFile(
+            'goldens/dolphin_58px_${tone.name}_dpr4.png',
+          ),
+        );
+      });
+    }
+
   });
 }
