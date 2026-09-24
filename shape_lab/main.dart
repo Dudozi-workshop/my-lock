@@ -308,24 +308,35 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                             ],
                           ),
                           const SizedBox(height: 14),
-                          Center(
-                            child: SizedBox.square(
-                              dimension: 280,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(28),
-                                child: ColoredBox(
-                                  color: const Color(0xFF081628),
-                                  child: GlossySphere3D(
-                                    tone: tone,
-                                    interactive: true,
-                                  ),
-                                ),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            alignment: WrapAlignment.center,
+                            children: [
+                              _PocMaterialCard(
+                                title: 'Matte',
+                                subtitle: '비교 기준 · 높은 Roughness',
+                                tone: tone,
+                                preset: Sphere3DMaterialPreset.matte,
                               ),
-                            ),
+                              _PocMaterialCard(
+                                title: 'Soft Glossy',
+                                subtitle: '기본 후보 · Clearcoat + Studio IBL',
+                                tone: tone,
+                                preset: Sphere3DMaterialPreset.softGlossy,
+                                interactive: true,
+                              ),
+                              _PocMaterialCard(
+                                title: 'Glassy Gloss',
+                                subtitle: '강한 반사 · 낮은 Roughness',
+                                tone: tone,
+                                preset: Sphere3DMaterialPreset.glassyGloss,
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            '검증 포인트: 광택/PBR 품질 · 회전 시 하이라이트 변화 · 모바일 GPU 호환성 · 이후 Dolphin.glb 교체 가능성',
+                            '검증 포인트: Matte 대비 실제 반사 차이 · 회전 시 하이라이트 이동 · Studio IBL/Key Light 효과 · 이후 Dolphin.glb 적용 가능성',
                             style: TextStyle(
                               color: muted,
                               fontSize: 12,
@@ -436,7 +447,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '실제 잠금화면 동작 크기 · Soft 3D Gloss v1',
+                          '실제 잠금화면 동작 크기 · Single Scene 3D PoC',
                           style: TextStyle(
                             color: textColor,
                             fontWeight: FontWeight.w800,
@@ -445,7 +456,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'FloatingPreview + FloatingEngine을 그대로 사용합니다. 412 × 915 logical px 기준에서 실제 도형 폭은 약 86~107 logical px 범위로 생성됩니다.',
+                          'FloatingEngine은 그대로 두고 Dolphin 슬롯 전체를 SceneView 1개 안의 3D 노드로 렌더합니다. 6/9/12개를 바꿔 렉 차이를 직접 비교해보세요.',
                           style: TextStyle(color: muted, fontSize: 13),
                         ),
                         const SizedBox(height: 14),
@@ -1429,6 +1440,61 @@ class _VariantCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _PocMaterialCard extends StatelessWidget {
+  const _PocMaterialCard({
+    required this.title,
+    required this.subtitle,
+    required this.tone,
+    required this.preset,
+    this.interactive = false,
+  });
+
+  final String title;
+  final String subtitle;
+  final ShapeTone tone;
+  final Sphere3DMaterialPreset preset;
+  final bool interactive;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 248,
+      child: Column(
+        children: [
+          AspectRatio(
+            aspectRatio: 1,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: ColoredBox(
+                color: const Color(0xFF081628),
+                child: GlossySphere3D(
+                  tone: tone,
+                  preset: preset,
+                  interactive: interactive,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }
