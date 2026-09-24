@@ -39,7 +39,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
   ShapeTone tone = ShapeTone.blue;
   ShapeTexture texture = ShapeTexture.glossy;
   bool darkBackground = false;
-  bool draftMode = true;
+  bool draftMode = false;
 
   double overallScale = 1.0;
   double scaleX = 1.0;
@@ -186,7 +186,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '본앱과 동일한 LockTokenPainter를 직접 사용',
+                              '기본값은 본앱과 동일한 APP EXACT 렌더 · Dolphin은 Raster Mask 사용',
                               style: TextStyle(color: muted, fontSize: 14),
                             ),
                           ],
@@ -409,7 +409,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                           ),
                           const SizedBox(height: 14),
                           Text(
-                            '현재는 PoC용 256px alpha mask를 코드에 내장. 채택 시 별도 에셋 파일로 이동합니다.',
+                            '현재는 정식 PNG asset 3종(Body / Mouth / Belly)을 로드해 본앱과 동일한 렌더 경로로 표시합니다.',
                             style: TextStyle(color: muted, fontSize: 12),
                           ),
                         ],
