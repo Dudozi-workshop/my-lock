@@ -23,14 +23,17 @@ class DolphinMaskCanvasCache extends ChangeNotifier {
   ui.Image? mouth;
   ui.Image? belly;
 
-  bool _loading = false;
+  Future<void>? _loadingFuture;
 
   bool get ready => body != null && mouth != null && belly != null;
 
   void ensureLoaded() {
-    if (ready || _loading) return;
-    _loading = true;
-    _load();
+    ensureLoadedAsync();
+  }
+
+  Future<void> ensureLoadedAsync() {
+    if (ready) return Future<void>.value();
+    return _loadingFuture ??= _load();
   }
 
   Future<void> _load() async {
@@ -44,7 +47,7 @@ class DolphinMaskCanvasCache extends ChangeNotifier {
       mouth = images[1];
       belly = images[2];
     } finally {
-      _loading = false;
+      _loadingFuture = null;
       notifyListeners();
     }
   }
