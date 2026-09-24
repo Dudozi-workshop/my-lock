@@ -80,11 +80,13 @@ bool paintDolphinMaskCanvas(
 
   // The source is square, with its alpha silhouette inset. 3r keeps the visible
   // body width close to the production vector dolphin at the same slot size.
-  final extent = radius * 3.0;
+  // Match the production dolphin's wide optical footprint while keeping the
+  // source masks square. The transparent source canvas is stretched slightly
+  // wider than tall; only the alpha silhouette is visible.
   final dst = Rect.fromCenter(
     center: center,
-    width: extent,
-    height: extent,
+    width: radius * 3.30,
+    height: radius * 2.50,
   );
   final src = Rect.fromLTWH(
     0,
