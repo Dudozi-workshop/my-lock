@@ -27,6 +27,10 @@ if [[ ",$PLATFORMS," == *",android,"* ]]; then
   bash "$ROOT/tool/apply_android_native.sh"
 fi
 
+if [[ ",$PLATFORMS," == *",ios,"* ]]; then
+  bash "$ROOT/tool/apply_ios_native.sh"
+fi
+
 rm -rf "$ROOT/lib" "$ROOT/test"
 cp -R "$TMP/lib" "$ROOT/lib"
 cp -R "$TMP/test" "$ROOT/test"
