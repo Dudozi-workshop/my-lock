@@ -1,11 +1,12 @@
-import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import 'dolphin_mask_assets.dart';
 import 'models.dart';
+
+const _bodyAsset = 'assets/shapes/dolphin/dolphin_body.png';
+const _mouthAsset = 'assets/shapes/dolphin/dolphin_mouth_accent.png';
+const _bellyAsset = 'assets/shapes/dolphin/dolphin_belly_accent.png';
 
 class DolphinMaskRenderer extends StatelessWidget {
   const DolphinMaskRenderer({
@@ -42,21 +43,21 @@ class DolphinMaskRenderer extends StatelessWidget {
             child: ImageFiltered(
               imageFilter: ui.ImageFilter.blur(sigmaX: 2.2, sigmaY: 2.2),
               child: _solidMask(
-                data: _decodedBody,
+                asset: _bodyAsset,
                 color: Colors.white,
               ),
             ),
           ),
-          _gradientMask(data: _decodedBody, gradient: bodyGradient),
+          _gradientMask(asset: _bodyAsset, gradient: bodyGradient),
         ],
         if (showBellyAccent)
           _solidMask(
-            data: _decodedBelly,
+            asset: _bellyAsset,
             color: belly.withValues(alpha: _accentAlpha(texture, false)),
           ),
         if (showMouthAccent)
           _solidMask(
-            data: _decodedMouth,
+            asset: _mouthAsset,
             color: mouth.withValues(alpha: _accentAlpha(texture, true)),
           ),
         if (showBody && texture != ShapeTexture.matte)
@@ -119,18 +120,14 @@ class DolphinMaskRenderer extends StatelessWidget {
   }
 }
 
-final Uint8List _decodedBody = base64Decode(dolphinBodyPngBase64);
-final Uint8List _decodedMouth = base64Decode(dolphinMouthPngBase64);
-final Uint8List _decodedBelly = base64Decode(dolphinBellyPngBase64);
-
 Widget _solidMask({
-  required Uint8List data,
+  required String asset,
   required Color color,
 }) {
   return ColorFiltered(
     colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-    child: Image.memory(
-      data,
+    child: Image.asset(
+      asset,
       fit: BoxFit.contain,
       filterQuality: FilterQuality.high,
       isAntiAlias: true,
@@ -140,14 +137,14 @@ Widget _solidMask({
 }
 
 Widget _gradientMask({
-  required Uint8List data,
+  required String asset,
   required Gradient gradient,
 }) {
   return ShaderMask(
     blendMode: BlendMode.srcIn,
     shaderCallback: gradient.createShader,
-    child: Image.memory(
-      data,
+    child: Image.asset(
+      asset,
       fit: BoxFit.contain,
       filterQuality: FilterQuality.high,
       isAntiAlias: true,
