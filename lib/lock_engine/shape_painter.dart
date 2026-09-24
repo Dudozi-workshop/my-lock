@@ -208,6 +208,18 @@ void _paintStyledShape(
   final colors = _tokenToneColors(tone);
   final bounds = Rect.fromCircle(center: center, radius: radius);
 
+  if (texture == ShapeTexture.glass) {
+    _paintGlassShape(
+      canvas,
+      path: path,
+      center: center,
+      radius: radius,
+      tone: tone,
+      opacity: opacity,
+    );
+    return;
+  }
+
   final shadowAlpha = switch (texture) {
     ShapeTexture.glass => 0.12,
     ShapeTexture.chrome => 0.34,
@@ -331,6 +343,114 @@ void _paintStyledShape(
     );
     canvas.restore();
   }
+}
+
+
+void _paintGlassShape(
+  Canvas canvas, {
+  required Path path,
+  required Offset center,
+  required double radius,
+  required ShapeTone tone,
+  required double opacity,
+}) {
+  final colors = _tokenToneColors(tone);
+  final bounds = Rect.fromCircle(center: center, radius: radius);
+  final rimTint = tone == ShapeTone.white
+      ? const Color(0xFFDDE8F6)
+      : Color.lerp(colors.$1, Colors.white, 0.48)!;
+
+  canvas.drawShadow(
+    path,
+    colors.$2.withValues(alpha: 0.15 * opacity),
+    10,
+    true,
+  );
+
+  canvas.save();
+  canvas.clipPath(path);
+
+  final body = Paint()
+    ..shader = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Colors.white.withValues(alpha: 0.30 * opacity),
+        colors.$1.withValues(alpha: 0.34 * opacity),
+        colors.$1.withValues(alpha: 0.18 * opacity),
+        colors.$2.withValues(alpha: 0.40 * opacity),
+      ],
+      stops: const [0.0, 0.28, 0.58, 1.0],
+    ).createShader(bounds);
+  canvas.drawPath(path, body);
+
+  final edgeDepth = Paint()
+    ..shader = RadialGradient(
+      center: const Alignment(-0.18, -0.20),
+      radius: 1.05,
+      colors: [
+        Colors.transparent,
+        colors.$1.withValues(alpha: 0.06 * opacity),
+        colors.$2.withValues(alpha: 0.22 * opacity),
+      ],
+      stops: const [0.0, 0.70, 1.0],
+    ).createShader(bounds);
+  canvas.drawPath(path, edgeDepth);
+
+  final refraction = Paint()
+    ..shader = LinearGradient(
+      begin: const Alignment(-1.0, -0.55),
+      end: const Alignment(0.85, 1.0),
+      colors: [
+        Colors.transparent,
+        Colors.white.withValues(alpha: 0.04 * opacity),
+        Colors.white.withValues(alpha: 0.30 * opacity),
+        Colors.white.withValues(alpha: 0.08 * opacity),
+        Colors.transparent,
+      ],
+      stops: const [0.14, 0.34, 0.47, 0.58, 0.78],
+    ).createShader(bounds);
+  canvas.drawRect(bounds.inflate(radius * 0.20), refraction);
+
+  final glint = Paint()
+    ..color = Colors.white.withValues(alpha: 0.62 * opacity);
+  canvas.drawOval(
+    Rect.fromCenter(
+      center: center.translate(-radius * 0.30, -radius * 0.31),
+      width: radius * 0.42,
+      height: radius * 0.15,
+    ),
+    glint,
+  );
+
+  final caustic = Paint()
+    ..color = rimTint.withValues(alpha: 0.18 * opacity);
+  canvas.drawOval(
+    Rect.fromCenter(
+      center: center.translate(radius * 0.20, radius * 0.29),
+      width: radius * 0.64,
+      height: radius * 0.18,
+    ),
+    caustic,
+  );
+
+  canvas.restore();
+
+  final coloredRim = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeJoin = StrokeJoin.round
+    ..strokeCap = StrokeCap.round
+    ..strokeWidth = max(2.0, radius * 0.075)
+    ..color = rimTint.withValues(alpha: 0.42 * opacity);
+  canvas.drawPath(path, coloredRim);
+
+  final clearRim = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeJoin = StrokeJoin.round
+    ..strokeCap = StrokeCap.round
+    ..strokeWidth = max(1.15, radius * 0.034)
+    ..color = Colors.white.withValues(alpha: 0.88 * opacity);
+  canvas.drawPath(path, clearRim);
 }
 
 void _paintIllustratedShape(
