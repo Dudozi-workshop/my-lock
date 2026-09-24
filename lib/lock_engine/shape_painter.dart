@@ -48,6 +48,7 @@ class LockTokenPainter extends CustomPainter {
     _paintStyledShape(
       canvas,
       path: path,
+      crystalKind: token.shape,
       center: center,
       radius: radius,
       tone: token.tone,
@@ -199,6 +200,7 @@ Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
 void _paintStyledShape(
   Canvas canvas, {
   required Path path,
+  ShapeKind? crystalKind,
   required Offset center,
   required double radius,
   required ShapeTone tone,
@@ -209,14 +211,25 @@ void _paintStyledShape(
   final bounds = Rect.fromCircle(center: center, radius: radius);
 
   if (texture == ShapeTexture.glass) {
-    _paintCrystalShape(
-      canvas,
-      path: path,
-      center: center,
-      radius: radius,
-      tone: tone,
-      opacity: opacity,
-    );
+    if (crystalKind == ShapeKind.circle) {
+      _paintRoundCutCrystal(
+        canvas,
+        path: path,
+        center: center,
+        radius: radius,
+        tone: tone,
+        opacity: opacity,
+      );
+    } else {
+      _paintCrystalShape(
+        canvas,
+        path: path,
+        center: center,
+        radius: radius,
+        tone: tone,
+        opacity: opacity,
+      );
+    }
     return;
   }
 
@@ -345,6 +358,107 @@ void _paintStyledShape(
   }
 }
 
+
+// A round brilliant cut: a continuous table, a ring of angled crown facets,
+// and a thin directional girdle. Keep faces large enough to read at 58 px.
+void _paintRoundCutCrystal(
+  Canvas canvas, {
+  required Path path,
+  required Offset center,
+  required double radius,
+  required ShapeTone tone,
+  required double opacity,
+}) {
+  final colors = _tokenToneColors(tone);
+  final light = Color.lerp(colors.$1, Colors.white, .55)!;
+  final pale = Color.lerp(colors.$1, Colors.white, .78)!;
+  final shade = Color.lerp(colors.$1, colors.$2, .63)!;
+  final deep = Color.lerp(colors.$2, Colors.black, .12)!;
+  const count = 12;
+  const start = -pi / 2 - pi / 12;
+  Offset vertex(int index, double scale) {
+    final angle = start + index * 2 * pi / count;
+    return center + Offset(cos(angle), sin(angle)) * radius * scale;
+  }
+
+  void facet(List<Offset> points, Color color, {double alpha = 1}) {
+    canvas.drawPath(
+      Path()..addPolygon(points, true),
+      Paint()..color = color.withValues(alpha: alpha * opacity),
+    );
+  }
+
+  canvas.drawShadow(path, colors.$2.withValues(alpha: .24 * opacity), 8, true);
+  canvas.save();
+  canvas.clipPath(path);
+  canvas.drawPath(path, Paint()..color = shade.withValues(alpha: opacity));
+
+  // The exterior vertices extend past the circular silhouette; clipping
+  // preserves its smooth edge while exposing the angled crown planes.
+  final crown = <Color>[
+    pale, light, colors.$1, shade, light, colors.$1,
+    shade, light, colors.$1, deep, shade, light,
+  ];
+  for (var i = 0; i < count; i++) {
+    facet([
+      vertex(i, 1.08), vertex(i + 1, 1.08),
+      vertex(i + 1, .58), vertex(i, .58),
+    ], crown[i]);
+  }
+
+  final table = Path()
+    ..addPolygon([for (var i = 0; i < count; i++) vertex(i, .58)], true);
+  canvas.drawPath(
+    table,
+    Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          pale.withValues(alpha: opacity),
+          light.withValues(alpha: opacity),
+          colors.$1.withValues(alpha: opacity),
+          shade.withValues(alpha: opacity),
+        ],
+        stops: const [0, .38, .76, 1],
+      ).createShader(Rect.fromCircle(center: center, radius: radius * .60)),
+  );
+  // A restrained reflection crosses the table without turning its center
+  // into a white stripe or splitting it into many tiny radial wedges.
+  facet([
+    vertex(10, .58),
+    vertex(11, .58),
+    vertex(1, .58),
+    center.translate(radius * .06, -radius * .10),
+  ], pale, alpha: .42);
+  canvas.drawPath(
+    table,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = max(.6, radius * .04)
+      ..color = deep.withValues(alpha: .42 * opacity),
+  );
+  canvas.restore();
+
+  canvas.drawPath(
+    path,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = max(.9, radius * .05)
+      ..color = shade.withValues(alpha: .80 * opacity),
+  );
+  final rim = Path()
+    ..addArc(Rect.fromCircle(center: center, radius: radius),
+        -pi * .91, pi * .85);
+  canvas.drawPath(
+    rim,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = max(.7, radius * .04)
+      ..color = Colors.white.withValues(alpha: .78 * opacity),
+  );
+}
 
 void _paintCrystalShape(
   Canvas canvas, {
@@ -688,6 +802,7 @@ class FloatingShapePainter extends CustomPainter {
       _paintStyledShape(
         canvas,
         path: path,
+        crystalKind: object.token.shape,
         center: object.position,
         radius: radius,
         tone: object.token.tone,
