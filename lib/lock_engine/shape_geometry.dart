@@ -66,58 +66,119 @@ IllustratedShapeGeometry _buildDolphinGeometry(
   Offset center,
   double radius,
 ) {
-  double x(double value) => center.dx + radius * value;
-  double y(double value) => center.dy + radius * value;
+  // IMPORTANT:
+  // These are the exact 100x100 reference-trace points used in the approved
+  // browser mockup. Do not hand-normalize or redraw them here; keeping the
+  // same source points prevents the Flutter silhouette from drifting away
+  // from the approved preview.
+  const points = <Offset>[
+    Offset(8, 39.4),
+    Offset(8, 41),
+    Offset(11.5, 44.3),
+    Offset(18.6, 47.3),
+    Offset(22.4, 49.8),
+    Offset(23.3, 49.5),
+    Offset(23, 48.6),
+    Offset(19.4, 46.3),
+    Offset(13.5, 43.8),
+    Offset(11.3, 42.5),
+    Offset(11.2, 41.7),
+    Offset(15.7, 41.9),
+    Offset(20.3, 43.8),
+    Offset(29.9, 45.4),
+    Offset(33.4, 46.7),
+    Offset(33.7, 50.8),
+    Offset(33.2, 51.3),
+    Offset(34.3, 52.7),
+    Offset(34.4, 55.4),
+    Offset(28.5, 53.3),
+    Offset(24.7, 50.4),
+    Offset(23.9, 50.4),
+    Offset(23.6, 51.1),
+    Offset(27, 53.9),
+    Offset(30.6, 55.8),
+    Offset(30.9, 60.7),
+    Offset(32.9, 65),
+    Offset(34, 65.3),
+    Offset(36.4, 60.7),
+    Offset(37.2, 60.6),
+    Offset(40.5, 66.6),
+    Offset(43.4, 69.2),
+    Offset(45.4, 69.5),
+    Offset(46, 69.1),
+    Offset(47.2, 61.6),
+    Offset(47.8, 60.7),
+    Offset(56.6, 60.7),
+    Offset(66.5, 58.9),
+    Offset(74.2, 58.3),
+    Offset(75.7, 58.7),
+    Offset(79.5, 65.7),
+    Offset(82.7, 68.8),
+    Offset(85.8, 70.7),
+    Offset(91.1, 70.7),
+    Offset(90.9, 68),
+    Offset(88.8, 64.5),
+    Offset(87.4, 60.3),
+    Offset(84.4, 56.6),
+    Offset(84.4, 55.8),
+    Offset(87, 52.8),
+    Offset(87.9, 49.6),
+    Offset(91.5, 44.3),
+    Offset(91.8, 42.8),
+    Offset(89.6, 42.2),
+    Offset(84.4, 44.5),
+    Offset(80.5, 47.3),
+    Offset(76.4, 52.1),
+    Offset(67.4, 49.5),
+    Offset(62.8, 46.9),
+    Offset(59.9, 44.3),
+    Offset(61.3, 39.9),
+    Offset(65.9, 33.4),
+    Offset(66, 31.8),
+    Offset(64.8, 30.8),
+    Offset(59.9, 30.8),
+    Offset(48.4, 35.8),
+    Offset(43.1, 32.3),
+    Offset(36.9, 29.9),
+    Offset(30.8, 29.1),
+    Offset(25.6, 29.4),
+    Offset(20.2, 31.7),
+    Offset(15.7, 36.3),
+    Offset(11.3, 37.3),
+  ];
 
-  // Reference-traced dolphin silhouette.
-  // The goal is optical similarity with the approved 58x58 preview rather
-  // than a mathematically generated dolphin. It is intentionally kept as
-  // one continuous body silhouette for clean small-size recognition.
-  final silhouette = Path()
-    ..moveTo(x(-1.05), y(-0.24))
-    ..quadraticBezierTo(x(-1.05), y(-0.18), x(-0.96), y(-0.08))
-    ..quadraticBezierTo(x(-0.82), y(0.02), x(-0.66), y(0.08))
-    ..quadraticBezierTo(x(-0.56), y(0.15), x(-0.48), y(0.14))
-    ..quadraticBezierTo(x(-0.45), y(0.11), x(-0.49), y(0.07))
-    ..quadraticBezierTo(x(-0.64), y(-0.01), x(-0.83), y(-0.06))
-    ..quadraticBezierTo(x(-0.91), y(-0.10), x(-0.91), y(-0.14))
-    ..quadraticBezierTo(x(-0.76), y(-0.14), x(-0.60), y(-0.08))
-    ..quadraticBezierTo(x(-0.28), y(-0.02), x(-0.16), y(0.03))
-    ..quadraticBezierTo(x(-0.15), y(0.19), x(-0.17), y(0.21))
-    ..quadraticBezierTo(x(-0.13), y(0.27), x(-0.13), y(0.36))
-    ..quadraticBezierTo(x(-0.35), y(0.29), x(-0.48), y(0.19))
-    ..quadraticBezierTo(x(-0.51), y(0.18), x(-0.52), y(0.21))
-    ..quadraticBezierTo(x(-0.40), y(0.31), x(-0.27), y(0.37))
-    ..quadraticBezierTo(x(-0.26), y(0.54), x(-0.19), y(0.68))
-    ..quadraticBezierTo(x(-0.15), y(0.70), x(-0.06), y(0.54))
-    ..quadraticBezierTo(x(-0.04), y(0.53), x(-0.01), y(0.53))
-    ..quadraticBezierTo(x(0.11), y(0.75), x(0.22), y(0.84))
-    ..quadraticBezierTo(x(0.30), y(0.85), x(0.32), y(0.84))
-    ..quadraticBezierTo(x(0.36), y(0.58), x(0.38), y(0.55))
-    ..quadraticBezierTo(x(0.70), y(0.55), x(1.00), y(0.49))
-    ..quadraticBezierTo(x(1.20), y(0.47), x(1.24), y(0.49))
-    ..quadraticBezierTo(x(1.37), y(0.72), x(1.48), y(0.82))
-    ..quadraticBezierTo(x(1.58), y(0.88), x(1.75), y(0.88))
-    ..quadraticBezierTo(x(1.74), y(0.79), x(1.67), y(0.68))
-    ..quadraticBezierTo(x(1.62), y(0.55), x(1.51), y(0.44))
-    ..quadraticBezierTo(x(1.51), y(0.41), x(1.60), y(0.31))
-    ..quadraticBezierTo(x(1.63), y(0.20), x(1.75), y(0.02))
-    ..quadraticBezierTo(x(1.76), y(-0.03), x(1.69), y(-0.05))
-    ..quadraticBezierTo(x(1.52), y(0.03), x(1.39), y(0.13))
-    ..quadraticBezierTo(x(1.25), y(0.29), x(1.11), y(0.45))
-    ..quadraticBezierTo(x(0.79), y(0.36), x(0.63), y(0.26))
-    ..quadraticBezierTo(x(0.53), y(0.17), x(0.43), y(0.08))
-    ..quadraticBezierTo(x(0.48), y(-0.07), x(0.64), y(-0.29))
-    ..quadraticBezierTo(x(0.64), y(-0.35), x(0.60), y(-0.39))
-    ..quadraticBezierTo(x(0.43), y(-0.39), x(0.05), y(-0.21))
-    ..quadraticBezierTo(x(-0.13), y(-0.34), x(-0.35), y(-0.42))
-    ..quadraticBezierTo(x(-0.57), y(-0.45), x(-0.76), y(-0.37))
-    ..quadraticBezierTo(x(-0.92), y(-0.21), x(-1.05), y(-0.18))
+  // The approved mockup compares the dolphin against a circle with radius 31
+  // in the same 100x100 viewBox. Mapping one SVG unit to radius / 31 therefore
+  // preserves the exact optical scale used in that comparison.
+  final unit = radius / 31.0;
+
+  Offset mapPoint(Offset point) => Offset(
+        center.dx + (point.dx - 50) * unit,
+        center.dy + (point.dy - 50) * unit,
+      );
+
+  Offset midpoint(Offset a, Offset b) => Offset(
+        (a.dx + b.dx) / 2,
+        (a.dy + b.dy) / 2,
+      );
+
+  final mapped = points.map(mapPoint).toList(growable: false);
+  final first = midpoint(mapped[0], mapped[1]);
+
+  final silhouette = Path()..moveTo(first.dx, first.dy);
+
+  for (var i = 1; i < mapped.length; i++) {
+    final point = mapped[i];
+    final next = mapped[(i + 1) % mapped.length];
+    final mid = midpoint(point, next);
+    silhouette.quadraticBezierTo(point.dx, point.dy, mid.dx, mid.dy);
+  }
+
+  final point0 = mapped[0];
+  silhouette
+    ..quadraticBezierTo(point0.dx, point0.dy, first.dx, first.dy)
     ..close();
 
-  // Keep the illustrated/composite contract even though this approved base
-  // currently renders as a single silhouette. Additional material masks or
-  // animated sub-parts can be added later without changing ShapeKind again.
   return IllustratedShapeGeometry(
     parts: [
       ShapePartGeometry(role: ShapePartRole.body, path: silhouette),
