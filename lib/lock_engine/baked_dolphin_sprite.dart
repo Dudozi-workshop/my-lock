@@ -228,6 +228,104 @@ class BakedDolphinSpriteCache extends ChangeNotifier {
   }
 }
 
+
+class BakedDolphinPreview extends StatefulWidget {
+  const BakedDolphinPreview({
+    super.key,
+    required this.tone,
+    this.background = const Color(0xFF081628),
+    this.animate = true,
+  });
+
+  final ShapeTone tone;
+  final Color background;
+  final bool animate;
+
+  @override
+  State<BakedDolphinPreview> createState() => _BakedDolphinPreviewState();
+}
+
+class _BakedDolphinPreviewState extends State<BakedDolphinPreview>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    BakedDolphinSpriteCache.instance.ensureLoaded();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    );
+    if (widget.animate) {
+      _controller.repeat();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant BakedDolphinPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.animate != widget.animate) {
+      if (widget.animate) {
+        _controller.repeat();
+      } else {
+        _controller.stop();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: widget.background,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([
+          _controller,
+          BakedDolphinSpriteCache.instance,
+        ]),
+        builder: (context, _) {
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth.isFinite
+                  ? constraints.maxWidth
+                  : 280.0;
+              final height = constraints.maxHeight.isFinite
+                  ? constraints.maxHeight
+                  : width;
+              final minDimension = math.min(width, height);
+              final radius = minDimension * 0.285;
+              final object = FloatingObject(
+                id: 0,
+                token: LockToken(
+                  shape: ShapeKind.dolphin,
+                  tone: widget.tone,
+                ),
+                position: Offset(width * 0.5, height * 0.52),
+                velocity: const Offset(16, 0),
+                radius: radius,
+              );
+
+              return CustomPaint(
+                painter: BakedDolphinSpritePainter(
+                  objects: [object],
+                  animationSeconds: _controller.value * 2.2,
+                ),
+                child: const SizedBox.expand(),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
 class BakedDolphinSpritePainter extends CustomPainter {
   BakedDolphinSpritePainter({
     required this.objects,
