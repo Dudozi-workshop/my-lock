@@ -74,7 +74,7 @@ class BakedDolphinSpriteCache extends ChangeNotifier {
   Future<ui.Image> _renderBodyFrame(double phase) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    final frameBounds = const Offset(0, 0) & const Size.square(_frameSize.toDouble());
+    final frameBounds = Offset.zero & Size.square(_frameSize.toDouble());
 
     canvas.saveLayer(frameBounds, Paint());
 
@@ -163,7 +163,7 @@ class BakedDolphinSpriteCache extends ChangeNotifier {
     double phase,
   ) {
     final src = _sourceCrop;
-    const dst = Rect.fromLTWH(0, 0, _frameSize.toDouble(), _frameSize.toDouble());
+    final dst = Rect.fromLTWH(0, 0, _frameSize.toDouble(), _frameSize.toDouble());
 
     // Main body stays stable. A generous overlap hides the tail seam.
     final mainSource = Rect.fromLTRB(
@@ -224,7 +224,7 @@ class BakedDolphinSpriteCache extends ChangeNotifier {
     canvas.drawImageRect(
       image,
       _sourceCrop,
-      const Rect.fromLTWH(
+      Rect.fromLTWH(
         0,
         0,
         _frameSize.toDouble(),
