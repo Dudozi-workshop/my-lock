@@ -342,6 +342,36 @@ void _paintIllustratedShape(
   );
 
   final colors = _tokenToneColors(tone);
+
+  final accentAlpha = switch (texture) {
+    ShapeTexture.glossy => 0.92,
+    ShapeTexture.jelly => 0.78,
+    ShapeTexture.glass => 0.42,
+    ShapeTexture.matte => 0.90,
+    ShapeTexture.metal => 0.58,
+    ShapeTexture.chrome => 0.42,
+    ShapeTexture.hologram => 0.34,
+  };
+
+  final accentBase = tone == ShapeTone.white
+      ? const Color(0xFFEFF0F5)
+      : Color.lerp(colors.$1, Colors.white, 0.48)!;
+
+  // Accent zones are structural details of an illustrated Shape, not a second
+  // user-selected color. They are always derived from the active ShapeTone.
+  canvas.save();
+  canvas.clipPath(geometry.combinedPath);
+  for (final part in geometry.parts) {
+    if (part.role != ShapePartRole.accentZone) continue;
+    canvas.drawPath(
+      part.path,
+      Paint()
+        ..style = PaintingStyle.fill
+        ..color = accentBase.withValues(alpha: accentAlpha * opacity),
+    );
+  }
+  canvas.restore();
+
   final shadeAlpha = switch (texture) {
     ShapeTexture.glass => 0.08,
     ShapeTexture.jelly => 0.10,
@@ -352,22 +382,22 @@ void _paintIllustratedShape(
     ShapeTexture.hologram => 0.10,
   };
 
-  // Separate geometry parts are allowed internally, but they must still read
-  // as one object. A light shared tint gives fins/tail depth without visible
-  // seams or fixed artwork colors.
+  // Optional appendages can still receive depth treatment later. Accent zones
+  // are excluded so the belly remains a clean light derived tone.
   final appendagePaint = Paint()
     ..style = PaintingStyle.fill
     ..color = colors.$2.withValues(alpha: shadeAlpha * opacity);
 
   for (final part in geometry.parts) {
-    if (part.role == ShapePartRole.body) continue;
+    if (part.role == ShapePartRole.body ||
+        part.role == ShapePartRole.accentZone) {
+      continue;
+    }
     canvas.drawPath(part.path, appendagePaint);
   }
 
   if (texture == ShapeTexture.matte) return;
 
-  // Small per-part highlights make Glass/Jelly/Metal more expressive while
-  // preserving the selected palette color as the shape identity.
   final partHighlight = Paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = max(0.9, radius * 0.025)
@@ -377,7 +407,10 @@ void _paintIllustratedShape(
     );
 
   for (final part in geometry.parts) {
-    if (part.role == ShapePartRole.body) continue;
+    if (part.role == ShapePartRole.body ||
+        part.role == ShapePartRole.accentZone) {
+      continue;
+    }
     canvas.drawPath(part.path, partHighlight);
   }
 }
