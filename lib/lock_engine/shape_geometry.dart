@@ -4,10 +4,37 @@ import 'models.dart';
 
 enum ShapePartRole {
   body,
+
+  // Generic detail role retained for simple illustrated shapes.
   accent,
+
+  // High-detail Shape Accent Map roles.
+  mouthAccent,
+  bellyAccent,
+  frontFinAccent,
+  rearFinAccent,
+
+  // Optional silhouette roles for future composite shapes.
   dorsalFin,
   pectoralFin,
   tail,
+}
+
+extension ShapePartRoleRules on ShapePartRole {
+  bool get contributesToSilhouette =>
+      this == ShapePartRole.body ||
+      this == ShapePartRole.dorsalFin ||
+      this == ShapePartRole.pectoralFin ||
+      this == ShapePartRole.tail;
+
+  bool get isLightAccent =>
+      this == ShapePartRole.accent ||
+      this == ShapePartRole.mouthAccent ||
+      this == ShapePartRole.bellyAccent;
+
+  bool get isDepthAccent =>
+      this == ShapePartRole.frontFinAccent ||
+      this == ShapePartRole.rearFinAccent;
 }
 
 class ShapeTracePart {
@@ -85,11 +112,14 @@ class IllustratedShapeGeometry {
   final Path combinedPath;
 
   static Path _combine(List<ShapePartGeometry> parts) {
-    if (parts.isEmpty) return Path();
+    final silhouetteParts = parts
+        .where((part) => part.role.contributesToSilhouette)
+        .toList(growable: false);
+    if (silhouetteParts.isEmpty) return Path();
 
-    var combined = Path()..addPath(parts.first.path, Offset.zero);
-    for (final part in parts.skip(1)) {
-      if (part.role == ShapePartRole.accent) continue;
+    var combined = Path()
+      ..addPath(silhouetteParts.first.path, Offset.zero);
+    for (final part in silhouetteParts.skip(1)) {
       combined = Path.combine(
         PathOperation.union,
         combined,
@@ -148,6 +178,8 @@ const illustratedShapeBlueprints = <ShapeKind, ShapeBlueprint>{
     referenceRadius: 31,
     opticalBounds: Rect.fromLTRB(8, 29.1, 91.8, 70.7),
     parts: [
+      // Canonical silhouette. The old inner-mouth loop has been removed so
+      // the lower snout is one continuous outer contour.
       ShapeTracePart(
         role: ShapePartRole.body,
         points: [
@@ -156,12 +188,6 @@ const illustratedShapeBlueprints = <ShapeKind, ShapeBlueprint>{
           Offset(11.5, 44.3),
           Offset(18.6, 47.3),
           Offset(22.4, 49.8),
-          Offset(23.3, 49.5),
-          Offset(23, 48.6),
-          Offset(19.4, 46.3),
-          Offset(13.5, 43.8),
-          Offset(11.3, 42.5),
-          Offset(11.2, 41.7),
           Offset(15.7, 41.9),
           Offset(20.3, 43.8),
           Offset(29.9, 45.4),
@@ -224,6 +250,69 @@ const illustratedShapeBlueprints = <ShapeKind, ShapeBlueprint>{
           Offset(20.2, 31.7),
           Offset(15.7, 36.3),
           Offset(11.3, 37.3),
+        ],
+      ),
+
+      // High-detail Accent Map. These are clipped inside the canonical
+      // silhouette and never receive their own outline.
+      ShapeTracePart(
+        role: ShapePartRole.mouthAccent,
+        points: [
+          Offset(10.6, 41.5),
+          Offset(14.8, 41.8),
+          Offset(19.7, 43.4),
+          Offset(24.3, 45.5),
+          Offset(29.7, 46.8),
+          Offset(32.4, 48.0),
+          Offset(33.0, 49.6),
+          Offset(31.5, 50.8),
+          Offset(28.0, 50.8),
+          Offset(23.5, 49.4),
+          Offset(19.2, 47.4),
+          Offset(15.0, 45.0),
+          Offset(11.6, 43.2),
+        ],
+      ),
+      ShapeTracePart(
+        role: ShapePartRole.bellyAccent,
+        points: [
+          Offset(46.4, 56.9),
+          Offset(52.5, 57.5),
+          Offset(60.3, 57.7),
+          Offset(67.8, 57.0),
+          Offset(74.6, 56.3),
+          Offset(75.0, 57.6),
+          Offset(72.3, 58.5),
+          Offset(66.0, 59.3),
+          Offset(58.3, 60.0),
+          Offset(51.0, 60.5),
+          Offset(47.2, 60.0),
+          Offset(46.0, 58.6),
+        ],
+      ),
+      ShapeTracePart(
+        role: ShapePartRole.frontFinAccent,
+        points: [
+          Offset(30.3, 54.6),
+          Offset(33.8, 55.5),
+          Offset(36.4, 60.5),
+          Offset(34.4, 64.2),
+          Offset(32.9, 63.8),
+          Offset(31.0, 60.4),
+          Offset(30.0, 57.2),
+        ],
+      ),
+      ShapeTracePart(
+        role: ShapePartRole.rearFinAccent,
+        points: [
+          Offset(37.4, 60.7),
+          Offset(40.5, 66.5),
+          Offset(43.4, 69.1),
+          Offset(45.3, 69.4),
+          Offset(45.9, 69.0),
+          Offset(47.0, 61.8),
+          Offset(44.5, 61.1),
+          Offset(41.0, 60.8),
         ],
       ),
     ],
