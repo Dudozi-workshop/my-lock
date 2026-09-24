@@ -5,6 +5,7 @@ on:
     branches:
       - feat/shape-lab
       - feat/dolphin-mask-poc
+      - feat/3d-renderer-poc
     paths:
       - 'lib/lock_engine/**'
       - 'shape_lab/**'
