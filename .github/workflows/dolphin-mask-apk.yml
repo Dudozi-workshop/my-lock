@@ -1,0 +1,57 @@
+name: Dolphin Mask PoC APK
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - feat/dolphin-mask-poc
+  workflow_dispatch:
+
+concurrency:
+  group: dolphin-mask-poc-apk
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Build Dolphin Mask PoC APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Bootstrap Android
+        env:
+          PLATFORMS: android
+        run: bash tool/bootstrap.sh
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Build ARM64 APK
+        run: flutter build apk --release --target-platform android-arm64 --split-per-abi
+
+      - name: Prepare APK
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk dist/my-lock-dolphin-mask-poc-arm64.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-lock-dolphin-mask-poc-arm64
+          path: dist/my-lock-dolphin-mask-poc-arm64.apk
+          retention-days: 14
