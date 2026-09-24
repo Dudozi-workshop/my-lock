@@ -17,7 +17,10 @@ class LockTokenPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
-    final radius = size.shortestSide * 0.31;
+    final baseRadius = size.shortestSide * 0.31;
+    final radius = token.shape == ShapeKind.dolphin
+        ? baseRadius * 1.18
+        : baseRadius;
     final path = _tokenShapePath(token.shape, center, radius);
     _paintStyledShape(
       canvas,
@@ -152,129 +155,140 @@ Path _dolphinPath(Offset center, double radius) {
   double x(double value) => center.dx + radius * value;
   double y(double value) => center.dy + radius * value;
 
-  // One closed contour only. Color, surface, highlights and shadows are
-  // applied later by _paintStyledShape, exactly like the existing shapes.
+  // Single, closed silhouette. Keep the body plump and the fins shallow so
+  // the token reads as a dolphin at password-entry sizes without looking
+  // spiky or fish-like.
   return Path()
-    ..moveTo(x(0.98), y(-0.08))
-    // Forehead and upper body.
+    // Nose tip / short beak.
+    ..moveTo(x(1.00), y(-0.02))
+    // Forehead into the rounded back.
     ..cubicTo(
-      x(0.86),
-      y(-0.24),
-      x(0.68),
-      y(-0.39),
-      x(0.46),
-      y(-0.45),
+      x(0.88),
+      y(-0.10),
+      x(0.78),
+      y(-0.28),
+      x(0.54),
+      y(-0.38),
     )
     ..cubicTo(
-      x(0.28),
-      y(-0.50),
-      x(0.12),
+      x(0.30),
       y(-0.49),
       x(0.02),
-      y(-0.44),
-    )
-    // Dorsal fin remains part of the same outer silhouette.
-    ..cubicTo(
-      x(-0.02),
-      y(-0.57),
-      x(-0.07),
-      y(-0.72),
-      x(-0.17),
-      y(-0.80),
-    )
-    ..cubicTo(
+      y(-0.50),
       x(-0.18),
-      y(-0.62),
-      x(-0.24),
-      y(-0.49),
-      x(-0.34),
-      y(-0.42),
+      y(-0.43),
     )
-    // Back into the tail stock.
+    // Small dorsal fin, kept inside a soft overall contour.
     ..cubicTo(
-      x(-0.50),
-      y(-0.34),
-      x(-0.63),
-      y(-0.24),
+      x(-0.22),
+      y(-0.54),
+      x(-0.27),
+      y(-0.63),
+      x(-0.35),
+      y(-0.68),
+    )
+    ..cubicTo(
+      x(-0.36),
+      y(-0.55),
+      x(-0.40),
+      y(-0.45),
+      x(-0.48),
+      y(-0.39),
+    )
+    // Back narrowing toward the tail stock.
+    ..cubicTo(
+      x(-0.62),
+      y(-0.30),
       x(-0.72),
-      y(-0.12),
+      y(-0.20),
+      x(-0.78),
+      y(-0.09),
     )
     // Upper tail lobe.
     ..cubicTo(
-      x(-0.83),
-      y(-0.17),
-      x(-0.96),
-      y(-0.22),
-      x(-1.02),
-      y(-0.16),
+      x(-0.88),
+      y(-0.13),
+      x(-0.99),
+      y(-0.19),
+      x(-1.03),
+      y(-0.12),
     )
     ..cubicTo(
-      x(-0.97),
-      y(-0.05),
-      x(-0.87),
+      x(-0.98),
+      y(-0.03),
+      x(-0.90),
       y(0.02),
-      x(-0.73),
+      x(-0.79),
       y(0.04),
     )
-    // Tail notch and lower lobe.
+    // Tail notch.
     ..cubicTo(
-      x(-0.70),
-      y(0.05),
-      x(-0.68),
-      y(0.06),
-      x(-0.66),
+      x(-0.75),
+      y(0.045),
+      x(-0.72),
+      y(0.055),
+      x(-0.69),
       y(0.08),
     )
+    // Lower tail lobe.
     ..cubicTo(
       x(-0.82),
-      y(0.13),
-      x(-0.96),
-      y(0.24),
+      y(0.12),
       x(-0.94),
-      y(0.31),
+      y(0.20),
+      x(-0.93),
+      y(0.27),
     )
     ..cubicTo(
-      x(-0.78),
-      y(0.28),
-      x(-0.67),
+      x(-0.79),
+      y(0.25),
+      x(-0.69),
       y(0.16),
-      x(-0.61),
+      x(-0.62),
       y(0.09),
     )
-    // Lower body.
+    // Fuller lower body.
     ..cubicTo(
-      x(-0.34),
-      y(0.23),
-      x(-0.06),
+      x(-0.42),
+      y(0.22),
+      x(-0.17),
       y(0.34),
+      x(0.10),
+      y(0.35),
+    )
+    // Compact pectoral fin.
+    ..cubicTo(
+      x(0.14),
+      y(0.43),
       x(0.18),
+      y(0.52),
+      x(0.25),
+      y(0.55),
+    )
+    ..cubicTo(
+      x(0.32),
+      y(0.47),
+      x(0.34),
+      y(0.37),
+      x(0.31),
       y(0.28),
     )
-    // Pectoral fin is also contained in the same contour.
+    // Belly into the snout underside.
     ..cubicTo(
-      x(0.21),
-      y(0.40),
-      x(0.23),
-      y(0.57),
-      x(0.30),
-      y(0.64),
+      x(0.50),
+      y(0.24),
+      x(0.66),
+      y(0.16),
+      x(0.80),
+      y(0.07),
     )
     ..cubicTo(
-      x(0.39),
-      y(0.54),
-      x(0.43),
-      y(0.38),
-      x(0.40),
-      y(0.25),
-    )
-    // Belly and short dolphin beak.
-    ..cubicTo(
-      x(0.62),
-      y(0.20),
-      x(0.82),
-      y(0.10),
-      x(0.98),
-      y(-0.08),
+      x(0.88),
+      y(0.04),
+      x(0.95),
+      y(0.01),
+      x(1.00),
+      y(-0.02),
     )
     ..close();
 }
@@ -493,7 +507,10 @@ class FloatingShapePainter extends CustomPainter {
     required double scale,
     required double opacity,
   }) {
-    final radius = object.radius * scale;
+    final baseRadius = object.radius * scale;
+    final radius = object.token.shape == ShapeKind.dolphin
+        ? baseRadius * 1.10
+        : baseRadius;
 
     canvas.save();
     canvas.translate(object.position.dx, object.position.dy);
