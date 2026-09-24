@@ -4,7 +4,6 @@ import 'models.dart';
 
 enum ShapePartRole {
   body,
-  accentZone,
   dorsalFin,
   pectoralFin,
   tail,
@@ -180,49 +179,9 @@ IllustratedShapeGeometry _buildDolphinGeometry(
     ..quadraticBezierTo(point0.dx, point0.dy, first.dx, first.dy)
     ..close();
 
-  // Approved Accent A: a small light belly zone only.
-  // It uses the same 100x100 source space as the silhouette so the in-chat
-  // actual-render preview and Flutter stay aligned.
-  final accent = Path()
-    ..moveTo(mapPoint(const Offset(27, 48)).dx, mapPoint(const Offset(27, 48)).dy)
-    ..cubicTo(
-      mapPoint(const Offset(33, 51)).dx,
-      mapPoint(const Offset(33, 51)).dy,
-      mapPoint(const Offset(38, 55)).dx,
-      mapPoint(const Offset(38, 55)).dy,
-      mapPoint(const Offset(46, 57)).dx,
-      mapPoint(const Offset(46, 57)).dy,
-    )
-    ..cubicTo(
-      mapPoint(const Offset(56, 60)).dx,
-      mapPoint(const Offset(56, 60)).dy,
-      mapPoint(const Offset(67, 58)).dx,
-      mapPoint(const Offset(67, 58)).dy,
-      mapPoint(const Offset(75, 55)).dx,
-      mapPoint(const Offset(75, 55)).dy,
-    )
-    ..cubicTo(
-      mapPoint(const Offset(72, 61)).dx,
-      mapPoint(const Offset(72, 61)).dy,
-      mapPoint(const Offset(64, 65)).dx,
-      mapPoint(const Offset(64, 65)).dy,
-      mapPoint(const Offset(53, 66)).dx,
-      mapPoint(const Offset(53, 66)).dy,
-    )
-    ..cubicTo(
-      mapPoint(const Offset(42, 66)).dx,
-      mapPoint(const Offset(42, 66)).dy,
-      mapPoint(const Offset(33, 61)).dx,
-      mapPoint(const Offset(33, 61)).dy,
-      mapPoint(const Offset(27, 56)).dx,
-      mapPoint(const Offset(27, 56)).dy,
-    )
-    ..close();
-
   return IllustratedShapeGeometry(
     parts: [
       ShapePartGeometry(role: ShapePartRole.body, path: silhouette),
-      ShapePartGeometry(role: ShapePartRole.accentZone, path: accent),
     ],
   );
 }
