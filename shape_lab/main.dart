@@ -50,6 +50,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
   double bodyDepth = 1.0;
   double tailScale = 1.0;
   bool accentEnabled = false;
+  bool mouthClosed = false;
   double accentSize = 1.0;
   double accentY = 0.0;
   double accentLightness = 0.48;
@@ -66,6 +67,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
       bodyDepth = 1.0;
       tailScale = 1.0;
       accentEnabled = false;
+      mouthClosed = false;
       accentSize = 1.0;
       accentY = 0.0;
       accentLightness = 0.48;
@@ -101,6 +103,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
             bodyDepth: bodyDepth,
             tailScale: tailScale,
             accentEnabled: accentEnabled,
+            mouthClosed: mouthClosed,
             accentSize: accentSize,
             accentY: accentY,
           )
@@ -330,6 +333,95 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                     ),
                   ),
 
+                  if (shape == ShapeKind.dolphin && draftMode) ...[
+                    const SizedBox(height: 16),
+                    _Panel(
+                      color: cardColor,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Quick Compare',
+                            style: TextStyle(
+                              color: textColor,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '같은 Draft Shape를 색상·재질만 바꿔 바로 비교',
+                            style: TextStyle(color: muted, fontSize: 13),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Basic Tones',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 24,
+                            runSpacing: 16,
+                            children: [
+                              for (final compareTone in const [
+                                ShapeTone.pink,
+                                ShapeTone.blue,
+                                ShapeTone.yellow,
+                              ])
+                                _CompareToken(
+                                  label: compareTone.label,
+                                  shape: shape,
+                                  tone: compareTone,
+                                  texture: texture,
+                                  background: pageColor,
+                                  transform: transform,
+                                  blueprintOverride: draftBlueprint,
+                                  accentLightness: accentLightness,
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          Text(
+                            'Surfaces',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 20,
+                            runSpacing: 16,
+                            children: [
+                              for (final compareTexture in const [
+                                ShapeTexture.glossy,
+                                ShapeTexture.jelly,
+                                ShapeTexture.glass,
+                                ShapeTexture.matte,
+                                ShapeTexture.metal,
+                                ShapeTexture.hologram,
+                              ])
+                                _CompareToken(
+                                  label: compareTexture.label,
+                                  shape: shape,
+                                  tone: tone,
+                                  texture: compareTexture,
+                                  background: pageColor,
+                                  transform: transform,
+                                  blueprintOverride: draftBlueprint,
+                                  accentLightness: accentLightness,
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+
                   if (shape == ShapeKind.dolphin) ...[
                     const SizedBox(height: 16),
                     _Panel(
@@ -338,7 +430,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Dolphin Shape Controls',
+                            'Dolphin Details',
                             style: TextStyle(
                               color: textColor,
                               fontWeight: FontWeight.w700,
@@ -347,44 +439,19 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                           const SizedBox(height: 4),
                           Text(
                             draftMode
-                                ? '여기 값은 Shape Lab 초안에만 적용. APP EXACT/본앱 코드는 바뀌지 않음.'
-                                : 'Draft를 켜면 돌고래 실루엣을 즉시 조정할 수 있음.',
+                                ? '자주 확인할 내부 표현만 앞에 배치. 아직 본앱에는 반영되지 않음.'
+                                : 'Draft를 켜면 입 닫기와 Belly Accent를 바로 비교할 수 있음.',
                             style: TextStyle(color: muted, fontSize: 13),
                           ),
-                          const SizedBox(height: 12),
-                          _LabSlider(
-                            label: 'Forehead',
-                            value: forehead,
-                            min: -5,
-                            max: 5,
-                            enabled: draftMode,
-                            decimals: 1,
-                            onChanged: (value) => setState(() => forehead = value),
-                          ),
-                          _LabSlider(
-                            label: 'Snout',
-                            value: snout,
-                            min: -6,
-                            max: 6,
-                            enabled: draftMode,
-                            decimals: 1,
-                            onChanged: (value) => setState(() => snout = value),
-                          ),
-                          _LabSlider(
-                            label: 'Body depth',
-                            value: bodyDepth,
-                            min: 0.82,
-                            max: 1.18,
-                            enabled: draftMode,
-                            onChanged: (value) => setState(() => bodyDepth = value),
-                          ),
-                          _LabSlider(
-                            label: 'Tail',
-                            value: tailScale,
-                            min: 0.78,
-                            max: 1.25,
-                            enabled: draftMode,
-                            onChanged: (value) => setState(() => tailScale = value),
+                          const SizedBox(height: 8),
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text('Close mouth'),
+                            subtitle: const Text('레퍼런스의 입쪽 빈 틈을 메운 실루엣 비교'),
+                            value: mouthClosed,
+                            onChanged: draftMode
+                                ? (value) => setState(() => mouthClosed = value)
+                                : null,
                           ),
                           SwitchListTile(
                             contentPadding: EdgeInsets.zero,
@@ -429,33 +496,74 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                   const SizedBox(height: 16),
                   _Panel(
                     color: cardColor,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: ExpansionTile(
+                      tilePadding: EdgeInsets.zero,
+                      childrenPadding: EdgeInsets.zero,
+                      initiallyExpanded: false,
+                      title: Text(
+                        'Advanced Geometry',
+                        style: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      subtitle: Text(
+                        draftMode
+                            ? '필요할 때만 여는 보조 조정값'
+                            : 'Draft를 켜면 사용 가능',
+                        style: TextStyle(color: muted, fontSize: 13),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextButton(
+                            onPressed: draftMode ? resetDraft : null,
+                            child: const Text('Reset'),
+                          ),
+                          const Icon(Icons.expand_more),
+                        ],
+                      ),
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Draft Geometry',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: draftMode ? resetDraft : null,
-                              child: const Text('Reset'),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          draftMode
-                              ? '실제 Painter 출력 위에 임시 변환만 적용. 확정 전 앱 코드에는 반영되지 않음.'
-                              : 'APP EXACT에서는 변환 없이 실제 Painter 결과만 표시.',
-                          style: TextStyle(color: muted, fontSize: 13),
-                        ),
-                        const SizedBox(height: 12),
+                        if (shape == ShapeKind.dolphin) ...[
+                          _LabSlider(
+                            label: 'Forehead',
+                            value: forehead,
+                            min: -5,
+                            max: 5,
+                            enabled: draftMode,
+                            decimals: 1,
+                            onChanged: (value) =>
+                                setState(() => forehead = value),
+                          ),
+                          _LabSlider(
+                            label: 'Snout',
+                            value: snout,
+                            min: -6,
+                            max: 6,
+                            enabled: draftMode,
+                            decimals: 1,
+                            onChanged: (value) => setState(() => snout = value),
+                          ),
+                          _LabSlider(
+                            label: 'Body depth',
+                            value: bodyDepth,
+                            min: 0.82,
+                            max: 1.18,
+                            enabled: draftMode,
+                            onChanged: (value) =>
+                                setState(() => bodyDepth = value),
+                          ),
+                          _LabSlider(
+                            label: 'Tail',
+                            value: tailScale,
+                            min: 0.78,
+                            max: 1.25,
+                            enabled: draftMode,
+                            onChanged: (value) =>
+                                setState(() => tailScale = value),
+                          ),
+                          const Divider(height: 24),
+                        ],
                         _LabSlider(
                           label: 'Overall',
                           value: overallScale,
@@ -529,6 +637,7 @@ ShapeBlueprint _buildDolphinDraftBlueprint({
   required double bodyDepth,
   required double tailScale,
   required bool accentEnabled,
+  required bool mouthClosed,
   required double accentSize,
   required double accentY,
 }) {
@@ -568,10 +677,22 @@ ShapeBlueprint _buildDolphinDraftBlueprint({
     return Offset(x, y);
   }
 
+  final tunedBody = body.points.map(tune).toList(growable: false);
+
+  // The traced reference contains a narrow inner-mouth loop at indices 5..10.
+  // Close-mouth preview removes only that loop and keeps the approved outer
+  // snout/head contour intact.
+  final bodyPoints = mouthClosed
+      ? <Offset>[
+          ...tunedBody.take(5),
+          ...tunedBody.skip(11),
+        ]
+      : tunedBody;
+
   final parts = <ShapeTracePart>[
     ShapeTracePart(
       role: ShapePartRole.body,
-      points: body.points.map(tune).toList(growable: false),
+      points: bodyPoints,
     ),
   ];
 
