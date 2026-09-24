@@ -132,6 +132,20 @@ bool paintDolphinMaskCanvas(
     opacity: opacity,
   );
 
+  if (texture == ShapeTexture.glossy || texture == ShapeTexture.jelly) {
+    _paintSoft3DForm(
+      canvas,
+      bodyMask: body,
+      src: src,
+      dst: dst,
+      light: colors.$1,
+      dark: colors.$2,
+      texture: texture,
+      opacity: opacity,
+      radius: radius,
+    );
+  }
+
   if (texture == ShapeTexture.glass) {
     _paintCrystalFacets(
       canvas,
@@ -144,24 +158,58 @@ bool paintDolphinMaskCanvas(
     );
   }
 
-  _paintSolidMask(
-    canvas,
-    image: belly,
-    src: src,
-    dst: dst,
-    color: bellyColor.withValues(
-      alpha: _accentAlpha(texture, false) * opacity,
-    ),
-  );
-  _paintSolidMask(
-    canvas,
-    image: mouth,
-    src: src,
-    dst: dst,
-    color: mouthColor.withValues(
-      alpha: _accentAlpha(texture, true) * opacity,
-    ),
-  );
+  if (texture == ShapeTexture.glossy || texture == ShapeTexture.jelly) {
+    _paintAccentGradient(
+      canvas,
+      mask: belly,
+      src: src,
+      dst: dst,
+      baseColor: bellyColor,
+      dark: colors.$2,
+      opacity: _accentAlpha(texture, false) * opacity,
+      radius: radius,
+    );
+    _paintAccentGradient(
+      canvas,
+      mask: mouth,
+      src: src,
+      dst: dst,
+      baseColor: mouthColor,
+      dark: colors.$2,
+      opacity: _accentAlpha(texture, true) * opacity,
+      radius: radius,
+    );
+  } else {
+    _paintSolidMask(
+      canvas,
+      image: belly,
+      src: src,
+      dst: dst,
+      color: bellyColor.withValues(
+        alpha: _accentAlpha(texture, false) * opacity,
+      ),
+    );
+    _paintSolidMask(
+      canvas,
+      image: mouth,
+      src: src,
+      dst: dst,
+      color: mouthColor.withValues(
+        alpha: _accentAlpha(texture, true) * opacity,
+      ),
+    );
+  }
+
+  if (texture == ShapeTexture.glossy || texture == ShapeTexture.jelly) {
+    _paintInnerRim(
+      canvas,
+      bodyMask: body,
+      src: src,
+      dst: dst,
+      opacity: opacity,
+      radius: radius,
+    );
+  }
 
   if (texture != ShapeTexture.matte) {
     _paintSpecular(
@@ -191,8 +239,8 @@ void _paintOuterGlow(
     ShapeTexture.glass => 0.78,
     ShapeTexture.chrome => 0.48,
     ShapeTexture.metal => 0.40,
-    ShapeTexture.jelly => 0.44,
-    ShapeTexture.glossy => 0.48,
+    ShapeTexture.jelly => 0.24,
+    ShapeTexture.glossy => 0.16,
     ShapeTexture.hologram => 0.36,
     ShapeTexture.matte => 0.20,
   };
@@ -209,7 +257,7 @@ void _paintOuterGlow(
     )
     ..maskFilter = MaskFilter.blur(
       BlurStyle.outer,
-      (radius * 0.07).clamp(0.8, 4.0),
+      (radius * 0.045).clamp(0.6, 2.6),
     );
 
   canvas.drawImageRect(image, src, dst, paint);
@@ -255,6 +303,178 @@ void _paintSolidMask(
     Paint()
       ..filterQuality = FilterQuality.high
       ..colorFilter = ColorFilter.mode(color, BlendMode.srcIn),
+  );
+}
+
+void _paintSoft3DForm(
+  Canvas canvas, {
+  required ui.Image bodyMask,
+  required Rect src,
+  required Rect dst,
+  required Color light,
+  required Color dark,
+  required ShapeTexture texture,
+  required double opacity,
+  required double radius,
+}) {
+  final jelly = texture == ShapeTexture.jelly;
+
+  canvas.saveLayer(dst, Paint());
+
+  // Broad dorsal light. This is intentionally low-frequency so it still reads
+  // on the real lock-screen token size.
+  canvas.drawRect(
+    dst,
+    Paint()
+      ..shader = RadialGradient(
+        center: const Alignment(-0.14, -0.58),
+        radius: 0.96,
+        colors: [
+          Colors.white.withValues(alpha: (jelly ? 0.42 : 0.34) * opacity),
+          Color.lerp(light, Colors.white, 0.72)!
+              .withValues(alpha: (jelly ? 0.22 : 0.16) * opacity),
+          Colors.transparent,
+        ],
+        stops: const [0.0, 0.36, 1.0],
+      ).createShader(dst),
+  );
+
+  // Lower/rear form shadow gives the body volume without adding line art.
+  canvas.drawRect(
+    dst,
+    Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.transparent,
+          Colors.transparent,
+          dark.withValues(alpha: (jelly ? 0.17 : 0.24) * opacity),
+          Color.lerp(dark, Colors.black, 0.24)!
+              .withValues(alpha: (jelly ? 0.20 : 0.28) * opacity),
+        ],
+        stops: const [0.0, 0.42, 0.77, 1.0],
+      ).createShader(dst),
+  );
+
+  // Local ambient-occlusion shadows at the fin roots and tail neck.
+  void ao(double x, double y, double w, double h, double alpha) {
+    final rect = Rect.fromCenter(
+      center: Offset(
+        dst.left + dst.width * x,
+        dst.top + dst.height * y,
+      ),
+      width: dst.width * w,
+      height: dst.height * h,
+    );
+    canvas.drawOval(
+      rect,
+      Paint()
+        ..color = Color.lerp(dark, Colors.black, 0.32)!
+            .withValues(alpha: alpha * opacity)
+        ..maskFilter = MaskFilter.blur(
+          BlurStyle.normal,
+          (radius * 0.12).clamp(1.3, 5.0),
+        ),
+    );
+  }
+
+  ao(.54, .58, .22, .065, jelly ? .12 : .18); // front fin root
+  ao(.63, .62, .17, .055, jelly ? .11 : .16); // rear fin / belly
+  ao(.31, .60, .25, .050, jelly ? .07 : .10); // belly transition
+  ao(.19, .70, .15, .050, jelly ? .06 : .09); // tail neck
+
+  // Keep all form work strictly inside the approved body silhouette.
+  canvas.drawImageRect(
+    bodyMask,
+    src,
+    dst,
+    Paint()
+      ..blendMode = BlendMode.dstIn
+      ..filterQuality = FilterQuality.high,
+  );
+  canvas.restore();
+}
+
+void _paintAccentGradient(
+  Canvas canvas, {
+  required ui.Image mask,
+  required Rect src,
+  required Rect dst,
+  required Color baseColor,
+  required Color dark,
+  required double opacity,
+  required double radius,
+}) {
+  // A tiny soft seam shadow keeps the light accent attached to the body
+  // instead of looking like a flat white sticker.
+  canvas.drawImageRect(
+    mask,
+    src,
+    dst.translate(0, radius * 0.018),
+    Paint()
+      ..filterQuality = FilterQuality.high
+      ..colorFilter = ColorFilter.mode(
+        Color.lerp(dark, Colors.black, 0.18)!
+            .withValues(alpha: 0.16 * opacity),
+        BlendMode.srcIn,
+      )
+      ..maskFilter = MaskFilter.blur(
+        BlurStyle.outer,
+        (radius * 0.035).clamp(0.7, 2.2),
+      ),
+  );
+
+  canvas.saveLayer(dst, Paint());
+  canvas.drawRect(
+    dst,
+    Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color.lerp(baseColor, Colors.white, 0.48)!
+              .withValues(alpha: opacity),
+          baseColor.withValues(alpha: opacity),
+          Color.lerp(baseColor, dark, 0.10)!
+              .withValues(alpha: opacity),
+        ],
+        stops: const [0.0, 0.54, 1.0],
+      ).createShader(dst),
+  );
+  canvas.drawImageRect(
+    mask,
+    src,
+    dst,
+    Paint()
+      ..blendMode = BlendMode.dstIn
+      ..filterQuality = FilterQuality.high,
+  );
+  canvas.restore();
+}
+
+void _paintInnerRim(
+  Canvas canvas, {
+  required ui.Image bodyMask,
+  required Rect src,
+  required Rect dst,
+  required double opacity,
+  required double radius,
+}) {
+  canvas.drawImageRect(
+    bodyMask,
+    src,
+    dst,
+    Paint()
+      ..filterQuality = FilterQuality.high
+      ..colorFilter = ColorFilter.mode(
+        Colors.white.withValues(alpha: 0.16 * opacity),
+        BlendMode.srcIn,
+      )
+      ..maskFilter = MaskFilter.blur(
+        BlurStyle.inner,
+        (radius * 0.045).clamp(0.7, 2.6),
+      ),
   );
 }
 
@@ -329,19 +549,39 @@ void _paintSpecular(
     ShapeTexture.matte => 0.0,
   };
 
-  final highlight = Rect.fromCenter(
+  final primary = Rect.fromCenter(
     center: Offset(
-      dst.left + dst.width * 0.37,
-      dst.top + dst.height * 0.32,
+      dst.left + dst.width * 0.46,
+      dst.top + dst.height * 0.27,
     ),
-    width: dst.width * 0.16,
-    height: dst.height * 0.055,
+    width: dst.width * 0.31,
+    height: dst.height * 0.095,
+  );
+  final secondary = Rect.fromCenter(
+    center: Offset(
+      dst.left + dst.width * 0.69,
+      dst.top + dst.height * 0.36,
+    ),
+    width: dst.width * 0.14,
+    height: dst.height * 0.045,
   );
 
   canvas.saveLayer(dst, Paint());
+  final blur = MaskFilter.blur(
+    BlurStyle.normal,
+    (dst.width * 0.018).clamp(1.2, 4.8),
+  );
   canvas.drawOval(
-    highlight,
-    Paint()..color = Colors.white.withValues(alpha: alpha * opacity),
+    primary,
+    Paint()
+      ..color = Colors.white.withValues(alpha: alpha * 0.68 * opacity)
+      ..maskFilter = blur,
+  );
+  canvas.drawOval(
+    secondary,
+    Paint()
+      ..color = Colors.white.withValues(alpha: alpha * 0.28 * opacity)
+      ..maskFilter = blur,
   );
   canvas.drawImageRect(
     bodyMask,
