@@ -1,16 +1,13 @@
-name: MY LOCK Composite Shape Preview
+name: MY LOCK Shape Lab Preview
 
 on:
   push:
     branches:
       - feat/composite-shape-renderer
     paths:
-      - 'lib/**'
-      - 'assets/**'
+      - 'lib/lock_engine/**'
+      - 'preview_test/**'
       - 'pubspec.yaml'
-      - 'analysis_options.yaml'
-      - 'tool/**'
-      - 'wrangler.jsonc'
       - '.github/workflows/composite-shape-preview.yml'
   workflow_dispatch:
 
@@ -18,16 +15,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: mylock-composite-shape-preview
+  group: mylock-shape-lab-preview
   cancel-in-progress: true
 
 jobs:
-  web:
-    name: Build and deploy composite shape preview
+  render:
+    name: Render exact Flutter shape previews
     runs-on: ubuntu-latest
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -39,23 +33,19 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Test
-        run: flutter test
+      - name: Get dependencies
+        run: flutter pub get
 
-      - name: Build web
-        run: bash tool/build_web.sh
+      - name: Run app tests
+        run: flutter test test
 
-      - name: Upload web artifact
+      - name: Render shape previews from production painter
+        run: flutter test --update-goldens preview_test/shape_preview_golden_test.dart
+
+      - name: Upload exact-render previews
         uses: actions/upload-artifact@v4
         with:
-          name: my-lock-composite-shape-preview-web
-          path: build/web
+          name: my-lock-shape-preview
+          path: preview_test/goldens/*.png
           if-no-files-found: error
-
-      - name: Deploy branch preview to Cloudflare Worker
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config wrangler.jsonc --name my-lock-composite-shape-preview
+          retention-days: 14
