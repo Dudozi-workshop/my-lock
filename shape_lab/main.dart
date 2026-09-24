@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/effects.dart';
 import 'package:my_lock/lock_engine/floating_preview.dart';
+import 'package:my_lock/lock_engine/glossy_sphere_3d.dart';
 import 'package:my_lock/lock_engine/dolphin_mask_renderer.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 import 'package:my_lock/lock_engine/shape_geometry.dart';
@@ -247,6 +248,93 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                       ],
                     ),
                   ),
+
+                  if (shape == ShapeKind.dolphin) ...[
+                    const SizedBox(height: 16),
+                    _Panel(
+                      color: cardColor,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '3D Renderer PoC · Step 1',
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 17,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Flutter Scene + Flutter GPU/Impeller 기반 PBR 구체입니다. 드래그로 회전하고 두 손가락으로 확대/축소할 수 있습니다.',
+                                      style: TextStyle(
+                                        color: muted,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: const Color(0x14256EEA),
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(
+                                    color: const Color(0x33256EEA),
+                                  ),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  child: Text(
+                                    'PBR 3D',
+                                    style: TextStyle(
+                                      color: Color(0xFF4F7FE8),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          Center(
+                            child: SizedBox.square(
+                              dimension: 280,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(28),
+                                child: ColoredBox(
+                                  color: const Color(0xFF081628),
+                                  child: GlossySphere3D(
+                                    tone: tone,
+                                    interactive: true,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            '검증 포인트: 광택/PBR 품질 · 회전 시 하이라이트 변화 · 모바일 GPU 호환성 · 이후 Dolphin.glb 교체 가능성',
+                            style: TextStyle(
+                              color: muted,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
 
                   const SizedBox(height: 16),
                   LayoutBuilder(
