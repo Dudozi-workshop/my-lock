@@ -37,6 +37,7 @@ void main() {
     expect(ShapeKind.defaults.every((item) => !item.premium), isTrue);
     expect(ShapeTone.defaults.every((item) => !item.premium), isTrue);
     expect(ShapeTexture.glossy.premium, isFalse);
+    expect(ShapeKind.dolphin.premium, isTrue);
     expect(
       ShapeTexture.values.where((item) => item.premium).length,
       greaterThan(0),
@@ -65,11 +66,11 @@ void main() {
 
     const password = [
       LockToken(shape: ShapeKind.star, tone: ShapeTone.purple),
-      LockToken(shape: ShapeKind.heart, tone: ShapeTone.mint),
+      LockToken(shape: ShapeKind.dolphin, tone: ShapeTone.mint),
     ];
 
     controller.setShapeStyleAndPassword(
-      {ShapeKind.star, ShapeKind.heart},
+      {ShapeKind.star, ShapeKind.dolphin},
       {ShapeTone.purple, ShapeTone.mint},
       password,
       texture: ShapeTexture.glass,
