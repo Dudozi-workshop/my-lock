@@ -1,0 +1,65 @@
+name: MY LOCK Dolphin Sprite Web
+
+on:
+  push:
+    branches:
+      - feat/dolphin-sprite-poc
+    paths:
+      - 'lib/lock_engine/**'
+      - 'shape_lab/**'
+      - 'assets/shapes/dolphin/**'
+      - 'assets/shapes/dolphin_sprite/**'
+      - 'tool/generate_dolphin_sprite.py'
+      - 'tool/build_shape_lab.sh'
+      - 'pubspec.yaml'
+      - 'wrangler.dolphin-sprite-poc.jsonc'
+      - '.github/workflows/dolphin-sprite-web.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: my-lock-dolphin-sprite-web
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Generate baked dolphin sprites
+        run: |
+          python3 -m pip install --disable-pip-version-check pillow
+          python3 tool/generate_dolphin_sprite.py
+
+      - name: Build Shape Lab
+        run: bash tool/build_shape_lab.sh
+
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-lock-dolphin-sprite-web
+          path: build/shape_lab
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Deploy Dolphin Sprite PoC Web
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config wrangler.dolphin-sprite-poc.jsonc
