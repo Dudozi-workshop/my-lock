@@ -1,11 +1,15 @@
-import 'dart:convert';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'dolphin_mask_assets.dart';
+import 'package:flutter/services.dart';
 import 'models.dart';
+
+const dolphinBodyMaskAsset = 'assets/shapes/dolphin/dolphin_body.png';
+const dolphinMouthMaskAsset =
+    'assets/shapes/dolphin/dolphin_mouth_accent.png';
+const dolphinBellyMaskAsset =
+    'assets/shapes/dolphin/dolphin_belly_accent.png';
 
 /// Lazily decodes the three PoC alpha masks once and invalidates painters when
 /// they become available. The first frame may use the existing vector fallback;
@@ -32,9 +36,9 @@ class DolphinMaskCanvasCache extends ChangeNotifier {
   Future<void> _load() async {
     try {
       final images = await Future.wait<ui.Image>([
-        _decode(dolphinBodyPngBase64),
-        _decode(dolphinMouthPngBase64),
-        _decode(dolphinBellyPngBase64),
+        _decodeAsset(dolphinBodyMaskAsset),
+        _decodeAsset(dolphinMouthMaskAsset),
+        _decodeAsset(dolphinBellyMaskAsset),
       ]);
       body = images[0];
       mouth = images[1];
@@ -45,8 +49,12 @@ class DolphinMaskCanvasCache extends ChangeNotifier {
     }
   }
 
-  Future<ui.Image> _decode(String source) async {
-    final bytes = base64Decode(source);
+  Future<ui.Image> _decodeAsset(String assetPath) async {
+    final data = await rootBundle.load(assetPath);
+    final bytes = data.buffer.asUint8List(
+      data.offsetInBytes,
+      data.lengthInBytes,
+    );
     final codec = await ui.instantiateImageCodec(
       bytes,
       targetWidth: 256,
