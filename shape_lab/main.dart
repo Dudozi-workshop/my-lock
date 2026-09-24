@@ -357,7 +357,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'FloatingPreview + FloatingEngine을 그대로 사용합니다. 412 × 915 logical px 기준에서 실제 도형 폭은 약 90~113 px 범위로 생성됩니다.',
+                          'FloatingPreview + FloatingEngine을 그대로 사용합니다. 412 × 915 logical px 기준에서 실제 도형 폭은 약 86~107 logical px 범위로 생성됩니다.',
                           style: TextStyle(color: muted, fontSize: 13),
                         ),
                         const SizedBox(height: 14),
