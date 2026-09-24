@@ -6,6 +6,7 @@ on:
       - feat/shape-lab
       - feat/dolphin-mask-poc
       - feat/3d-renderer-poc
+      - feat/baked-sprite-poc
     paths:
       - 'lib/lock_engine/**'
       - 'shape_lab/**'
