@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feat/3d-renderer-poc
+      - feat/baked-sprite-poc
   workflow_dispatch:
 
 concurrency:
