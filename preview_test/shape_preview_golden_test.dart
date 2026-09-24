@@ -10,55 +10,60 @@ void main() {
     ShapeTexture.glossy,
     ShapeTexture.glass,
   ];
+  const previewSizes = <double>[55, 65, 75];
 
   group('shape preview export', () {
     for (final shape in ShapeKind.values) {
       for (final texture in previewTextures) {
-        testWidgets(
-          '${shape.name} ${texture.name} exact 58 logical px',
-          (tester) async {
-            tester.view.devicePixelRatio = 4.0;
-            addTearDown(tester.view.resetDevicePixelRatio);
+        for (final logicalSize in previewSizes) {
+          testWidgets(
+            '${shape.name} ${texture.name} ${logicalSize.toInt()} logical px',
+            (tester) async {
+              tester.view.devicePixelRatio = 4.0;
+              addTearDown(tester.view.resetDevicePixelRatio);
 
-            await tester.binding.setSurfaceSize(const Size(58, 58));
-            addTearDown(() => tester.binding.setSurfaceSize(null));
+              final size = Size.square(logicalSize);
+              await tester.binding.setSurfaceSize(size);
+              addTearDown(() => tester.binding.setSurfaceSize(null));
 
-            final previewKey = ValueKey<String>(
-              'shape-preview-${shape.name}-${texture.name}',
-            );
-            final token = LockToken(
-              shape: shape,
-              tone: ShapeTone.blue,
-            );
+              final px = logicalSize.toInt();
+              final previewKey = ValueKey<String>(
+                'shape-preview-${shape.name}-${texture.name}-$px',
+              );
+              final token = LockToken(
+                shape: shape,
+                tone: ShapeTone.blue,
+              );
 
-            await tester.pumpWidget(
-              RepaintBoundary(
-                key: previewKey,
-                child: ColoredBox(
-                  color: const Color(0xFFF4F5F8),
-                  child: SizedBox.square(
-                    dimension: 58,
-                    child: CustomPaint(
-                      painter: LockTokenPainter(
-                        token,
-                        texture: texture,
+              await tester.pumpWidget(
+                RepaintBoundary(
+                  key: previewKey,
+                  child: ColoredBox(
+                    color: const Color(0xFFF4F5F8),
+                    child: SizedBox.square(
+                      dimension: logicalSize,
+                      child: CustomPaint(
+                        painter: LockTokenPainter(
+                          token,
+                          texture: texture,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            );
+              );
 
-            await tester.pump();
+              await tester.pump();
 
-            await expectLater(
-              find.byKey(previewKey),
-              matchesGoldenFile(
-                'goldens/${shape.name}_${texture.name}_58px_dpr4.png',
-              ),
-            );
-          },
-        );
+              await expectLater(
+                find.byKey(previewKey),
+                matchesGoldenFile(
+                  'goldens/${shape.name}_${texture.name}_${px}px_dpr4.png',
+                ),
+              );
+            },
+          );
+        }
       }
     }
   });
