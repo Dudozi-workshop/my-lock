@@ -191,7 +191,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '기본값은 본앱과 동일한 APP EXACT 렌더 · Dolphin은 Raster Mask 사용',
+                              '기본값은 본앱과 동일한 APP EXACT 렌더 · Dolphin Soft 3D Gloss v1',
                               style: TextStyle(color: muted, fontSize: 14),
                             ),
                           ],
@@ -348,7 +348,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '실제 잠금화면 동작 크기',
+                          '실제 잠금화면 동작 크기 · Soft 3D Gloss v1',
                           style: TextStyle(
                             color: textColor,
                             fontWeight: FontWeight.w800,
