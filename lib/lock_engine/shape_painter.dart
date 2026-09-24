@@ -209,7 +209,7 @@ void _paintStyledShape(
   final bounds = Rect.fromCircle(center: center, radius: radius);
 
   if (texture == ShapeTexture.glass) {
-    _paintGlassShape(
+    _paintCrystalShape(
       canvas,
       path: path,
       center: center,
@@ -346,7 +346,7 @@ void _paintStyledShape(
 }
 
 
-void _paintGlassShape(
+void _paintCrystalShape(
   Canvas canvas, {
   required Path path,
   required Offset center,
@@ -375,12 +375,12 @@ void _paintGlassShape(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [
-        Colors.white.withValues(alpha: 0.30 * opacity),
-        colors.$1.withValues(alpha: 0.34 * opacity),
-        colors.$1.withValues(alpha: 0.18 * opacity),
-        colors.$2.withValues(alpha: 0.40 * opacity),
+        Colors.white.withValues(alpha: 0.28 * opacity),
+        colors.$1.withValues(alpha: 0.46 * opacity),
+        colors.$1.withValues(alpha: 0.30 * opacity),
+        colors.$2.withValues(alpha: 0.48 * opacity),
       ],
-      stops: const [0.0, 0.28, 0.58, 1.0],
+      stops: const [0.0, 0.30, 0.62, 1.0],
     ).createShader(bounds);
   canvas.drawPath(path, body);
 
@@ -390,10 +390,10 @@ void _paintGlassShape(
       radius: 1.05,
       colors: [
         Colors.transparent,
-        colors.$1.withValues(alpha: 0.06 * opacity),
-        colors.$2.withValues(alpha: 0.22 * opacity),
+        colors.$1.withValues(alpha: 0.10 * opacity),
+        colors.$2.withValues(alpha: 0.30 * opacity),
       ],
-      stops: const [0.0, 0.70, 1.0],
+      stops: const [0.0, 0.66, 1.0],
     ).createShader(bounds);
   canvas.drawPath(path, edgeDepth);
 
@@ -404,7 +404,7 @@ void _paintGlassShape(
       colors: [
         Colors.transparent,
         Colors.white.withValues(alpha: 0.04 * opacity),
-        Colors.white.withValues(alpha: 0.30 * opacity),
+        Colors.white.withValues(alpha: 0.34 * opacity),
         Colors.white.withValues(alpha: 0.08 * opacity),
         Colors.transparent,
       ],
@@ -424,7 +424,7 @@ void _paintGlassShape(
   );
 
   final caustic = Paint()
-    ..color = rimTint.withValues(alpha: 0.18 * opacity);
+    ..color = rimTint.withValues(alpha: 0.24 * opacity);
   canvas.drawOval(
     Rect.fromCenter(
       center: center.translate(radius * 0.20, radius * 0.29),
@@ -440,8 +440,8 @@ void _paintGlassShape(
     ..style = PaintingStyle.stroke
     ..strokeJoin = StrokeJoin.round
     ..strokeCap = StrokeCap.round
-    ..strokeWidth = max(2.0, radius * 0.075)
-    ..color = rimTint.withValues(alpha: 0.42 * opacity);
+    ..strokeWidth = max(2.2, radius * 0.082)
+    ..color = rimTint.withValues(alpha: 0.50 * opacity);
   canvas.drawPath(path, coloredRim);
 
   final clearRim = Paint()
@@ -485,7 +485,7 @@ void _paintIllustratedShape(
   final mouthAlpha = switch (texture) {
     ShapeTexture.glossy => 0.78,
     ShapeTexture.jelly => 0.66,
-    ShapeTexture.glass => 0.36,
+    ShapeTexture.glass => 0.46,
     ShapeTexture.matte => 0.74,
     ShapeTexture.metal => 0.54,
     ShapeTexture.chrome => 0.40,
@@ -494,7 +494,7 @@ void _paintIllustratedShape(
   final bellyAlpha = switch (texture) {
     ShapeTexture.glossy => 0.44,
     ShapeTexture.jelly => 0.38,
-    ShapeTexture.glass => 0.22,
+    ShapeTexture.glass => 0.30,
     ShapeTexture.matte => 0.42,
     ShapeTexture.metal => 0.34,
     ShapeTexture.chrome => 0.28,
@@ -503,7 +503,7 @@ void _paintIllustratedShape(
   final frontFinShadeAlpha = switch (texture) {
     ShapeTexture.glossy => 0.055,
     ShapeTexture.jelly => 0.050,
-    ShapeTexture.glass => 0.035,
+    ShapeTexture.glass => 0.055,
     ShapeTexture.matte => 0.050,
     ShapeTexture.metal => 0.075,
     ShapeTexture.chrome => 0.080,
@@ -512,7 +512,7 @@ void _paintIllustratedShape(
   final rearFinShadeAlpha = switch (texture) {
     ShapeTexture.glossy => 0.16,
     ShapeTexture.jelly => 0.14,
-    ShapeTexture.glass => 0.10,
+    ShapeTexture.glass => 0.14,
     ShapeTexture.matte => 0.14,
     ShapeTexture.metal => 0.20,
     ShapeTexture.chrome => 0.22,
