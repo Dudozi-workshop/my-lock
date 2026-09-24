@@ -423,14 +423,38 @@ void _paintRoundCutCrystal(
         stops: const [0, .38, .76, 1],
       ).createShader(Rect.fromCircle(center: center, radius: radius * .60)),
   );
-  // A restrained reflection crosses the table without turning its center
-  // into a white stripe or splitting it into many tiny radial wedges.
+  // Asymmetric reflections expose the cut inside the table. Large adjoining
+  // planes survive downsampling while their angled edges imply depth.
   facet([
     vertex(10, .58),
     vertex(11, .58),
+    center.translate(-radius * .10, -radius * .10),
+    center.translate(-radius * .40, radius * .08),
+  ], pale, alpha: .67);
+  facet([
+    center.translate(-radius * .10, -radius * .10),
     vertex(1, .58),
-    center.translate(radius * .06, -radius * .10),
+    vertex(2, .58),
+    center.translate(radius * .22, radius * .08),
+  ], colors.$1, alpha: .50);
+  facet([
+    center.translate(-radius * .40, radius * .08),
+    center.translate(-radius * .10, -radius * .10),
+    center.translate(radius * .22, radius * .08),
+    center.translate(radius * .04, radius * .40),
   ], pale, alpha: .42);
+  facet([
+    center.translate(radius * .22, radius * .08),
+    vertex(3, .58),
+    vertex(5, .58),
+    center.translate(radius * .04, radius * .40),
+  ], deep, alpha: .22);
+  facet([
+    vertex(6, .58),
+    center.translate(radius * .04, radius * .40),
+    center.translate(-radius * .40, radius * .08),
+    vertex(8, .58),
+  ], light, alpha: .48);
   canvas.drawPath(
     table,
     Paint()
