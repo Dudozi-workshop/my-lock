@@ -215,13 +215,14 @@ void _paintStyledShape(
     if (crystalKind == ShapeKind.circle) {
       final sprite = tone == ShapeTone.blue ? CrystalSprite.blueCircle : null;
       if (sprite != null) {
-        canvas.drawImageRect(
-          sprite,
-          Rect.fromLTWH(0, 0, sprite.width.toDouble(), sprite.height.toDouble()),
-          bounds,
-          Paint()
-            ..filterQuality = FilterQuality.medium
-            ..color = Colors.white.withValues(alpha: opacity),
+        _paintCrystalSpriteCircle(
+          canvas,
+          path: path,
+          sprite: sprite,
+          center: center,
+          radius: radius,
+          tone: tone,
+          opacity: opacity,
         );
       } else {
         _paintRoundCutCrystal(
@@ -515,6 +516,97 @@ void _paintRoundCutCrystal(
   );
 }
 
+void _paintCrystalSpriteCircle(
+  Canvas canvas, {
+  required Path path,
+  required ui.Image sprite,
+  required Offset center,
+  required double radius,
+  required ShapeTone tone,
+  required double opacity,
+}) {
+  final colors = _tokenToneColors(tone);
+  final bounds = Rect.fromCircle(center: center, radius: radius);
+  final pale = Color.lerp(colors.$1, Colors.white, .76)!;
+  final deep = Color.lerp(colors.$2, Colors.black, .10)!;
+
+  canvas.drawShadow(
+    path,
+    colors.$2.withValues(alpha: .26 * opacity),
+    8,
+    true,
+  );
+
+  canvas.save();
+  canvas.clipPath(path);
+
+  canvas.drawImageRect(
+    sprite,
+    Rect.fromLTWH(0, 0, sprite.width.toDouble(), sprite.height.toDouble()),
+    bounds,
+    Paint()
+      ..filterQuality = FilterQuality.high
+      ..color = Colors.white.withValues(alpha: opacity),
+  );
+
+  // Preserve the photographic facet asset but make it survive 58 px:
+  // darker perimeter planes + a diagonal white refraction band.
+  canvas.drawRect(
+    bounds,
+    Paint()
+      ..blendMode = BlendMode.multiply
+      ..shader = RadialGradient(
+        center: const Alignment(-.20, -.24),
+        radius: 1.10,
+        colors: [
+          Colors.white.withValues(alpha: 0),
+          colors.$1.withValues(alpha: .04 * opacity),
+          deep.withValues(alpha: .34 * opacity),
+        ],
+        stops: const [.42, .72, 1],
+      ).createShader(bounds),
+  );
+
+  canvas.drawRect(
+    bounds,
+    Paint()
+      ..blendMode = BlendMode.screen
+      ..shader = LinearGradient(
+        begin: const Alignment(-1, -.85),
+        end: const Alignment(.85, 1),
+        colors: [
+          Colors.white.withValues(alpha: .62 * opacity),
+          Colors.white.withValues(alpha: .10 * opacity),
+          pale.withValues(alpha: .30 * opacity),
+          Colors.transparent,
+        ],
+        stops: const [0, .22, .55, 1],
+      ).createShader(bounds),
+  );
+  canvas.restore();
+
+  // A bright upper-left rim and a saturated lower-right rim create the
+  // "cut crystal" edge without adding visible cartoon outlines.
+  canvas.drawPath(
+    path,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = max(.72, radius * .040)
+      ..shader = SweepGradient(
+        startAngle: -pi,
+        endAngle: pi,
+        colors: [
+          pale.withValues(alpha: .96 * opacity),
+          Colors.white.withValues(alpha: .96 * opacity),
+          colors.$1.withValues(alpha: .70 * opacity),
+          deep.withValues(alpha: .76 * opacity),
+          pale.withValues(alpha: .96 * opacity),
+        ],
+        stops: const [0, .25, .52, .78, 1],
+      ).createShader(bounds),
+  );
+}
+
 void _paintTriangleCutCrystal(
   Canvas canvas, {
   required Path path,
@@ -525,40 +617,49 @@ void _paintTriangleCutCrystal(
 }) {
   final colors = _tokenToneColors(tone);
   final bounds = path.getBounds();
-  final pale = Color.lerp(colors.$1, Colors.white, 0.74)!;
-  final light = Color.lerp(colors.$1, Colors.white, 0.48)!;
-  final mid = Color.lerp(colors.$1, colors.$2, 0.20)!;
-  final shade = Color.lerp(colors.$1, colors.$2, 0.60)!;
-  final deep = Color.lerp(colors.$2, Colors.black, 0.08)!;
+  final white = Colors.white;
+  final pale = Color.lerp(colors.$1, Colors.white, .82)!;
+  final light = Color.lerp(colors.$1, Colors.white, .48)!;
+  final mid = Color.lerp(colors.$1, colors.$2, .20)!;
+  final shade = Color.lerp(colors.$1, colors.$2, .60)!;
+  final deep = Color.lerp(colors.$2, Colors.black, .14)!;
 
   Offset p(double x, double y) => Offset(
         bounds.left + bounds.width * x,
         bounds.top + bounds.height * y,
       );
 
-  void facet(List<Offset> points, Color color, {double alpha = 1}) {
+  void facet(
+    List<Offset> points,
+    Color color, {
+    double alpha = 1,
+    BlendMode blendMode = BlendMode.srcOver,
+  }) {
     canvas.drawPath(
       Path()..addPolygon(points, true),
-      Paint()..color = color.withValues(alpha: alpha * opacity),
+      Paint()
+        ..blendMode = blendMode
+        ..color = color.withValues(alpha: alpha * opacity),
     );
   }
 
-  final top = p(.50, 0);
-  final left = p(0, 1);
-  final right = p(1, 1);
-  final leftMid = p(.25, .50);
-  final rightMid = p(.75, .50);
-  final baseMid = p(.50, 1);
+  final t = p(.50, 0);
+  final l = p(0, 1);
+  final r = p(1, 1);
 
-  final it = p(.50, .27);
-  final il = p(.28, .70);
-  final ir = p(.72, .70);
-  final hub = p(.50, .53);
+  final l1 = p(.17, .67);
+  final r1 = p(.83, .67);
+  final b1 = p(.50, 1);
+
+  final it = p(.50, .22);
+  final il = p(.29, .68);
+  final ir = p(.71, .68);
+  final hub = p(.50, .51);
 
   canvas.drawShadow(
     path,
-    colors.$2.withValues(alpha: .22 * opacity),
-    7,
+    colors.$2.withValues(alpha: .30 * opacity),
+    8,
     true,
   );
 
@@ -566,39 +667,47 @@ void _paintTriangleCutCrystal(
   canvas.clipPath(path);
   canvas.drawPath(path, Paint()..color = mid.withValues(alpha: opacity));
 
-  // Crown: large alternating planes, derived from the brilliant-cut reference.
-  // No white separator lines: plane contrast itself defines the cut.
-  facet([top, rightMid, it], pale);
-  facet([top, it, leftMid], light);
-  facet([leftMid, it, il, left], Color.lerp(colors.$1, pale, .32)!);
-  facet([rightMid, right, ir, it], deep, alpha: .86);
-  facet([left, il, baseMid], shade, alpha: .72);
-  facet([baseMid, il, ir], light, alpha: .86);
-  facet([baseMid, ir, right], deep, alpha: .68);
+  // Outer crown: strong alternating faces. The right/lower facets deliberately
+  // retain deep blue so the crystal does not wash out at app size.
+  facet([t, r1, it], white, alpha: .90);
+  facet([t, it, l1], pale, alpha: .95);
+  facet([l, l1, il], light, alpha: .92);
+  facet([l1, it, il], Color.lerp(colors.$1, pale, .60)!);
+  facet([r1, r, ir], deep, alpha: .94);
+  facet([it, r1, ir], Color.lerp(colors.$1, colors.$2, .55)!);
+  facet([l, il, b1], shade, alpha: .80);
+  facet([b1, il, ir], light, alpha: .88);
+  facet([b1, ir, r], deep, alpha: .72);
 
-  // Central table stays bright but keeps the selected hue, avoiding a flat
-  // white center when rendered at the 58 px production size.
-  facet([it, ir, hub], Color.lerp(colors.$1, pale, .62)!);
-  facet([it, hub, il], Color.lerp(colors.$1, pale, .78)!);
-  facet([il, hub, ir], Color.lerp(colors.$1, light, .50)!);
+  // Table: three broad planes plus two subtle refraction wedges.
+  facet([it, ir, hub], Color.lerp(colors.$1, pale, .58)!);
+  facet([it, hub, il], pale, alpha: .96);
+  facet([il, hub, ir], Color.lerp(colors.$1, light, .56)!);
+  facet([it, hub, p(.63, .38)], white,
+      alpha: .22, blendMode: BlendMode.screen);
+  facet([hub, ir, p(.58, .66)], deep,
+      alpha: .18, blendMode: BlendMode.multiply);
 
   canvas.restore();
 
-  final rim = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeJoin = StrokeJoin.round
-    ..strokeWidth = max(.72, radius * .035)
-    ..shader = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        Colors.white.withValues(alpha: .88 * opacity),
-        pale.withValues(alpha: .68 * opacity),
-        deep.withValues(alpha: .70 * opacity),
-      ],
-      stops: const [0, .46, 1],
-    ).createShader(bounds);
-  canvas.drawPath(path, rim);
+  canvas.drawPath(
+    path,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeJoin = StrokeJoin.round
+      ..strokeWidth = max(.72, radius * .040)
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          white.withValues(alpha: .98 * opacity),
+          pale.withValues(alpha: .84 * opacity),
+          colors.$1.withValues(alpha: .58 * opacity),
+          deep.withValues(alpha: .78 * opacity),
+        ],
+        stops: const [0, .36, .67, 1],
+      ).createShader(bounds),
+  );
 }
 
 void _paintSquareCutCrystal(
@@ -611,21 +720,29 @@ void _paintSquareCutCrystal(
 }) {
   final colors = _tokenToneColors(tone);
   final bounds = path.getBounds();
-  final pale = Color.lerp(colors.$1, Colors.white, 0.76)!;
-  final light = Color.lerp(colors.$1, Colors.white, 0.46)!;
-  final mid = Color.lerp(colors.$1, colors.$2, 0.18)!;
-  final shade = Color.lerp(colors.$1, colors.$2, 0.58)!;
-  final deep = Color.lerp(colors.$2, Colors.black, 0.10)!;
+  final white = Colors.white;
+  final pale = Color.lerp(colors.$1, Colors.white, .84)!;
+  final light = Color.lerp(colors.$1, Colors.white, .50)!;
+  final mid = Color.lerp(colors.$1, colors.$2, .18)!;
+  final shade = Color.lerp(colors.$1, colors.$2, .60)!;
+  final deep = Color.lerp(colors.$2, Colors.black, .16)!;
 
   Offset p(double x, double y) => Offset(
         bounds.left + bounds.width * x,
         bounds.top + bounds.height * y,
       );
 
-  void facet(List<Offset> points, Color color, {double alpha = 1}) {
+  void facet(
+    List<Offset> points,
+    Color color, {
+    double alpha = 1,
+    BlendMode blendMode = BlendMode.srcOver,
+  }) {
     canvas.drawPath(
       Path()..addPolygon(points, true),
-      Paint()..color = color.withValues(alpha: alpha * opacity),
+      Paint()
+        ..blendMode = blendMode
+        ..color = color.withValues(alpha: alpha * opacity),
     );
   }
 
@@ -638,16 +755,16 @@ void _paintSquareCutCrystal(
   final bm = p(.50, 1);
   final lm = p(0, .50);
 
-  final iTL = p(.27, .27);
-  final iTR = p(.73, .27);
-  final iBR = p(.73, .73);
-  final iBL = p(.27, .73);
+  final a = p(.24, .24);
+  final b = p(.76, .24);
+  final c = p(.76, .76);
+  final d = p(.24, .76);
   final hub = p(.50, .50);
 
   canvas.drawShadow(
     path,
-    colors.$2.withValues(alpha: .22 * opacity),
-    7,
+    colors.$2.withValues(alpha: .30 * opacity),
+    8,
     true,
   );
 
@@ -655,41 +772,50 @@ void _paintSquareCutCrystal(
   canvas.clipPath(path);
   canvas.drawPath(path, Paint()..color = mid.withValues(alpha: opacity));
 
-  // Princess-cut crown. The upper-left catches light while the right/lower
-  // crown carries the saturated dark planes seen in the reference gem.
-  facet([tl, tm, iTR, iTL, lm], Color.lerp(colors.$1, pale, .54)!);
-  facet([tm, tr, rm, iTR], light, alpha: .95);
-  facet([rm, br, bm, iBR], deep, alpha: .84);
-  facet([bm, bl, lm, iBL], shade, alpha: .70);
+  // Cushion/princess crown with a bright upper-left and saturated right side.
+  facet([tl, tm, b, a, lm], pale, alpha: .96);
+  facet([tm, tr, rm, b], white, alpha: .90);
+  facet([rm, br, bm, c], deep, alpha: .92);
+  facet([bm, bl, lm, d], shade, alpha: .78);
 
-  facet([lm, iTL, iBL], light, alpha: .86);
-  facet([tm, iTR, iTL], pale, alpha: .92);
-  facet([rm, iBR, iTR], deep, alpha: .76);
-  facet([bm, iBL, iBR], Color.lerp(colors.$1, light, .42)!, alpha: .92);
+  facet([lm, a, d], light, alpha: .92);
+  facet([tm, b, a], Color.lerp(colors.$1, pale, .74)!);
+  facet([rm, c, b], Color.lerp(colors.$2, deep, .42)!, alpha: .96);
+  facet([bm, d, c], Color.lerp(colors.$1, light, .46)!, alpha: .92);
 
-  // Table: four broad planes are enough to keep the cut legible at 58 px.
-  facet([iTL, iTR, hub], Color.lerp(colors.$1, pale, .76)!);
-  facet([iTR, iBR, hub], Color.lerp(colors.$1, light, .28)!);
-  facet([iBR, iBL, hub], Color.lerp(colors.$1, colors.$2, .20)!);
-  facet([iBL, iTL, hub], Color.lerp(colors.$1, pale, .52)!);
+  // Table: broad, asymmetrical planes mimic the large white/ice facets in
+  // the reference instead of a flat central gradient.
+  facet([a, b, hub], pale, alpha: .98);
+  facet([b, c, hub], Color.lerp(colors.$1, light, .30)!);
+  facet([c, d, hub], Color.lerp(colors.$1, colors.$2, .24)!);
+  facet([d, a, hub], Color.lerp(colors.$1, pale, .62)!);
+
+  // Refraction wedges; blend modes add depth without drawing seam strokes.
+  facet([a, hub, p(.34, .58)], white,
+      alpha: .28, blendMode: BlendMode.screen);
+  facet([hub, c, p(.64, .55)], deep,
+      alpha: .22, blendMode: BlendMode.multiply);
 
   canvas.restore();
 
-  final rim = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeJoin = StrokeJoin.round
-    ..strokeWidth = max(.72, radius * .035)
-    ..shader = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        Colors.white.withValues(alpha: .90 * opacity),
-        pale.withValues(alpha: .66 * opacity),
-        deep.withValues(alpha: .72 * opacity),
-      ],
-      stops: const [0, .48, 1],
-    ).createShader(bounds);
-  canvas.drawPath(path, rim);
+  canvas.drawPath(
+    path,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeJoin = StrokeJoin.round
+      ..strokeWidth = max(.72, radius * .040)
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          white.withValues(alpha: .98 * opacity),
+          pale.withValues(alpha: .82 * opacity),
+          colors.$1.withValues(alpha: .56 * opacity),
+          deep.withValues(alpha: .82 * opacity),
+        ],
+        stops: const [0, .34, .66, 1],
+      ).createShader(bounds),
+  );
 }
 
 void _paintCrystalShape(
