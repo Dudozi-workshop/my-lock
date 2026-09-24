@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'effects.dart';
 import 'dolphin_mask_canvas.dart';
+import 'dolphin_sprite_cache.dart';
+import 'dolphin_sprite_renderer.dart';
 import 'dolphin_visual_renderer_v2.dart';
 import 'models.dart';
 import 'shape_geometry.dart';
@@ -14,7 +16,10 @@ class LockTokenPainter extends CustomPainter {
     this.texture = ShapeTexture.glossy,
     this.blueprintOverride,
     this.accentLightness = 0.48,
-  }) : super(repaint: DolphinMaskCanvasCache.instance);
+  }) : super(repaint: Listenable.merge([
+          DolphinMaskCanvasCache.instance,
+          DolphinSpriteCache.instance,
+        ]));
 
   final LockToken token;
   final ShapeTexture texture;
@@ -34,6 +39,18 @@ class LockTokenPainter extends CustomPainter {
     // Production/App Exact uses the raster-mask dolphin. Shape Lab draft
     // blueprints remain available for direct A/B comparison.
     if (token.shape == ShapeKind.dolphin && blueprintOverride == null) {
+      final spritePainted = paintDolphinSprite(
+        canvas,
+        center: center,
+        radius: radius,
+        tone: token.tone,
+        texture: texture,
+        opacity: 1,
+        animationPhase: 0,
+        animationSeed: 0,
+      );
+      if (spritePainted) return;
+
       final painted = paintDolphinVisualV2(
         canvas,
         center: center,
@@ -765,7 +782,10 @@ class FloatingShapePainter extends CustomPainter {
     required this.objects,
     this.popStyle = PopStyle.basicPop,
     this.texture = ShapeTexture.glossy,
-  }) : super(repaint: DolphinMaskCanvasCache.instance);
+  }) : super(repaint: Listenable.merge([
+          DolphinMaskCanvasCache.instance,
+          DolphinSpriteCache.instance,
+        ]));
 
   final List<FloatingObject> objects;
   final PopStyle popStyle;
@@ -826,6 +846,21 @@ class FloatingShapePainter extends CustomPainter {
     canvas.translate(-object.position.dx, -object.position.dy);
 
     if (object.token.shape == ShapeKind.dolphin) {
+      final spritePainted = paintDolphinSprite(
+        canvas,
+        center: object.position,
+        radius: radius,
+        tone: object.token.tone,
+        texture: texture,
+        opacity: opacity,
+        animationPhase: object.spritePhase,
+        animationSeed: object.id,
+      );
+      if (spritePainted) {
+        canvas.restore();
+        return;
+      }
+
       final painted = paintDolphinVisualV2(
         canvas,
         center: object.position,
