@@ -85,6 +85,7 @@ class FloatingObject {
 
   double rotation = 0;
   double angularVelocity = 0;
+  double spritePhase = 0;
   double popElapsed = -1;
 
   bool get isPopping => popElapsed >= 0;
