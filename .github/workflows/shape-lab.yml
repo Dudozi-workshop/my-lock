@@ -6,6 +6,7 @@ on:
       - feat/shape-lab
     paths:
       - 'lib/lock_engine/**'
+      - 'assets/materials/**'
       - 'shape_lab/**'
       - 'preview_test/**'
       - 'tool/build_shape_lab.sh'
