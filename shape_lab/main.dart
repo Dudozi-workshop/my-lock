@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 import 'package:my_lock/lock_engine/shape_geometry.dart';
@@ -37,7 +38,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
   ShapeTone tone = ShapeTone.blue;
   ShapeTexture texture = ShapeTexture.glossy;
   bool darkBackground = false;
-  bool draftMode = false;
+  bool draftMode = true;
 
   double overallScale = 1.0;
   double scaleX = 1.0;
@@ -49,8 +50,8 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
   double snout = 0.0;
   double bodyDepth = 1.0;
   double tailScale = 1.0;
-  bool accentEnabled = false;
-  bool mouthClosed = false;
+  bool accentEnabled = true;
+  bool mouthClosed = true;
   double accentSize = 1.0;
   double accentY = 0.0;
   double accentLightness = 0.48;
@@ -66,8 +67,8 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
       snout = 0.0;
       bodyDepth = 1.0;
       tailScale = 1.0;
-      accentEnabled = false;
-      mouthClosed = false;
+      accentEnabled = true;
+      mouthClosed = true;
       accentSize = 1.0;
       accentY = 0.0;
       accentLightness = 0.48;
@@ -108,6 +109,59 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
             accentY: accentY,
           )
         : null;
+
+    final closedOnlyBlueprint = shape == ShapeKind.dolphin
+        ? _buildDolphinDraftBlueprint(
+            forehead: forehead,
+            snout: snout,
+            bodyDepth: bodyDepth,
+            tailScale: tailScale,
+            accentEnabled: false,
+            mouthClosed: true,
+            accentSize: accentSize,
+            accentY: accentY,
+          )
+        : null;
+
+    final closedAccentBlueprint = shape == ShapeKind.dolphin
+        ? _buildDolphinDraftBlueprint(
+            forehead: forehead,
+            snout: snout,
+            bodyDepth: bodyDepth,
+            tailScale: tailScale,
+            accentEnabled: true,
+            mouthClosed: true,
+            accentSize: accentSize,
+            accentY: accentY,
+          )
+        : null;
+
+    Future<void> copyDraftSpec() async {
+      final spec = <String, Object>{
+        'shape': shape.name,
+        'tone': tone.name,
+        'surface': texture.name,
+        'mouthClosed': mouthClosed,
+        'accentEnabled': accentEnabled,
+        'accentSize': double.parse(accentSize.toStringAsFixed(3)),
+        'accentY': double.parse(accentY.toStringAsFixed(2)),
+        'accentLightness': double.parse(accentLightness.toStringAsFixed(3)),
+        'forehead': double.parse(forehead.toStringAsFixed(2)),
+        'snout': double.parse(snout.toStringAsFixed(2)),
+        'bodyDepth': double.parse(bodyDepth.toStringAsFixed(3)),
+        'tailScale': double.parse(tailScale.toStringAsFixed(3)),
+        'overallScale': double.parse(overallScale.toStringAsFixed(3)),
+        'scaleX': double.parse(scaleX.toStringAsFixed(3)),
+        'scaleY': double.parse(scaleY.toStringAsFixed(3)),
+        'offsetX': double.parse(offsetX.toStringAsFixed(2)),
+        'offsetY': double.parse(offsetY.toStringAsFixed(2)),
+      };
+      await Clipboard.setData(ClipboardData(text: spec.toString()));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Draft 설정값을 복사했어요.')),
+      );
+    }
 
     return Scaffold(
       backgroundColor: pageColor,
@@ -157,34 +211,34 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                       runSpacing: 12,
                       children: [
                         _DropdownField<ShapeKind>(
-                          label: 'Shape',
+                          label: '도형',
                           value: shape,
                           values: ShapeKind.values,
                           text: (value) => value.label,
                           onChanged: (value) => setState(() => shape = value),
                         ),
                         _DropdownField<ShapeTone>(
-                          label: 'Tone',
+                          label: '색상',
                           value: tone,
                           values: ShapeTone.values,
                           text: (value) => value.label,
                           onChanged: (value) => setState(() => tone = value),
                         ),
                         _DropdownField<ShapeTexture>(
-                          label: 'Surface',
+                          label: '재질',
                           value: texture,
                           values: ShapeTexture.values,
                           text: (value) => value.label,
                           onChanged: (value) => setState(() => texture = value),
                         ),
                         _ToggleField(
-                          label: 'Dark BG',
+                          label: '어두운 배경',
                           value: darkBackground,
                           onChanged: (value) =>
                               setState(() => darkBackground = value),
                         ),
                         _ToggleField(
-                          label: 'Draft',
+                          label: '편집모드',
                           value: draftMode,
                           onChanged: (value) =>
                               setState(() => draftMode = value),
@@ -285,6 +339,141 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                       );
                     },
                   ),
+
+                  if (shape == ShapeKind.dolphin) ...[
+                    const SizedBox(height: 16),
+                    _Panel(
+                      color: cardColor,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '바로 비교',
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      '셋 다 실제 LockTokenPainter 렌더. 마음에 드는 안을 누르면 Draft에 바로 적용.',
+                                      style: TextStyle(color: muted, fontSize: 13),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              TextButton.icon(
+                                onPressed: draftMode ? copyDraftSpec : null,
+                                icon: const Icon(Icons.copy_all_outlined, size: 18),
+                                label: const Text('Draft 복사'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          LayoutBuilder(
+                            builder: (context, inner) {
+                              final width = inner.maxWidth;
+                              final itemWidth = width < 620
+                                  ? width
+                                  : (width - 24) / 3;
+                              return Wrap(
+                                spacing: 12,
+                                runSpacing: 12,
+                                children: [
+                                  SizedBox(
+                                    width: itemWidth,
+                                    child: _VariantCard(
+                                      title: '현재',
+                                      subtitle: '기존 실루엣',
+                                      selected: draftMode &&
+                                          !mouthClosed &&
+                                          !accentEnabled,
+                                      onTap: draftMode
+                                          ? () => setState(() {
+                                                mouthClosed = false;
+                                                accentEnabled = false;
+                                              })
+                                          : null,
+                                      child: _TokenPreview(
+                                        shape: shape,
+                                        tone: tone,
+                                        texture: texture,
+                                        background: pageColor,
+                                        transform: const _DraftTransform(
+                                          enabled: false,
+                                          overallScale: 1,
+                                          scaleX: 1,
+                                          scaleY: 1,
+                                          offsetX: 0,
+                                          offsetY: 0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: itemWidth,
+                                    child: _VariantCard(
+                                      title: '입 틈 메움',
+                                      subtitle: '외곽만 정리',
+                                      selected: draftMode &&
+                                          mouthClosed &&
+                                          !accentEnabled,
+                                      onTap: draftMode
+                                          ? () => setState(() {
+                                                mouthClosed = true;
+                                                accentEnabled = false;
+                                              })
+                                          : null,
+                                      child: _TokenPreview(
+                                        shape: shape,
+                                        tone: tone,
+                                        texture: texture,
+                                        background: pageColor,
+                                        transform: transform,
+                                        blueprintOverride: closedOnlyBlueprint,
+                                        accentLightness: accentLightness,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: itemWidth,
+                                    child: _VariantCard(
+                                      title: '입 틈 + 배색',
+                                      subtitle: '현재 작업안',
+                                      selected: draftMode &&
+                                          mouthClosed &&
+                                          accentEnabled,
+                                      onTap: draftMode
+                                          ? () => setState(() {
+                                                mouthClosed = true;
+                                                accentEnabled = true;
+                                              })
+                                          : null,
+                                      child: _TokenPreview(
+                                        shape: shape,
+                                        tone: tone,
+                                        texture: texture,
+                                        background: pageColor,
+                                        transform: transform,
+                                        blueprintOverride: closedAccentBlueprint,
+                                        accentLightness: accentLightness,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
 
                   const SizedBox(height: 16),
                   _Panel(
@@ -446,7 +635,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                           const SizedBox(height: 8),
                           SwitchListTile(
                             contentPadding: EdgeInsets.zero,
-                            title: const Text('Close mouth'),
+                            title: const Text('입 틈 메우기'),
                             subtitle: const Text('레퍼런스의 입쪽 빈 틈을 메운 실루엣 비교'),
                             value: mouthClosed,
                             onChanged: draftMode
@@ -455,7 +644,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                           ),
                           SwitchListTile(
                             contentPadding: EdgeInsets.zero,
-                            title: const Text('Belly Accent'),
+                            title: const Text('배 Accent'),
                             subtitle: const Text('선택 색상에서 자동으로 연한 톤 파생'),
                             value: accentEnabled,
                             onChanged: draftMode
@@ -463,7 +652,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                                 : null,
                           ),
                           _LabSlider(
-                            label: 'Accent size',
+                            label: '배 크기',
                             value: accentSize,
                             min: 0.70,
                             max: 1.30,
@@ -471,7 +660,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                             onChanged: (value) => setState(() => accentSize = value),
                           ),
                           _LabSlider(
-                            label: 'Accent Y',
+                            label: '배 위치',
                             value: accentY,
                             min: -6,
                             max: 6,
@@ -480,7 +669,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                             onChanged: (value) => setState(() => accentY = value),
                           ),
                           _LabSlider(
-                            label: 'Accent light',
+                            label: '배 밝기',
                             value: accentLightness,
                             min: 0.18,
                             max: 0.72,
@@ -526,7 +715,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                       children: [
                         if (shape == ShapeKind.dolphin) ...[
                           _LabSlider(
-                            label: 'Forehead',
+                            label: '이마',
                             value: forehead,
                             min: -5,
                             max: 5,
@@ -536,7 +725,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                                 setState(() => forehead = value),
                           ),
                           _LabSlider(
-                            label: 'Snout',
+                            label: '주둥이',
                             value: snout,
                             min: -6,
                             max: 6,
@@ -545,7 +734,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                             onChanged: (value) => setState(() => snout = value),
                           ),
                           _LabSlider(
-                            label: 'Body depth',
+                            label: '몸통',
                             value: bodyDepth,
                             min: 0.82,
                             max: 1.18,
@@ -554,7 +743,7 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                                 setState(() => bodyDepth = value),
                           ),
                           _LabSlider(
-                            label: 'Tail',
+                            label: '꼬리',
                             value: tailScale,
                             min: 0.78,
                             max: 1.25,
@@ -898,6 +1087,72 @@ class _CompareToken extends StatelessWidget {
         const SizedBox(height: 6),
         Text(label, style: const TextStyle(fontSize: 12)),
       ],
+    );
+  }
+}
+
+class _VariantCard extends StatelessWidget {
+  const _VariantCard({
+    required this.title,
+    required this.subtitle,
+    required this.selected,
+    required this.child,
+    this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final bool selected;
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: selected
+          ? scheme.primaryContainer.withValues(alpha: 0.40)
+          : Colors.transparent,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 140),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: selected ? scheme.primary : const Color(0x247B8190),
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              SizedBox.square(
+                dimension: 116,
+                child: Center(
+                  child: Transform.scale(scale: 2, child: child),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
