@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_lock/lock_engine/models.dart';
+import 'package:my_lock/lock_engine/effects.dart';
+import 'package:my_lock/lock_engine/floating_preview.dart';
 import 'package:my_lock/lock_engine/dolphin_mask_renderer.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 import 'package:my_lock/lock_engine/shape_geometry.dart';
@@ -40,6 +42,9 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
   ShapeTexture texture = ShapeTexture.glossy;
   bool darkBackground = false;
   bool draftMode = false;
+  MovementStyle runtimeMovement = MovementStyle.floating;
+  MovementArea runtimeArea = MovementArea.full;
+  int runtimeObjectCount = 9;
 
   double overallScale = 1.0;
   double scaleX = 1.0;
@@ -334,6 +339,129 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                         ],
                       );
                     },
+                  ),
+
+                  const SizedBox(height: 16),
+                  _Panel(
+                    color: cardColor,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '실제 잠금화면 동작 크기',
+                          style: TextStyle(
+                            color: textColor,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 17,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'FloatingPreview + FloatingEngine을 그대로 사용합니다. 412 × 915 logical px 기준에서 실제 도형 폭은 약 90~113 px 범위로 생성됩니다.',
+                          style: TextStyle(color: muted, fontSize: 13),
+                        ),
+                        const SizedBox(height: 14),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            _DropdownField<MovementStyle>(
+                              label: 'Motion',
+                              value: runtimeMovement,
+                              values: MovementStyle.values,
+                              text: (value) => value.label,
+                              onChanged: (value) =>
+                                  setState(() => runtimeMovement = value),
+                            ),
+                            _DropdownField<MovementArea>(
+                              label: '이동 영역',
+                              value: runtimeArea,
+                              values: MovementArea.values,
+                              text: (value) => value.label,
+                              onChanged: (value) =>
+                                  setState(() => runtimeArea = value),
+                            ),
+                            _DropdownField<int>(
+                              label: '도형 수',
+                              value: runtimeObjectCount,
+                              values: const [6, 9, 12],
+                              text: (value) => '$value개',
+                              onChanged: (value) =>
+                                  setState(() => runtimeObjectCount = value),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 390),
+                            child: AspectRatio(
+                              aspectRatio: 412 / 915,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(28),
+                                child: ColoredBox(
+                                  color: const Color(0xFF09172B),
+                                  child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: SizedBox(
+                                      width: 412,
+                                      height: 915,
+                                      child: Stack(
+                                        children: [
+                                          const Positioned.fill(
+                                            child: DecoratedBox(
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                  colors: [
+                                                    Color(0xFF102441),
+                                                    Color(0xFF071426),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned.fill(
+                                            child: FloatingPreview(
+                                              selectedShapes: {shape},
+                                              selectedTones: {tone},
+                                              movementStyle: runtimeMovement,
+                                              texture: texture,
+                                              objectCount: runtimeObjectCount,
+                                              movementArea: runtimeArea,
+                                              speed: FloatingSpeed.normal,
+                                              topInset: 150,
+                                            ),
+                                          ),
+                                          const Positioned(
+                                            left: 22,
+                                            top: 28,
+                                            child: Text(
+                                              'MY LOCK · runtime preview',
+                                              style: TextStyle(
+                                                color: Colors.white70,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          '※ 위 화면은 58 × 58 고정 아이콘 미리보기가 아니라, 실제 잠금 엔진이 화면 폭을 기준으로 radius를 생성하고 이동·충돌·터치 판정을 수행하는 런타임입니다.',
+                          style: TextStyle(color: muted, fontSize: 12),
+                        ),
+                      ],
+                    ),
                   ),
 
                   if (shape == ShapeKind.dolphin) ...[
