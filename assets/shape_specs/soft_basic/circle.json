@@ -1,7 +1,7 @@
 {
   "styleId": "soft_basic",
   "shapeId": "circle",
-  "version": 9,
+  "version": 10,
   "rotationMode": "fixed",
   "body": {
     "kind": "circle",
@@ -13,6 +13,36 @@
     "kind": "solid"
   },
   "layers": [
+    {
+      "id": "color_shell",
+      "role": "shade",
+      "blend": "normal",
+      "opacity": 0.28,
+      "blur": 1.7,
+      "toneLightnessDelta": -0.10,
+      "toneSaturationDelta": 0.02,
+      "geometry": {
+        "kind": "circle",
+        "cx": 50,
+        "cy": 50,
+        "r": 46
+      }
+    },
+    {
+      "id": "color_shell_inner",
+      "role": "light",
+      "blend": "normal",
+      "opacity": 1.0,
+      "blur": 0.0,
+      "toneLightnessDelta": 0.0,
+      "toneSaturationDelta": 0.0,
+      "geometry": {
+        "kind": "circle",
+        "cx": 50,
+        "cy": 50,
+        "r": 44.6
+      }
+    },
     {
       "id": "airbrush_light",
       "role": "light",
@@ -41,6 +71,53 @@
         "cx": 78.16,
         "cy": 81.68,
         "r": 37.84
+      }
+    },
+    {
+      "id": "ambient_bounce",
+      "role": "light",
+      "blend": "normal",
+      "opacity": 0.16,
+      "blur": 10.0,
+      "toneLightnessDelta": 0.11,
+      "toneSaturationDelta": -0.025,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 56.44,
+        "cy": 77.36,
+        "rx": 35.88,
+        "ry": 15.64
+      }
+    },
+    {
+      "id": "ambient_core",
+      "role": "light",
+      "blend": "normal",
+      "opacity": 0.09,
+      "blur": 7.0,
+      "toneLightnessDelta": 0.16,
+      "toneSaturationDelta": -0.04,
+      "geometry": {
+        "kind": "circle",
+        "cx": 61.96,
+        "cy": 70.24,
+        "r": 11.96
+      }
+    },
+    {
+      "id": "ambient_depth",
+      "role": "shade",
+      "blend": "normal",
+      "opacity": 0.045,
+      "blur": 5.0,
+      "toneLightnessDelta": -0.16,
+      "toneSaturationDelta": 0.03,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 50,
+        "cy": 87.72,
+        "rx": 25.76,
+        "ry": 5.52
       }
     },
     {
