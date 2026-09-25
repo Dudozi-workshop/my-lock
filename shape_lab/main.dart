@@ -203,6 +203,7 @@ class _CrayonStyleLabPageState extends State<CrayonStyleLabPage> {
     final fg = dark ? Colors.white : const Color(0xFF171923);
     final muted = dark ? const Color(0xFFAEB4C3) : const Color(0xFF6D7382);
     final selected = _candidates[selectedIndex];
+    final compact = MediaQuery.sizeOf(context).width < 700;
 
     return Scaffold(
       backgroundColor: bg,
@@ -249,17 +250,19 @@ class _CrayonStyleLabPageState extends State<CrayonStyleLabPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
-                  _Panel(
-                    color: card,
-                    child: Text(
-                      'C01~C08은 이미지 시안이 아니라 앱과 동일한 LockTokenPainter + '
-                      'Crayon Soft 렌더러를 서로 다른 파라미터로 즉시 그립니다. '
-                      '좋은 후보를 고른 뒤 다음 라운드에서 요소를 조합합니다.',
-                      style: TextStyle(color: muted, height: 1.5),
+                  const SizedBox(height: 10),
+                  if (!compact) ...[
+                    _Panel(
+                      color: card,
+                      child: Text(
+                        'C01~C08은 이미지 시안이 아니라 앱과 동일한 LockTokenPainter + '
+                        'Crayon Soft 렌더러를 서로 다른 파라미터로 즉시 그립니다. '
+                        '좋은 후보를 고른 뒤 다음 라운드에서 요소를 조합합니다.',
+                        style: TextStyle(color: muted, height: 1.5),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 14),
+                    const SizedBox(height: 14),
+                  ],
                   Text(
                     'ROUND 1 · 방향 탐색',
                     style: TextStyle(
@@ -343,23 +346,24 @@ class _CandidateCard extends StatelessWidget {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.fromLTRB(10, 9, 10, 10),
           decoration: BoxDecoration(
             color: card,
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: selected ? accent : const Color(0xFFE6E3EE),
               width: selected ? 2 : 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: selected ? 0.08 : 0.035),
-                blurRadius: selected ? 18 : 10,
-                offset: const Offset(0, 5),
+                color: Colors.black.withValues(alpha: selected ? 0.07 : 0.025),
+                blurRadius: selected ? 12 : 7,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -369,15 +373,15 @@ class _CandidateCard extends StatelessWidget {
                     style: TextStyle(
                       color: fg,
                       fontWeight: FontWeight.w900,
-                      fontSize: 15,
+                      fontSize: 13,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 5),
                   if (candidate.badge != null)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 7,
-                        vertical: 3,
+                        horizontal: 5,
+                        vertical: 2,
                       ),
                       decoration: BoxDecoration(
                         color: accent.withValues(alpha: 0.10),
@@ -387,84 +391,55 @@ class _CandidateCard extends StatelessWidget {
                         candidate.badge!,
                         style: const TextStyle(
                           color: accent,
-                          fontSize: 10,
+                          fontSize: 8,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
                     ),
                   const Spacer(),
                   if (selected)
-                    const Icon(Icons.check_circle, color: accent, size: 20),
+                    const Icon(Icons.check_circle, color: accent, size: 17),
                 ],
               ),
-              const SizedBox(height: 12),
-              const SizedBox(
-                height: 66,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [],
-                ),
-              ),
-              Transform.translate(
-                offset: const Offset(0, -66),
-                child: SizedBox(
-                  height: 66,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _ExactToken(
-                        token: LockToken(
-                          shape: ShapeKind.circle,
-                          tone: ShapeTone.pink,
-                        ),
-                        config: candidate.config,
-                      ),
-                      _ExactToken(
-                        token: LockToken(
-                          shape: ShapeKind.triangle,
-                          tone: ShapeTone.blue,
-                        ),
-                        config: candidate.config,
-                      ),
-                      _ExactToken(
-                        token: LockToken(
-                          shape: ShapeKind.square,
-                          tone: ShapeTone.yellow,
-                        ),
-                        config: candidate.config,
-                      ),
-                    ],
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _ExactToken(
+                    token: const LockToken(
+                      shape: ShapeKind.circle,
+                      tone: ShapeTone.pink,
+                    ),
+                    config: candidate.config,
+                    size: 38,
                   ),
-                ),
+                  _ExactToken(
+                    token: const LockToken(
+                      shape: ShapeKind.triangle,
+                      tone: ShapeTone.blue,
+                    ),
+                    config: candidate.config,
+                    size: 38,
+                  ),
+                  _ExactToken(
+                    token: const LockToken(
+                      shape: ShapeKind.square,
+                      tone: ShapeTone.yellow,
+                    ),
+                    config: candidate.config,
+                    size: 38,
+                  ),
+                ],
               ),
-              Transform.translate(
-                offset: const Offset(0, -58),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      candidate.name,
-                      style: TextStyle(
-                        color: fg,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      candidate.intent,
-                      style: TextStyle(color: muted, fontSize: 12, height: 1.35),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _shortConfig(candidate.config),
-                      style: TextStyle(
-                        color: muted,
-                        fontSize: 10.5,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 5),
+              Text(
+                candidate.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
             ],
@@ -690,15 +665,17 @@ class _ExactToken extends StatelessWidget {
   const _ExactToken({
     required this.token,
     required this.config,
+    this.size = 58,
   });
 
   final LockToken token;
   final CrayonTextureSpec config;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox.square(
-      dimension: 58,
+      dimension: size,
       child: CustomPaint(
         painter: LockTokenPainter(
           token,
