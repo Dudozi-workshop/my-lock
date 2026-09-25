@@ -1,0 +1,44 @@
+name: Soft Basic Circle Lab Build
+
+on:
+  push:
+    branches:
+      - feat/soft-basic-circle-lab-001
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: soft-basic-circle-lab-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Analyze test and build web lab
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Build web
+        run: bash tool/build_web.sh
+
+      - name: Upload web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: soft-basic-circle-lab-web
+          path: build/web
+          if-no-files-found: error
