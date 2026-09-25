@@ -26,6 +26,7 @@ class FloatingPreview extends StatefulWidget {
     this.speed = FloatingSpeed.normal,
     this.movementArea = MovementArea.full,
     this.topInset = 0,
+    this.seaTurtleRuntimePoc = false,
   });
 
   final Set<ShapeKind> selectedShapes;
@@ -39,6 +40,7 @@ class FloatingPreview extends StatefulWidget {
   final FloatingSpeed speed;
   final MovementArea movementArea;
   final double topInset;
+  final bool seaTurtleRuntimePoc;
 
   @override
   State<FloatingPreview> createState() => _FloatingPreviewState();
@@ -204,6 +206,7 @@ class _FloatingPreviewState extends State<FloatingPreview>
               objects: _engine.objects,
               popStyle: widget.popStyle,
               style: widget.style,
+              seaTurtleRuntimePoc: widget.seaTurtleRuntimePoc,
             ),
             child: const SizedBox.expand(),
           ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'effects.dart';
 import 'models.dart';
+import 'sea_turtle_runtime_poc.dart';
 import 'shape_spec/shape_spec.dart';
 import 'shape_spec/shape_spec_renderer.dart';
 
@@ -15,6 +16,7 @@ class LockTokenPainter extends CustomPainter {
 
   final LockToken token;
   final ShapeStyle style;
+  final bool seaTurtleRuntimePoc;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -40,6 +42,7 @@ class FloatingShapePainter extends CustomPainter {
     required this.objects,
     this.popStyle = PopStyle.basicPop,
     this.style = ShapeStyle.softBasic,
+    this.seaTurtleRuntimePoc = false,
   });
 
   final List<FloatingObject> objects;
@@ -77,6 +80,18 @@ class FloatingShapePainter extends CustomPainter {
     required double opacity,
   }) {
     final radius = object.radius * scale;
+
+    if (seaTurtleRuntimePoc && object.token.shape == ShapeKind.circle) {
+      SeaTurtleRuntimePoc.instance.paint(
+        canvas,
+        center: object.position,
+        radius: radius,
+        tone: object.token.tone,
+        opacity: opacity,
+        objectRotation: object.rotation,
+      );
+      return;
+    }
 
     ShapeSpecRenderer.paintToken(
       canvas,
