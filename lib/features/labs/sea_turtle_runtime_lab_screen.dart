@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -397,14 +399,14 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
 }
 
 
-String _assetForTone(ShapeTone tone) {
-  return switch (tone) {
-    ShapeTone.blue => 'assets/sea_turtle_runtime_v2/sea_turtle_blue.webp',
-    ShapeTone.pink => 'assets/sea_turtle_runtime_v2/sea_turtle_pink.webp',
-    ShapeTone.yellow => 'assets/sea_turtle_runtime_v2/sea_turtle_yellow.webp',
-  };
-}
 
+final Map<ShapeTone, Uint8List> _embeddedTurtleBytes = <ShapeTone, Uint8List>{
+  ShapeTone.blue: base64Decode('$aqua'),
+  ShapeTone.pink: base64Decode('$coral'),
+  ShapeTone.yellow: base64Decode('$sand'),
+};
+
+Uint8List _bytesForTone(ShapeTone tone) => _embeddedTurtleBytes[tone]!;
 class _SeaTurtleRuntimeObject extends StatelessWidget {
   const _SeaTurtleRuntimeObject({
     super.key,
@@ -424,8 +426,8 @@ class _SeaTurtleRuntimeObject extends StatelessWidget {
       child: IgnorePointer(
         child: Transform.rotate(
           angle: object.rotation,
-          child: Image.asset(
-            _assetForTone(object.token.tone),
+          child: Image.memory(
+            _bytesForTone(object.token.tone),
             width: side,
             height: side,
             fit: BoxFit.contain,
