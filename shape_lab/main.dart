@@ -879,24 +879,41 @@ class _SoftBasicCandidatePainter extends CustomPainter {
       lightnessDelta: tone == ShapeTone.yellow ? -0.13 : -0.16,
       saturationDelta: 0.03,
     );
+    final rimLight = adjustTone(
+      base,
+      lightnessDelta: tone == ShapeTone.yellow ? 0.12 : 0.15,
+      saturationDelta: -0.03,
+    );
+    final rimDeep = adjustTone(
+      base,
+      lightnessDelta: tone == ShapeTone.yellow ? -0.08 : -0.11,
+      saturationDelta: 0.02,
+    );
 
     _paintAirbrushBody(canvas, rect, base, light, deep);
-    _paintEdgeLeaf(canvas, rect);
 
     switch (candidate.finishTechnique) {
       case SoftBasicCircleFinishTechnique.edgeLeafReference:
-        break;
+        _paintEdgeLeafStack(canvas, rect);
       case SoftBasicCircleFinishTechnique.bottomBloom:
         _paintBottomBloom(canvas, rect);
+        _paintEdgeLeafStack(canvas, rect);
       case SoftBasicCircleFinishTechnique.innerRimShell:
-        _paintInnerRimShell(canvas, rect, base, light);
+        _paintInnerRimShell(canvas, rect, rimLight, alpha: 0.42, width: 0.050);
+        _paintEdgeLeafStack(canvas, rect);
       case SoftBasicCircleFinishTechnique.crescentBounce:
-        _paintCrescentBounce(canvas, rect);
+        _paintCrescentBounce(canvas, rect, alpha: 0.27, blur: 2.8);
+        _paintEdgeLeafStack(canvas, rect);
       case SoftBasicCircleFinishTechnique.dualRim:
-        _paintDualRim(canvas, rect, base, light, deep);
+        _paintOuterTintRim(canvas, rect, rimDeep, alpha: 0.40, width: 0.034);
+        _paintInnerRimShell(canvas, rect, rimLight, alpha: 0.50, width: 0.046);
+        _paintEdgeLeafStack(canvas, rect);
       case SoftBasicCircleFinishTechnique.mockupPush:
-        _paintBottomBloom(canvas, rect);
-        _paintMockupRim(canvas, rect, base, light, deep);
+        _paintOuterTintRim(canvas, rect, rimDeep, alpha: 0.44, width: 0.038);
+        _paintBottomBloom(canvas, rect, haloAlpha: 0.14, coreAlpha: 0.22);
+        _paintInnerRimShell(canvas, rect, rimLight, alpha: 0.53, width: 0.052);
+        _paintCrescentBounce(canvas, rect, alpha: 0.20, blur: 3.2);
+        _paintEdgeLeafStack(canvas, rect, alpha: 0.78);
     }
   }
 
@@ -912,8 +929,8 @@ class _SoftBasicCandidatePainter extends CustomPainter {
 
     canvas.save();
     canvas.clipPath(Path()..addOval(rect));
-
     final r = rect.width;
+
     canvas.drawCircle(
       Offset(rect.left + r * 0.29, rect.top + r * 0.28),
       r * 0.42,
@@ -921,6 +938,7 @@ class _SoftBasicCandidatePainter extends CustomPainter {
         ..color = light.withValues(alpha: 0.48)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 13),
     );
+
     canvas.drawCircle(
       Offset(rect.right - r * 0.18, rect.bottom - r * 0.14),
       r * 0.43,
@@ -932,171 +950,155 @@ class _SoftBasicCandidatePainter extends CustomPainter {
     canvas.restore();
   }
 
-  void _paintEdgeLeaf(Canvas canvas, Rect rect) {
+  void _paintEdgeLeafStack(
+    Canvas canvas,
+    Rect rect, {
+    double alpha = 0.76,
+  }) {
     final path = _edgeLeafPath(rect);
+
     canvas.drawPath(
       path,
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.20)
+        ..color = Colors.white.withValues(alpha: alpha * 0.24)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5.0),
     );
     canvas.drawPath(
       path,
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.76)
+        ..color = Colors.white.withValues(alpha: alpha)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.8),
     );
   }
 
-  void _paintBottomBloom(Canvas canvas, Rect rect) {
+  void _paintBottomBloom(
+    Canvas canvas,
+    Rect rect, {
+    double haloAlpha = 0.12,
+    double coreAlpha = 0.18,
+  }) {
     canvas.save();
     canvas.clipPath(Path()..addOval(rect));
 
-    final bloomRect = Rect.fromCenter(
+    final haloRect = Rect.fromCenter(
       center: Offset(
-        rect.left + rect.width * 0.63,
+        rect.left + rect.width * 0.64,
         rect.top + rect.height * 0.78,
       ),
-      width: rect.width * 0.34,
-      height: rect.height * 0.15,
+      width: rect.width * 0.40,
+      height: rect.height * 0.20,
+    );
+    final coreRect = Rect.fromCenter(
+      center: Offset(
+        rect.left + rect.width * 0.64,
+        rect.top + rect.height * 0.77,
+      ),
+      width: rect.width * 0.30,
+      height: rect.height * 0.12,
     );
 
     canvas.drawOval(
-      bloomRect.inflate(rect.width * 0.02),
+      haloRect,
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.16)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7.0),
+        ..color = Colors.white.withValues(alpha: haloAlpha)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8.0),
     );
     canvas.drawOval(
-      bloomRect,
+      coreRect,
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.24)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.4),
+        ..color = Colors.white.withValues(alpha: coreAlpha)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.6),
     );
 
+    canvas.restore();
+  }
+
+  void _paintCrescentBounce(
+    Canvas canvas,
+    Rect rect, {
+    required double alpha,
+    required double blur,
+  }) {
+    final path = Path()
+      ..moveTo(rect.left + rect.width * 0.50, rect.top + rect.height * 0.83)
+      ..cubicTo(
+        rect.left + rect.width * 0.61,
+        rect.top + rect.height * 0.89,
+        rect.left + rect.width * 0.78,
+        rect.top + rect.height * 0.86,
+        rect.left + rect.width * 0.86,
+        rect.top + rect.height * 0.75,
+      )
+      ..cubicTo(
+        rect.left + rect.width * 0.78,
+        rect.top + rect.height * 0.80,
+        rect.left + rect.width * 0.64,
+        rect.top + rect.height * 0.81,
+        rect.left + rect.width * 0.53,
+        rect.top + rect.height * 0.77,
+      )
+      ..cubicTo(
+        rect.left + rect.width * 0.49,
+        rect.top + rect.height * 0.78,
+        rect.left + rect.width * 0.48,
+        rect.top + rect.height * 0.81,
+        rect.left + rect.width * 0.50,
+        rect.top + rect.height * 0.83,
+      )
+      ..close();
+
+    canvas.save();
+    canvas.clipPath(Path()..addOval(rect));
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = Colors.white.withValues(alpha: alpha)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur),
+    );
     canvas.restore();
   }
 
   void _paintInnerRimShell(
     Canvas canvas,
     Rect rect,
-    Color base,
-    Color light,
-  ) {
-    final rimRect = rect.deflate(rect.width * 0.024);
-    canvas.drawOval(
-      rimRect,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = rect.width * 0.052
-        ..color = light.withValues(alpha: 0.26)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5),
-    );
+    Color color, {
+    required double alpha,
+    required double width,
+  }) {
+    final inset = rect.width * 0.028;
+    final rimRect = rect.deflate(inset);
+
+    canvas.save();
+    canvas.clipPath(Path()..addOval(rect));
     canvas.drawArc(
       rimRect,
       0.40,
-      2.15,
+      2.28,
       false,
       Paint()
         ..style = PaintingStyle.stroke
+        ..strokeWidth = rect.width * width
         ..strokeCap = StrokeCap.round
-        ..strokeWidth = rect.width * 0.030
-        ..color = Colors.white.withValues(alpha: 0.28),
+        ..color = color.withValues(alpha: alpha)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5),
     );
+    canvas.restore();
   }
 
-  void _paintCrescentBounce(Canvas canvas, Rect rect) {
-    final path = Path()
-      ..moveTo(rect.left + rect.width * 0.38, rect.top + rect.height * 0.82)
-      ..cubicTo(
-        rect.left + rect.width * 0.50,
-        rect.top + rect.height * 0.91,
-        rect.left + rect.width * 0.69,
-        rect.top + rect.height * 0.92,
-        rect.left + rect.width * 0.80,
-        rect.top + rect.height * 0.80,
-      );
-
-    canvas.drawPath(
-      path,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = rect.width * 0.095
-        ..color = Colors.white.withValues(alpha: 0.13)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6.0),
-    );
-    canvas.drawPath(
-      path,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = rect.width * 0.036
-        ..color = Colors.white.withValues(alpha: 0.32)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.2),
-    );
-  }
-
-  void _paintDualRim(
+  void _paintOuterTintRim(
     Canvas canvas,
     Rect rect,
-    Color base,
-    Color light,
-    Color deep,
-  ) {
-    final outer = rect.deflate(rect.width * 0.012);
+    Color color, {
+    required double alpha,
+    required double width,
+  }) {
     canvas.drawOval(
-      outer,
+      rect.deflate(rect.width * 0.008),
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = rect.width * 0.045
-        ..color = deep.withValues(alpha: 0.22)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.2),
-    );
-
-    final inner = rect.deflate(rect.width * 0.035);
-    canvas.drawArc(
-      inner,
-      0.25,
-      2.35,
-      false,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = rect.width * 0.028
-        ..color = Colors.white.withValues(alpha: 0.30),
-    );
-  }
-
-  void _paintMockupRim(
-    Canvas canvas,
-    Rect rect,
-    Color base,
-    Color light,
-    Color deep,
-  ) {
-    final outer = rect.deflate(rect.width * 0.008);
-    canvas.drawOval(
-      outer,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = rect.width * 0.050
-        ..color = deep.withValues(alpha: 0.18)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.3),
-    );
-
-    final inner = rect.deflate(rect.width * 0.030);
-    canvas.drawArc(
-      inner,
-      0.18,
-      2.50,
-      false,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = rect.width * 0.030
-        ..color = Colors.white.withValues(alpha: 0.31)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.8),
+        ..strokeWidth = rect.width * width
+        ..color = color.withValues(alpha: alpha)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.0),
     );
   }
 
