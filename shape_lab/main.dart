@@ -362,7 +362,7 @@ const _candidates = <_CrayonCandidate>[
       strokeBreakChance: 0.18,
     ),
   ),
-]
+];
 
 class CrayonStyleLab extends StatefulWidget {
   const CrayonStyleLab({
@@ -1448,7 +1448,7 @@ class _EnumDropdown<T> extends StatelessWidget {
     return SizedBox(
       width: 150,
       child: DropdownButtonFormField<T>(
-        value: value,
+        initialValue: value,
         isDense: true,
         decoration: InputDecoration(
           labelText: label,
