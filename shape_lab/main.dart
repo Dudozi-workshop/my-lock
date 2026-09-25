@@ -88,7 +88,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 011 · C08 coverage refinement',
+                                  'LAB 012 · Soft Basic R9 Bottom Highlight',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -575,14 +575,14 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
-    final selected = softBasicCircleRound8Candidates[selectedIndex];
+    final selected = softBasicCircleRound9Candidates[selectedIndex];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Circle · Round 8 · Outline Only',
-          subtitle: 'R7-01 Edge Leaf를 고정하고, 외곽선/림 처리만 서로 다르게 비교합니다. 하단 하이라이트는 이번 라운드에서 제외합니다.',
+          title: 'Soft Basic · Circle · Round 9 · Bottom Highlight Only',
+          subtitle: 'R7-01 상단 하이라이트와 R8-03 Color Shell을 고정하고, 하단 하이라이트만 독립적으로 비교합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -597,11 +597,11 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
               spacing: gap,
               runSpacing: gap,
               children: [
-                for (var i = 0; i < softBasicCircleRound8Candidates.length; i++)
+                for (var i = 0; i < softBasicCircleRound9Candidates.length; i++)
                   SizedBox(
                     width: itemWidth,
                     child: _SoftBasicCandidateCard(
-                      candidate: softBasicCircleRound8Candidates[i],
+                      candidate: softBasicCircleRound9Candidates[i],
                       selected: i == selectedIndex,
                       card: widget.card,
                       fg: widget.fg,
@@ -894,25 +894,28 @@ class _SoftBasicCandidatePainter extends CustomPainter {
 
     switch (candidate.finishTechnique) {
       case SoftBasicCircleFinishTechnique.outlineBase:
-        _paintEdgeLeafBase(canvas, rect);
+        break;
       case SoftBasicCircleFinishTechnique.softInnerRim:
         _paintSoftInnerRim(canvas, rect, rimLight, alpha: 0.34, width: 0.040);
-        _paintEdgeLeafBase(canvas, rect);
       case SoftBasicCircleFinishTechnique.colorShell:
         _paintColorShell(canvas, rect, rimDeep, alpha: 0.28, width: 0.028);
-        _paintEdgeLeafBase(canvas, rect);
       case SoftBasicCircleFinishTechnique.lowerRim:
         _paintLowerRim(canvas, rect, rimLight, alpha: 0.42, width: 0.050);
-        _paintEdgeLeafBase(canvas, rect);
       case SoftBasicCircleFinishTechnique.cleanOutline:
         _paintCleanOutline(canvas, rect, rimDeep, alpha: 0.22, width: 0.020);
-        _paintEdgeLeafBase(canvas, rect);
       case SoftBasicCircleFinishTechnique.premiumRim:
         _paintColorShell(canvas, rect, rimDeep, alpha: 0.20, width: 0.024);
         _paintSoftInnerRim(canvas, rect, rimLight, alpha: 0.36, width: 0.042);
         _paintLowerRim(canvas, rect, rimLight, alpha: 0.24, width: 0.048);
-        _paintEdgeLeafBase(canvas, rect);
     }
+
+    _paintBottomHighlight(
+      canvas,
+      rect,
+      rimLight,
+      candidate.bottomHighlightTechnique,
+    );
+    _paintEdgeLeafBase(canvas, rect);
   }
 
   void _paintAirbrushBody(
@@ -962,6 +965,138 @@ class _SoftBasicCandidatePainter extends CustomPainter {
         ..color = Colors.white.withValues(alpha: 0.76)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.8),
     );
+  }
+
+  void _paintBottomHighlight(
+    Canvas canvas,
+    Rect rect,
+    Color rimLight,
+    SoftBasicBottomHighlightTechnique technique,
+  ) {
+    if (technique == SoftBasicBottomHighlightTechnique.none) return;
+
+    canvas.save();
+    canvas.clipPath(Path()..addOval(rect));
+
+    switch (technique) {
+      case SoftBasicBottomHighlightTechnique.none:
+        break;
+      case SoftBasicBottomHighlightTechnique.softBloom:
+        canvas.drawArc(
+          rect.deflate(rect.width * 0.085),
+          0.47,
+          2.20,
+          false,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = rect.width * 0.105
+            ..strokeCap = StrokeCap.round
+            ..color = Colors.white.withValues(alpha: 0.20)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.2),
+        );
+        canvas.drawArc(
+          rect.deflate(rect.width * 0.070),
+          0.58,
+          1.98,
+          false,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = rect.width * 0.050
+            ..strokeCap = StrokeCap.round
+            ..color = rimLight.withValues(alpha: 0.24)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.1),
+        );
+      case SoftBasicBottomHighlightTechnique.narrowBloom:
+        canvas.drawArc(
+          rect.deflate(rect.width * 0.060),
+          0.70,
+          1.70,
+          false,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = rect.width * 0.035
+            ..strokeCap = StrokeCap.round
+            ..color = Colors.white.withValues(alpha: 0.52)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.35),
+        );
+      case SoftBasicBottomHighlightTechnique.crescent:
+        final crescent = Path()
+          ..moveTo(
+            rect.left + rect.width * 0.22,
+            rect.top + rect.height * 0.73,
+          )
+          ..cubicTo(
+            rect.left + rect.width * 0.37,
+            rect.top + rect.height * 0.88,
+            rect.left + rect.width * 0.63,
+            rect.top + rect.height * 0.88,
+            rect.left + rect.width * 0.79,
+            rect.top + rect.height * 0.70,
+          );
+        canvas.drawPath(
+          crescent,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = rect.width * 0.050
+            ..strokeCap = StrokeCap.round
+            ..color = Colors.white.withValues(alpha: 0.42)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.25),
+        );
+      case SoftBasicBottomHighlightTechnique.liftedGlow:
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(
+              rect.center.dx,
+              rect.top + rect.height * 0.70,
+            ),
+            width: rect.width * 0.54,
+            height: rect.height * 0.20,
+          ),
+          Paint()
+            ..color = Colors.white.withValues(alpha: 0.24)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6.5),
+        );
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(
+              rect.center.dx,
+              rect.top + rect.height * 0.73,
+            ),
+            width: rect.width * 0.36,
+            height: rect.height * 0.085,
+          ),
+          Paint()
+            ..color = rimLight.withValues(alpha: 0.28)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.3),
+        );
+      case SoftBasicBottomHighlightTechnique.premiumBottom:
+        canvas.drawArc(
+          rect.deflate(rect.width * 0.078),
+          0.50,
+          2.10,
+          false,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = rect.width * 0.090
+            ..strokeCap = StrokeCap.round
+            ..color = rimLight.withValues(alpha: 0.20)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.8),
+        );
+        canvas.drawArc(
+          rect.deflate(rect.width * 0.058),
+          0.69,
+          1.72,
+          false,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = rect.width * 0.025
+            ..strokeCap = StrokeCap.round
+            ..color = Colors.white.withValues(alpha: 0.58)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.05),
+        );
+    }
+
+    canvas.restore();
   }
 
   void _paintSoftInnerRim(
