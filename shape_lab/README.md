@@ -1,52 +1,16 @@
-# MY LOCK Style Lab
+# MY LOCK Crayon Soft Shape Lab
 
-The standalone Labs build is the comparison surface for production-rendered
-Shape/Style experiments.
+Production renderer를 그대로 사용해 Crayon Soft 후보를 실제 58×58로 비교합니다.
 
-## Style separation
+## Round 11 — P01 Internal Fill
 
-- Soft Basic: locked reference only in this Crayon round.
-- Crayon Soft: active experimental style.
-- Each style keeps its own candidate set; candidates are never mixed across
-  styles.
+- 외곽 기준: P01 Clean Edge 고정
+- 변경 영역: 내부 coverage / dropout / broken stroke / pressure / grain
+- 후보: F01 Baseline, F02 Light Gap, F03 Dry Wax, F04 Scribble Fill, F05 Half-Filled, F06 Layered Patch
+- 우선 관찰: F02 / F03 / F06
+- 후보는 PNG/SVG가 아니라 동일 `LockTokenPainter + ShapeSpecRenderer`에 다른 `CrayonTextureSpec` preset을 주입
+- Production `assets/shape_specs/crayon_soft/style.json`은 최종 승인 전 변경하지 않음
 
-## Crayon Soft Round 2
+## 승인 흐름
 
-Round 1 selected C08 as the direction. Round 2 compares only C08 derivatives:
-
-- C08-A: baseline C08
-- C08-B: lower underpaint coverage
-- C08-C: wider spacing / more visible paper gaps
-- C08-D: strongest broken-stroke, childlike incomplete fill
-
-All candidates use the production `LockTokenPainter` and
-`ShapeSpecRenderer`. No screenshot or separately drawn PNG/SVG is used.
-
-New coverage parameters default to the PREVIEW 008 behavior, so Soft Basic and
-the current app Crayon preset are unchanged until a candidate is explicitly
-promoted.
-
-## Round 6 · Thick Crayon Brush
-
-The active comparison deliberately moves away from fine pencil-like texture.
-
-- E01: ~3 px edge / ~2 px fill
-- E02: ~3 px edge / ~3 px fill
-- E03: ~4 px edge / ~2.5 px fill
-- E04: ~4 px edge / ~3 px fill
-- E05: E04 + repeated contour passes
-- E06: E04 + uneven child-like fill strokes
-- E07: E05 + visible paper gaps
-- E08: balanced reference-target candidate
-
-All candidates are rendered by the production ShapeSpecRenderer at 58 logical
-pixels. The contour and fill share the same palette hue; no white or
-independent outline color is introduced.
-
-
-## Round 10 · E05 Edge Polish
-
-E05 (Broken + Overfill) is the current base. E02 remains as a reference.
-P01-P05 keep the internal crayon surface fixed and vary only the edge
-parameters: width, opacity, segment length/gap, offset/width/opacity jitter,
-edge band width, and overflow amount.
+Candidate → Shortlist → Selected → APP EXACT / Runtime QA → Production Master
