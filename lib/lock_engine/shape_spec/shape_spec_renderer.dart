@@ -49,25 +49,26 @@ class ShapeSpecRenderer {
 
     final base = baseColorForTone(token.tone);
     final rules = bundle.style.colorRules;
+    final toneScale = _perceptualToneScale(token.tone);
     final light = adjustTone(
       base,
-      lightnessDelta: rules.lightnessUp,
+      lightnessDelta: rules.lightnessUp * toneScale.light,
       saturationDelta: rules.lightSaturationDelta,
     );
     final shade = adjustTone(
       base,
-      lightnessDelta: -rules.lightnessDown,
+      lightnessDelta: -rules.lightnessDown * toneScale.shade,
       saturationDelta: rules.shadeSaturationDelta,
     );
 
     final surfaceLight = adjustTone(
       base,
-      lightnessDelta: rules.lightnessUp * 0.48,
+      lightnessDelta: rules.lightnessUp * 0.26 * toneScale.light,
       saturationDelta: rules.lightSaturationDelta,
     );
     final surfaceShade = adjustTone(
       base,
-      lightnessDelta: -rules.lightnessDown * 0.40,
+      lightnessDelta: -rules.lightnessDown * 0.22 * toneScale.shade,
       saturationDelta: rules.shadeSaturationDelta * 0.5,
     );
 
@@ -269,6 +270,19 @@ class ShapeSpecRenderer {
         return _pathFor(geometry).getBounds().center;
       default:
         return Offset.zero;
+    }
+  }
+
+  static ({double light, double shade}) _perceptualToneScale(
+    ShapeTone tone,
+  ) {
+    switch (tone) {
+      case ShapeTone.pink:
+        return (light: 0.92, shade: 1.00);
+      case ShapeTone.blue:
+        return (light: 0.88, shade: 0.92);
+      case ShapeTone.yellow:
+        return (light: 0.58, shade: 1.22);
     }
   }
 
