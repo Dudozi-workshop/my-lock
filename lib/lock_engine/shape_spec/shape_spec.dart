@@ -66,6 +66,16 @@ class CrayonTextureSpec {
     this.underpaintOpacity = 1.0,
     this.baseStrokeOpacity = 0.0,
     this.strokeBreakChance = 0.0,
+    this.strokeBuiltSurface = false,
+    this.broadStrokeCount = 0,
+    this.broadStrokeWidth = 4.0,
+    this.broadStrokeOpacity = 0.0,
+    this.angleJitterDeg = 0.0,
+    this.strokeWidthJitter = 0.0,
+    this.strokeLengthMin = 1.0,
+    this.strokeLengthMax = 1.0,
+    this.gapChance = 0.0,
+    this.toneVariation = 0.0,
   });
 
   final int darkStrokeCount;
@@ -86,6 +96,19 @@ class CrayonTextureSpec {
   final double baseStrokeOpacity;
   final double strokeBreakChance;
 
+  /// Round 3 experimental renderer: the shape surface is constructed from
+  /// layered pigment strokes instead of a solid fill with texture on top.
+  final bool strokeBuiltSurface;
+  final int broadStrokeCount;
+  final double broadStrokeWidth;
+  final double broadStrokeOpacity;
+  final double angleJitterDeg;
+  final double strokeWidthJitter;
+  final double strokeLengthMin;
+  final double strokeLengthMax;
+  final double gapChance;
+  final double toneVariation;
+
   factory CrayonTextureSpec.fromJson(Map<String, dynamic> json) {
     return CrayonTextureSpec(
       darkStrokeCount: (json['darkStrokeCount'] as num).toInt(),
@@ -105,6 +128,25 @@ class CrayonTextureSpec {
           (json['baseStrokeOpacity'] as num?)?.toDouble() ?? 0.0,
       strokeBreakChance:
           (json['strokeBreakChance'] as num?)?.toDouble() ?? 0.0,
+      strokeBuiltSurface: json['strokeBuiltSurface'] as bool? ?? false,
+      broadStrokeCount:
+          (json['broadStrokeCount'] as num?)?.toInt() ?? 0,
+      broadStrokeWidth:
+          (json['broadStrokeWidth'] as num?)?.toDouble() ?? 4.0,
+      broadStrokeOpacity:
+          (json['broadStrokeOpacity'] as num?)?.toDouble() ?? 0.0,
+      angleJitterDeg:
+          (json['angleJitterDeg'] as num?)?.toDouble() ?? 0.0,
+      strokeWidthJitter:
+          (json['strokeWidthJitter'] as num?)?.toDouble() ?? 0.0,
+      strokeLengthMin:
+          (json['strokeLengthMin'] as num?)?.toDouble() ?? 1.0,
+      strokeLengthMax:
+          (json['strokeLengthMax'] as num?)?.toDouble() ?? 1.0,
+      gapChance:
+          (json['gapChance'] as num?)?.toDouble() ?? 0.0,
+      toneVariation:
+          (json['toneVariation'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }
