@@ -268,6 +268,63 @@ class _ShapeLabPageState extends State<ShapeLabPage>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          'Drop 01 · 작은 바닷속 Palette Lab',
+                          style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '확정된 2D Soft 색상값을 브라우저에서 직접 렌더링 · 이미지 에셋 미사용',
+                          style: TextStyle(color: muted, fontSize: 13),
+                        ),
+                        const SizedBox(height: 16),
+                        LayoutBuilder(builder: (context, constraints) {
+                          final itemWidth = constraints.maxWidth < 720
+                              ? (constraints.maxWidth - 12) / 2
+                              : (constraints.maxWidth - 24) / 3;
+                          const colors = [
+                            ('Deep Ocean', '딥 오션 블루', Color(0xFF4F8EDB), '#4F8EDB'),
+                            ('Aqua Mint', '아쿠아 민트', Color(0xFF7CCFC4), '#7CCFC4'),
+                            ('Coral Red', '코랄 레드', Color(0xFFF7A7B5), '#F7A7B5'),
+                            ('Sand Gold', '샌드 골드', Color(0xFFEFD59A), '#EFD59A'),
+                            ('Jelly Violet', '젤리 바이올렛', Color(0xFFB9A7E8), '#B9A7E8'),
+                            ('Sea Orange', '씨 오렌지', Color(0xFFF7B385), '#F7B385'),
+                          ];
+                          return Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: [
+                              for (final entry in colors)
+                                SizedBox(
+                                  width: itemWidth,
+                                  child: _PaletteSwatch(
+                                    english: entry.$1,
+                                    korean: entry.$2,
+                                    color: entry.$3,
+                                    hex: entry.$4,
+                                    dark: darkBackground,
+                                  ),
+                                ),
+                            ],
+                          );
+                        }),
+                        const SizedBox(height: 12),
+                        _AuroraSeaSwatch(dark: darkBackground),
+                        const SizedBox(height: 12),
+                        Text(
+                          '명칭은 초기 기획명 유지 · HEX/Gradient는 2D Soft 보정안 사용',
+                          style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  _Panel(
+                    color: cardColor,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text('Drop 01 · 작은 물고기 Shape Master 후보',
                           style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.w800)),
                         const SizedBox(height: 4),
@@ -1474,4 +1531,89 @@ class _FishCandidatePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _FishCandidatePainter oldDelegate) => oldDelegate.variant != variant;
+}
+
+
+class _PaletteSwatch extends StatelessWidget {
+  const _PaletteSwatch({
+    required this.english,
+    required this.korean,
+    required this.color,
+    required this.hex,
+    required this.dark,
+  });
+
+  final String english;
+  final String korean;
+  final Color color;
+  final String hex;
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = dark ? Colors.white : const Color(0xFF171923);
+    final muted = dark ? const Color(0xFFAEB4C3) : const Color(0xFF6D7382);
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: dark ? const Color(0xFF343846) : const Color(0xFFE7E9EF)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 82,
+            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(10)),
+          ),
+          const SizedBox(height: 9),
+          Text(english, style: TextStyle(color: fg, fontWeight: FontWeight.w800)),
+          Text(korean, style: TextStyle(color: muted, fontSize: 12)),
+          const SizedBox(height: 3),
+          Text(hex, style: TextStyle(color: muted, fontSize: 12, fontFeatures: const [FontFeature.tabularFigures()])),
+        ],
+      ),
+    );
+  }
+}
+
+class _AuroraSeaSwatch extends StatelessWidget {
+  const _AuroraSeaSwatch({required this.dark});
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = dark ? Colors.white : const Color(0xFF171923);
+    final muted = dark ? const Color(0xFFAEB4C3) : const Color(0xFF6D7382);
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: dark ? const Color(0xFF343846) : const Color(0xFFE7E9EF)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 92,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              gradient: const LinearGradient(
+                colors: [Color(0xFFA7D8F7), Color(0xFF7FB8FF), Color(0xFFC7B6F3)],
+              ),
+            ),
+          ),
+          const SizedBox(height: 9),
+          Row(
+            children: [
+              Expanded(child: Text('Aurora Sea · 오로라 씨', style: TextStyle(color: fg, fontWeight: FontWeight.w800))),
+              Text('SIGNATURE', style: TextStyle(color: muted, fontSize: 11, fontWeight: FontWeight.w800)),
+            ],
+          ),
+          const SizedBox(height: 3),
+          Text('#A7D8F7 → #7FB8FF → #C7B6F3', style: TextStyle(color: muted, fontSize: 12)),
+        ],
+      ),
+    );
+  }
 }
