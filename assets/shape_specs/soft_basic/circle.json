@@ -1,18 +1,32 @@
 {
   "styleId": "soft_basic",
   "shapeId": "circle",
-  "version": 3,
+  "version": 4,
+  "rotationMode": "fixed",
   "body": {
     "kind": "circle",
     "cx": 50,
     "cy": 50,
     "r": 46
   },
+  "surface": {
+    "kind": "radial",
+    "centerX": -0.42,
+    "centerY": -0.5,
+    "radius": 1.28,
+    "stops": [
+      0,
+      0.3,
+      0.76,
+      1
+    ]
+  },
   "layers": [
     {
       "id": "diffuse_light",
       "role": "light",
-      "opacity": 0.58,
+      "blend": "softLight",
+      "opacity": 0.52,
       "blur": 0,
       "geometry": {
         "kind": "mask",
@@ -22,7 +36,8 @@
     {
       "id": "form_shadow",
       "role": "shade",
-      "opacity": 0.62,
+      "blend": "multiply",
+      "opacity": 0.26,
       "blur": 0,
       "geometry": {
         "kind": "mask",
@@ -32,7 +47,8 @@
     {
       "id": "rim_light",
       "role": "light",
-      "opacity": 0.3,
+      "blend": "screen",
+      "opacity": 0.08,
       "blur": 0,
       "geometry": {
         "kind": "mask",
@@ -42,7 +58,8 @@
     {
       "id": "soft_spec",
       "role": "spec",
-      "opacity": 0.34,
+      "blend": "screen",
+      "opacity": 0.22,
       "blur": 0,
       "geometry": {
         "kind": "mask",
@@ -52,6 +69,7 @@
     {
       "id": "core_spec",
       "role": "spec",
+      "blend": "screen",
       "opacity": 0.72,
       "blur": 0,
       "geometry": {
@@ -61,9 +79,9 @@
     }
   ],
   "shadow": {
-    "opacity": 0.035,
-    "elevation": 2,
-    "offsetX": 0,
+    "opacity": 0.025,
+    "elevation": 1.6,
+    "offsetX": 0.35,
     "offsetY": 0.8
   }
 }
