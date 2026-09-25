@@ -216,13 +216,13 @@ Color _adjustSoftBasicTone(
     base: base,
     highlight: _adjustSoftBasicTone(
       base,
-      lightnessDelta: 0.12,
-      saturationDelta: -0.025,
+      lightnessDelta: 0.065,
+      saturationDelta: 0.0,
     ),
     shade: _adjustSoftBasicTone(
       base,
-      lightnessDelta: -0.085,
-      saturationDelta: 0.025,
+      lightnessDelta: -0.04,
+      saturationDelta: 0.01,
     ),
   );
 }
@@ -241,14 +241,14 @@ void _paintStyledShape(
 
   final softBasicColors = _softBasicToneColors(tone);
   final shadowAlpha = switch (texture) {
-    ShapeTexture.glossy => 0.10,
+    ShapeTexture.glossy => 0.05,
     ShapeTexture.glass => 0.12,
     ShapeTexture.chrome => 0.34,
     ShapeTexture.metal => 0.30,
     _ => 0.24,
   };
   final shadowElevation = switch (texture) {
-    ShapeTexture.glossy => 4.0,
+    ShapeTexture.glossy => 3.0,
     ShapeTexture.matte => 7.0,
     _ => 12.0,
   };
@@ -263,17 +263,18 @@ void _paintStyledShape(
   final fill = Paint();
   switch (texture) {
     case ShapeTexture.glossy:
-      // Soft Basic: color-first 2D volume. A broad same-hue light field
-      // shapes the object; white is reserved for a small specular accent.
+      // Soft Basic v2: keep the palette base visible across most of the shape.
+      // Tone changes only frame the upper-left light and lower-right depth.
       fill.shader = RadialGradient(
-        center: const Alignment(-0.52, -0.58),
-        radius: 1.30,
+        center: const Alignment(-0.46, -0.52),
+        radius: 1.22,
         colors: [
           softBasicColors.highlight.withValues(alpha: opacity),
           softBasicColors.base.withValues(alpha: opacity),
+          softBasicColors.base.withValues(alpha: opacity),
           softBasicColors.shade.withValues(alpha: opacity),
         ],
-        stops: const [0.0, 0.56, 1.0],
+        stops: const [0.0, 0.24, 0.80, 1.0],
       ).createShader(bounds);
       break;
     case ShapeTexture.jelly:
@@ -348,44 +349,16 @@ void _paintStyledShape(
     canvas.save();
     canvas.clipPath(path);
 
-    // Broad colored light: this is what the concept mockup shows most
-    // strongly. It stays in the selected hue instead of washing to white.
-    final toneLight = Paint()
-      ..shader = RadialGradient(
-        center: const Alignment(-0.72, -0.74),
-        radius: 0.86,
-        colors: [
-          softBasicColors.highlight.withValues(alpha: 0.30 * opacity),
-          Colors.transparent,
-        ],
-        stops: const [0.0, 1.0],
-      ).createShader(bounds);
-    canvas.drawRect(bounds, toneLight);
-
-    // Same-hue depth on the lower-right. Avoid black-heavy shading so Pink,
-    // Blue and Yellow keep their identity.
-    final toneShade = Paint()
-      ..shader = RadialGradient(
-        center: const Alignment(0.82, 0.84),
-        radius: 0.92,
-        colors: [
-          Colors.transparent,
-          softBasicColors.shade.withValues(alpha: 0.20 * opacity),
-        ],
-        stops: const [0.45, 1.0],
-      ).createShader(bounds);
-    canvas.drawRect(bounds, toneShade);
-
-    // Small soft specular accent. Larger and rounder than the previous dash,
-    // but still secondary to the palette color.
+    // Keep white as a small, clean accent only. The body remains dominated by
+    // the original palette color instead of stacking extra light/shade layers.
     final highlightCenter =
         center.translate(-radius * 0.28, -radius * 0.31);
     canvas.save();
     canvas.translate(highlightCenter.dx, highlightCenter.dy);
     canvas.rotate(-0.52);
     final specular = Paint()
-      ..color = Colors.white.withValues(alpha: 0.46 * opacity)
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, max(0.7, radius * 0.018));
+      ..color = Colors.white.withValues(alpha: 0.50 * opacity)
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, max(0.4, radius * 0.008));
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromCenter(
