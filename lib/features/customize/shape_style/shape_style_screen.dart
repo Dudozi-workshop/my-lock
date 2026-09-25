@@ -9,7 +9,7 @@ import 'shape_style_controller.dart';
 import 'shape_style_preview.dart';
 import 'tabs/color_tab.dart';
 import 'tabs/shape_tab.dart';
-import 'tabs/texture_tab.dart';
+import 'tabs/style_tab.dart';
 
 class ShapeStyleScreen extends StatefulWidget {
   const ShapeStyleScreen({
@@ -17,7 +17,7 @@ class ShapeStyleScreen extends StatefulWidget {
     required this.selectedShapes,
     required this.selectedTones,
     required this.currentPassword,
-    required this.texture,
+    required this.style,
     required this.background,
     required this.movementStyle,
     required this.popStyle,
@@ -30,7 +30,7 @@ class ShapeStyleScreen extends StatefulWidget {
   final Set<ShapeKind> selectedShapes;
   final Set<ShapeTone> selectedTones;
   final List<LockToken>? currentPassword;
-  final ShapeTexture texture;
+  final ShapeStyle style;
   final LockBackground background;
   final MovementStyle movementStyle;
   final PopStyle popStyle;
@@ -55,7 +55,7 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
     _controller = ShapeStyleController(
       initialShapes: widget.selectedShapes,
       initialTones: widget.selectedTones,
-      initialTexture: widget.texture,
+      initialStyle: widget.style,
     )..addListener(_refresh);
   }
 
@@ -123,7 +123,7 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
                 background: widget.background,
                 movementStyle: widget.movementStyle,
                 popStyle: widget.popStyle,
-                texture: _controller.texture,
+                style: _controller.style,
                 objectCount: widget.objectCount,
                 speed: widget.speed,
                 movementArea: widget.movementArea,
@@ -146,9 +146,9 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
                     selectedTones: _controller.tones,
                     onToggle: _controller.toggleTone,
                   ),
-                  TextureTab(
-                    selectedTexture: _controller.texture,
-                    onSelect: _controller.selectTexture,
+                  StyleTab(
+                    selectedStyle: _controller.style,
+                    onSelect: _controller.selectStyle,
                   ),
                 ],
               ),
@@ -229,7 +229,7 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
           builder: (context) => PasswordSetupScreen(
             selectedShapes: _controller.shapes,
             selectedTones: _controller.tones,
-            texture: _controller.texture,
+            style: _controller.style,
           ),
         ),
       );
@@ -240,7 +240,7 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
     widget.onApply(
       _controller.shapes,
       _controller.tones,
-      _controller.texture,
+      _controller.style,
       replacementPassword,
     );
     _controller.markApplied();
