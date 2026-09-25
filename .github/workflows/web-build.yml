@@ -58,10 +58,14 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy --config wrangler.jsonc
 
-      - name: Deploy Sea Turtle lab preview
+      - name: Install Wrangler for Sea Turtle Pages preview
         if: ${{ github.ref == 'refs/heads/feat/sea-turtle-runtime-poc' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config wrangler.sea-turtle.jsonc
+        run: npm install --global wrangler@4
+
+      - name: Ensure Sea Turtle Pages project
+        if: ${{ github.ref == 'refs/heads/feat/sea-turtle-runtime-poc' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        run: wrangler pages project create my-lock-sea-turtle-preview --production-branch main || true
+
+      - name: Deploy Sea Turtle lab to Cloudflare Pages
+        if: ${{ github.ref == 'refs/heads/feat/sea-turtle-runtime-poc' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        run: wrangler pages deploy build/web --project-name my-lock-sea-turtle-preview --branch main --commit-dirty=true
