@@ -575,14 +575,14 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
-    final selected = softBasicCircleRound7Candidates[selectedIndex];
+    final selected = softBasicCircleRound8Candidates[selectedIndex];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Circle · Round 7 · Edge Leaf Refinement',
-          subtitle: 'R6-01 Edge Leaf Base를 기준으로 몸체는 고정하고, 상단 하이라이트의 형태·경계·내부 페이드만 다른 6안을 비교합니다.',
+          title: 'Soft Basic · Circle · Round 8 · Outline Only',
+          subtitle: 'R7-01 Edge Leaf를 고정하고, 외곽선/림 처리만 서로 다르게 비교합니다. 하단 하이라이트는 이번 라운드에서 제외합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -597,11 +597,11 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
               spacing: gap,
               runSpacing: gap,
               children: [
-                for (var i = 0; i < softBasicCircleRound7Candidates.length; i++)
+                for (var i = 0; i < softBasicCircleRound8Candidates.length; i++)
                   SizedBox(
                     width: itemWidth,
                     child: _SoftBasicCandidateCard(
-                      candidate: softBasicCircleRound7Candidates[i],
+                      candidate: softBasicCircleRound8Candidates[i],
                       selected: i == selectedIndex,
                       card: widget.card,
                       fg: widget.fg,
@@ -879,22 +879,39 @@ class _SoftBasicCandidatePainter extends CustomPainter {
       lightnessDelta: tone == ShapeTone.yellow ? -0.13 : -0.16,
       saturationDelta: 0.03,
     );
+    final rimLight = adjustTone(
+      base,
+      lightnessDelta: tone == ShapeTone.yellow ? 0.10 : 0.14,
+      saturationDelta: -0.03,
+    );
+    final rimDeep = adjustTone(
+      base,
+      lightnessDelta: tone == ShapeTone.yellow ? -0.08 : -0.10,
+      saturationDelta: 0.02,
+    );
 
     _paintAirbrushBody(canvas, rect, base, light, deep);
 
     switch (candidate.finishTechnique) {
-      case SoftBasicCircleFinishTechnique.baseHold:
-        _paintLeaf(canvas, rect, _baseEdgeLeafPath(rect), alpha: 0.76, blur: 1.8);
-      case SoftBasicCircleFinishTechnique.longTaper:
-        _paintLeaf(canvas, rect, _longTaperPath(rect), alpha: 0.74, blur: 1.7);
-      case SoftBasicCircleFinishTechnique.softBelly:
-        _paintLeaf(canvas, rect, _softBellyPath(rect), alpha: 0.71, blur: 2.2);
-      case SoftBasicCircleFinishTechnique.innerFade:
-        _paintInnerFade(canvas, rect, _baseEdgeLeafPath(rect));
-      case SoftBasicCircleFinishTechnique.flattenedTop:
-        _paintLeaf(canvas, rect, _flattenedTopPath(rect), alpha: 0.73, blur: 1.9);
-      case SoftBasicCircleFinishTechnique.refinedEdgeLeaf:
-        _paintRefinedLeaf(canvas, rect, _refinedEdgeLeafPath(rect));
+      case SoftBasicCircleFinishTechnique.outlineBase:
+        _paintEdgeLeafBase(canvas, rect);
+      case SoftBasicCircleFinishTechnique.softInnerRim:
+        _paintSoftInnerRim(canvas, rect, rimLight, alpha: 0.34, width: 0.040);
+        _paintEdgeLeafBase(canvas, rect);
+      case SoftBasicCircleFinishTechnique.colorShell:
+        _paintColorShell(canvas, rect, rimDeep, alpha: 0.28, width: 0.028);
+        _paintEdgeLeafBase(canvas, rect);
+      case SoftBasicCircleFinishTechnique.lowerRim:
+        _paintLowerRim(canvas, rect, rimLight, alpha: 0.42, width: 0.050);
+        _paintEdgeLeafBase(canvas, rect);
+      case SoftBasicCircleFinishTechnique.cleanOutline:
+        _paintCleanOutline(canvas, rect, rimDeep, alpha: 0.22, width: 0.020);
+        _paintEdgeLeafBase(canvas, rect);
+      case SoftBasicCircleFinishTechnique.premiumRim:
+        _paintColorShell(canvas, rect, rimDeep, alpha: 0.20, width: 0.024);
+        _paintSoftInnerRim(canvas, rect, rimLight, alpha: 0.36, width: 0.042);
+        _paintLowerRim(canvas, rect, rimLight, alpha: 0.24, width: 0.048);
+        _paintEdgeLeafBase(canvas, rect);
     }
   }
 
@@ -931,74 +948,97 @@ class _SoftBasicCandidatePainter extends CustomPainter {
     canvas.restore();
   }
 
-  void _paintLeaf(
-    Canvas canvas,
-    Rect rect,
-    Path path, {
-    required double alpha,
-    required double blur,
-  }) {
+  void _paintEdgeLeafBase(Canvas canvas, Rect rect) {
+    final path = _baseEdgeLeafPath(rect);
     canvas.drawPath(
       path,
       Paint()
-        ..color = Colors.white.withValues(alpha: alpha * 0.22)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur + 3.1),
+        ..color = Colors.white.withValues(alpha: 0.76 * 0.22)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.9),
     );
     canvas.drawPath(
       path,
       Paint()
-        ..color = Colors.white.withValues(alpha: alpha)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur),
-    );
-  }
-
-  void _paintInnerFade(Canvas canvas, Rect rect, Path path) {
-    final bounds = path.getBounds();
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = Colors.white.withValues(alpha: 0.17)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5.2),
-    );
-    canvas.drawPath(
-      path,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment(-0.85, -0.85),
-          end: Alignment(0.75, 0.85),
-          colors: [
-            Color(0xE6FFFFFF),
-            Color(0xADFFFFFF),
-            Color(0x38FFFFFF),
-          ],
-          stops: [0.0, 0.48, 1.0],
-        ).createShader(bounds)
+        ..color = Colors.white.withValues(alpha: 0.76)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.8),
     );
   }
 
-  void _paintRefinedLeaf(Canvas canvas, Rect rect, Path path) {
-    final bounds = path.getBounds();
-    canvas.drawPath(
-      path,
+  void _paintSoftInnerRim(
+    Canvas canvas,
+    Rect rect,
+    Color color, {
+    required double alpha,
+    required double width,
+  }) {
+    canvas.save();
+    canvas.clipPath(Path()..addOval(rect));
+    canvas.drawOval(
+      rect.deflate(rect.width * 0.026),
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.16)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5.0),
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = rect.width * width
+        ..color = color.withValues(alpha: alpha)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.4),
     );
-    canvas.drawPath(
-      path,
+    canvas.restore();
+  }
+
+  void _paintColorShell(
+    Canvas canvas,
+    Rect rect,
+    Color color, {
+    required double alpha,
+    required double width,
+  }) {
+    canvas.drawOval(
+      rect.deflate(rect.width * 0.008),
       Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment(-0.75, -0.95),
-          end: Alignment(0.65, 0.90),
-          colors: [
-            Color(0xE8FFFFFF),
-            Color(0xC4FFFFFF),
-            Color(0x72FFFFFF),
-          ],
-          stops: [0.0, 0.56, 1.0],
-        ).createShader(bounds)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.45),
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = rect.width * width
+        ..color = color.withValues(alpha: alpha)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.0),
+    );
+  }
+
+  void _paintLowerRim(
+    Canvas canvas,
+    Rect rect,
+    Color color, {
+    required double alpha,
+    required double width,
+  }) {
+    canvas.save();
+    canvas.clipPath(Path()..addOval(rect));
+    canvas.drawArc(
+      rect.deflate(rect.width * 0.026),
+      0.40,
+      1.95,
+      false,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = rect.width * width
+        ..strokeCap = StrokeCap.round
+        ..color = color.withValues(alpha: alpha)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5),
+    );
+    canvas.restore();
+  }
+
+  void _paintCleanOutline(
+    Canvas canvas,
+    Rect rect,
+    Color color, {
+    required double alpha,
+    required double width,
+  }) {
+    canvas.drawOval(
+      rect.deflate(rect.width * 0.006),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = rect.width * width
+        ..color = color.withValues(alpha: alpha)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.8),
     );
   }
 
@@ -1035,150 +1075,6 @@ class _SoftBasicCandidatePainter extends CustomPainter {
       rect.top + rect.height * 0.45,
       rect.left + rect.width * 0.13,
       rect.top + rect.height * 0.40,
-    )
-    ..close();
-
-  Path _longTaperPath(Rect rect) => Path()
-    ..moveTo(rect.left + rect.width * 0.12, rect.top + rect.height * 0.44)
-    ..cubicTo(
-      rect.left + rect.width * 0.12,
-      rect.top + rect.height * 0.29,
-      rect.left + rect.width * 0.18,
-      rect.top + rect.height * 0.15,
-      rect.left + rect.width * 0.29,
-      rect.top + rect.height * 0.09,
-    )
-    ..cubicTo(
-      rect.left + rect.width * 0.34,
-      rect.top + rect.height * 0.065,
-      rect.left + rect.width * 0.39,
-      rect.top + rect.height * 0.075,
-      rect.left + rect.width * 0.40,
-      rect.top + rect.height * 0.12,
-    )
-    ..cubicTo(
-      rect.left + rect.width * 0.41,
-      rect.top + rect.height * 0.17,
-      rect.left + rect.width * 0.35,
-      rect.top + rect.height * 0.26,
-      rect.left + rect.width * 0.28,
-      rect.top + rect.height * 0.34,
-    )
-    ..cubicTo(
-      rect.left + rect.width * 0.21,
-      rect.top + rect.height * 0.42,
-      rect.left + rect.width * 0.15,
-      rect.top + rect.height * 0.48,
-      rect.left + rect.width * 0.12,
-      rect.top + rect.height * 0.44,
-    )
-    ..close();
-
-  Path _softBellyPath(Rect rect) => Path()
-    ..moveTo(rect.left + rect.width * 0.12, rect.top + rect.height * 0.40)
-    ..cubicTo(
-      rect.left + rect.width * 0.12,
-      rect.top + rect.height * 0.27,
-      rect.left + rect.width * 0.18,
-      rect.top + rect.height * 0.16,
-      rect.left + rect.width * 0.28,
-      rect.top + rect.height * 0.11,
-    )
-    ..cubicTo(
-      rect.left + rect.width * 0.36,
-      rect.top + rect.height * 0.07,
-      rect.left + rect.width * 0.43,
-      rect.top + rect.height * 0.10,
-      rect.left + rect.width * 0.44,
-      rect.top + rect.height * 0.17,
-    )
-    ..cubicTo(
-      rect.left + rect.width * 0.45,
-      rect.top + rect.height * 0.25,
-      rect.left + rect.width * 0.38,
-      rect.top + rect.height * 0.32,
-      rect.left + rect.width * 0.31,
-      rect.top + rect.height * 0.37,
-    )
-    ..cubicTo(
-      rect.left + rect.width * 0.24,
-      rect.top + rect.height * 0.42,
-      rect.left + rect.width * 0.17,
-      rect.top + rect.height * 0.46,
-      rect.left + rect.width * 0.12,
-      rect.top + rect.height * 0.40,
-    )
-    ..close();
-
-  Path _flattenedTopPath(Rect rect) => Path()
-    ..moveTo(rect.left + rect.width * 0.13, rect.top + rect.height * 0.40)
-    ..cubicTo(
-      rect.left + rect.width * 0.13,
-      rect.top + rect.height * 0.29,
-      rect.left + rect.width * 0.18,
-      rect.top + rect.height * 0.18,
-      rect.left + rect.width * 0.27,
-      rect.top + rect.height * 0.13,
-    )
-    ..cubicTo(
-      rect.left + rect.width * 0.31,
-      rect.top + rect.height * 0.11,
-      rect.left + rect.width * 0.38,
-      rect.top + rect.height * 0.11,
-      rect.left + rect.width * 0.42,
-      rect.top + rect.height * 0.13,
-    )
-    ..cubicTo(
-      rect.left + rect.width * 0.43,
-      rect.top + rect.height * 0.19,
-      rect.left + rect.width * 0.36,
-      rect.top + rect.height * 0.28,
-      rect.left + rect.width * 0.29,
-      rect.top + rect.height * 0.34,
-    )
-    ..cubicTo(
-      rect.left + rect.width * 0.23,
-      rect.top + rect.height * 0.40,
-      rect.left + rect.width * 0.17,
-      rect.top + rect.height * 0.45,
-      rect.left + rect.width * 0.13,
-      rect.top + rect.height * 0.40,
-    )
-    ..close();
-
-  Path _refinedEdgeLeafPath(Rect rect) => Path()
-    ..moveTo(rect.left + rect.width * 0.125, rect.top + rect.height * 0.415)
-    ..cubicTo(
-      rect.left + rect.width * 0.125,
-      rect.top + rect.height * 0.285,
-      rect.left + rect.width * 0.18,
-      rect.top + rect.height * 0.165,
-      rect.left + rect.width * 0.275,
-      rect.top + rect.height * 0.115,
-    )
-    ..cubicTo(
-      rect.left + rect.width * 0.335,
-      rect.top + rect.height * 0.082,
-      rect.left + rect.width * 0.40,
-      rect.top + rect.height * 0.095,
-      rect.left + rect.width * 0.415,
-      rect.top + rect.height * 0.145,
-    )
-    ..cubicTo(
-      rect.left + rect.width * 0.43,
-      rect.top + rect.height * 0.205,
-      rect.left + rect.width * 0.365,
-      rect.top + rect.height * 0.285,
-      rect.left + rect.width * 0.295,
-      rect.top + rect.height * 0.35,
-    )
-    ..cubicTo(
-      rect.left + rect.width * 0.235,
-      rect.top + rect.height * 0.405,
-      rect.left + rect.width * 0.17,
-      rect.top + rect.height * 0.465,
-      rect.left + rect.width * 0.125,
-      rect.top + rect.height * 0.415,
     )
     ..close();
 
