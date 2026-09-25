@@ -272,3 +272,70 @@ const softBasicCircleRound11Candidates = <SoftBasicCandidate>[
     lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.ambientBounceCarved,
   ),
 ];
+
+
+enum SoftBasicSquareTechnique {
+  balanced,
+  softerCorner,
+  tighterCorner,
+  wideHighlight,
+  compactHighlight,
+  strongerBounce,
+}
+
+class SoftBasicSquareCandidate {
+  const SoftBasicSquareCandidate({
+    required this.id,
+    required this.name,
+    required this.intent,
+    required this.technique,
+    this.badge,
+  });
+
+  final String id;
+  final String name;
+  final String intent;
+  final SoftBasicSquareTechnique technique;
+  final String? badge;
+}
+
+const softBasicSquareRound1Candidates = <SoftBasicSquareCandidate>[
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R1-01',
+    name: 'Balanced',
+    intent: 'Circle 확정 언어를 Square에 가장 중립적으로 이식한 기준안.',
+    technique: SoftBasicSquareTechnique.balanced,
+    badge: 'BASE',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R1-02',
+    name: 'Softer Corner',
+    intent: '모서리를 더 둥글게 하여 말랑한 인상을 강화한 안.',
+    technique: SoftBasicSquareTechnique.softerCorner,
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R1-03',
+    name: 'Tighter Corner',
+    intent: 'Square 정체성이 더 선명하도록 코너 반경을 줄인 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R1-04',
+    name: 'Wide Highlight',
+    intent: '상단 좌측 하이라이트를 넓혀 Circle과 같은 부드러운 빛 흐름을 강조한 안.',
+    technique: SoftBasicSquareTechnique.wideHighlight,
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R1-05',
+    name: 'Compact Highlight',
+    intent: '하이라이트를 작고 응축되게 만들어 Square의 면감을 살린 안.',
+    technique: SoftBasicSquareTechnique.compactHighlight,
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R1-06',
+    name: 'Stronger Bounce',
+    intent: '하단 Ambient Bounce를 조금 강화해 사각 면에서도 볼륨이 읽히게 한 안.',
+    technique: SoftBasicSquareTechnique.strongerBounce,
+    badge: 'VOLUME',
+  ),
+];
