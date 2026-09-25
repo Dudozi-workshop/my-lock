@@ -47,7 +47,7 @@ class ShopScreen extends StatelessWidget {
                     painter: LockTokenPainter(
                       LockToken(
                         shape: shape,
-                        tone: ShapeTone.purple,
+                        tone: ShapeTone.pink,
                       ),
                     ),
                     child: const SizedBox.expand(),
