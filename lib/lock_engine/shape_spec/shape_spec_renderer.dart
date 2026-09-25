@@ -699,10 +699,11 @@ class ShapeSpecRenderer {
               if (random.nextDouble() < gapChance) {
                 final length = minGapLength +
                     random.nextDouble() * (maxGapLength - minGapLength);
-                final startGap =
-                    cursor.clamp(0.0, max(0.0, metric.length - 0.2));
+                final startGap = cursor
+                    .clamp(0.0, max(0.0, metric.length - 0.2))
+                    .toDouble();
                 final endGap =
-                    min(metric.length, startGap + length);
+                    min(metric.length, startGap + length).toDouble();
                 if (endGap > startGap + 0.5) {
                   final midpoint = (startGap + endGap) / 2;
                   final tangent = metric.getTangentForOffset(midpoint);
