@@ -1,0 +1,60 @@
+{
+  "styleId": "soft_basic",
+  "shapeId": "circle",
+  "version": 1,
+  "body": {
+    "kind": "circle",
+    "cx": 50,
+    "cy": 50,
+    "r": 46
+  },
+  "layers": [
+    {
+      "id": "light",
+      "role": "light",
+      "opacity": 0.26,
+      "blur": 5.5,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 36,
+        "cy": 33,
+        "rx": 28,
+        "ry": 22
+      }
+    },
+    {
+      "id": "shade",
+      "role": "shade",
+      "opacity": 0.15,
+      "blur": 7.0,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 68,
+        "cy": 69,
+        "rx": 30,
+        "ry": 27
+      }
+    },
+    {
+      "id": "spec",
+      "role": "spec",
+      "opacity": 0.58,
+      "blur": 0.8,
+      "rotationDeg": -28,
+      "geometry": {
+        "kind": "roundRect",
+        "x": 23,
+        "y": 22,
+        "w": 21,
+        "h": 7.5,
+        "radius": 3.5
+      }
+    }
+  ],
+  "shadow": {
+    "opacity": 0.045,
+    "elevation": 2.4,
+    "offsetX": 0,
+    "offsetY": 1.0
+  }
+}

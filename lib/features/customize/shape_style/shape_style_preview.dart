@@ -14,7 +14,7 @@ class ShapeStylePreview extends StatelessWidget {
     required this.background,
     required this.movementStyle,
     required this.popStyle,
-    required this.texture,
+    required this.style,
     required this.objectCount,
     required this.speed,
     required this.movementArea,
@@ -25,7 +25,7 @@ class ShapeStylePreview extends StatelessWidget {
   final LockBackground background;
   final MovementStyle movementStyle;
   final PopStyle popStyle;
-  final ShapeTexture texture;
+  final ShapeStyle style;
   final int objectCount;
   final FloatingSpeed speed;
   final MovementArea movementArea;
@@ -48,7 +48,7 @@ class ShapeStylePreview extends StatelessWidget {
               selectedTones: tones,
               movementStyle: movementStyle,
               popStyle: popStyle,
-              texture: texture,
+              style: style,
               objectCount: objectCount,
               speed: speed,
               movementArea: movementArea,

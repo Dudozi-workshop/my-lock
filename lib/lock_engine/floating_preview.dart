@@ -19,7 +19,7 @@ class FloatingPreview extends StatefulWidget {
     required this.selectedTones,
     this.movementStyle = MovementStyle.floating,
     this.popStyle = PopStyle.basicPop,
-    this.texture = ShapeTexture.glossy,
+    this.style = ShapeStyle.softBasic,
     this.onTokenTap,
     this.requiredTokens = const <LockToken>[],
     this.objectCount = FloatingEngine.defaultObjectCount,
@@ -32,7 +32,7 @@ class FloatingPreview extends StatefulWidget {
   final Set<ShapeTone> selectedTones;
   final MovementStyle movementStyle;
   final PopStyle popStyle;
-  final ShapeTexture texture;
+  final ShapeStyle style;
   final ValueChanged<LockToken>? onTokenTap;
   final List<LockToken> requiredTokens;
   final int objectCount;
@@ -203,7 +203,7 @@ class _FloatingPreviewState extends State<FloatingPreview>
             painter: FloatingShapePainter(
               objects: _engine.objects,
               popStyle: widget.popStyle,
-              texture: widget.texture,
+              style: widget.style,
             ),
             child: const SizedBox.expand(),
           ),

@@ -12,7 +12,7 @@ class ScreenBehaviorScreen extends StatefulWidget {
     required this.selectedTones,
     required this.movementStyle,
     required this.popStyle,
-    required this.texture,
+    required this.style,
     required this.objectCount,
     required this.speed,
     required this.movementArea,
@@ -23,7 +23,7 @@ class ScreenBehaviorScreen extends StatefulWidget {
   final Set<ShapeTone> selectedTones;
   final MovementStyle movementStyle;
   final PopStyle popStyle;
-  final ShapeTexture texture;
+  final ShapeStyle style;
   final int objectCount;
   final FloatingSpeed speed;
   final MovementArea movementArea;
@@ -91,7 +91,7 @@ class _ScreenBehaviorScreenState extends State<ScreenBehaviorScreen> {
                       selectedTones: widget.selectedTones,
                       movementStyle: widget.movementStyle,
                       popStyle: widget.popStyle,
-                      texture: widget.texture,
+                      style: widget.style,
                       objectCount: _objectCount,
                       speed: _speed,
                       movementArea: _movementArea,

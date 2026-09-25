@@ -3,12 +3,7 @@ import 'dart:ui';
 enum ShapeKind {
   circle('원', false),
   triangle('세모', false),
-  square('네모', false),
-  star('별', true),
-  heart('하트', true),
-  diamond('다이아', true),
-  hexagon('육각형', true),
-  crescent('달', true);
+  square('네모', false);
 
   const ShapeKind(this.label, this.premium);
 
@@ -25,11 +20,7 @@ enum ShapeKind {
 enum ShapeTone {
   pink('핑크', false),
   blue('블루', false),
-  yellow('옐로우', false),
-  purple('퍼플', true),
-  mint('민트', true),
-  black('블랙', true),
-  white('화이트', true);
+  yellow('옐로우', false);
 
   const ShapeTone(this.label, this.premium);
 
@@ -43,19 +34,14 @@ enum ShapeTone {
   };
 }
 
-enum ShapeTexture {
-  glossy('Soft Basic', false),
-  jelly('Jelly', true),
-  glass('Glass', true),
-  metal('Metal', true),
-  chrome('Chrome', true),
-  hologram('Hologram', true),
-  matte('Matte', true);
+enum ShapeStyle {
+  softBasic('Soft Basic', false, 'soft_basic');
 
-  const ShapeTexture(this.label, this.premium);
+  const ShapeStyle(this.label, this.premium, this.assetId);
 
   final String label;
   final bool premium;
+  final String assetId;
 }
 
 class LockToken {

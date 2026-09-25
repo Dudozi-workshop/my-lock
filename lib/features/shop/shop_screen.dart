@@ -14,8 +14,8 @@ class ShopScreen extends StatelessWidget {
         ShapeKind.values.where((item) => item.premium).toList();
     final premiumTones =
         ShapeTone.values.where((item) => item.premium).toList();
-    final premiumTextures =
-        ShapeTexture.values.where((item) => item.premium).toList();
+    final premiumStyles =
+        ShapeStyle.values.where((item) => item.premium).toList();
     final premiumBackgrounds =
         LockBackground.values.where((item) => item.locked).toList();
 
@@ -27,7 +27,7 @@ class ShopScreen extends StatelessWidget {
           Text('상점', style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 6),
           Text(
-            'PLUS 스타일 카탈로그',
+            '스타일 카탈로그',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 18),
@@ -47,7 +47,7 @@ class ShopScreen extends StatelessWidget {
                     painter: LockTokenPainter(
                       LockToken(
                         shape: shape,
-                        tone: ShapeTone.purple,
+                        tone: ShapeTone.pink,
                       ),
                     ),
                     child: const SizedBox.expand(),
@@ -80,22 +80,22 @@ class ShopScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           _SectionTitle(
-            title: '질감',
-            count: premiumTextures.length,
+            title: '스타일',
+            count: premiumStyles.length,
           ),
           const SizedBox(height: 10),
           _CatalogGrid(
             children: [
-              for (final texture in premiumTextures)
+              for (final style in premiumStyles)
                 _PreviewCard(
-                  label: texture.label,
+                  label: style.label,
                   child: CustomPaint(
                     painter: LockTokenPainter(
                       const LockToken(
                         shape: ShapeKind.circle,
                         tone: ShapeTone.pink,
                       ),
-                      texture: texture,
+                      style: style,
                     ),
                     child: const SizedBox.expand(),
                   ),

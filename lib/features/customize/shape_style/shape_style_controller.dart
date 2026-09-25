@@ -10,7 +10,7 @@ typedef ShapeStyleChanged = void Function(
 typedef ShapeStyleApplied = void Function(
   Set<ShapeKind> shapes,
   Set<ShapeTone> tones,
-  ShapeTexture texture,
+  ShapeStyle style,
   List<LockToken>? replacementPassword,
 );
 
@@ -18,7 +18,7 @@ class ShapeStyleController extends ChangeNotifier {
   ShapeStyleController({
     required Set<ShapeKind> initialShapes,
     required Set<ShapeTone> initialTones,
-    ShapeTexture initialTexture = ShapeTexture.glossy,
+    ShapeStyle initialStyle = ShapeStyle.softBasic,
   })  : _shapes = initialShapes.isEmpty
             ? {ShapeKind.circle}
             : Set<ShapeKind>.from(initialShapes),
@@ -31,24 +31,24 @@ class ShapeStyleController extends ChangeNotifier {
         _savedTones = initialTones.isEmpty
             ? {ShapeTone.pink}
             : Set<ShapeTone>.from(initialTones),
-        _texture = initialTexture,
-        _savedTexture = initialTexture;
+        _style = initialStyle,
+        _savedStyle = initialStyle;
 
   final Set<ShapeKind> _shapes;
   final Set<ShapeTone> _tones;
   Set<ShapeKind> _savedShapes;
   Set<ShapeTone> _savedTones;
-  ShapeTexture _texture;
-  ShapeTexture _savedTexture;
+  ShapeStyle _style;
+  ShapeStyle _savedStyle;
 
   Set<ShapeKind> get shapes => Set<ShapeKind>.unmodifiable(_shapes);
   Set<ShapeTone> get tones => Set<ShapeTone>.unmodifiable(_tones);
-  ShapeTexture get texture => _texture;
+  ShapeStyle get style => _style;
 
   bool get hasChanges =>
       !setEquals(_shapes, _savedShapes) ||
       !setEquals(_tones, _savedTones) ||
-      _texture != _savedTexture;
+      _style != _savedStyle;
 
   void toggleShape(ShapeKind kind) {
     if (_shapes.contains(kind) && _shapes.length == 1) return;
@@ -68,16 +68,16 @@ class ShapeStyleController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void selectTexture(ShapeTexture texture) {
-    if (_texture == texture) return;
-    _texture = texture;
+  void selectStyle(ShapeStyle style) {
+    if (_style == style) return;
+    _style = style;
     notifyListeners();
   }
 
   void markApplied() {
     _savedShapes = Set<ShapeKind>.from(_shapes);
     _savedTones = Set<ShapeTone>.from(_tones);
-    _savedTexture = _texture;
+    _savedStyle = _style;
     notifyListeners();
   }
 }

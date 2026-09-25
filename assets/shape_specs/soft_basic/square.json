@@ -1,0 +1,62 @@
+{
+  "styleId": "soft_basic",
+  "shapeId": "square",
+  "version": 1,
+  "body": {
+    "kind": "roundRect",
+    "x": 6,
+    "y": 6,
+    "w": 88,
+    "h": 88,
+    "radius": 23
+  },
+  "layers": [
+    {
+      "id": "light",
+      "role": "light",
+      "opacity": 0.22,
+      "blur": 5.0,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 35,
+        "cy": 31,
+        "rx": 31,
+        "ry": 23
+      }
+    },
+    {
+      "id": "shade",
+      "role": "shade",
+      "opacity": 0.13,
+      "blur": 6.5,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 72,
+        "cy": 73,
+        "rx": 32,
+        "ry": 26
+      }
+    },
+    {
+      "id": "spec",
+      "role": "spec",
+      "opacity": 0.56,
+      "blur": 0.7,
+      "rotationDeg": -30,
+      "geometry": {
+        "kind": "roundRect",
+        "x": 20,
+        "y": 20,
+        "w": 21,
+        "h": 7,
+        "radius": 3.2
+      }
+    }
+  ],
+  "shadow": {
+    "opacity": 0.04,
+    "elevation": 2.2,
+    "offsetX": 0,
+    "offsetY": 1.0
+  }
+}
