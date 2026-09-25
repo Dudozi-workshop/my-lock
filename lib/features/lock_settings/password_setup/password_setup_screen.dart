@@ -10,13 +10,13 @@ class PasswordSetupScreen extends StatefulWidget {
     super.key,
     required this.selectedShapes,
     required this.selectedTones,
-    this.texture = ShapeTexture.glossy,
+    this.style = ShapeStyle.softBasic,
     this.recoveryMode = false,
   });
 
   final Set<ShapeKind> selectedShapes;
   final Set<ShapeTone> selectedTones;
-  final ShapeTexture texture;
+  final ShapeStyle style;
   final bool recoveryMode;
 
   @override
@@ -83,7 +83,7 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _PatternSlots(
                 tokens: _controller.input,
-                texture: widget.texture,
+                style: widget.style,
                 slotCount: confirming
                     ? _controller.pattern.length
                     : PasswordSetupController.maxLength,
@@ -132,7 +132,7 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
                       Expanded(
                         child: _TokenSelectionGrid(
                           tokens: tokens,
-                          texture: widget.texture,
+                          style: widget.style,
                           onTap: _controller.addToken,
                         ),
                       ),
@@ -204,12 +204,12 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
 class _TokenSelectionGrid extends StatelessWidget {
   const _TokenSelectionGrid({
     required this.tokens,
-    required this.texture,
+    required this.style,
     required this.onTap,
   });
 
   final List<LockToken> tokens;
-  final ShapeTexture texture;
+  final ShapeStyle style;
   final ValueChanged<LockToken> onTap;
 
   @override
@@ -238,7 +238,7 @@ class _TokenSelectionGrid extends StatelessWidget {
               ),
               padding: const EdgeInsets.all(8),
               child: CustomPaint(
-                painter: LockTokenPainter(token, texture: texture),
+                painter: LockTokenPainter(token, style: style),
                 child: const SizedBox.expand(),
               ),
             ),
@@ -296,12 +296,12 @@ class _Header extends StatelessWidget {
 class _PatternSlots extends StatelessWidget {
   const _PatternSlots({
     required this.tokens,
-    required this.texture,
+    required this.style,
     required this.slotCount,
   });
 
   final List<LockToken> tokens;
-  final ShapeTexture texture;
+  final ShapeStyle style;
   final int slotCount;
 
   @override
@@ -330,7 +330,7 @@ class _PatternSlots extends StatelessWidget {
                     ? CustomPaint(
                         painter: LockTokenPainter(
                           tokens[i],
-                          texture: texture,
+                          style: style,
                         ),
                       )
                     : null,
