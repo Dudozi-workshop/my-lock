@@ -1,11 +1,8 @@
-import 'dart:convert';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import '../../lock_engine/effects.dart';
 import '../../lock_engine/floating_engine.dart';
 import '../../lock_engine/models.dart';
 
@@ -13,9 +10,7 @@ class SeaTurtleRuntimeLabBootstrap extends StatelessWidget {
   const SeaTurtleRuntimeLabBootstrap({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const SeaTurtleRuntimeLabScreen();
-  }
+  Widget build(BuildContext context) => const SeaTurtleRuntimeLabScreen();
 }
 
 class SeaTurtleRuntimeLabScreen extends StatefulWidget {
@@ -49,6 +44,7 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
       ..setMovementStyle(_movementStyle)
       ..setMovementArea(MovementArea.full)
       ..setSpeed(FloatingSpeed.normal);
+
     _ticker = createTicker(_onTick)..start();
   }
 
@@ -59,7 +55,6 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
         : (elapsed - _previous).inMicroseconds /
             Duration.microsecondsPerSecond;
     _previous = elapsed;
-
     if (delta > 0) {
       _engine.step(delta.clamp(0.0, 0.035).toDouble());
       setState(() {});
@@ -74,18 +69,13 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
 
   @override
   Widget build(BuildContext context) {
-    final background = _darkBackground
-        ? const Color(0xFF08182A)
-        : const Color(0xFFF4FAFF);
-    final panel = _darkBackground
-        ? const Color(0xFF10243A)
-        : Colors.white;
-    final ink = _darkBackground
-        ? const Color(0xFFF5FAFF)
-        : const Color(0xFF18304D);
-    final subInk = _darkBackground
-        ? const Color(0xFFB9CADB)
-        : const Color(0xFF667C92);
+    final background =
+        _darkBackground ? const Color(0xFF08182A) : const Color(0xFFF4FAFF);
+    final panel = _darkBackground ? const Color(0xFF10243A) : Colors.white;
+    final ink =
+        _darkBackground ? const Color(0xFFF5FAFF) : const Color(0xFF18304D);
+    final subInk =
+        _darkBackground ? const Color(0xFFB9CADB) : const Color(0xFF667C92);
 
     return Scaffold(
       backgroundColor: background,
@@ -94,7 +84,6 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
           builder: (context, constraints) {
             final horizontalPadding =
                 constraints.maxWidth < 720 ? 16.0 : 28.0;
-
             return SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(
                 horizontalPadding,
@@ -118,7 +107,7 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'S02 Long Flipper · dedicated web QA object · production Circle is untouched',
+                        'S02 Long Flipper · dedicated web QA object · production shapes untouched',
                         style: TextStyle(
                           color: subInk,
                           fontSize: 13,
@@ -154,13 +143,8 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
         runSpacing: 10,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          Text(
-            'Count',
-            style: TextStyle(
-              color: ink,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
+          Text('Count',
+              style: TextStyle(color: ink, fontWeight: FontWeight.w800)),
           for (final count in const [6, 9, 12])
             ChoiceChip(
               label: Text('$count'),
@@ -173,13 +157,8 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
               },
             ),
           const SizedBox(width: 6),
-          Text(
-            'Motion',
-            style: TextStyle(
-              color: ink,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
+          Text('Motion',
+              style: TextStyle(color: ink, fontWeight: FontWeight.w800)),
           for (final entry in const <(MovementStyle, String)>[
             (MovementStyle.floating, 'Floating'),
             (MovementStyle.underwater, 'Underwater'),
@@ -199,9 +178,8 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
           FilterChip(
             label: const Text('Dark BG'),
             selected: _darkBackground,
-            onSelected: (value) {
-              setState(() => _darkBackground = value);
-            },
+            onSelected: (value) =>
+                setState(() => _darkBackground = value),
           ),
         ],
       ),
@@ -228,86 +206,19 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
           ),
           const SizedBox(height: 4),
           Text(
-            'Geometry / palette / edge quality only. No production ShapeKind is replaced.',
-            style: TextStyle(
-              color: subInk,
-              fontSize: 12,
-            ),
+            'One verified Aqua source asset is reused for all three slots; Pink/Sand use a temporary color filter for runtime QA.',
+            style: TextStyle(color: subInk, fontSize: 12),
           ),
           const SizedBox(height: 16),
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: [
-              _singleTile(
-                panel: panel,
-                tone: ShapeTone.blue,
-                label: 'Aqua Mint / Blue slot',
-              ),
-              _singleTile(
-                panel: panel,
-                tone: ShapeTone.pink,
-                label: 'Coral Pink',
-              ),
-              _singleTile(
-                panel: panel,
-                tone: ShapeTone.yellow,
-                label: 'Sand Beige / Yellow slot',
-              ),
+            children: const [
+              _SingleTile(tone: ShapeTone.blue, label: 'Aqua Mint'),
+              _SingleTile(tone: ShapeTone.pink, label: 'Coral Pink QA tint'),
+              _SingleTile(
+                  tone: ShapeTone.yellow, label: 'Sand Beige QA tint'),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _singleTile({
-    required Color panel,
-    required ShapeTone tone,
-    required String label,
-  }) {
-    return SizedBox(
-      width: 210,
-      child: Column(
-        children: [
-          SizedBox(
-            width: 190,
-            height: 150,
-            child: Center(
-              child: Image.asset(
-                _assetForTone(tone),
-                width: 132,
-                height: 132,
-                fit: BoxFit.contain,
-                gaplessPlayback: true,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: 132,
-                  height: 132,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFECEC),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Text(
-                    'Asset load failed\n$error',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Color(0xFF9F2F2F),
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-            ),
           ),
         ],
       ),
@@ -334,11 +245,8 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
           ),
           const SizedBox(height: 4),
           Text(
-            'Uses the current FloatingEngine radius, collision and motion values. The engine token is physics-only inside this lab.',
-            style: TextStyle(
-              color: subInk,
-              fontSize: 12,
-            ),
+            'Current FloatingEngine radius, collision and motion are used. The Circle token is physics-only inside this lab.',
+            style: TextStyle(color: subInk, fontSize: 12),
           ),
           const SizedBox(height: 14),
           LayoutBuilder(
@@ -398,15 +306,38 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
   }
 }
 
+class _SingleTile extends StatelessWidget {
+  const _SingleTile({required this.tone, required this.label});
 
+  final ShapeTone tone;
+  final String label;
 
-final Map<ShapeTone, Uint8List> _embeddedTurtleBytes = <ShapeTone, Uint8List>{
-  ShapeTone.blue: base64Decode('$aqua'),
-  ShapeTone.pink: base64Decode('$coral'),
-  ShapeTone.yellow: base64Decode('$sand'),
-};
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 210,
+      child: Column(
+        children: [
+          const SizedBox(height: 4),
+          SizedBox(
+            width: 190,
+            height: 150,
+            child: Center(
+              child: _TurtleAsset(tone: tone, size: 132),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-Uint8List _bytesForTone(ShapeTone tone) => _embeddedTurtleBytes[tone]!;
 class _SeaTurtleRuntimeObject extends StatelessWidget {
   const _SeaTurtleRuntimeObject({
     super.key,
@@ -426,28 +357,83 @@ class _SeaTurtleRuntimeObject extends StatelessWidget {
       child: IgnorePointer(
         child: Transform.rotate(
           angle: object.rotation,
-          child: Image.memory(
-            _bytesForTone(object.token.tone),
-            width: side,
-            height: side,
-            fit: BoxFit.contain,
-            gaplessPlayback: true,
-            filterQuality: FilterQuality.high,
-            errorBuilder: (context, error, stackTrace) => Container(
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: const Color(0x66FF0000),
-                borderRadius: BorderRadius.circular(side / 2),
-              ),
-              child: const Icon(
-                Icons.broken_image_outlined,
-                size: 18,
-                color: Colors.white,
-              ),
-            ),
+          child: _TurtleAsset(
+            tone: object.token.tone,
+            size: side,
+            compactError: true,
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TurtleAsset extends StatelessWidget {
+  const _TurtleAsset({
+    required this.tone,
+    required this.size,
+    this.compactError = false,
+  });
+
+  final ShapeTone tone;
+  final double size;
+  final bool compactError;
+
+  @override
+  Widget build(BuildContext context) {
+    final image = Image.asset(
+      'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+      gaplessPlayback: true,
+      filterQuality: FilterQuality.high,
+      errorBuilder: (context, error, stackTrace) {
+        if (compactError) {
+          return Container(
+            width: size,
+            height: size,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: Color(0x66FF0000),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.broken_image_outlined,
+              size: 18,
+              color: Colors.white,
+            ),
+          );
+        }
+        return Container(
+          width: size,
+          height: size,
+          padding: const EdgeInsets.all(8),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFECEC),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Text(
+            'Asset load failed\n$error',
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Color(0xFF9F2F2F), fontSize: 10),
+          ),
+        );
+      },
+    );
+
+    final tint = switch (tone) {
+      ShapeTone.blue => null,
+      ShapeTone.pink => const Color(0xFFF7A7B5),
+      ShapeTone.yellow => const Color(0xFFEFD59A),
+    };
+
+    if (tint == null) return image;
+
+    return ColorFiltered(
+      colorFilter: ColorFilter.mode(tint, BlendMode.color),
+      child: image,
     );
   }
 }
