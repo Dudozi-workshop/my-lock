@@ -24,7 +24,10 @@ void main() {
         ShapeTone.yellow,
       ]),
     );
-    expect(ShapeStyle.values, equals([ShapeStyle.softBasic]));
+    expect(
+      ShapeStyle.values,
+      equals([ShapeStyle.softBasic, ShapeStyle.crayonSoft]),
+    );
 
     final ids = <String>{
       for (final shape in ShapeKind.values)
