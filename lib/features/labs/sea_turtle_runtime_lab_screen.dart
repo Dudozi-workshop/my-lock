@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import '../../lock_engine/effects.dart';
 import '../../lock_engine/floating_engine.dart';
 import '../../lock_engine/models.dart';
 
