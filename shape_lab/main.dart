@@ -88,7 +88,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 012 · Soft Basic R9 Bottom Highlight',
+                                  'LAB 013 · Soft Basic R10 Lower Volume',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -575,14 +575,14 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
-    final selected = softBasicCircleRound9Candidates[selectedIndex];
+    final selected = softBasicCircleRound10Candidates[selectedIndex];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Circle · Round 9 · Bottom Highlight Only',
-          subtitle: 'R7-01 상단 하이라이트와 R8-03 Color Shell을 고정하고, 하단 하이라이트만 독립적으로 비교합니다.',
+          title: 'Soft Basic · Circle · Round 10 · Integrated Lower Volume',
+          subtitle: '흰 선형 하이라이트를 제거합니다. R7-01 + R8-03은 고정하고, 본체 색 내부의 확산광·그라디언트·음영 완화만 비교합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -597,11 +597,11 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
               spacing: gap,
               runSpacing: gap,
               children: [
-                for (var i = 0; i < softBasicCircleRound9Candidates.length; i++)
+                for (var i = 0; i < softBasicCircleRound10Candidates.length; i++)
                   SizedBox(
                     width: itemWidth,
                     child: _SoftBasicCandidateCard(
-                      candidate: softBasicCircleRound9Candidates[i],
+                      candidate: softBasicCircleRound10Candidates[i],
                       selected: i == selectedIndex,
                       card: widget.card,
                       fg: widget.fg,
@@ -915,6 +915,14 @@ class _SoftBasicCandidatePainter extends CustomPainter {
       rimLight,
       candidate.bottomHighlightTechnique,
     );
+    _paintLowerVolume(
+      canvas,
+      rect,
+      base,
+      light,
+      deep,
+      candidate.lowerVolumeTechnique,
+    );
     _paintEdgeLeafBase(canvas, rect);
   }
 
@@ -965,6 +973,176 @@ class _SoftBasicCandidatePainter extends CustomPainter {
         ..color = Colors.white.withValues(alpha: 0.76)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.8),
     );
+  }
+
+  void _paintLowerVolume(
+    Canvas canvas,
+    Rect rect,
+    Color base,
+    Color light,
+    Color deep,
+    SoftBasicLowerVolumeTechnique technique,
+  ) {
+    if (technique == SoftBasicLowerVolumeTechnique.none) return;
+
+    final tintedLight = adjustTone(
+      base,
+      lightnessDelta: tone == ShapeTone.yellow ? 0.075 : 0.11,
+      saturationDelta: -0.025,
+    );
+    final softBase = adjustTone(
+      base,
+      lightnessDelta: tone == ShapeTone.yellow ? 0.035 : 0.055,
+      saturationDelta: -0.015,
+    );
+
+    canvas.save();
+    canvas.clipPath(Path()..addOval(rect));
+
+    switch (technique) {
+      case SoftBasicLowerVolumeTechnique.none:
+        break;
+
+      case SoftBasicLowerVolumeTechnique.tintedBloom:
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(
+              rect.center.dx,
+              rect.top + rect.height * 0.77,
+            ),
+            width: rect.width * 0.68,
+            height: rect.height * 0.29,
+          ),
+          Paint()
+            ..color = tintedLight.withValues(alpha: 0.20)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8.0),
+        );
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(
+              rect.center.dx,
+              rect.top + rect.height * 0.80,
+            ),
+            width: rect.width * 0.46,
+            height: rect.height * 0.15,
+          ),
+          Paint()
+            ..color = softBase.withValues(alpha: 0.20)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.6),
+        );
+
+      case SoftBasicLowerVolumeTechnique.embeddedLight:
+        canvas.drawCircle(
+          Offset(
+            rect.left + rect.width * 0.58,
+            rect.top + rect.height * 0.72,
+          ),
+          rect.width * 0.24,
+          Paint()
+            ..color = tintedLight.withValues(alpha: 0.16)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10.5),
+        );
+        canvas.drawCircle(
+          Offset(
+            rect.left + rect.width * 0.60,
+            rect.top + rect.height * 0.73,
+          ),
+          rect.width * 0.11,
+          Paint()
+            ..color = light.withValues(alpha: 0.10)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6.0),
+        );
+
+      case SoftBasicLowerVolumeTechnique.liftGradient:
+        final shaderRect = Rect.fromLTWH(
+          rect.left,
+          rect.top + rect.height * 0.42,
+          rect.width,
+          rect.height * 0.58,
+        );
+        canvas.drawRect(
+          shaderRect,
+          Paint()
+            ..shader = LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                base.withValues(alpha: 0.00),
+                softBase.withValues(alpha: 0.06),
+                tintedLight.withValues(alpha: 0.18),
+              ],
+              stops: const [0.0, 0.50, 1.0],
+            ).createShader(shaderRect),
+        );
+
+      case SoftBasicLowerVolumeTechnique.shadowCarve:
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(
+              rect.left + rect.width * 0.68,
+              rect.top + rect.height * 0.72,
+            ),
+            width: rect.width * 0.54,
+            height: rect.height * 0.46,
+          ),
+          Paint()
+            ..color = base.withValues(alpha: 0.17)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12.0),
+        );
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(
+              rect.left + rect.width * 0.63,
+              rect.top + rect.height * 0.76,
+            ),
+            width: rect.width * 0.34,
+            height: rect.height * 0.20,
+          ),
+          Paint()
+            ..color = softBase.withValues(alpha: 0.12)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7.0),
+        );
+
+      case SoftBasicLowerVolumeTechnique.ambientBounce:
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(
+              rect.left + rect.width * 0.57,
+              rect.top + rect.height * 0.79,
+            ),
+            width: rect.width * 0.78,
+            height: rect.height * 0.34,
+          ),
+          Paint()
+            ..color = tintedLight.withValues(alpha: 0.16)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10.0),
+        );
+        canvas.drawCircle(
+          Offset(
+            rect.left + rect.width * 0.63,
+            rect.top + rect.height * 0.72,
+          ),
+          rect.width * 0.13,
+          Paint()
+            ..color = light.withValues(alpha: 0.09)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7.0),
+        );
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(
+              rect.center.dx,
+              rect.top + rect.height * 0.91,
+            ),
+            width: rect.width * 0.56,
+            height: rect.height * 0.12,
+          ),
+          Paint()
+            ..color = deep.withValues(alpha: 0.045)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5.0),
+        );
+    }
+
+    canvas.restore();
   }
 
   void _paintBottomHighlight(
