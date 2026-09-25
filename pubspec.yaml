@@ -22,6 +22,7 @@ flutter:
   assets:
     - assets/shape_specs/soft_basic/
     - assets/shape_specs/crayon_soft/
+    - assets/sea_turtle_runtime_v2/
 
 flutter_launcher_icons:
   android: true

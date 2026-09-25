@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:my_lock/lock_engine/effects.dart';
 import 'package:my_lock/lock_engine/floating_preview.dart';
+import 'package:my_lock/lock_engine/floating_engine.dart';
 import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec.dart';
@@ -221,42 +225,362 @@ class ShapeLab extends StatelessWidget {
     const shapes = [ShapeKind.circle, ShapeKind.triangle, ShapeKind.square];
     const tones = [ShapeTone.pink, ShapeTone.blue, ShapeTone.yellow];
 
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _Panel(
+          color: card,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionTitle(
+                title: 'Shape Lab',
+                subtitle: '기본 Shape Master와 Drop Shape를 한 화면에서 실제 렌더 기준으로 확인합니다.',
+                fg: fg,
+                muted: muted,
+              ),
+              const SizedBox(height: 16),
+              for (final shape in shapes) ...[
+                Text(
+                  shape.label,
+                  style: TextStyle(color: fg, fontWeight: FontWeight.w900),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 14,
+                  runSpacing: 10,
+                  children: [
+                    for (final tone in tones)
+                      _TokenWithLabel(
+                        shape: shape,
+                        tone: tone,
+                        style: ShapeStyle.softBasic,
+                        label: tone.label,
+                        muted: muted,
+                      ),
+                  ],
+                ),
+                if (shape != shapes.last) const SizedBox(height: 18),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        _SeaTurtleShapePanel(card: card, fg: fg, muted: muted),
+      ],
+    );
+  }
+}
+
+class _SeaTurtleShapePanel extends StatefulWidget {
+  const _SeaTurtleShapePanel({
+    required this.card,
+    required this.fg,
+    required this.muted,
+  });
+
+  final Color card;
+  final Color fg;
+  final Color muted;
+
+  @override
+  State<_SeaTurtleShapePanel> createState() => _SeaTurtleShapePanelState();
+}
+
+class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
+    with SingleTickerProviderStateMixin {
+  late final Ticker _ticker;
+  final FloatingEngine _engine = FloatingEngine(seed: 240925);
+
+  Duration _previous = Duration.zero;
+  Size _lastStageSize = Size.zero;
+  int _objectCount = 9;
+  MovementStyle _movement = MovementStyle.underwater;
+  bool _darkBackground = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _engine
+      ..setSelection(
+        const {ShapeKind.circle},
+        const {ShapeTone.blue, ShapeTone.pink, ShapeTone.yellow},
+      )
+      ..setObjectCount(_objectCount)
+      ..setMovementStyle(_movement)
+      ..setMovementArea(MovementArea.full)
+      ..setSpeed(FloatingSpeed.normal);
+
+    _ticker = createTicker(_onTick)..start();
+  }
+
+  void _onTick(Duration elapsed) {
+    if (!mounted) return;
+    final delta = _previous == Duration.zero
+        ? 0.0
+        : (elapsed - _previous).inMicroseconds /
+            Duration.microsecondsPerSecond;
+    _previous = elapsed;
+
+    if (delta > 0) {
+      _engine.step(delta.clamp(0.0, 0.035).toDouble());
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return _Panel(
-      color: card,
+      color: widget.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SectionTitle(
-            title: 'Shape Lab',
-            subtitle: '현재 기본 Shape Master를 실제 58×58 renderer로 확인합니다.',
-            fg: fg,
-            muted: muted,
+            title: 'Drop 01 · Sea Turtle · Long Flipper',
+            subtitle:
+                'Static Runtime QA PASS · 투명 Runtime Asset 3색 · Shape 자체 애니메이션 없음 · 이동은 Motion Set이 담당',
+            fg: widget.fg,
+            muted: widget.muted,
           ),
           const SizedBox(height: 16),
-          for (final shape in shapes) ...[
-            Text(
-              shape.label,
-              style: TextStyle(color: fg, fontWeight: FontWeight.w900),
+          Wrap(
+            spacing: 18,
+            runSpacing: 12,
+            children: const [
+              _SeaTurtlePreview(tone: ShapeTone.blue, label: 'Aqua Mint'),
+              _SeaTurtlePreview(tone: ShapeTone.pink, label: 'Coral Pink'),
+              _SeaTurtlePreview(tone: ShapeTone.yellow, label: 'Sand Beige'),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Text(
+            'Runtime Motion Set QA',
+            style: TextStyle(
+              color: widget.fg,
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
             ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 14,
-              runSpacing: 10,
-              children: [
-                for (final tone in tones)
-                  _TokenWithLabel(
-                    shape: shape,
-                    tone: tone,
-                    style: ShapeStyle.softBasic,
-                    label: tone.label,
-                    muted: muted,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '실제 FloatingEngine의 이동·충돌·크기 값을 사용합니다. Circle token은 이 Lab에서 물리 계산용으로만 사용됩니다.',
+            style: TextStyle(color: widget.muted, fontSize: 11.5),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              for (final value in const [6, 9, 12])
+                ChoiceChip(
+                  label: Text('$value개'),
+                  selected: _objectCount == value,
+                  onSelected: (_) {
+                    setState(() {
+                      _objectCount = value;
+                      _engine.setObjectCount(value);
+                    });
+                  },
+                ),
+              _EnumDropdown<MovementStyle>(
+                label: 'Motion',
+                value: _movement,
+                values: MovementStyle.values,
+                text: (v) => v.label,
+                onChanged: (value) {
+                  setState(() {
+                    _movement = value;
+                    _engine.setMovementStyle(value);
+                  });
+                },
+              ),
+              FilterChip(
+                label: const Text('Dark BG'),
+                selected: _darkBackground,
+                onSelected: (value) =>
+                    setState(() => _darkBackground = value),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              final height = min(520.0, max(400.0, width * 0.72));
+              final stageSize = Size(width, height);
+
+              if (stageSize != _lastStageSize &&
+                  stageSize.width > 0 &&
+                  stageSize.height > 0) {
+                _lastStageSize = stageSize;
+                _engine.resize(stageSize);
+              }
+
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Container(
+                  width: width,
+                  height: height,
+                  decoration: BoxDecoration(
+                    gradient: _darkBackground
+                        ? const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFF071525),
+                              Color(0xFF10345A),
+                            ],
+                          )
+                        : const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFFEAF8FF),
+                              Color(0xFFDFF3F8),
+                            ],
+                          ),
                   ),
-              ],
-            ),
-            if (shape != shapes.last) const SizedBox(height: 18),
-          ],
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      for (final object in _engine.objects)
+                        _SeaTurtleRuntimeObject(
+                          key: ValueKey(object.id),
+                          object: object,
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _SeaTurtlePreview extends StatelessWidget {
+  const _SeaTurtlePreview({
+    required this.tone,
+    required this.label,
+  });
+
+  final ShapeTone tone;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 118,
+      child: Column(
+        children: [
+          _SeaTurtleAsset(tone: tone, size: 104),
+          const SizedBox(height: 5),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SeaTurtleRuntimeObject extends StatelessWidget {
+  const _SeaTurtleRuntimeObject({
+    super.key,
+    required this.object,
+  });
+
+  final FloatingObject object;
+
+  @override
+  Widget build(BuildContext context) {
+    final side = object.radius * 2.34;
+    return Positioned(
+      left: object.position.dx - side / 2,
+      top: object.position.dy - side / 2,
+      width: side,
+      height: side,
+      child: IgnorePointer(
+        child: Transform.rotate(
+          angle: object.rotation,
+          child: _SeaTurtleAsset(
+            tone: object.token.tone,
+            size: side,
+            compactError: true,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SeaTurtleAsset extends StatelessWidget {
+  const _SeaTurtleAsset({
+    required this.tone,
+    required this.size,
+    this.compactError = false,
+  });
+
+  final ShapeTone tone;
+  final double size;
+  final bool compactError;
+
+  @override
+  Widget build(BuildContext context) {
+    final asset = switch (tone) {
+      ShapeTone.blue =>
+        'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
+      ShapeTone.pink =>
+        'assets/sea_turtle_runtime_v2/sea_turtle_pink.png',
+      ShapeTone.yellow =>
+        'assets/sea_turtle_runtime_v2/sea_turtle_yellow.png',
+    };
+
+    return Image.asset(
+      asset,
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+      gaplessPlayback: true,
+      filterQuality: FilterQuality.high,
+      errorBuilder: (context, error, stackTrace) {
+        if (compactError) {
+          return const Center(
+            child: Icon(
+              Icons.broken_image_outlined,
+              size: 18,
+              color: Color(0xFFB64242),
+            ),
+          );
+        }
+        return Container(
+          width: size,
+          height: size,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFECEC),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Text(
+            'Asset error',
+            style: TextStyle(color: Color(0xFF9F2F2F), fontSize: 10),
+          ),
+        );
+      },
     );
   }
 }
