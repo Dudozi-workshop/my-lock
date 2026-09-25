@@ -1,5 +1,7 @@
 name: MY LOCK Web Build
 
+# Sea Turtle lab branch uses an isolated preview worker.
+
 on:
   push:
     branches: [main, feat/sea-turtle-runtime-poc]
