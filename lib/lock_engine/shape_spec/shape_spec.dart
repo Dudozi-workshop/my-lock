@@ -95,6 +95,14 @@ class CrayonTextureSpec {
     this.zigzagCycles = 0,
     this.negativeGapCount = 0,
     this.negativeGapWidth = 0.0,
+    this.internalGapChance = 0.0,
+    this.internalGapWidthRatio = 0.0,
+    this.internalGapLengthMin = 4.0,
+    this.internalGapLengthMax = 12.0,
+    this.internalGapStrength = 1.0,
+    this.internalStrandCount = 1,
+    this.internalStrandSpread = 0.0,
+    this.internalGapOffsetJitter = 0.0,
   });
 
   final int darkStrokeCount;
@@ -153,6 +161,19 @@ class CrayonTextureSpec {
   /// lighter pigment mark over the fill.
   final int negativeGapCount;
   final double negativeGapWidth;
+
+  /// Sparse paper reveal inside an otherwise continuous crayon stroke.
+  /// Unlike negativeGapCount, these marks never cut across the full stroke
+  /// width. They stay inside the pigment band so the outer stroke reads as
+  /// one continuous hand motion.
+  final double internalGapChance;
+  final double internalGapWidthRatio;
+  final double internalGapLengthMin;
+  final double internalGapLengthMax;
+  final double internalGapStrength;
+  final int internalStrandCount;
+  final double internalStrandSpread;
+  final double internalGapOffsetJitter;
 
   factory CrayonTextureSpec.fromJson(Map<String, dynamic> json) {
     return CrayonTextureSpec(
@@ -224,6 +245,22 @@ class CrayonTextureSpec {
           (json['negativeGapCount'] as num?)?.toInt() ?? 0,
       negativeGapWidth:
           (json['negativeGapWidth'] as num?)?.toDouble() ?? 0.0,
+      internalGapChance:
+          (json['internalGapChance'] as num?)?.toDouble() ?? 0.0,
+      internalGapWidthRatio:
+          (json['internalGapWidthRatio'] as num?)?.toDouble() ?? 0.0,
+      internalGapLengthMin:
+          (json['internalGapLengthMin'] as num?)?.toDouble() ?? 4.0,
+      internalGapLengthMax:
+          (json['internalGapLengthMax'] as num?)?.toDouble() ?? 12.0,
+      internalGapStrength:
+          (json['internalGapStrength'] as num?)?.toDouble() ?? 1.0,
+      internalStrandCount:
+          (json['internalStrandCount'] as num?)?.toInt() ?? 1,
+      internalStrandSpread:
+          (json['internalStrandSpread'] as num?)?.toDouble() ?? 0.0,
+      internalGapOffsetJitter:
+          (json['internalGapOffsetJitter'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

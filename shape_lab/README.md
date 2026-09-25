@@ -14,3 +14,12 @@ Production renderer를 그대로 사용해 Crayon Soft 후보를 실제 58×58�
 ## 승인 흐름
 
 Candidate → Shortlist → Selected → APP EXACT / Runtime QA → Production Master
+
+
+## Round 16 · Internal Paper Gap
+
+G01-G08 compare sparse negative space *inside* a continuous crayon stroke.
+The outer stroke itself is not cut. Previous full-surface negative-gap cuts are
+disabled for this round. Each candidate uses the same production renderer and
+58x58 logical token size; only internal gap amount, width, length, reveal
+strength, and pigment-band distribution vary.

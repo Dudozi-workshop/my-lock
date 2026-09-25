@@ -370,6 +370,22 @@ class ShapeSpecRenderer {
           ..strokeWidth = stroke.width
           ..color = pigment.withValues(alpha: stroke.opacity * opacity),
       );
+
+      // Paper reveal stays inside the stroke body. dstOut can remove the
+      // underpaint underneath, but the gap width is clamped below the stroke
+      // width so both pigment edges remain continuous.
+      for (final gap in stroke.internalGaps) {
+        canvas.drawPath(
+          gap.path,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeCap = StrokeCap.round
+            ..strokeJoin = StrokeJoin.round
+            ..strokeWidth = gap.width
+            ..blendMode = BlendMode.dstOut
+            ..color = Colors.white.withValues(alpha: gap.strength),
+        );
+      }
     }
 
     // Broad passes read as the first hand-filled wax layer. Main and light
@@ -649,6 +665,7 @@ class ShapeSpecRenderer {
 
         final widthJitter =
             1 + (random.nextDouble() - 0.5) * 2 * config.strokeWidthJitter;
+        final actualWidth = max(0.35, nominalWidth * widthJitter);
         final opacityJitter = 0.78 + random.nextDouble() * 0.36;
         final toneRoll = random.nextDouble();
         final toneBand = toneRoll < 0.24
@@ -656,12 +673,90 @@ class ShapeSpecRenderer {
             : toneRoll > 0.76
                 ? 1
                 : 0;
+
+        final internalGaps = <_CrayonInternalGap>[];
+        final gapChance =
+            (config.internalGapChance * gapScale).clamp(0.0, 0.65);
+        final gapWidthRatio =
+            config.internalGapWidthRatio.clamp(0.0, 0.68);
+        if (gapChance > 0 && gapWidthRatio > 0) {
+          final minGapLength = max(1.2, config.internalGapLengthMin);
+          final maxGapLength =
+              max(minGapLength, config.internalGapLengthMax);
+          final strandCount = config.internalStrandCount.clamp(1, 4);
+          final strandSpread =
+              config.internalStrandSpread.clamp(0.0, 0.72);
+          final offsetJitter =
+              config.internalGapOffsetJitter.clamp(0.0, 0.35);
+          final strength = config.internalGapStrength.clamp(0.0, 1.0);
+
+          for (final metric in path.computeMetrics()) {
+            final averageLength = (minGapLength + maxGapLength) / 2;
+            final window = max(5.0, averageLength * 1.55);
+            var cursor = random.nextDouble() * window;
+
+            while (cursor < metric.length) {
+              if (random.nextDouble() < gapChance) {
+                final length = minGapLength +
+                    random.nextDouble() * (maxGapLength - minGapLength);
+                final startGap =
+                    cursor.clamp(0.0, max(0.0, metric.length - 0.2));
+                final endGap =
+                    min(metric.length, startGap + length);
+                if (endGap > startGap + 0.5) {
+                  final midpoint = (startGap + endGap) / 2;
+                  final tangent = metric.getTangentForOffset(midpoint);
+                  if (tangent != null) {
+                    final normal = Offset(
+                      -tangent.vector.dy,
+                      tangent.vector.dx,
+                    );
+                    final track = strandCount == 1
+                        ? 0.0
+                        : -1.0 +
+                            2.0 *
+                                random.nextInt(strandCount) /
+                                (strandCount - 1);
+                    final laneOffset =
+                        track * actualWidth * 0.5 * strandSpread;
+                    final randomOffset =
+                        (random.nextDouble() - 0.5) *
+                        2 *
+                        actualWidth *
+                        offsetJitter;
+                    final gapPath = metric
+                        .extractPath(startGap, endGap)
+                        .shift(normal * (laneOffset + randomOffset));
+                    final widthVariation =
+                        0.82 + random.nextDouble() * 0.30;
+                    internalGaps.add(
+                      _CrayonInternalGap(
+                        path: gapPath,
+                        width: max(
+                          0.22,
+                          actualWidth *
+                              gapWidthRatio *
+                              widthVariation,
+                        ),
+                        strength: strength *
+                            (0.82 + random.nextDouble() * 0.18),
+                      ),
+                    );
+                  }
+                }
+              }
+              cursor += window * (0.72 + random.nextDouble() * 0.72);
+            }
+          }
+        }
+
         strokes.add(
           _CrayonStroke(
             path: path,
-            width: max(0.35, nominalWidth * widthJitter),
+            width: actualWidth,
             opacity: (nominalOpacity * opacityJitter).clamp(0.01, 0.95),
             toneBand: toneBand,
+            internalGaps: internalGaps,
           ),
         );
       }
@@ -870,6 +965,14 @@ class ShapeSpecRenderer {
       config.zigzagCycles,
       config.negativeGapCount,
       config.negativeGapWidth,
+      config.internalGapChance,
+      config.internalGapWidthRatio,
+      config.internalGapLengthMin,
+      config.internalGapLengthMax,
+      config.internalGapStrength,
+      config.internalStrandCount,
+      config.internalStrandSpread,
+      config.internalGapOffsetJitter,
     ].join(':');
   }
 
@@ -1093,12 +1196,26 @@ class _CrayonStroke {
     required this.width,
     required this.opacity,
     required this.toneBand,
+    this.internalGaps = const [],
   });
 
   final Path path;
   final double width;
   final double opacity;
   final int toneBand;
+  final List<_CrayonInternalGap> internalGaps;
+}
+
+class _CrayonInternalGap {
+  const _CrayonInternalGap({
+    required this.path,
+    required this.width,
+    required this.strength,
+  });
+
+  final Path path;
+  final double width;
+  final double strength;
 }
 
 class _CrayonGrainDot {
