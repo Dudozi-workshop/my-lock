@@ -25,7 +25,7 @@ void main() {
     }
   });
 
-  test('Preview 007 circle uses target-master masks', () async {
+  test('Production Circle v9 uses Airbrush + Edge Leaf geometry', () async {
     await ShapeSpecRegistry.instance.load();
 
     final bundle = ShapeSpecRegistry.instance.resolve(
@@ -33,62 +33,55 @@ void main() {
       ShapeKind.circle,
     );
 
-    expect(bundle.shape.version, 8);
+    expect(bundle.shape.version, 9);
     expect(bundle.shape.rotationMode, ShapeRotationMode.fixed);
-    expect(bundle.shape.surface.kind, 'radial');
-    expect(bundle.shape.layers.length, 5);
+    expect(bundle.shape.surface.kind, 'solid');
+    expect(bundle.shape.layers.length, 4);
     expect(
-      bundle.shape.layers.every((layer) => layer.geometry.kind == 'mask'),
-      isTrue,
-    );
-    expect(
-      bundle.shape.layers.map((layer) => layer.blend).toList(),
+      bundle.shape.layers.map((layer) => layer.id).toList(),
       [
-        ShapeLayerBlend.softLight,
-        ShapeLayerBlend.multiply,
-        ShapeLayerBlend.screen,
-        ShapeLayerBlend.screen,
-        ShapeLayerBlend.screen,
+        'airbrush_light',
+        'airbrush_shade',
+        'edge_leaf_halo',
+        'edge_leaf',
       ],
     );
+    expect(
+      bundle.shape.layers.map((layer) => layer.geometry.kind).toList(),
+      ['circle', 'circle', 'path', 'path'],
+    );
+    expect(
+      bundle.shape.layers.any((layer) => layer.id == 'core_spec'),
+      isFalse,
+    );
+    expect(
+      bundle.shape.layers.any((layer) => layer.geometry.kind == 'mask'),
+      isFalse,
+    );
 
-    for (final layer in bundle.shape.layers) {
-      final asset = layer.geometry.values['asset'] as String;
-      final image = ShapeSpecRegistry.instance.resolveMask(asset);
-      expect(image.width, 128);
-      expect(image.height, 128);
-      switch (layer.id) {
-        case 'diffuse_light':
-        case 'form_shadow':
-          expect(asset.contains('_v4.b64'), isTrue);
-          break;
-        case 'rim_light':
-          expect(asset.contains('_v2.b64'), isTrue);
-          break;
-        case 'soft_spec':
-          expect(asset.contains('_v6.b64'), isTrue);
-          break;
-        case 'core_spec':
-          expect(asset.contains('_v4.b64'), isTrue);
-          break;
-      }
-    }
+    final light = bundle.shape.layers.first;
+    final shade = bundle.shape.layers[1];
+    final leaf = bundle.shape.layers.last;
+
+    expect(light.toneLightnessDelta, closeTo(0.16, 0.0001));
+    expect(shade.toneLightnessDelta, closeTo(-0.16, 0.0001));
+    expect(leaf.role, ShapeLayerRole.spec);
+    expect(leaf.blur, greaterThan(0));
   });
 
-  test('Preview 007 Circle mask assets are not fully opaque', () async {
+  test('Production Circle Edge Leaf path is authored and closed', () async {
     await ShapeSpecRegistry.instance.load();
 
     final bundle = ShapeSpecRegistry.instance.resolve(
       ShapeStyle.softBasic,
       ShapeKind.circle,
     );
+    final leaf = bundle.shape.layers.last;
+    final commands = leaf.geometry.values['commands'] as List<dynamic>;
 
-    for (final layer in bundle.shape.layers) {
-      final asset = layer.geometry.values['asset'] as String;
-      final image = ShapeSpecRegistry.instance.resolveMask(asset);
-      expect(image.width, 128);
-      expect(image.height, 128);
-    }
+    expect(commands.first['op'], 'M');
+    expect(commands.where((value) => value['op'] == 'C').length, 4);
+    expect(commands.last['op'], 'Z');
   });
 
   test('Crayon Soft reuses shape masters with procedural texture', () async {
