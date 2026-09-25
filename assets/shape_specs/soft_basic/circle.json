@@ -1,7 +1,7 @@
 {
   "styleId": "soft_basic",
   "shapeId": "circle",
-  "version": 5,
+  "version": 6,
   "rotationMode": "fixed",
   "body": {
     "kind": "circle",
@@ -37,7 +37,7 @@
       "id": "form_shadow",
       "role": "shade",
       "blend": "multiply",
-      "opacity": 0.22,
+      "opacity": 0.245,
       "blur": 0,
       "geometry": {
         "kind": "mask",
@@ -59,28 +59,28 @@
       "id": "soft_spec",
       "role": "spec",
       "blend": "screen",
-      "opacity": 0.18,
+      "opacity": 0.16,
       "blur": 0,
       "geometry": {
         "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_soft_spec_v2.b64"
+        "asset": "assets/shape_specs/soft_basic/circle_soft_spec_v3.b64"
       }
     },
     {
       "id": "core_spec",
       "role": "spec",
       "blend": "screen",
-      "opacity": 0.62,
+      "opacity": 0.68,
       "blur": 0,
       "geometry": {
         "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_core_spec_v2.b64"
+        "asset": "assets/shape_specs/soft_basic/circle_core_spec_v3.b64"
       }
     }
   ],
   "shadow": {
-    "opacity": 0.018,
-    "elevation": 1.3,
+    "opacity": 0.016,
+    "elevation": 1.2,
     "offsetX": 0.25,
     "offsetY": 0.65
   }
