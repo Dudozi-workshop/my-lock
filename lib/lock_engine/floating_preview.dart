@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
 import 'effects.dart';
+import 'dolphin_baked_only_cache.dart';
 import 'floating_engine.dart';
 import 'models.dart';
 import 'shape_painter.dart';
@@ -49,6 +50,7 @@ class _FloatingPreviewState extends State<FloatingPreview>
   late final Ticker _ticker;
   final FloatingEngine _engine = FloatingEngine();
   Duration _previous = Duration.zero;
+  Duration _lastVisualTick = Duration.zero;
   Size _lastSize = Size.zero;
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   StreamSubscription<GyroscopeEvent>? _gyroscopeSubscription;
@@ -60,6 +62,8 @@ class _FloatingPreviewState extends State<FloatingPreview>
   @override
   void initState() {
     super.initState();
+    DolphinBakedOnlyCache.instance.ensureLoaded();
+
     _engine
       ..setSelection(widget.selectedShapes, widget.selectedTones)
       ..setMovementStyle(widget.movementStyle)
@@ -164,8 +168,15 @@ class _FloatingPreviewState extends State<FloatingPreview>
             Duration.microsecondsPerSecond;
     _previous = elapsed;
 
-    if (delta > 0) {
-      _engine.step(delta.clamp(0.0, 0.035).toDouble());
+    if (delta <= 0) return;
+
+    _engine.step(delta.clamp(0.0, 0.035).toDouble());
+
+    // The floating lock scene does not need 120 Hz Flutter rebuilds. Cap the
+    // visual refresh near 60 fps while physics still integrates each ticker.
+    if (_lastVisualTick == Duration.zero ||
+        (elapsed - _lastVisualTick).inMicroseconds >= 16000) {
+      _lastVisualTick = elapsed;
       setState(() {});
     }
   }
