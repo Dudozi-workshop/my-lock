@@ -10,6 +10,8 @@ enum ShapeRotationMode { rotateWithObject, fixed }
 
 enum ShapeRenderMode { layered, crayon }
 
+enum CrayonEdgeMode { vector, none, broken, scribble, overfill, hybrid }
+
 class ShapeStyleSpec {
   const ShapeStyleSpec({
     required this.id,
@@ -78,6 +80,14 @@ class CrayonTextureSpec {
     this.toneVariation = 0.0,
     this.edgeWidth = 0.72,
     this.edgeTexture = 0.0,
+    this.edgeMode = CrayonEdgeMode.vector,
+    this.edgeSegmentLength = 7.0,
+    this.edgeSegmentGap = 3.0,
+    this.edgeOffsetJitter = 0.8,
+    this.edgeWidthJitter = 0.25,
+    this.edgeOpacityJitter = 0.20,
+    this.edgeBandWidth = 3.0,
+    this.overflowAmount = 1.2,
   });
 
   final int darkStrokeCount;
@@ -116,6 +126,14 @@ class CrayonTextureSpec {
   /// a wax-crayon edge instead of a clean vector stroke.
   final double edgeWidth;
   final double edgeTexture;
+  final CrayonEdgeMode edgeMode;
+  final double edgeSegmentLength;
+  final double edgeSegmentGap;
+  final double edgeOffsetJitter;
+  final double edgeWidthJitter;
+  final double edgeOpacityJitter;
+  final double edgeBandWidth;
+  final double overflowAmount;
 
   factory CrayonTextureSpec.fromJson(Map<String, dynamic> json) {
     return CrayonTextureSpec(
@@ -159,6 +177,23 @@ class CrayonTextureSpec {
           (json['edgeWidth'] as num?)?.toDouble() ?? 0.72,
       edgeTexture:
           (json['edgeTexture'] as num?)?.toDouble() ?? 0.0,
+      edgeMode: CrayonEdgeMode.values.byName(
+        (json['edgeMode'] as String?) ?? 'vector',
+      ),
+      edgeSegmentLength:
+          (json['edgeSegmentLength'] as num?)?.toDouble() ?? 7.0,
+      edgeSegmentGap:
+          (json['edgeSegmentGap'] as num?)?.toDouble() ?? 3.0,
+      edgeOffsetJitter:
+          (json['edgeOffsetJitter'] as num?)?.toDouble() ?? 0.8,
+      edgeWidthJitter:
+          (json['edgeWidthJitter'] as num?)?.toDouble() ?? 0.25,
+      edgeOpacityJitter:
+          (json['edgeOpacityJitter'] as num?)?.toDouble() ?? 0.20,
+      edgeBandWidth:
+          (json['edgeBandWidth'] as num?)?.toDouble() ?? 3.0,
+      overflowAmount:
+          (json['overflowAmount'] as num?)?.toDouble() ?? 1.2,
     );
   }
 }
