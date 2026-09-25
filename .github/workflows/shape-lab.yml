@@ -14,6 +14,7 @@ on:
       - 'pubspec.yaml'
       - '.github/workflows/shape-lab.yml'
       - 'wrangler.shape-lab.jsonc'
+      - 'docs/shape-lab-preview-standard.md'
   workflow_dispatch:
 
 permissions:
@@ -29,6 +30,9 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PAGES_PROJECT: my-lock-shape-lab-pages
+      PRIMARY_URL: https://my-lock-shape-lab-pages.pages.dev/
+      BACKUP_URL: https://my-lock-shape-lab.rlatkd5959.workers.dev/
 
     steps:
       - uses: actions/checkout@v4
@@ -49,7 +53,7 @@ jobs:
       - name: Build Shape Lab
         run: bash tool/build_shape_lab.sh
 
-      - name: Upload Shape Lab artifact
+      - name: Upload recovery artifact
         uses: actions/upload-artifact@v4
         with:
           name: my-lock-crayon-shape-lab
@@ -57,84 +61,66 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Deploy Shape Lab
+      # Primary host: Cloudflare Pages.
+      # A Worker DNS issue must never block the primary preview.
+      - name: Ensure Pages primary project exists
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        run: |
+          set -e
+          API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects"
+          if curl --fail --show-error --silent             --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN"             "$API/$PAGES_PROJECT"             --output /tmp/pages-project.json; then
+            echo "Pages project already exists"
+          else
+            curl --fail --show-error --silent               --request POST               --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN"               --header "Content-Type: application/json"               --data "{"name":"$PAGES_PROJECT","production_branch":"feat/crayon-style-lab"}"               "$API"               --output /tmp/pages-project-create.json
+            echo "Pages project created"
+          fi
+
+      - name: Deploy Pages primary
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        run: |
+          set -e
+          npx wrangler pages deploy build/shape_lab             --project-name "$PAGES_PROJECT"             --branch "feat/crayon-style-lab"             --commit-hash "$GITHUB_SHA"
+
+      - name: Verify Pages primary
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        run: |
+          set -e
+          echo "Checking $PRIMARY_URL"
+          curl --fail --show-error --silent --location             --retry 5 --retry-delay 3 --retry-all-errors             --output /tmp/pages-index.html             --write-out "HTTP %{http_code}\n"             "$PRIMARY_URL"
+          grep -q "<html" /tmp/pages-index.html
+          grep -q "flutter_bootstrap.js" /tmp/pages-index.html
+
+      # Backup host: Worker. Keep it available, but do not fail the job if
+      # workers.dev is temporarily unreachable for a network or DNS reason.
+      - name: Deploy Worker backup
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        continue-on-error: true
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy --config wrangler.shape-lab.jsonc
 
-      - name: Verify public Shape Lab URL
+      - name: Verify Worker backup
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        continue-on-error: true
         run: |
           set -e
-          URL="https://my-lock-shape-lab.rlatkd5959.workers.dev/"
-          echo "Checking $URL"
-          curl --fail --show-error --silent --location \
-            --retry 5 --retry-delay 3 --retry-all-errors \
-            --output /tmp/shape-lab-index.html \
-            --write-out "HTTP %{http_code}\n" \
-            "$URL"
-          grep -q "<html" /tmp/shape-lab-index.html
-          grep -q "flutter_bootstrap.js" /tmp/shape-lab-index.html
+          echo "Checking $BACKUP_URL"
+          curl --fail --show-error --silent --location             --retry 3 --retry-delay 3 --retry-all-errors             --output /tmp/worker-index.html             --write-out "HTTP %{http_code}\n"             "$BACKUP_URL"
+          grep -q "<html" /tmp/worker-index.html
+          grep -q "flutter_bootstrap.js" /tmp/worker-index.html
 
-
-      - name: Create Pages fallback project if needed
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
-        env:
-          PAGES_PROJECT: my-lock-shape-lab-pages
+      - name: Publish preview access summary
+        if: always()
         run: |
-          set -e
-          API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects"
-          if curl --fail --show-error --silent \
-            --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            "$API/$PAGES_PROJECT" \
-            --output /tmp/pages-project.json; then
-            echo "Pages project already exists"
-          else
-            curl --fail --show-error --silent \
-              --request POST \
-              --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-              --header "Content-Type: application/json" \
-              --data "{\"name\":\"$PAGES_PROJECT\",\"production_branch\":\"feat/crayon-style-lab\"}" \
-              "$API" \
-              --output /tmp/pages-project-create.json
-            echo "Pages project created"
-          fi
-
-      - name: Deploy Pages fallback
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
-        env:
-          PAGES_PROJECT: my-lock-shape-lab-pages
-        run: |
-          set -e
-          npx wrangler pages deploy build/shape_lab \
-            --project-name "$PAGES_PROJECT" \
-            --branch "feat/crayon-style-lab" \
-            --commit-hash "$GITHUB_SHA"
-
-      - name: Verify Pages fallback URL
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
-        env:
-          PAGES_PROJECT: my-lock-shape-lab-pages
-        run: |
-          set -e
-          API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$PAGES_PROJECT"
-          curl --fail --show-error --silent \
-            --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            "$API" \
-            --output /tmp/pages-project-final.json
-          SUBDOMAIN="$(jq -r '.result.subdomain' /tmp/pages-project-final.json)"
-          test -n "$SUBDOMAIN"
-          test "$SUBDOMAIN" != "null"
-          URL="https://$SUBDOMAIN/"
-          echo "Checking $URL"
-          curl --fail --show-error --silent --location \
-            --retry 5 --retry-delay 3 --retry-all-errors \
-            --output /tmp/pages-index.html \
-            --write-out "HTTP %{http_code}\n" \
-            "$URL"
-          grep -q "<html" /tmp/pages-index.html
-          grep -q "flutter_bootstrap.js" /tmp/pages-index.html
-          echo "PAGES_URL=$URL"
+          {
+            echo "## MY LOCK Shape Lab preview"
+            echo ""
+            echo "- Primary: $PRIMARY_URL"
+            echo "- Backup: $BACKUP_URL"
+            echo "- Recovery artifact: my-lock-crayon-shape-lab (14 days)"
+            echo "- Commit: $GITHUB_SHA"
+            echo ""
+            echo "Access order: Pages -> Worker -> GitHub Actions artifact"
+          } >> "$GITHUB_STEP_SUMMARY"
