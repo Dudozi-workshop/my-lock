@@ -25,7 +25,7 @@ void main() {
     }
   });
 
-  test('Preview 006 circle uses alpha-safe spec masks', () async {
+  test('Preview 007 circle uses target-master masks', () async {
     await ShapeSpecRegistry.instance.load();
 
     final bundle = ShapeSpecRegistry.instance.resolve(
@@ -33,7 +33,7 @@ void main() {
       ShapeKind.circle,
     );
 
-    expect(bundle.shape.version, 7);
+    expect(bundle.shape.version, 8);
     expect(bundle.shape.rotationMode, ShapeRotationMode.fixed);
     expect(bundle.shape.surface.kind, 'radial');
     expect(bundle.shape.layers.length, 5);
@@ -57,11 +57,34 @@ void main() {
       final image = ShapeSpecRegistry.instance.resolveMask(asset);
       expect(image.width, 128);
       expect(image.height, 128);
-      if (layer.id == 'soft_spec' || layer.id == 'core_spec') {
-        expect(asset.contains('_v4.b64'), isTrue);
-      } else {
-        expect(asset.contains('_v2.b64'), isTrue);
+      switch (layer.id) {
+        case 'diffuse_light':
+        case 'form_shadow':
+        case 'rim_light':
+          expect(asset.contains('_v4.b64'), isTrue);
+          break;
+        case 'soft_spec':
+        case 'core_spec':
+          expect(asset.contains('_v6.b64'), isTrue);
+          break;
       }
     }
   });
+
+  test('Preview 007 Circle mask assets are not fully opaque', () async {
+    await ShapeSpecRegistry.instance.load();
+
+    final bundle = ShapeSpecRegistry.instance.resolve(
+      ShapeStyle.softBasic,
+      ShapeKind.circle,
+    );
+
+    for (final layer in bundle.shape.layers) {
+      final asset = layer.geometry.values['asset'] as String;
+      final image = ShapeSpecRegistry.instance.resolveMask(asset);
+      expect(image.width, 128);
+      expect(image.height, 128);
+    }
+  });
+
 }
