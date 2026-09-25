@@ -78,11 +78,6 @@ class FloatingShapePainter extends CustomPainter {
   }) {
     final radius = object.radius * scale;
 
-    canvas.save();
-    canvas.translate(object.position.dx, object.position.dy);
-    canvas.rotate(object.rotation);
-    canvas.translate(-object.position.dx, -object.position.dy);
-
     ShapeSpecRenderer.paintToken(
       canvas,
       center: object.position,
@@ -90,9 +85,8 @@ class FloatingShapePainter extends CustomPainter {
       token: object.token,
       style: style,
       opacity: opacity,
+      objectRotation: object.rotation,
     );
-
-    canvas.restore();
   }
 
   void _paintPopFeedback(
