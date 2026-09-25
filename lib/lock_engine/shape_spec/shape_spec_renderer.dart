@@ -328,8 +328,13 @@ class ShapeSpecRenderer {
       saturationDelta: 0.0,
     );
 
-    // A very light underpaint prevents 58px pinholes from reading as broken
-    // rendering, while the visible surface is still built by actual strokes.
+    // Keep the whole internal pigment on an isolated layer. This lets
+    // negative-space marks reveal the real runtime background instead of
+    // faking a "gap" with a lighter pigment color.
+    canvas.saveLayer(bodyPath.getBounds().inflate(3.0), Paint());
+
+    // A light underpaint prevents tiny accidental pinholes while the visible
+    // surface is still built by actual strokes.
     if (config.underpaintOpacity > 0) {
       canvas.drawPath(
         bodyPath,
@@ -387,6 +392,19 @@ class ShapeSpecRenderer {
       canvas.drawCircle(dot.center, dot.radius, grainPaint);
     }
 
+    if (texture.negativeGaps.isNotEmpty && config.negativeGapWidth > 0) {
+      final clearPaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..strokeWidth = config.negativeGapWidth
+        ..blendMode = BlendMode.clear;
+      for (final gap in texture.negativeGaps) {
+        canvas.drawPath(gap, clearPaint);
+      }
+    }
+
+    canvas.restore();
     canvas.restore();
 
     if (config.edgeOpacity <= 0 ||
@@ -604,9 +622,19 @@ class ShapeSpecRenderer {
               (random.nextDouble() - 0.5) * config.jitter * 0.92;
           final alongWobble =
               (random.nextDouble() - 0.5) * config.jitter * 0.28;
+          var patternOffset = 0.0;
+          if (config.strokePattern == CrayonStrokePattern.zigzag &&
+              config.zigzagCycles > 0 &&
+              config.zigzagAmplitude > 0) {
+            final phase = (t * config.zigzagCycles) % 1.0;
+            final triangle = phase < 0.5
+                ? -1.0 + phase * 4.0
+                : 3.0 - phase * 4.0;
+            patternOffset = triangle * config.zigzagAmplitude;
+          }
           final point = const Offset(50, 50) +
               direction * (travel + alongWobble) +
-              normal * (lane + wobble);
+              normal * (lane + wobble + patternOffset);
 
           final shouldBreak = step > 0 &&
               random.nextDouble() <
@@ -665,6 +693,40 @@ class ShapeSpecRenderer {
       gapScale: 0.82,
     );
 
+    final negativeGaps = <Path>[];
+    if (config.negativeGapCount > 0 && config.negativeGapWidth > 0) {
+      for (var i = 0; i < config.negativeGapCount; i++) {
+        final localAngle = (config.angleDeg + 9.0 +
+                (random.nextDouble() - 0.5) * max(8.0, config.angleJitterDeg))
+            * pi /
+            180;
+        final direction = Offset(cos(localAngle), sin(localAngle));
+        final normal = Offset(-direction.dy, direction.dx);
+        final lane = -34 + random.nextDouble() * 68;
+        final length = 18 + random.nextDouble() * 34;
+        final centerTravel = -28 + random.nextDouble() * 56;
+        final start = centerTravel - length / 2;
+        final end = centerTravel + length / 2;
+        final gap = Path();
+        const steps = 7;
+        for (var step = 0; step <= steps; step++) {
+          final t = step / steps;
+          final travel = start + (end - start) * t;
+          final wobble =
+              (random.nextDouble() - 0.5) * max(0.8, config.jitter * 0.55);
+          final point = const Offset(50, 50) +
+              direction * travel +
+              normal * (lane + wobble);
+          if (step == 0) {
+            gap.moveTo(point.dx, point.dy);
+          } else {
+            gap.lineTo(point.dx, point.dy);
+          }
+        }
+        negativeGaps.add(gap);
+      }
+    }
+
     final grain = <_CrayonGrainDot>[];
     for (var i = 0; i < config.grainCount; i++) {
       grain.add(
@@ -682,6 +744,7 @@ class ShapeSpecRenderer {
       broadStrokes: broadStrokes,
       mainStrokes: mainStrokes,
       lightPigmentStrokes: lightPigmentStrokes,
+      negativeGaps: negativeGaps,
       baseStrokes: const [],
       darkStrokes: const [],
       lightStrokes: const [],
@@ -802,6 +865,11 @@ class ShapeSpecRenderer {
       config.edgeOpacityJitter,
       config.edgeBandWidth,
       config.overflowAmount,
+      config.strokePattern.name,
+      config.zigzagAmplitude,
+      config.zigzagCycles,
+      config.negativeGapCount,
+      config.negativeGapWidth,
     ].join(':');
   }
 
@@ -1002,6 +1070,7 @@ class _CrayonTextureGeometry {
     this.broadStrokes = const [],
     this.mainStrokes = const [],
     this.lightPigmentStrokes = const [],
+    this.negativeGaps = const [],
     required this.baseStrokes,
     required this.darkStrokes,
     required this.lightStrokes,
@@ -1011,6 +1080,7 @@ class _CrayonTextureGeometry {
   final List<_CrayonStroke> broadStrokes;
   final List<_CrayonStroke> mainStrokes;
   final List<_CrayonStroke> lightPigmentStrokes;
+  final List<Path> negativeGaps;
   final List<Path> baseStrokes;
   final List<Path> darkStrokes;
   final List<Path> lightStrokes;

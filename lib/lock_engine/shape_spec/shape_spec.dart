@@ -12,6 +12,8 @@ enum ShapeRenderMode { layered, crayon }
 
 enum CrayonEdgeMode { vector, none, broken, scribble, overfill, hybrid }
 
+enum CrayonStrokePattern { hatch, zigzag }
+
 class ShapeStyleSpec {
   const ShapeStyleSpec({
     required this.id,
@@ -88,6 +90,11 @@ class CrayonTextureSpec {
     this.edgeOpacityJitter = 0.20,
     this.edgeBandWidth = 3.0,
     this.overflowAmount = 1.2,
+    this.strokePattern = CrayonStrokePattern.hatch,
+    this.zigzagAmplitude = 0.0,
+    this.zigzagCycles = 0,
+    this.negativeGapCount = 0,
+    this.negativeGapWidth = 0.0,
   });
 
   final int darkStrokeCount;
@@ -134,6 +141,18 @@ class CrayonTextureSpec {
   final double edgeOpacityJitter;
   final double edgeBandWidth;
   final double overflowAmount;
+
+  /// Internal mark geometry. hatch preserves the existing diagonal fill.
+  /// zigzag produces a hand-coloring lightning / back-and-forth stroke.
+  final CrayonStrokePattern strokePattern;
+  final double zigzagAmplitude;
+  final int zigzagCycles;
+
+  /// True negative-space cuts. These erase pigment inside the isolated token
+  /// layer so the runtime background shows through instead of drawing a
+  /// lighter pigment mark over the fill.
+  final int negativeGapCount;
+  final double negativeGapWidth;
 
   factory CrayonTextureSpec.fromJson(Map<String, dynamic> json) {
     return CrayonTextureSpec(
@@ -194,6 +213,17 @@ class CrayonTextureSpec {
           (json['edgeBandWidth'] as num?)?.toDouble() ?? 3.0,
       overflowAmount:
           (json['overflowAmount'] as num?)?.toDouble() ?? 1.2,
+      strokePattern: CrayonStrokePattern.values.byName(
+        (json['strokePattern'] as String?) ?? 'hatch',
+      ),
+      zigzagAmplitude:
+          (json['zigzagAmplitude'] as num?)?.toDouble() ?? 0.0,
+      zigzagCycles:
+          (json['zigzagCycles'] as num?)?.toInt() ?? 0,
+      negativeGapCount:
+          (json['negativeGapCount'] as num?)?.toInt() ?? 0,
+      negativeGapWidth:
+          (json['negativeGapWidth'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }
