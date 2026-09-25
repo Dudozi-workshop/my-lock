@@ -576,14 +576,14 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
-    final selected = softBasicRound1Candidates[selectedIndex];
+    final selected = softBasicCircleRound2Candidates[selectedIndex];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Round 1 · Direction',
-          subtitle: 'SB-R1-01~08을 한 화면에서 비교합니다. Production Master는 변경하지 않습니다.',
+          title: 'Soft Basic · Circle · Round 2',
+          subtitle: 'Circle 하나만 집중 최적화합니다. 목업 쪽으로 하이라이트와 볼륨을 강하게 당긴 8안을 비교합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -598,11 +598,11 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
               spacing: gap,
               runSpacing: gap,
               children: [
-                for (var i = 0; i < softBasicRound1Candidates.length; i++)
+                for (var i = 0; i < softBasicCircleRound2Candidates.length; i++)
                   SizedBox(
                     width: itemWidth,
                     child: _SoftBasicCandidateCard(
-                      candidate: softBasicRound1Candidates[i],
+                      candidate: softBasicCircleRound2Candidates[i],
                       selected: i == selectedIndex,
                       card: widget.card,
                       fg: widget.fg,
@@ -645,7 +645,7 @@ class _SoftBasicCandidateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const shapes = [ShapeKind.circle, ShapeKind.square, ShapeKind.triangle];
+    const tones = [ShapeTone.pink, ShapeTone.blue, ShapeTone.yellow];
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -702,12 +702,12 @@ class _SoftBasicCandidateCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  for (final shape in shapes)
+                  for (final tone in tones)
                     _SoftBasicExactToken(
-                      shape: shape,
-                      tone: ShapeTone.blue,
+                      shape: ShapeKind.circle,
+                      tone: tone,
                       candidate: candidate,
-                      size: 46,
+                      size: 48,
                     ),
                 ],
               ),
@@ -741,7 +741,6 @@ class _SoftBasicDetailPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const shapes = [ShapeKind.circle, ShapeKind.square, ShapeKind.triangle];
     const tones = [ShapeTone.pink, ShapeTone.blue, ShapeTone.yellow];
     return _Panel(
       color: card,
@@ -760,7 +759,7 @@ class _SoftBasicDetailPanel extends StatelessWidget {
           Text(candidate.intent, style: TextStyle(color: muted, fontSize: 12)),
           const SizedBox(height: 14),
           Text(
-            '3 Shapes × 3 Colors · 58px APP EXACT',
+            'Circle · Pink / Blue / Yellow · 58px APP EXACT',
             style: TextStyle(
               color: fg,
               fontSize: 12,
@@ -768,30 +767,55 @@ class _SoftBasicDetailPanel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          Wrap(
-            spacing: 14,
-            runSpacing: 14,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              for (final shape in shapes)
-                for (final tone in tones)
-                  SizedBox(
-                    width: 76,
-                    child: Column(
-                      children: [
-                        _SoftBasicExactToken(
-                          shape: shape,
-                          tone: tone,
-                          candidate: candidate,
-                          size: 58,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          shape.label + '·' + tone.label,
-                          style: TextStyle(color: muted, fontSize: 9),
-                        ),
-                      ],
+              SizedBox(
+                width: 150,
+                child: Column(
+                  children: [
+                    _SoftBasicExactToken(
+                      shape: ShapeKind.circle,
+                      tone: ShapeTone.pink,
+                      candidate: candidate,
+                      size: 132,
                     ),
-                  ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Pink · enlarged',
+                      style: TextStyle(color: muted, fontSize: 10),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Wrap(
+                  spacing: 14,
+                  runSpacing: 14,
+                  children: [
+                    for (final tone in tones)
+                      SizedBox(
+                        width: 76,
+                        child: Column(
+                          children: [
+                            _SoftBasicExactToken(
+                              shape: ShapeKind.circle,
+                              tone: tone,
+                              candidate: candidate,
+                              size: 58,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              tone.label,
+                              style: TextStyle(color: muted, fontSize: 9),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ],
           ),
         ],
