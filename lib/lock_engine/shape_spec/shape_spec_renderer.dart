@@ -389,55 +389,163 @@ class ShapeSpecRenderer {
 
     canvas.restore();
 
-    if (config.edgeOpacity <= 0) return;
-
-    // The contour is drawn with the SAME crayon color, then repeated with
-    // tiny deterministic offsets. This is intentionally not a clean vector
-    // border: it mimics outlining the shape by hand before filling it in.
-    final edgeAlpha = config.edgeOpacity * opacity;
-    final edgeWidth = config.edgeWidth;
-    final contourColor = pressureDark;
-
-    void paintContour(
-      Offset delta,
-      double widthScale,
-      double alphaScale,
-    ) {
-      canvas.save();
-      canvas.translate(delta.dx, delta.dy);
-      canvas.drawPath(
-        bodyPath,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = edgeWidth * widthScale
-          ..strokeJoin = StrokeJoin.round
-          ..strokeCap = StrokeCap.round
-          ..color = contourColor.withValues(alpha: edgeAlpha * alphaScale),
-      );
-      canvas.restore();
+    if (config.edgeOpacity <= 0 ||
+        config.edgeMode == CrayonEdgeMode.none) {
+      return;
     }
 
-    paintContour(Offset.zero, 1.0, 0.74);
+    final edgeAlpha = config.edgeOpacity * opacity;
+    final contourColor = pressureDark;
+    final edgeRandom = Random(
+      _stableSeed(
+        '${style.id}:${token.id}:EDGE:${_crayonConfigKey(config)}',
+      ),
+    );
+    final metrics = bodyPath.computeMetrics().toList(growable: false);
 
-    if (config.edgeTexture > 0) {
-      final roughness = config.edgeTexture.clamp(0.0, 1.0);
-      final offset = 0.14 + roughness * 0.86;
-      final extraPasses = 1 + (roughness * 4).round();
+    Paint edgePaint({
+      double widthScale = 1.0,
+      double alphaScale = 1.0,
+    }) {
+      final widthJitter =
+          1 + (edgeRandom.nextDouble() - 0.5) * 2 * config.edgeWidthJitter;
+      final opacityJitter =
+          1 + (edgeRandom.nextDouble() - 0.5) * 2 * config.edgeOpacityJitter;
+      return Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = max(
+          0.45,
+          config.edgeWidth * widthScale * widthJitter,
+        )
+        ..strokeJoin = StrokeJoin.round
+        ..strokeCap = StrokeCap.round
+        ..color = contourColor.withValues(
+          alpha: (edgeAlpha * alphaScale * opacityJitter).clamp(0.0, 1.0),
+        );
+    }
 
-      const directions = <Offset>[
-        Offset(1.0, -0.24),
-        Offset(-0.70, 0.50),
-        Offset(0.26, 0.90),
-        Offset(-0.92, -0.20),
-        Offset(0.62, 0.54),
-      ];
+    void paintVectorEdge() {
+      canvas.drawPath(bodyPath, edgePaint(alphaScale: 0.72));
+    }
 
-      for (var i = 0; i < extraPasses; i++) {
-        final d = directions[i % directions.length];
-        final scale = i.isEven ? 0.90 : 0.74;
-        final alpha = i.isEven ? 0.30 : 0.22;
-        paintContour(d * offset, scale, alpha);
+    void paintBrokenEdge() {
+      for (final metric in metrics) {
+        var distance = edgeRandom.nextDouble() * config.edgeSegmentGap;
+        while (distance < metric.length) {
+          final segmentLength = config.edgeSegmentLength *
+              (0.62 + edgeRandom.nextDouble() * 0.72);
+          final gap =
+              config.edgeSegmentGap * (0.55 + edgeRandom.nextDouble() * 1.15);
+          final end = min(metric.length, distance + segmentLength);
+          if (end > distance + 0.2) {
+            final tangent = metric.getTangentForOffset((distance + end) / 2);
+            if (tangent != null) {
+              final normal = Offset(
+                -tangent.vector.dy,
+                tangent.vector.dx,
+              );
+              final offset = (edgeRandom.nextDouble() - 0.5) *
+                  2 *
+                  config.edgeOffsetJitter;
+              canvas.save();
+              canvas.translate(normal.dx * offset, normal.dy * offset);
+              canvas.drawPath(
+                metric.extractPath(distance, end),
+                edgePaint(alphaScale: 0.82),
+              );
+              canvas.restore();
+            }
+          }
+          distance = end + gap;
+        }
       }
+    }
+
+    void paintScribbleBand() {
+      for (final metric in metrics) {
+        final spacing = max(2.4, config.edgeSegmentLength * 0.72);
+        final count = max(6, (metric.length / spacing).ceil());
+        for (var i = 0; i < count; i++) {
+          final d = ((i + 0.25 + edgeRandom.nextDouble() * 0.5) / count) *
+              metric.length;
+          final tangent = metric.getTangentForOffset(d);
+          if (tangent == null) continue;
+          final unit = tangent.vector;
+          final normal = Offset(-unit.dy, unit.dx);
+          final bandOffset = (edgeRandom.nextDouble() - 0.5) *
+              2 *
+              config.edgeBandWidth;
+          final center = tangent.position + normal * bandOffset;
+          final halfLength = config.edgeSegmentLength *
+              (0.24 + edgeRandom.nextDouble() * 0.34);
+          final wobble =
+              (edgeRandom.nextDouble() - 0.5) * config.edgeOffsetJitter * 1.4;
+          final start =
+              center - unit * halfLength + normal * (wobble * 0.35);
+          final mid = center + normal * wobble;
+          final end =
+              center + unit * halfLength - normal * (wobble * 0.25);
+          final path = Path()
+            ..moveTo(start.dx, start.dy)
+            ..quadraticBezierTo(mid.dx, mid.dy, end.dx, end.dy);
+          canvas.drawPath(path, edgePaint(widthScale: 0.72, alphaScale: 0.66));
+        }
+      }
+    }
+
+    void paintOverfill() {
+      final angle = config.angleDeg * pi / 180;
+      final strokeDirection = Offset(cos(angle), sin(angle));
+      for (final metric in metrics) {
+        final spacing = max(3.0, config.edgeSegmentLength * 0.95);
+        final count = max(5, (metric.length / spacing).ceil());
+        for (var i = 0; i < count; i++) {
+          if (edgeRandom.nextDouble() < 0.22) continue;
+          final d = ((i + edgeRandom.nextDouble()) / count) * metric.length;
+          final tangent = metric.getTangentForOffset(d);
+          if (tangent == null) continue;
+          final normal = Offset(-tangent.vector.dy, tangent.vector.dx);
+          final outside = config.overflowAmount *
+              (0.45 + edgeRandom.nextDouble() * 0.95);
+          final center = tangent.position + normal * outside * 0.45;
+          final len = config.edgeSegmentLength *
+              (0.28 + edgeRandom.nextDouble() * 0.32);
+          final tilt = normal *
+              ((edgeRandom.nextDouble() - 0.5) *
+                  config.edgeOffsetJitter *
+                  1.5);
+          final start = center - strokeDirection * len + tilt;
+          final end = center + strokeDirection * len - tilt * 0.4;
+          final path = Path()
+            ..moveTo(start.dx, start.dy)
+            ..lineTo(end.dx, end.dy);
+          canvas.drawPath(
+            path,
+            edgePaint(widthScale: 0.60, alphaScale: 0.46),
+          );
+        }
+      }
+    }
+
+    switch (config.edgeMode) {
+      case CrayonEdgeMode.vector:
+        paintVectorEdge();
+        break;
+      case CrayonEdgeMode.none:
+        break;
+      case CrayonEdgeMode.broken:
+        paintBrokenEdge();
+        break;
+      case CrayonEdgeMode.scribble:
+        paintScribbleBand();
+        break;
+      case CrayonEdgeMode.overfill:
+        paintOverfill();
+        break;
+      case CrayonEdgeMode.hybrid:
+        paintBrokenEdge();
+        paintOverfill();
+        break;
     }
   }
 
@@ -686,6 +794,14 @@ class ShapeSpecRenderer {
       config.toneVariation,
       config.edgeWidth,
       config.edgeTexture,
+      config.edgeMode.name,
+      config.edgeSegmentLength,
+      config.edgeSegmentGap,
+      config.edgeOffsetJitter,
+      config.edgeWidthJitter,
+      config.edgeOpacityJitter,
+      config.edgeBandWidth,
+      config.overflowAmount,
     ].join(':');
   }
 
