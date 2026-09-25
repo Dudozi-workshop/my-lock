@@ -32,6 +32,8 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
   int _objectCount = 9;
   MovementStyle _movementStyle = MovementStyle.underwater;
   bool _darkBackground = false;
+  bool _grade2Idle = true;
+  double _labElapsedSeconds = 0;
 
   @override
   void initState() {
@@ -57,7 +59,9 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
             Duration.microsecondsPerSecond;
     _previous = elapsed;
     if (delta > 0) {
-      _engine.step(delta.clamp(0.0, 0.035).toDouble());
+      final safeDelta = delta.clamp(0.0, 0.035).toDouble();
+      _labElapsedSeconds += safeDelta;
+      _engine.step(safeDelta);
       setState(() {});
     }
   }
@@ -177,6 +181,12 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
             ),
           const SizedBox(width: 6),
           FilterChip(
+            label: const Text('Grade 2 idle'),
+            selected: _grade2Idle,
+            onSelected: (value) =>
+                setState(() => _grade2Idle = value),
+          ),
+          FilterChip(
             label: const Text('Dark BG'),
             selected: _darkBackground,
             onSelected: (value) =>
@@ -246,7 +256,7 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
           ),
           const SizedBox(height: 4),
           Text(
-            'Current FloatingEngine radius, collision and motion are used. The Circle token is physics-only inside this lab.',
+            'Current FloatingEngine translation/collision is used. Sea Turtle applies a shape-specific Grade 2 idle layer: very small bob + restrained tilt, with no tap animation.',
             style: TextStyle(color: subInk, fontSize: 12),
           ),
           const SizedBox(height: 14),
@@ -294,6 +304,8 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
                         _SeaTurtleRuntimeObject(
                           key: ValueKey(object.id),
                           object: object,
+                          elapsedSeconds: _labElapsedSeconds,
+                          grade2Idle: _grade2Idle,
                         ),
                     ],
                   ),
@@ -343,21 +355,39 @@ class _SeaTurtleRuntimeObject extends StatelessWidget {
   const _SeaTurtleRuntimeObject({
     super.key,
     required this.object,
+    required this.elapsedSeconds,
+    required this.grade2Idle,
   });
 
   final FloatingObject object;
+  final double elapsedSeconds;
+  final bool grade2Idle;
 
   @override
   Widget build(BuildContext context) {
     final side = object.radius * 2.34;
+
+    // Grade 2: calm, always-on motion only.
+    // Geometry is never redrawn. The exact same locked sprite is transformed.
+    final phase = elapsedSeconds * (2 * pi / 3.6) + object.id * 0.73;
+    final bob = grade2Idle ? sin(phase) * side * 0.006 : 0.0;
+
+    // The shared underwater engine can rotate generic tokens by about ±0.22 rad.
+    // Sea Turtle intentionally damps that strongly to preserve the Long Flipper pose.
+    final engineTilt = grade2Idle ? object.rotation * 0.10 : 0.0;
+    final microTilt = grade2Idle
+        ? sin(elapsedSeconds * (2 * pi / 5.4) + object.id * 1.11) * 0.010
+        : 0.0;
+    final turtleRotation = engineTilt + microTilt;
+
     return Positioned(
       left: object.position.dx - side / 2,
-      top: object.position.dy - side / 2,
+      top: object.position.dy - side / 2 + bob,
       width: side,
       height: side,
       child: IgnorePointer(
         child: Transform.rotate(
-          angle: object.rotation,
+          angle: turtleRotation,
           child: _TurtleAsset(
             tone: object.token.tone,
             size: side,
