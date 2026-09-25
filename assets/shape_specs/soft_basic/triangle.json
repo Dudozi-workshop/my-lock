@@ -1,0 +1,65 @@
+{
+  "styleId": "soft_basic",
+  "shapeId": "triangle",
+  "version": 1,
+  "body": {
+    "kind": "roundedPolygon",
+    "cornerRadius": 8,
+    "points": [
+      [50, 13],
+      [86, 80],
+      [14, 80]
+    ]
+  },
+  "layers": [
+    {
+      "id": "light",
+      "role": "light",
+      "opacity": 0.22,
+      "blur": 4.5,
+      "rotationDeg": -42,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 36,
+        "cy": 39,
+        "rx": 22,
+        "ry": 10
+      }
+    },
+    {
+      "id": "shade",
+      "role": "shade",
+      "opacity": 0.13,
+      "blur": 6.0,
+      "rotationDeg": 22,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 63,
+        "cy": 67,
+        "rx": 25,
+        "ry": 14
+      }
+    },
+    {
+      "id": "spec",
+      "role": "spec",
+      "opacity": 0.56,
+      "blur": 0.65,
+      "rotationDeg": -58,
+      "geometry": {
+        "kind": "roundRect",
+        "x": 28,
+        "y": 31,
+        "w": 17,
+        "h": 6,
+        "radius": 3
+      }
+    }
+  ],
+  "shadow": {
+    "opacity": 0.04,
+    "elevation": 2.0,
+    "offsetX": 0,
+    "offsetY": 1.0
+  }
+}
