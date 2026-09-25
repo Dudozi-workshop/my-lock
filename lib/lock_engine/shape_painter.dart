@@ -3,12 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'effects.dart';
-import 'dolphin_mask_canvas.dart';
-import 'dolphin_sprite_cache.dart';
-import 'dolphin_sprite_renderer.dart';
-import 'dolphin_tripo_baked_cache.dart';
-import 'dolphin_tripo_baked_renderer.dart';
-import 'dolphin_visual_renderer_v2.dart';
+import 'dolphin_baked_only_cache.dart';
+import 'dolphin_baked_only_renderer.dart';
 import 'models.dart';
 import 'shape_geometry.dart';
 
@@ -18,11 +14,7 @@ class LockTokenPainter extends CustomPainter {
     this.texture = ShapeTexture.glossy,
     this.blueprintOverride,
     this.accentLightness = 0.48,
-  }) : super(repaint: Listenable.merge([
-          DolphinMaskCanvasCache.instance,
-          DolphinSpriteCache.instance,
-          DolphinTripoBakedCache.instance,
-        ]));
+  }) : super(repaint: DolphinBakedOnlyCache.instance);
 
   final LockToken token;
   final ShapeTexture texture;
@@ -39,40 +31,17 @@ class LockTokenPainter extends CustomPainter {
     final center = size.center(Offset.zero);
     final radius = size.shortestSide * 0.31;
 
-    // Production/App Exact uses the raster-mask dolphin. Shape Lab draft
-    // blueprints remain available for direct A/B comparison.
+    // Premium dolphin assets are baked-only. Runtime material/vector fallbacks
+    // are intentionally disabled so every color keeps the same silhouette.
     if (token.shape == ShapeKind.dolphin && blueprintOverride == null) {
-      final tripoPainted = paintDolphinTripoBaked(
+      paintDolphinBakedOnly(
         canvas,
         center: center,
         radius: radius,
         tone: token.tone,
-        texture: texture,
         opacity: 1,
       );
-      if (tripoPainted) return;
-
-      final spritePainted = paintDolphinSprite(
-        canvas,
-        center: center,
-        radius: radius,
-        tone: token.tone,
-        texture: texture,
-        opacity: 1,
-        animationPhase: 0,
-        animationSeed: 0,
-      );
-      if (spritePainted) return;
-
-      final painted = paintDolphinVisualV2(
-        canvas,
-        center: center,
-        radius: radius,
-        tone: token.tone,
-        texture: texture,
-        opacity: 1,
-      );
-      if (painted) return;
+      return;
     }
 
     final illustrated = blueprintOverride?.build(center, radius) ??
@@ -795,11 +764,7 @@ class FloatingShapePainter extends CustomPainter {
     required this.objects,
     this.popStyle = PopStyle.basicPop,
     this.texture = ShapeTexture.glossy,
-  }) : super(repaint: Listenable.merge([
-          DolphinMaskCanvasCache.instance,
-          DolphinSpriteCache.instance,
-          DolphinTripoBakedCache.instance,
-        ]));
+  }) : super(repaint: DolphinBakedOnlyCache.instance);
 
   final List<FloatingObject> objects;
   final PopStyle popStyle;
@@ -860,46 +825,15 @@ class FloatingShapePainter extends CustomPainter {
     canvas.translate(-object.position.dx, -object.position.dy);
 
     if (object.token.shape == ShapeKind.dolphin) {
-      final tripoPainted = paintDolphinTripoBaked(
+      paintDolphinBakedOnly(
         canvas,
         center: object.position,
         radius: radius,
         tone: object.token.tone,
-        texture: texture,
         opacity: opacity,
       );
-      if (tripoPainted) {
-        canvas.restore();
-        return;
-      }
-
-      final spritePainted = paintDolphinSprite(
-        canvas,
-        center: object.position,
-        radius: radius,
-        tone: object.token.tone,
-        texture: texture,
-        opacity: opacity,
-        animationPhase: object.spritePhase,
-        animationSeed: object.id,
-      );
-      if (spritePainted) {
-        canvas.restore();
-        return;
-      }
-
-      final painted = paintDolphinVisualV2(
-        canvas,
-        center: object.position,
-        radius: radius,
-        tone: object.token.tone,
-        texture: texture,
-        opacity: opacity,
-      );
-      if (painted) {
-        canvas.restore();
-        return;
-      }
+      canvas.restore();
+      return;
     }
 
     final illustrated = buildIllustratedShapeGeometry(
