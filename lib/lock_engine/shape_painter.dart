@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,7 @@ class LockTokenPainter extends CustomPainter {
     this.texture = ShapeTexture.glossy,
     this.blueprintOverride,
     this.accentLightness = 0.48,
+    this.effectPhase,
   });
 
   final LockToken token;
@@ -24,6 +26,10 @@ class LockTokenPainter extends CustomPainter {
 
   /// Blend amount toward white for ShapePartRole.accent.
   final double accentLightness;
+
+  /// Optional 0..1 animation phase for premium color surface behavior.
+  /// Null keeps normal app rendering static and unchanged.
+  final double? effectPhase;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -41,6 +47,7 @@ class LockTokenPainter extends CustomPainter {
         texture: texture,
         opacity: 1,
         accentLightness: accentLightness,
+        effectPhase: effectPhase,
       );
       return;
     }
@@ -55,6 +62,7 @@ class LockTokenPainter extends CustomPainter {
       tone: token.tone,
       texture: texture,
       opacity: 1,
+      effectPhase: effectPhase,
     );
   }
 
@@ -63,7 +71,8 @@ class LockTokenPainter extends CustomPainter {
       oldDelegate.token.id != token.id ||
       oldDelegate.texture != texture ||
       oldDelegate.blueprintOverride != blueprintOverride ||
-      oldDelegate.accentLightness != accentLightness;
+      oldDelegate.accentLightness != accentLightness ||
+      oldDelegate.effectPhase != effectPhase;
 }
 
 Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
@@ -195,6 +204,10 @@ Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
       return (const Color(0xFF5A5A64), const Color(0xFF17171D));
     case ShapeTone.white:
       return (const Color(0xFFFFFFFF), const Color(0xFFD9D9E2));
+    case ShapeTone.dawnDew:
+      return (const Color(0xFF9FE8E8), const Color(0xFF58A9D8));
+    case ShapeTone.fireflyLight:
+      return (const Color(0xFF8EDB61), const Color(0xFF214F2B));
   }
 }
 
@@ -207,6 +220,7 @@ void _paintStyledShape(
   required ShapeTone tone,
   required ShapeTexture texture,
   required double opacity,
+  double? effectPhase,
 }) {
   final colors = _tokenToneColors(tone);
   final bounds = Rect.fromCircle(center: center, radius: radius);
@@ -360,6 +374,18 @@ void _paintStyledShape(
 
   canvas.drawPath(path, fill);
 
+  if (effectPhase != null) {
+    _paintToneMotionEffect(
+      canvas,
+      path: path,
+      bounds: bounds,
+      radius: radius,
+      tone: tone,
+      phase: effectPhase,
+      opacity: opacity,
+    );
+  }
+
   final borderColor = tone == ShapeTone.white
       ? const Color(0xFFB9B9C4)
       : Colors.white;
@@ -390,6 +416,139 @@ void _paintStyledShape(
   }
 }
 
+
+
+void _paintToneMotionEffect(
+  Canvas canvas, {
+  required Path path,
+  required Rect bounds,
+  required double radius,
+  required ShapeTone tone,
+  required double phase,
+  required double opacity,
+}) {
+  final t = phase % 1.0;
+  if (tone != ShapeTone.dawnDew && tone != ShapeTone.fireflyLight) return;
+
+  if (tone == ShapeTone.dawnDew) {
+    canvas.save();
+    canvas.clipPath(path);
+    final sweepX = bounds.left - radius * .55 +
+        (bounds.width + radius * 1.10) * t;
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(sweepX, bounds.center.dy - radius * .12),
+        width: radius * .42,
+        height: bounds.height * 1.45,
+      ),
+      Paint()
+        ..blendMode = BlendMode.screen
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, radius * .12)
+        ..color = const Color(0xFFDDFBFF).withValues(alpha: .34 * opacity),
+    );
+    for (var i = 0; i < 2; i++) {
+      final angle = 2 * pi * (t + i * .46);
+      final point = bounds.center +
+          Offset(cos(angle) * radius * .50, sin(angle) * radius * .34);
+      canvas.drawCircle(
+        point,
+        max(1.0, radius * .075),
+        Paint()
+          ..blendMode = BlendMode.screen
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, radius * .045)
+          ..color = Colors.white.withValues(alpha: .68 * opacity),
+      );
+    }
+    canvas.restore();
+    return;
+  }
+
+  // Firefly Light: three nearby fireflies wander between deterministic
+  // pseudo-random waypoints. The motion is intentionally non-orbital:
+  // direction, distance and speed vary smoothly like real insects, while the
+  // sequence stays deterministic and allocation-free inside paint().
+  const fireflyCount = 3;
+  const waypointCount = 11;
+
+  double hash01(int value) {
+    final x = sin(value * 12.9898 + 78.233) * 43758.5453;
+    return x - x.floorToDouble();
+  }
+
+  double smoothstep(double x) => x * x * (3 - 2 * x);
+
+  Offset waypoint(int firefly, int index) {
+    final wrapped = index % waypointCount;
+    final seed = firefly * 97 + wrapped * 31;
+    final nx = hash01(seed + 11) * 2 - 1;
+    final ny = hash01(seed + 29) * 2 - 1;
+    final extentX = bounds.width * (.62 + hash01(seed + 41) * .16);
+    final extentY = bounds.height * (.64 + hash01(seed + 53) * .18);
+    var point = bounds.center + Offset(nx * extentX, ny * extentY);
+
+    // Keep the firefly itself outside the token. If a random waypoint lands
+    // inside the silhouette, push it outward along the center vector.
+    if (path.contains(point)) {
+      var vector = point - bounds.center;
+      if (vector.distance < .001) vector = const Offset(1, 0);
+      point = bounds.center +
+          vector / vector.distance * (radius * (1.10 + hash01(seed + 67) * .26));
+    }
+    return point;
+  }
+
+  for (var i = 0; i < fireflyCount; i++) {
+    final local = (t + i * .173) % 1.0;
+    final travel = local * waypointCount;
+    final segment = travel.floor();
+    final segmentT = smoothstep(travel - segment);
+    final a = waypoint(i, segment);
+    final b = waypoint(i, segment + 1);
+    final point = Offset.lerp(a, b, segmentT)!;
+
+    // Irregular bioluminescent pulse rather than a steady blink.
+    final pulseA = max(0.0, sin(2 * pi * (local * (2.1 + i * .27) + i * .19)));
+    final pulseB = max(0.0, sin(2 * pi * (local * (3.7 + i * .13) + .31)));
+    final pulse = pow((pulseA * .68 + pulseB * .32).clamp(0.0, 1.0), 2.2).toDouble();
+    final glow = radius * (.075 + .060 * pulse);
+
+    canvas.drawCircle(
+      point,
+      glow * 3.4,
+      Paint()
+        ..blendMode = BlendMode.screen
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, glow * 1.9)
+        ..color = const Color(0xFFFFDF54)
+            .withValues(alpha: (.16 + .48 * pulse) * opacity),
+    );
+    canvas.drawCircle(
+      point,
+      max(.9, glow * .58),
+      Paint()
+        ..color = const Color(0xFFFFF6A6)
+            .withValues(alpha: (.58 + .40 * pulse) * opacity),
+    );
+
+    // When a firefly passes close to the token, let its light softly spill
+    // across the glossy surface without turning into an internal particle.
+    final towardCenter = Offset(
+      point.dx + (bounds.center.dx - point.dx) * .30,
+      point.dy + (bounds.center.dy - point.dy) * .30,
+    );
+    canvas.save();
+    canvas.clipPath(path);
+    canvas.drawCircle(
+      towardCenter,
+      glow * 2.7,
+      Paint()
+        ..blendMode = BlendMode.screen
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, glow * 1.6)
+        ..color = const Color(0xFFFFED79)
+            .withValues(alpha: (.05 + .24 * pulse) * opacity),
+    );
+    canvas.restore();
+  }
+}
 
 // A round brilliant cut: a continuous table, a ring of angled crown facets,
 // and a thin directional girdle. Keep faces large enough to read at 58 px.
@@ -964,6 +1123,7 @@ void _paintIllustratedShape(
   required ShapeTexture texture,
   required double opacity,
   double accentLightness = 0.48,
+  double? effectPhase,
 }) {
   // First render the union silhouette through the existing material pipeline.
   // This keeps illustrated shapes visually consistent with the basic catalog.
@@ -975,6 +1135,7 @@ void _paintIllustratedShape(
     tone: tone,
     texture: texture,
     opacity: opacity,
+    effectPhase: effectPhase,
   );
 
   final colors = _tokenToneColors(tone);

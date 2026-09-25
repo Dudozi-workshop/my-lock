@@ -33,7 +33,8 @@ class ShapeLabPage extends StatefulWidget {
   State<ShapeLabPage> createState() => _ShapeLabPageState();
 }
 
-class _ShapeLabPageState extends State<ShapeLabPage> {
+class _ShapeLabPageState extends State<ShapeLabPage>
+    with SingleTickerProviderStateMixin {
   ShapeKind shape = ShapeKind.dolphin;
   ShapeTone tone = ShapeTone.blue;
   ShapeTexture texture = ShapeTexture.glossy;
@@ -54,6 +55,25 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
   double accentSize = 1.0;
   double accentY = 0.0;
   double accentLightness = 0.48;
+  late final AnimationController _effectController;
+
+  @override
+  void initState() {
+    super.initState();
+    _effectController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 8),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _effectController.dispose();
+    super.dispose();
+  }
+
+  bool get _isColorEffectPreview =>
+      tone == ShapeTone.dawnDew || tone == ShapeTone.fireflyLight;
 
   void resetDraft() {
     setState(() {
@@ -237,6 +257,184 @@ class _ShapeLabPageState extends State<ShapeLabPage> {
                           value: draftMode,
                           onChanged: (value) =>
                               setState(() => draftMode = value),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  _Panel(
+                    color: cardColor,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Drop 01 · 작은 바닷속 Palette Lab',
+                          style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '확정된 2D Soft 색상값을 브라우저에서 직접 렌더링 · 이미지 에셋 미사용',
+                          style: TextStyle(color: muted, fontSize: 13),
+                        ),
+                        const SizedBox(height: 16),
+                        LayoutBuilder(builder: (context, constraints) {
+                          final itemWidth = constraints.maxWidth < 720
+                              ? (constraints.maxWidth - 12) / 2
+                              : (constraints.maxWidth - 24) / 3;
+                          const colors = [
+                            ('Deep Ocean', '딥 오션 블루', Color(0xFF4F8EDB), '#4F8EDB'),
+                            ('Aqua Mint', '아쿠아 민트', Color(0xFF7CCFC4), '#7CCFC4'),
+                            ('Coral Red', '코랄 레드', Color(0xFFF7A7B5), '#F7A7B5'),
+                            ('Sand Gold', '샌드 골드', Color(0xFFEFD59A), '#EFD59A'),
+                            ('Jelly Violet', '젤리 바이올렛', Color(0xFFB9A7E8), '#B9A7E8'),
+                            ('Sea Orange', '씨 오렌지', Color(0xFFF7B385), '#F7B385'),
+                          ];
+                          return Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: [
+                              for (final entry in colors)
+                                SizedBox(
+                                  width: itemWidth,
+                                  child: _PaletteSwatch(
+                                    english: entry.$1,
+                                    korean: entry.$2,
+                                    color: entry.$3,
+                                    hex: entry.$4,
+                                    dark: darkBackground,
+                                  ),
+                                ),
+                            ],
+                          );
+                        }),
+                        const SizedBox(height: 12),
+                        _AuroraSeaSwatch(dark: darkBackground),
+                        const SizedBox(height: 12),
+                        Text(
+                          '명칭은 초기 기획명 유지 · HEX/Gradient는 2D Soft 보정안 사용',
+                          style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  _Panel(
+                    color: cardColor,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Drop 01 · 작은 물고기 Shape Master 후보',
+                          style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 4),
+                        Text('색상·애니메이션·이펙트 제외 · 동일 58×58 슬롯 · 실루엣 비교용',
+                          style: TextStyle(color: muted, fontSize: 13)),
+                        const SizedBox(height: 16),
+                        LayoutBuilder(builder: (context, constraints) {
+                          final width = constraints.maxWidth < 720
+                              ? (constraints.maxWidth - 12) / 2
+                              : (constraints.maxWidth - 24) / 3;
+                          return Wrap(
+                            spacing: 12, runSpacing: 12,
+                            children: [
+                              for (var i = 0; i < 6; i++)
+                                SizedBox(
+                                  width: width,
+                                  child: Column(children: [
+                                    SizedBox.square(
+                                      dimension: 132,
+                                      child: Center(child: Transform.scale(
+                                        scale: 2,
+                                        child: SizedBox.square(
+                                          dimension: 58,
+                                          child: CustomPaint(painter: _FishCandidatePainter(i)),
+                                        ),
+                                      )),
+                                    ),
+                                    Text(['01 타원형','02 세로형','03 삼각 체형','04 부채꼬리형','05 통통형','06 슬림 열대어형'][i],
+                                      style: TextStyle(color: textColor, fontWeight: FontWeight.w800)),
+                                  ]),
+                                ),
+                            ],
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  _Panel(
+                    color: cardColor,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Color Effect PoC · APP EXACT',
+                          style: TextStyle(
+                            color: textColor,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '실제 LockTokenPainter · Glossy · 58×58 · 원/세모/네모',
+                          style: TextStyle(color: muted, fontSize: 13),
+                        ),
+                        const SizedBox(height: 16),
+                        AnimatedBuilder(
+                          animation: _effectController,
+                          builder: (context, _) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                for (final kind in const [
+                                  ShapeKind.circle,
+                                  ShapeKind.triangle,
+                                  ShapeKind.square,
+                                ])
+                                  Column(
+                                    children: [
+                                      SizedBox.square(
+                                        dimension: 116,
+                                        child: Center(
+                                          child: Transform.scale(
+                                            scale: 2,
+                                            child: SizedBox.square(
+                                              dimension: 58,
+                                              child: _AnimatedColorToken(
+                                                shape: kind,
+                                                tone: tone,
+                                                background: pageColor,
+                                                phase: _effectController.value,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        kind.label,
+                                        style: TextStyle(
+                                          color: textColor,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                              ],
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          _isColorEffectPreview
+                              ? tone == ShapeTone.dawnDew
+                                  ? '새벽이슬: 굴절광 밴드 + 이슬 하이라이트가 Shape 내부에서 이동'
+                                  : '반딧불빛: 작은 황금 발광점이 Shape 내부에서 독립적으로 이동·점멸'
+                              : '색상에서 새벽이슬 또는 반딧불빛을 선택하면 애니메이션을 비교할 수 있습니다.',
+                          style: TextStyle(color: muted, fontSize: 12),
                         ),
                       ],
                     ),
@@ -880,6 +1078,35 @@ class _DraftTransform {
   final double offsetY;
 }
 
+
+class _AnimatedColorToken extends StatelessWidget {
+  const _AnimatedColorToken({
+    required this.shape,
+    required this.tone,
+    required this.background,
+    required this.phase,
+  });
+
+  final ShapeKind shape;
+  final ShapeTone tone;
+  final Color background;
+  final double phase;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: background,
+      child: CustomPaint(
+        painter: LockTokenPainter(
+          LockToken(shape: shape, tone: tone),
+          texture: ShapeTexture.glossy,
+          effectPhase: phase,
+        ),
+      ),
+    );
+  }
+}
+
 class _TokenPreview extends StatelessWidget {
   const _TokenPreview({
     required this.shape,
@@ -1250,6 +1477,143 @@ class _LabSlider extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+
+class _FishCandidatePainter extends CustomPainter {
+  const _FishCandidatePainter(this.variant);
+  final int variant;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()..color = const Color(0xFF72AEEA);
+    final outline = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.1
+      ..color = const Color(0xFF3979B9);
+    final cx = size.width * .47, cy = size.height * .50;
+    final specs = <List<double>>[
+      [31, 19, 13, 18], [25, 26, 13, 19], [30, 17, 18, 22],
+      [28, 19, 19, 27], [25, 23, 14, 18], [34, 14, 15, 20],
+    ];
+    final s = specs[variant];
+    final body = Rect.fromCenter(center: Offset(cx, cy), width: s[0], height: s[1]);
+    final bodyPath = Path()..addOval(body);
+    canvas.drawPath(bodyPath, p); canvas.drawPath(bodyPath, outline);
+
+    final tailX = body.right - 1;
+    final tail = Path()
+      ..moveTo(tailX, cy)
+      ..quadraticBezierTo(tailX + s[2], cy - s[3] * .58, tailX + s[2], cy - s[3] * .45)
+      ..quadraticBezierTo(tailX + s[2] * .55, cy, tailX + s[2], cy + s[3] * .45)
+      ..quadraticBezierTo(tailX + s[2], cy + s[3] * .58, tailX, cy)
+      ..close();
+    canvas.drawPath(tail, p); canvas.drawPath(tail, outline);
+
+    final fin = Path()
+      ..moveTo(cx - 2, body.top + 1)
+      ..quadraticBezierTo(cx + 4, body.top - 8 - variant % 2 * 2, cx + 9, body.top + 2)
+      ..close();
+    canvas.drawPath(fin, p); canvas.drawPath(fin, outline);
+
+    if (variant == 2 || variant == 5) {
+      final lower = Path()
+        ..moveTo(cx + 2, body.bottom - 1)
+        ..quadraticBezierTo(cx + 8, body.bottom + 7, cx + 11, body.bottom - 2)
+        ..close();
+      canvas.drawPath(lower, p); canvas.drawPath(lower, outline);
+    }
+
+    canvas.drawCircle(Offset(body.left + 7, cy - 3), 1.7, Paint()..color = const Color(0xFF173D69));
+  }
+
+  @override
+  bool shouldRepaint(covariant _FishCandidatePainter oldDelegate) => oldDelegate.variant != variant;
+}
+
+
+class _PaletteSwatch extends StatelessWidget {
+  const _PaletteSwatch({
+    required this.english,
+    required this.korean,
+    required this.color,
+    required this.hex,
+    required this.dark,
+  });
+
+  final String english;
+  final String korean;
+  final Color color;
+  final String hex;
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = dark ? Colors.white : const Color(0xFF171923);
+    final muted = dark ? const Color(0xFFAEB4C3) : const Color(0xFF6D7382);
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: dark ? const Color(0xFF343846) : const Color(0xFFE7E9EF)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 82,
+            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(10)),
+          ),
+          const SizedBox(height: 9),
+          Text(english, style: TextStyle(color: fg, fontWeight: FontWeight.w800)),
+          Text(korean, style: TextStyle(color: muted, fontSize: 12)),
+          const SizedBox(height: 3),
+          Text(hex, style: TextStyle(color: muted, fontSize: 12, fontFeatures: const [FontFeature.tabularFigures()])),
+        ],
+      ),
+    );
+  }
+}
+
+class _AuroraSeaSwatch extends StatelessWidget {
+  const _AuroraSeaSwatch({required this.dark});
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = dark ? Colors.white : const Color(0xFF171923);
+    final muted = dark ? const Color(0xFFAEB4C3) : const Color(0xFF6D7382);
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: dark ? const Color(0xFF343846) : const Color(0xFFE7E9EF)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 92,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              gradient: const LinearGradient(
+                colors: [Color(0xFFA7D8F7), Color(0xFF7FB8FF), Color(0xFFC7B6F3)],
+              ),
+            ),
+          ),
+          const SizedBox(height: 9),
+          Row(
+            children: [
+              Expanded(child: Text('Aurora Sea · 오로라 씨', style: TextStyle(color: fg, fontWeight: FontWeight.w800))),
+              Text('SIGNATURE', style: TextStyle(color: muted, fontSize: 11, fontWeight: FontWeight.w800)),
+            ],
+          ),
+          const SizedBox(height: 3),
+          Text('#A7D8F7 → #7FB8FF → #C7B6F3', style: TextStyle(color: muted, fontSize: 12)),
+        ],
+      ),
     );
   }
 }

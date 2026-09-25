@@ -30,7 +30,9 @@ enum ShapeTone {
   purple('퍼플', true),
   mint('민트', true),
   black('블랙', true),
-  white('화이트', true);
+  white('화이트', true),
+  dawnDew('새벽이슬', true),
+  fireflyLight('반딧불빛', true);
 
   const ShapeTone(this.label, this.premium);
 
