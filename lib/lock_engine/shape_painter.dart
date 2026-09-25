@@ -15,6 +15,7 @@ class LockTokenPainter extends CustomPainter {
     this.blueprintOverride,
     this.accentLightness = 0.48,
     this.effectPhase,
+    this.colorOverride,
   });
 
   final LockToken token;
@@ -30,6 +31,9 @@ class LockTokenPainter extends CustomPainter {
   /// Optional 0..1 animation phase for premium color surface behavior.
   /// Null keeps normal app rendering static and unchanged.
   final double? effectPhase;
+  /// Palette Lab only: render the production painter with an exact base color.
+  /// Normal app rendering leaves this null.
+  final Color? colorOverride;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -48,6 +52,7 @@ class LockTokenPainter extends CustomPainter {
         opacity: 1,
         accentLightness: accentLightness,
         effectPhase: effectPhase,
+        colorOverride: colorOverride,
       );
       return;
     }
@@ -63,6 +68,7 @@ class LockTokenPainter extends CustomPainter {
       texture: texture,
       opacity: 1,
       effectPhase: effectPhase,
+      colorOverride: colorOverride,
     );
   }
 
@@ -72,7 +78,8 @@ class LockTokenPainter extends CustomPainter {
       oldDelegate.texture != texture ||
       oldDelegate.blueprintOverride != blueprintOverride ||
       oldDelegate.accentLightness != accentLightness ||
-      oldDelegate.effectPhase != effectPhase;
+      oldDelegate.effectPhase != effectPhase ||
+      oldDelegate.colorOverride != colorOverride;
 }
 
 Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
@@ -188,6 +195,18 @@ Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
   }
 }
 
+(Color, Color) _colorsFor(ShapeTone tone, Color? override) {
+  if (override != null) {
+    final hsl = HSLColor.fromColor(override);
+    final shade = hsl
+        .withLightness((hsl.lightness - 0.20).clamp(0.0, 1.0))
+        .withSaturation((hsl.saturation + 0.06).clamp(0.0, 1.0))
+        .toColor();
+    return (override, shade);
+  }
+  return _tokenToneColors(tone);
+}
+
 (Color, Color) _tokenToneColors(ShapeTone tone) {
   switch (tone) {
     case ShapeTone.pink:
@@ -221,8 +240,9 @@ void _paintStyledShape(
   required ShapeTexture texture,
   required double opacity,
   double? effectPhase,
+  Color? colorOverride,
 }) {
-  final colors = _tokenToneColors(tone);
+  final colors = _colorsFor(tone, colorOverride);
   final bounds = Rect.fromCircle(center: center, radius: radius);
 
   if (texture == ShapeTexture.glass) {
@@ -1124,6 +1144,7 @@ void _paintIllustratedShape(
   required double opacity,
   double accentLightness = 0.48,
   double? effectPhase,
+  Color? colorOverride,
 }) {
   // First render the union silhouette through the existing material pipeline.
   // This keeps illustrated shapes visually consistent with the basic catalog.
@@ -1136,9 +1157,10 @@ void _paintIllustratedShape(
     texture: texture,
     opacity: opacity,
     effectPhase: effectPhase,
+    colorOverride: colorOverride,
   );
 
-  final colors = _tokenToneColors(tone);
+  final colors = _colorsFor(tone, colorOverride);
 
   // High-detail Shape Accent Map
   // --------------------------------
