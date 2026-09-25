@@ -152,7 +152,6 @@ class _LockModeScreenState extends State<LockModeScreen>
                     : (_canUseRecoveryPin ? 178 : 142),
                 requiredTokens: _controller.requiredTokens,
                 onTokenTap: _controller.tap,
-                seaTurtleRuntimePoc: true,
               ),
             ),
             Positioned(
