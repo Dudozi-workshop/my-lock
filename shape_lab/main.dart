@@ -47,8 +47,28 @@ class LabsPage extends StatefulWidget {
 }
 
 class _LabsPageState extends State<LabsPage> {
-  LabTab tab = LabTab.style;
+  LabTab tab = switch (Uri.base.queryParameters['lab']) {
+    'shape' => LabTab.shape,
+    'palette' => LabTab.palette,
+    'effect' => LabTab.effect,
+    'qa' => LabTab.qa,
+    _ => LabTab.style,
+  };
   bool dark = false;
+
+  void _setTab(LabTab next) {
+    setState(() => tab = next);
+    final query = Map<String, String>.from(Uri.base.queryParameters)
+      ..['lab'] = switch (next) {
+        LabTab.shape => 'shape',
+        LabTab.style => 'style',
+        LabTab.palette => 'palette',
+        LabTab.effect => 'effect',
+        LabTab.qa => 'qa',
+      };
+    final nextUri = Uri.base.replace(queryParameters: query);
+    SystemNavigator.routeInformationUpdated(uri: nextUri, replace: true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,27 +139,27 @@ class _LabsPageState extends State<LabsPage> {
                             _TabChip(
                               label: 'Shape Lab',
                               selected: tab == LabTab.shape,
-                              onTap: () => setState(() => tab = LabTab.shape),
+                              onTap: () => _setTab(LabTab.shape),
                             ),
                             _TabChip(
                               label: 'Style Lab',
                               selected: tab == LabTab.style,
-                              onTap: () => setState(() => tab = LabTab.style),
+                              onTap: () => _setTab(LabTab.style),
                             ),
                             _TabChip(
                               label: 'Palette Lab',
                               selected: tab == LabTab.palette,
-                              onTap: () => setState(() => tab = LabTab.palette),
+                              onTap: () => _setTab(LabTab.palette),
                             ),
                             _TabChip(
                               label: 'Effect Lab',
                               selected: tab == LabTab.effect,
-                              onTap: () => setState(() => tab = LabTab.effect),
+                              onTap: () => _setTab(LabTab.effect),
                             ),
                             _TabChip(
                               label: 'Runtime QA',
                               selected: tab == LabTab.qa,
-                              onTap: () => setState(() => tab = LabTab.qa),
+                              onTap: () => _setTab(LabTab.qa),
                             ),
                           ],
                         ),
@@ -349,10 +369,10 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
             muted: widget.muted,
           ),
           const SizedBox(height: 16),
-          Wrap(
+          const Wrap(
             spacing: 18,
             runSpacing: 12,
-            children: const [
+            children: [
               _SeaTurtlePreview(tone: ShapeTone.blue, label: 'Aqua Mint'),
               _SeaTurtlePreview(tone: ShapeTone.pink, label: 'Coral Pink'),
               _SeaTurtlePreview(tone: ShapeTone.yellow, label: 'Sand Beige'),
