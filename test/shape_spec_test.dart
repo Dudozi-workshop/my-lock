@@ -25,7 +25,7 @@ void main() {
     }
   });
 
-  test('Preview 002 circle uses authored raster masks', () async {
+  test('Preview 003 circle uses fixed authored lighting architecture', () async {
     await ShapeSpecRegistry.instance.load();
 
     final bundle = ShapeSpecRegistry.instance.resolve(
@@ -33,11 +33,23 @@ void main() {
       ShapeKind.circle,
     );
 
-    expect(bundle.shape.version, 3);
+    expect(bundle.shape.version, 4);
+    expect(bundle.shape.rotationMode, ShapeRotationMode.fixed);
+    expect(bundle.shape.surface.kind, 'radial');
     expect(bundle.shape.layers.length, 5);
     expect(
       bundle.shape.layers.every((layer) => layer.geometry.kind == 'mask'),
       isTrue,
+    );
+    expect(
+      bundle.shape.layers.map((layer) => layer.blend).toList(),
+      [
+        ShapeLayerBlend.softLight,
+        ShapeLayerBlend.multiply,
+        ShapeLayerBlend.screen,
+        ShapeLayerBlend.screen,
+        ShapeLayerBlend.screen,
+      ],
     );
 
     for (final layer in bundle.shape.layers) {

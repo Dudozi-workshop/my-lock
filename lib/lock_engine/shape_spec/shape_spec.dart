@@ -4,6 +4,10 @@ import '../models.dart';
 
 enum ShapeLayerRole { light, shade, spec }
 
+enum ShapeLayerBlend { normal, softLight, multiply, screen }
+
+enum ShapeRotationMode { rotateWithObject, fixed }
+
 class ShapeStyleSpec {
   const ShapeStyleSpec({
     required this.id,
@@ -63,6 +67,8 @@ class ShapeSpec {
     required this.shapeId,
     required this.version,
     required this.body,
+    required this.surface,
+    required this.rotationMode,
     required this.layers,
     required this.shadow,
   });
@@ -71,6 +77,8 @@ class ShapeSpec {
   final String shapeId;
   final int version;
   final ShapeGeometrySpec body;
+  final ShapeSurfaceSpec surface;
+  final ShapeRotationMode rotationMode;
   final List<ShapeLayerSpec> layers;
   final ShapeShadowSpec shadow;
 
@@ -80,6 +88,13 @@ class ShapeSpec {
       shapeId: json['shapeId'] as String,
       version: (json['version'] as num).toInt(),
       body: ShapeGeometrySpec.fromJson(json['body'] as Map<String, dynamic>),
+      surface: ShapeSurfaceSpec.fromJson(
+        (json['surface'] as Map<String, dynamic>?) ??
+            const <String, dynamic>{'kind': 'solid'},
+      ),
+      rotationMode: ShapeRotationMode.values.byName(
+        (json['rotationMode'] as String?) ?? 'rotateWithObject',
+      ),
       layers: [
         for (final value in json['layers'] as List<dynamic>)
           ShapeLayerSpec.fromJson(value as Map<String, dynamic>),
@@ -94,6 +109,7 @@ class ShapeLayerSpec {
   const ShapeLayerSpec({
     required this.id,
     required this.role,
+    required this.blend,
     required this.opacity,
     required this.blur,
     required this.rotationDeg,
@@ -102,6 +118,7 @@ class ShapeLayerSpec {
 
   final String id;
   final ShapeLayerRole role;
+  final ShapeLayerBlend blend;
   final double opacity;
   final double blur;
   final double rotationDeg;
@@ -111,12 +128,47 @@ class ShapeLayerSpec {
     return ShapeLayerSpec(
       id: json['id'] as String,
       role: ShapeLayerRole.values.byName(json['role'] as String),
+      blend: ShapeLayerBlend.values.byName(
+        (json['blend'] as String?) ?? 'normal',
+      ),
       opacity: (json['opacity'] as num).toDouble(),
       blur: (json['blur'] as num).toDouble(),
       rotationDeg: (json['rotationDeg'] as num?)?.toDouble() ?? 0,
       geometry: ShapeGeometrySpec.fromJson(
         json['geometry'] as Map<String, dynamic>,
       ),
+    );
+  }
+}
+
+
+class ShapeSurfaceSpec {
+  const ShapeSurfaceSpec({
+    required this.kind,
+    required this.centerX,
+    required this.centerY,
+    required this.radius,
+    required this.stops,
+  });
+
+  final String kind;
+  final double centerX;
+  final double centerY;
+  final double radius;
+  final List<double> stops;
+
+  factory ShapeSurfaceSpec.fromJson(Map<String, dynamic> json) {
+    return ShapeSurfaceSpec(
+      kind: (json['kind'] as String?) ?? 'solid',
+      centerX: (json['centerX'] as num?)?.toDouble() ?? -0.45,
+      centerY: (json['centerY'] as num?)?.toDouble() ?? -0.55,
+      radius: (json['radius'] as num?)?.toDouble() ?? 1.25,
+      stops: [
+        for (final value
+            in (json['stops'] as List<dynamic>? ??
+                const <dynamic>[0.0, 0.34, 0.74, 1.0]))
+          (value as num).toDouble(),
+      ],
     );
   }
 }
