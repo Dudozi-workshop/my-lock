@@ -304,7 +304,7 @@ const _candidates = <_CrayonCandidate>[
       strokeLengthMin: 0.66,
       strokeLengthMax: 0.99,
       gapChance: 0.055,
-      toneVariation: 0.0,
+      toneVariation: 0.035,
     ),
   ),
   _CrayonCandidate(
@@ -336,7 +336,7 @@ const _candidates = <_CrayonCandidate>[
       strokeLengthMin: 0.66,
       strokeLengthMax: 0.99,
       gapChance: 0.055,
-      toneVariation: 0.0,
+      toneVariation: 0.055,
     ),
   ),
   _CrayonCandidate(
@@ -368,7 +368,7 @@ const _candidates = <_CrayonCandidate>[
       strokeLengthMin: 0.60,
       strokeLengthMax: 0.98,
       gapChance: 0.07,
-      toneVariation: 0.0,
+      toneVariation: 0.085,
     ),
   ),
   _CrayonCandidate(
@@ -400,7 +400,7 @@ const _candidates = <_CrayonCandidate>[
       strokeLengthMin: 0.48,
       strokeLengthMax: 0.96,
       gapChance: 0.09,
-      toneVariation: 0.0,
+      toneVariation: 0.110,
     ),
   ),
   _CrayonCandidate(
@@ -432,7 +432,7 @@ const _candidates = <_CrayonCandidate>[
       strokeLengthMin: 0.78,
       strokeLengthMax: 1.00,
       gapChance: 0.025,
-      toneVariation: 0.0,
+      toneVariation: 0.025,
     ),
   ),
   _CrayonCandidate(
@@ -464,7 +464,7 @@ const _candidates = <_CrayonCandidate>[
       strokeLengthMin: 0.56,
       strokeLengthMax: 0.98,
       gapChance: 0.07,
-      toneVariation: 0.0,
+      toneVariation: 0.075,
     ),
   ),
 ];
@@ -528,7 +528,7 @@ class _CrayonStyleLabState extends State<CrayonStyleLab> {
         const SizedBox(height: 12),
         _SectionTitle(
           title: 'Crayon Soft · Round 7 · Original Color Lock',
-          subtitle: 'E04의 굵기와 구조는 유지하고 색상은 원본 Palette를 고정합니다. 후보 간 차이는 획 밀도·거칠기·외곽 손맛만 비교하며 색상 보정은 거의 사용하지 않습니다.',
+          subtitle: 'Round 7 재설계: 원본 Palette의 hue/saturation은 고정하되, 크레용 압력에 따른 명암 폭을 후보마다 분리해 실제 58px에서도 차이가 보이도록 합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
