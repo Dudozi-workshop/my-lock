@@ -312,14 +312,19 @@ class ShapeSpecRenderer {
     // Color-lock rule: Crayon Soft must preserve the exact palette identity.
     // Marks may move only a few lightness points to reveal wax pressure;
     // hue and saturation stay fixed across candidates.
+    // PREVIEW LAB FIX: Round 7 varied geometry/opacity while rendering nearly
+    // the same pigment over an opaque base, so every candidate collapsed to
+    // the same flat-looking result at 58 px. toneVariation now controls an
+    // actual lightness range while hue/saturation remain locked to the palette.
+    final variation = config.toneVariation.clamp(0.0, 0.18);
     final pressureDark = adjustTone(
       base,
-      lightnessDelta: -0.010,
+      lightnessDelta: -(0.022 + variation * 0.62),
       saturationDelta: 0.0,
     );
     final pressureLight = adjustTone(
       base,
-      lightnessDelta: 0.008,
+      lightnessDelta: 0.018 + variation * 0.52,
       saturationDelta: 0.0,
     );
 
@@ -375,7 +380,9 @@ class ShapeSpecRenderer {
     }
 
     final grainPaint = Paint()
-      ..color = base.withValues(alpha: config.grainOpacity * 0.42 * opacity);
+      ..color = pressureLight.withValues(
+        alpha: config.grainOpacity * 0.72 * opacity,
+      );
     for (final dot in texture.grain) {
       canvas.drawCircle(dot.center, dot.radius, grainPaint);
     }
@@ -389,7 +396,7 @@ class ShapeSpecRenderer {
     // border: it mimics outlining the shape by hand before filling it in.
     final edgeAlpha = config.edgeOpacity * opacity;
     final edgeWidth = config.edgeWidth;
-    final contourColor = base;
+    final contourColor = pressureDark;
 
     void paintContour(
       Offset delta,
