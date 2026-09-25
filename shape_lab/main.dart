@@ -230,12 +230,19 @@ class PaletteEntry {
     required this.ko,
     required this.color,
     required this.hex,
+    this.gradient,
+    this.effectLabel,
   });
 
   final String en;
   final String ko;
   final Color color;
   final String hex;
+  final List<Color>? gradient;
+  final String? effectLabel;
+
+  bool get hasGradient => gradient != null && gradient!.length >= 2;
+  bool get hasColorEffect => effectLabel != null;
 }
 
 const drop01Palette = [
@@ -275,6 +282,18 @@ const drop01Palette = [
     color: Color(0xFFF7B385),
     hex: '#F7B385',
   ),
+  PaletteEntry(
+    en: 'Aurora Sea',
+    ko: '오로라 씨',
+    color: Color(0xFF7FB8FF),
+    hex: '#A7D8F7 → #7FB8FF → #C7B6F3',
+    gradient: [
+      Color(0xFFA7D8F7),
+      Color(0xFF7FB8FF),
+      Color(0xFFC7B6F3),
+    ],
+    effectLabel: 'Slow Gradient Flow',
+  ),
 ];
 
 class PaletteLab extends StatefulWidget {
@@ -298,7 +317,6 @@ class PaletteLab extends StatefulWidget {
 class _PaletteLabState extends State<PaletteLab> {
   int selectedIndex = 0;
   ShapeKind previewShape = ShapeKind.dolphin;
-  bool colorMotion = false;
 
   @override
   Widget build(BuildContext context) {
@@ -351,32 +369,8 @@ class _PaletteLabState extends State<PaletteLab> {
                   );
                 },
               ),
-              const SizedBox(height: 14),
-              Container(
-                height: 94,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFFA7D8F7),
-                      Color(0xFF7FB8FF),
-                      Color(0xFFC7B6F3),
-                    ],
-                  ),
-                ),
-              ),
               const SizedBox(height: 6),
-              Text(
-                'Aurora Sea · 오로라 씨 · SIGNATURE',
-                style: TextStyle(
-                  color: widget.muted,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              Text(
-                '#A7D8F7 → #7FB8FF → #C7B6F3',
-                style: TextStyle(color: widget.muted, fontSize: 12),
+              Text('Signature Color도 동일 목록에서 선택해 실제 Shape 적용을 확인합니다.', style: TextStyle(color: widget.muted, fontSize: 12)),
               ),
             ],
           ),
@@ -426,8 +420,6 @@ class _PaletteLabState extends State<PaletteLab> {
               AnimatedBuilder(
                 animation: widget.effectController,
                 builder: (context, _) {
-                  final phase =
-                      colorMotion ? widget.effectController.value : null;
                   return Wrap(
                     spacing: 22,
                     runSpacing: 18,
@@ -435,29 +427,29 @@ class _PaletteLabState extends State<PaletteLab> {
                     children: [
                       LabeledPreview(
                         label: 'Large',
-                        child: TokenPreview(
+                        child: PaletteTokenPreview(
                           shape: previewShape,
-                          color: selected.color,
+                          entry: selected,
                           size: 180,
-                          effectPhase: phase,
+                          phase: widget.effectController.value,
                         ),
                       ),
                       LabeledPreview(
                         label: '100 px',
-                        child: TokenPreview(
+                        child: PaletteTokenPreview(
                           shape: previewShape,
-                          color: selected.color,
+                          entry: selected,
                           size: 100,
-                          effectPhase: phase,
+                          phase: widget.effectController.value,
                         ),
                       ),
                       LabeledPreview(
                         label: '58 px · APP',
-                        child: TokenPreview(
+                        child: PaletteTokenPreview(
                           shape: previewShape,
-                          color: selected.color,
+                          entry: selected,
                           size: 58,
-                          effectPhase: phase,
+                          phase: widget.effectController.value,
                         ),
                       ),
                     ],
@@ -467,17 +459,26 @@ class _PaletteLabState extends State<PaletteLab> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Switch(
-                    value: colorMotion,
-                    onChanged: (value) => setState(() => colorMotion = value),
+                  Icon(
+                    selected.hasColorEffect ? Icons.auto_awesome : Icons.circle_outlined,
+                    size: 18,
+                    color: widget.muted,
                   ),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Color 내부 효과 Preview · 주변 Particle은 Effect Lab에서 분리',
+                      selected.hasColorEffect
+                          ? 'Color Effect 자동 재생 · ${selected.effectLabel}'
+                          : 'Static Color · 별도 Color Effect 없음',
                       style: TextStyle(color: widget.muted),
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Shape 밖 Particle은 Effect Lab에서 분리 검수',
+                style: TextStyle(color: widget.muted, fontSize: 12),
               ),
             ],
           ),
@@ -523,7 +524,10 @@ class PaletteSwatch extends StatelessWidget {
             Container(
               height: 78,
               decoration: BoxDecoration(
-                color: entry.color,
+                color: entry.hasGradient ? null : entry.color,
+                gradient: entry.hasGradient
+                    ? LinearGradient(colors: entry.gradient!)
+                    : null,
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -540,6 +544,17 @@ class PaletteSwatch extends StatelessWidget {
               entry.hex,
               style: TextStyle(color: muted, fontSize: 12),
             ),
+            if (entry.hasColorEffect) ...[
+              const SizedBox(height: 4),
+              Text(
+                'EFFECT · ${entry.effectLabel}',
+                style: TextStyle(
+                  color: muted,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -744,6 +759,57 @@ class TokenPreview extends StatelessWidget {
           effectPhase: effectPhase,
         ),
       ),
+    );
+  }
+}
+
+
+class PaletteTokenPreview extends StatelessWidget {
+  const PaletteTokenPreview({
+    super.key,
+    required this.shape,
+    required this.entry,
+    required this.size,
+    required this.phase,
+  });
+
+  final ShapeKind shape;
+  final PaletteEntry entry;
+  final double size;
+  final double phase;
+
+  @override
+  Widget build(BuildContext context) {
+    final base = TokenPreview(
+      shape: shape,
+      color: entry.color,
+      size: size,
+    );
+
+    if (!entry.hasGradient) return base;
+
+    final shifted = (phase + 0.18) % 1.0;
+    return ShaderMask(
+      blendMode: BlendMode.modulate,
+      shaderCallback: (rect) {
+        return LinearGradient(
+          begin: Alignment(-1.2 + phase * 0.8, -0.9),
+          end: Alignment(1.0 + phase * 0.8, 0.9),
+          colors: [
+            entry.gradient![0],
+            entry.gradient![1],
+            entry.gradient![2],
+            entry.gradient![0],
+          ],
+          stops: [
+            0.0,
+            (0.30 + shifted * 0.12).clamp(0.0, 1.0),
+            (0.68 + shifted * 0.10).clamp(0.0, 1.0),
+            1.0,
+          ],
+        ).createShader(rect);
+      },
+      child: base,
     );
   }
 }
