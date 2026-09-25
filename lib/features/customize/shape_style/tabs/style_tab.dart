@@ -72,7 +72,7 @@ class StyleTab extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         const FreedomNote(
-          text: '스타일은 ShapeSpec 기반으로 적용됩니다. 현재는 Soft Basic만 활성화하며 후속 스타일은 동일 구조로 확장합니다.',
+          text: 'Soft Basic은 정교한 마스크 레이어를 사용하고, Crayon Soft는 하나의 절차형 재질을 모든 도형에 재사용합니다.',
         ),
       ],
     );

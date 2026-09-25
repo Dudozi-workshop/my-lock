@@ -1,0 +1,26 @@
+{
+  "id": "crayon_soft",
+  "version": 1,
+  "canvasSize": 100,
+  "shapeSourceId": "soft_basic",
+  "renderMode": "crayon",
+  "colorRules": {
+    "lightnessUp": 0.08,
+    "lightSaturationDelta": -0.03,
+    "lightnessDown": 0.11,
+    "shadeSaturationDelta": 0.02,
+    "specColor": "#FFFFFF"
+  },
+  "crayon": {
+    "darkStrokeCount": 34,
+    "lightStrokeCount": 18,
+    "grainCount": 30,
+    "strokeWidth": 1.35,
+    "angleDeg": -18,
+    "jitter": 2.6,
+    "darkOpacity": 0.17,
+    "lightOpacity": 0.16,
+    "grainOpacity": 0.18,
+    "edgeOpacity": 0.16
+  }
+}

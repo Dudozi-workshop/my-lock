@@ -8,18 +8,26 @@ enum ShapeLayerBlend { normal, softLight, multiply, screen }
 
 enum ShapeRotationMode { rotateWithObject, fixed }
 
+enum ShapeRenderMode { layered, crayon }
+
 class ShapeStyleSpec {
   const ShapeStyleSpec({
     required this.id,
     required this.version,
     required this.canvasSize,
     required this.colorRules,
+    required this.renderMode,
+    required this.shapeSourceId,
+    required this.crayon,
   });
 
   final String id;
   final int version;
   final double canvasSize;
   final ShapeColorRuleSpec colorRules;
+  final ShapeRenderMode renderMode;
+  final String? shapeSourceId;
+  final CrayonTextureSpec? crayon;
 
   factory ShapeStyleSpec.fromJson(Map<String, dynamic> json) {
     return ShapeStyleSpec(
@@ -29,6 +37,56 @@ class ShapeStyleSpec {
       colorRules: ShapeColorRuleSpec.fromJson(
         json['colorRules'] as Map<String, dynamic>,
       ),
+      renderMode: ShapeRenderMode.values.byName(
+        (json['renderMode'] as String?) ?? 'layered',
+      ),
+      shapeSourceId: json['shapeSourceId'] as String?,
+      crayon: json['crayon'] == null
+          ? null
+          : CrayonTextureSpec.fromJson(
+              json['crayon'] as Map<String, dynamic>,
+            ),
+    );
+  }
+}
+
+class CrayonTextureSpec {
+  const CrayonTextureSpec({
+    required this.darkStrokeCount,
+    required this.lightStrokeCount,
+    required this.grainCount,
+    required this.strokeWidth,
+    required this.angleDeg,
+    required this.jitter,
+    required this.darkOpacity,
+    required this.lightOpacity,
+    required this.grainOpacity,
+    required this.edgeOpacity,
+  });
+
+  final int darkStrokeCount;
+  final int lightStrokeCount;
+  final int grainCount;
+  final double strokeWidth;
+  final double angleDeg;
+  final double jitter;
+  final double darkOpacity;
+  final double lightOpacity;
+  final double grainOpacity;
+  final double edgeOpacity;
+
+  factory CrayonTextureSpec.fromJson(Map<String, dynamic> json) {
+    return CrayonTextureSpec(
+      darkStrokeCount: (json['darkStrokeCount'] as num).toInt(),
+      lightStrokeCount: (json['lightStrokeCount'] as num).toInt(),
+      grainCount: (json['grainCount'] as num).toInt(),
+      strokeWidth: (json['strokeWidth'] as num).toDouble(),
+      angleDeg: (json['angleDeg'] as num).toDouble(),
+      jitter: (json['jitter'] as num).toDouble(),
+      darkOpacity: (json['darkOpacity'] as num).toDouble(),
+      lightOpacity: (json['lightOpacity'] as num).toDouble(),
+      grainOpacity: (json['grainOpacity'] as num).toDouble(),
+      edgeOpacity: (json['edgeOpacity'] as num).toDouble(),
     );
   }
 }

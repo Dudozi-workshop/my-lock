@@ -25,19 +25,25 @@ class ShapeSpecRegistry {
       final styleSpec = await _loadJson(
         'assets/shape_specs/${style.assetId}/style.json',
       );
-      _styles[style] = ShapeStyleSpec.fromJson(styleSpec);
+      final parsedStyle = ShapeStyleSpec.fromJson(styleSpec);
+      _styles[style] = parsedStyle;
+      final shapeSourceId = parsedStyle.shapeSourceId ?? style.assetId;
 
       for (final shape in ShapeKind.values) {
         final shapeJson = await _loadJson(
-          'assets/shape_specs/${style.assetId}/${shape.name}.json',
+          'assets/shape_specs/$shapeSourceId/${shape.name}.json',
         );
         final spec = ShapeSpec.fromJson(shapeJson);
-        if (spec.styleId != style.assetId || spec.shapeId != shape.name) {
+        if (spec.styleId != shapeSourceId || spec.shapeId != shape.name) {
           throw StateError(
-            'ShapeSpec id mismatch: ${style.assetId}/${shape.name}',
+            'ShapeSpec id mismatch: $shapeSourceId/${shape.name}',
           );
         }
         _shapes[(style, shape)] = spec;
+
+        if (parsedStyle.renderMode != ShapeRenderMode.layered) {
+          continue;
+        }
 
         for (final layer in spec.layers) {
           if (layer.geometry.kind != 'mask') continue;

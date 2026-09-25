@@ -35,7 +35,8 @@ enum ShapeTone {
 }
 
 enum ShapeStyle {
-  softBasic('Soft Basic', false, 'soft_basic');
+  softBasic('Soft Basic', false, 'soft_basic'),
+  crayonSoft('Crayon Soft', false, 'crayon_soft');
 
   const ShapeStyle(this.label, this.premium, this.assetId);
 

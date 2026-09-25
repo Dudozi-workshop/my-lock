@@ -21,6 +21,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/shape_specs/soft_basic/
+    - assets/shape_specs/crayon_soft/
 
 flutter_launcher_icons:
   android: true

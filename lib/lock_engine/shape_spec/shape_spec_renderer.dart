@@ -9,6 +9,8 @@ import 'shape_spec_registry.dart';
 class ShapeSpecRenderer {
   const ShapeSpecRenderer._();
 
+  static final Map<String, _CrayonTextureGeometry> _crayonTextureCache = {};
+
   static void paintToken(
     Canvas canvas, {
     required Offset center,
@@ -34,6 +36,19 @@ class ShapeSpecRenderer {
     canvas.scale(scale, scale);
 
     final bodyPath = _pathFor(bundle.shape.body);
+
+    if (bundle.style.renderMode == ShapeRenderMode.crayon) {
+      _paintCrayonToken(
+        canvas,
+        bodyPath: bodyPath,
+        style: bundle.style,
+        token: token,
+        opacity: opacity,
+      );
+      canvas.restore();
+      return;
+    }
+
     final shadow = bundle.shape.shadow;
     if (shadow.opacity > 0) {
       canvas.save();
@@ -147,6 +162,179 @@ class ShapeSpecRenderer {
     canvas.restore();
 
     canvas.restore();
+  }
+
+  static void _paintCrayonToken(
+    Canvas canvas, {
+    required Path bodyPath,
+    required ShapeStyleSpec style,
+    required LockToken token,
+    required double opacity,
+  }) {
+    final config = style.crayon;
+    if (config == null) {
+      throw StateError('Crayon render mode requires crayon style config.');
+    }
+
+    final base = baseColorForTone(token.tone);
+    final fill = adjustTone(
+      base,
+      lightnessDelta: 0.015,
+      saturationDelta: -0.035,
+    );
+    final dark = adjustTone(
+      base,
+      lightnessDelta: -0.13,
+      saturationDelta: 0.025,
+    );
+    final light = adjustTone(
+      base,
+      lightnessDelta: 0.18,
+      saturationDelta: -0.055,
+    );
+
+    canvas.save();
+    canvas.translate(0.15, 0.75);
+    canvas.drawShadow(
+      bodyPath,
+      Colors.black.withValues(alpha: 0.035 * opacity),
+      1.5,
+      true,
+    );
+    canvas.restore();
+
+    canvas.drawPath(
+      bodyPath,
+      Paint()..color = fill.withValues(alpha: opacity),
+    );
+
+    final cacheKey = '${style.id}:${style.version}:${token.id}';
+    final texture = _crayonTextureCache.putIfAbsent(
+      cacheKey,
+      () => _buildCrayonTexture(config, cacheKey),
+    );
+
+    canvas.save();
+    canvas.clipPath(bodyPath);
+
+    final darkPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..strokeWidth = config.strokeWidth
+      ..color = dark.withValues(alpha: config.darkOpacity * opacity);
+
+    for (final path in texture.darkStrokes) {
+      canvas.drawPath(path, darkPaint);
+    }
+
+    final lightPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..strokeWidth = config.strokeWidth * 0.82
+      ..color = light.withValues(alpha: config.lightOpacity * opacity);
+
+    for (final path in texture.lightStrokes) {
+      canvas.drawPath(path, lightPaint);
+    }
+
+    final grainPaint = Paint()
+      ..color = light.withValues(alpha: config.grainOpacity * opacity);
+    for (final dot in texture.grain) {
+      canvas.drawCircle(dot.center, dot.radius, grainPaint);
+    }
+
+    canvas.restore();
+
+    final edgePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.15
+      ..strokeJoin = StrokeJoin.round
+      ..color = dark.withValues(alpha: config.edgeOpacity * opacity)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.3);
+    canvas.drawPath(bodyPath, edgePaint);
+
+    canvas.save();
+    canvas.translate(0.35, -0.2);
+    canvas.drawPath(
+      bodyPath,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.7
+        ..strokeJoin = StrokeJoin.round
+        ..color = light.withValues(alpha: config.edgeOpacity * 0.5 * opacity),
+    );
+    canvas.restore();
+  }
+
+  static _CrayonTextureGeometry _buildCrayonTexture(
+    CrayonTextureSpec config,
+    String seedText,
+  ) {
+    final random = Random(_stableSeed(seedText));
+
+    List<Path> buildStrokes(int count, double angleOffset) {
+      final angle = (config.angleDeg + angleOffset) * pi / 180;
+      final direction = Offset(cos(angle), sin(angle));
+      final normal = Offset(-direction.dy, direction.dx);
+      final strokes = <Path>[];
+
+      for (var i = 0; i < count; i++) {
+        final fraction = count <= 1 ? 0.5 : i / (count - 1);
+        final lane = -72 + fraction * 144 +
+            (random.nextDouble() - 0.5) * config.jitter * 1.8;
+        final path = Path();
+
+        for (var step = 0; step <= 14; step++) {
+          final travel = -86 + step * (172 / 14);
+          final wobble = (random.nextDouble() - 0.5) * config.jitter;
+          final alongWobble =
+              (random.nextDouble() - 0.5) * config.jitter * 0.45;
+          final point = const Offset(50, 50) +
+              direction * (travel + alongWobble) +
+              normal * (lane + wobble);
+          if (step == 0) {
+            path.moveTo(point.dx, point.dy);
+          } else {
+            path.lineTo(point.dx, point.dy);
+          }
+        }
+        strokes.add(path);
+      }
+      return strokes;
+    }
+
+    final darkStrokes = buildStrokes(config.darkStrokeCount, 0);
+    final lightStrokes = buildStrokes(config.lightStrokeCount, 9);
+
+    final grain = <_CrayonGrainDot>[];
+    for (var i = 0; i < config.grainCount; i++) {
+      grain.add(
+        _CrayonGrainDot(
+          Offset(
+            5 + random.nextDouble() * 90,
+            5 + random.nextDouble() * 90,
+          ),
+          0.22 + random.nextDouble() * 0.72,
+        ),
+      );
+    }
+
+    return _CrayonTextureGeometry(
+      darkStrokes: darkStrokes,
+      lightStrokes: lightStrokes,
+      grain: grain,
+    );
+  }
+
+  static int _stableSeed(String value) {
+    var hash = 0x811C9DC5;
+    for (final unit in value.codeUnits) {
+      hash ^= unit;
+      hash = (hash * 0x01000193) & 0x7FFFFFFF;
+    }
+    return hash;
   }
 
   static Path _pathFor(ShapeGeometrySpec geometry) {
@@ -329,4 +517,24 @@ class ShapeSpecRenderer {
     }
     return path..close();
   }
+}
+
+
+class _CrayonTextureGeometry {
+  const _CrayonTextureGeometry({
+    required this.darkStrokes,
+    required this.lightStrokes,
+    required this.grain,
+  });
+
+  final List<Path> darkStrokes;
+  final List<Path> lightStrokes;
+  final List<_CrayonGrainDot> grain;
+}
+
+class _CrayonGrainDot {
+  const _CrayonGrainDot(this.center, this.radius);
+
+  final Offset center;
+  final double radius;
 }
