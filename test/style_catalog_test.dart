@@ -7,7 +7,7 @@ import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/relock_policy.dart';
 
 void main() {
-  test('Soft Basic starts with the free 3x3 token catalog', () {
+  test('base catalog keeps the free 3x3 tokens and active styles', () {
     expect(
       ShapeKind.values,
       equals([
@@ -24,7 +24,13 @@ void main() {
         ShapeTone.yellow,
       ]),
     );
-    expect(ShapeStyle.values, equals([ShapeStyle.softBasic]));
+    expect(
+      ShapeStyle.values,
+      equals([
+        ShapeStyle.softBasic,
+        ShapeStyle.crayonSoft,
+      ]),
+    );
 
     final ids = <String>{
       for (final shape in ShapeKind.values)
