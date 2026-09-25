@@ -399,9 +399,9 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
 
 String _assetForTone(ShapeTone tone) {
   return switch (tone) {
-    ShapeTone.blue => 'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
-    ShapeTone.pink => 'assets/sea_turtle_runtime_v2/sea_turtle_pink.png',
-    ShapeTone.yellow => 'assets/sea_turtle_runtime_v2/sea_turtle_yellow.png',
+    ShapeTone.blue => 'assets/sea_turtle_runtime_v2/sea_turtle_blue.webp',
+    ShapeTone.pink => 'assets/sea_turtle_runtime_v2/sea_turtle_pink.webp',
+    ShapeTone.yellow => 'assets/sea_turtle_runtime_v2/sea_turtle_yellow.webp',
   };
 }
 
