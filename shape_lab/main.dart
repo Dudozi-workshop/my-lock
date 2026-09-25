@@ -92,7 +92,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 014 · Soft Basic R11 Ambient Bounce',
+                                  'LAB 015 · Soft Basic Square R1',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -895,10 +895,19 @@ class _SoftBasicCandidateLab extends StatefulWidget {
 
 class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
   int selectedIndex = 0;
+  bool squareMode = true;
 
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
+    if (squareMode) {
+      return _SoftBasicSquareRound1(
+        card: widget.card,
+        fg: widget.fg,
+        muted: widget.muted,
+        onBackToCircle: () => setState(() => squareMode = false),
+      );
+    }
     final selected = softBasicCircleRound11Candidates[selectedIndex];
 
     return Column(
@@ -946,6 +955,470 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
         ),
       ],
     );
+  }
+}
+
+
+class _SoftBasicSquareRound1 extends StatefulWidget {
+  const _SoftBasicSquareRound1({
+    required this.card,
+    required this.fg,
+    required this.muted,
+    required this.onBackToCircle,
+  });
+
+  final Color card;
+  final Color fg;
+  final Color muted;
+  final VoidCallback onBackToCircle;
+
+  @override
+  State<_SoftBasicSquareRound1> createState() => _SoftBasicSquareRound1State();
+}
+
+class _SoftBasicSquareRound1State extends State<_SoftBasicSquareRound1> {
+  int selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < 700;
+    final selected = softBasicSquareRound1Candidates[selectedIndex];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SectionTitle(
+          title: 'Soft Basic · Square · Round 1',
+          subtitle: 'Circle Master의 Color Shell · Edge Leaf · Ambient Bounce 디자인 언어를 Square에 맞게 이식합니다. 코너·하이라이트·하단 볼륨만 비교합니다.',
+          fg: widget.fg,
+          muted: widget.muted,
+        ),
+        const SizedBox(height: 10),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: widget.onBackToCircle,
+            icon: const Icon(Icons.check_circle_outline, size: 16),
+            label: const Text('Circle Master R11-01 보기'),
+          ),
+        ),
+        const SizedBox(height: 8),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final columns = constraints.maxWidth >= 980 ? 3 : 2;
+            final gap = compact ? 8.0 : 12.0;
+            final itemWidth =
+                (constraints.maxWidth - gap * (columns - 1)) / columns;
+            return Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                for (var i = 0; i < softBasicSquareRound1Candidates.length; i++)
+                  SizedBox(
+                    width: itemWidth,
+                    child: _SoftBasicSquareCandidateCard(
+                      candidate: softBasicSquareRound1Candidates[i],
+                      selected: i == selectedIndex,
+                      card: widget.card,
+                      fg: widget.fg,
+                      muted: widget.muted,
+                      onTap: () => setState(() => selectedIndex = i),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 14),
+        _Panel(
+          color: widget.card,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                selected.id + ' · ' + selected.name,
+                style: TextStyle(
+                  color: widget.fg,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                selected.intent,
+                style: TextStyle(color: widget.muted, fontSize: 12),
+              ),
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 18,
+                runSpacing: 14,
+                children: [
+                  for (final tone in const [
+                    ShapeTone.pink,
+                    ShapeTone.blue,
+                    ShapeTone.yellow,
+                  ])
+                    Column(
+                      children: [
+                        _SoftBasicSquareExactToken(
+                          tone: tone,
+                          candidate: selected,
+                          size: 96,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          tone.label,
+                          style: TextStyle(
+                            color: widget.muted,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '58px APP EXACT',
+                style: TextStyle(
+                  color: widget.fg,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 12,
+                children: [
+                  for (final tone in const [
+                    ShapeTone.pink,
+                    ShapeTone.blue,
+                    ShapeTone.yellow,
+                  ])
+                    _SoftBasicSquareExactToken(
+                      tone: tone,
+                      candidate: selected,
+                      size: 58,
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SoftBasicSquareCandidateCard extends StatelessWidget {
+  const _SoftBasicSquareCandidateCard({
+    required this.candidate,
+    required this.selected,
+    required this.card,
+    required this.fg,
+    required this.muted,
+    required this.onTap,
+  });
+
+  final SoftBasicSquareCandidate candidate;
+  final bool selected;
+  final Color card;
+  final Color fg;
+  final Color muted;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          height: 176,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: card,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: selected
+                  ? const Color(0xFF7257F5)
+                  : const Color(0xFFE6E3EE),
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      candidate.id,
+                      style: TextStyle(
+                        color: fg,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  if (candidate.badge != null)
+                    Text(
+                      candidate.badge!,
+                      style: const TextStyle(
+                        color: Color(0xFF7257F5),
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                ],
+              ),
+              Text(
+                candidate.name,
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const Spacer(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  for (final tone in const [
+                    ShapeTone.pink,
+                    ShapeTone.blue,
+                    ShapeTone.yellow,
+                  ])
+                    _SoftBasicSquareExactToken(
+                      tone: tone,
+                      candidate: candidate,
+                      size: 58,
+                    ),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                candidate.intent,
+                style: TextStyle(
+                  color: muted,
+                  fontSize: 9.5,
+                  height: 1.2,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SoftBasicSquareExactToken extends StatelessWidget {
+  const _SoftBasicSquareExactToken({
+    required this.tone,
+    required this.candidate,
+    required this.size,
+  });
+
+  final ShapeTone tone;
+  final SoftBasicSquareCandidate candidate;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(
+        painter: _SoftBasicSquareCandidatePainter(
+          tone: tone,
+          candidate: candidate,
+        ),
+      ),
+    );
+  }
+}
+
+class _SoftBasicSquareCandidatePainter extends CustomPainter {
+  const _SoftBasicSquareCandidatePainter({
+    required this.tone,
+    required this.candidate,
+  });
+
+  final ShapeTone tone;
+  final SoftBasicSquareCandidate candidate;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final base = baseColorForTone(tone);
+    final light = adjustTone(
+      base,
+      lightnessDelta: tone == ShapeTone.yellow ? 0.10 : 0.16,
+      saturationDelta: -0.04,
+    );
+    final deep = adjustTone(
+      base,
+      lightnessDelta: tone == ShapeTone.yellow ? -0.10 : -0.13,
+      saturationDelta: 0.02,
+    );
+    final bounce = adjustTone(
+      base,
+      lightnessDelta: tone == ShapeTone.yellow ? 0.075 : 0.11,
+      saturationDelta: -0.025,
+    );
+
+    final inset = size.shortestSide * 0.07;
+    final rect = Rect.fromLTWH(
+      inset,
+      inset,
+      size.width - inset * 2,
+      size.height - inset * 2,
+    );
+
+    final radiusFactor = switch (candidate.technique) {
+      SoftBasicSquareTechnique.softerCorner => 0.31,
+      SoftBasicSquareTechnique.tighterCorner => 0.20,
+      _ => 0.26,
+    };
+    final rrect = RRect.fromRectAndRadius(
+      rect,
+      Radius.circular(rect.width * radiusFactor),
+    );
+    final bodyPath = Path()..addRRect(rrect);
+
+    canvas.drawShadow(
+      bodyPath,
+      Colors.black.withValues(alpha: 0.035),
+      size.shortestSide * 0.035,
+      true,
+    );
+
+    canvas.drawRRect(
+      rrect,
+      Paint()..color = deep.withValues(alpha: 0.28),
+    );
+    final inner = RRect.fromRectAndRadius(
+      rect.deflate(rect.width * 0.015),
+      Radius.circular(rect.width * radiusFactor * 0.97),
+    );
+    canvas.drawRRect(inner, Paint()..color = base);
+
+    canvas.save();
+    canvas.clipRRect(inner);
+
+    canvas.drawCircle(
+      Offset(
+        rect.left + rect.width * 0.28,
+        rect.top + rect.height * 0.27,
+      ),
+      rect.width * 0.40,
+      Paint()
+        ..color = light.withValues(alpha: 0.46)
+        ..maskFilter = MaskFilter.blur(
+          BlurStyle.normal,
+          size.shortestSide * 0.18,
+        ),
+    );
+
+    canvas.drawCircle(
+      Offset(
+        rect.right - rect.width * 0.17,
+        rect.bottom - rect.height * 0.15,
+      ),
+      rect.width * 0.42,
+      Paint()
+        ..color = deep.withValues(alpha: 0.34)
+        ..maskFilter = MaskFilter.blur(
+          BlurStyle.normal,
+          size.shortestSide * 0.22,
+        ),
+    );
+
+    final bounceAlpha =
+        candidate.technique == SoftBasicSquareTechnique.strongerBounce
+            ? 0.22
+            : 0.16;
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(
+          rect.left + rect.width * 0.56,
+          rect.top + rect.height * 0.79,
+        ),
+        width: rect.width * 0.76,
+        height: rect.height * 0.30,
+      ),
+      Paint()
+        ..color = bounce.withValues(alpha: bounceAlpha)
+        ..maskFilter = MaskFilter.blur(
+          BlurStyle.normal,
+          size.shortestSide * 0.10,
+        ),
+    );
+
+    canvas.restore();
+
+    final wide =
+        candidate.technique == SoftBasicSquareTechnique.wideHighlight;
+    final compact =
+        candidate.technique == SoftBasicSquareTechnique.compactHighlight;
+
+    final highlight = Path()
+      ..moveTo(
+        rect.left + rect.width * 0.12,
+        rect.top + rect.height * (wide ? 0.39 : 0.36),
+      )
+      ..cubicTo(
+        rect.left + rect.width * 0.12,
+        rect.top + rect.height * 0.23,
+        rect.left + rect.width * (compact ? 0.20 : 0.18),
+        rect.top + rect.height * 0.13,
+        rect.left + rect.width * (compact ? 0.27 : 0.30),
+        rect.top + rect.height * 0.11,
+      )
+      ..cubicTo(
+        rect.left + rect.width * (compact ? 0.32 : 0.39),
+        rect.top + rect.height * 0.10,
+        rect.left + rect.width * (compact ? 0.34 : 0.42),
+        rect.top + rect.height * 0.16,
+        rect.left + rect.width * (compact ? 0.31 : 0.39),
+        rect.top + rect.height * 0.22,
+      )
+      ..cubicTo(
+        rect.left + rect.width * (compact ? 0.27 : 0.34),
+        rect.top + rect.height * 0.29,
+        rect.left + rect.width * 0.18,
+        rect.top + rect.height * (wide ? 0.43 : 0.40),
+        rect.left + rect.width * 0.12,
+        rect.top + rect.height * (wide ? 0.39 : 0.36),
+      )
+      ..close();
+
+    canvas.drawPath(
+      highlight,
+      Paint()
+        ..color = Colors.white.withValues(alpha: 0.18)
+        ..maskFilter = MaskFilter.blur(
+          BlurStyle.normal,
+          size.shortestSide * 0.08,
+        ),
+    );
+    canvas.drawPath(
+      highlight,
+      Paint()
+        ..color = Colors.white.withValues(alpha: 0.74)
+        ..maskFilter = MaskFilter.blur(
+          BlurStyle.normal,
+          size.shortestSide * 0.026,
+        ),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _SoftBasicSquareCandidatePainter oldDelegate) {
+    return oldDelegate.tone != tone ||
+        oldDelegate.candidate.id != candidate.id;
   }
 }
 
