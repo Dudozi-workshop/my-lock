@@ -4,11 +4,11 @@
   "version": 1,
   "body": {
     "kind": "roundRect",
-    "x": 17,
-    "y": 17,
-    "w": 66,
-    "h": 66,
-    "radius": 17
+    "x": 6,
+    "y": 6,
+    "w": 88,
+    "h": 88,
+    "radius": 23
   },
   "layers": [
     {
@@ -18,10 +18,10 @@
       "blur": 5.0,
       "geometry": {
         "kind": "ellipse",
-        "cx": 38,
-        "cy": 34,
-        "rx": 27,
-        "ry": 19
+        "cx": 35,
+        "cy": 31,
+        "rx": 31,
+        "ry": 23
       }
     },
     {
@@ -31,10 +31,10 @@
       "blur": 6.5,
       "geometry": {
         "kind": "ellipse",
-        "cx": 67,
-        "cy": 67,
-        "rx": 28,
-        "ry": 22
+        "cx": 72,
+        "cy": 73,
+        "rx": 32,
+        "ry": 26
       }
     },
     {
@@ -45,10 +45,10 @@
       "rotationDeg": -30,
       "geometry": {
         "kind": "roundRect",
-        "x": 27,
-        "y": 26,
-        "w": 18,
-        "h": 6.5,
+        "x": 20,
+        "y": 20,
+        "w": 21,
+        "h": 7,
         "radius": 3.2
       }
     }
