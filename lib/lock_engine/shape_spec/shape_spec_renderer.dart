@@ -385,14 +385,44 @@ class ShapeSpecRenderer {
     canvas.restore();
 
     if (config.edgeOpacity > 0) {
+      final edgeAlpha = config.edgeOpacity * opacity;
+      final edgeWidth = config.edgeWidth;
+
+      // A Crayon Soft contour should read as pigment deposited along the
+      // silhouette, not as a thin vector outline. Build it from several
+      // slightly offset passes so the edge stays thick but softly irregular.
       canvas.drawPath(
         bodyPath,
         Paint()
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.72
+          ..strokeWidth = edgeWidth
           ..strokeJoin = StrokeJoin.round
-          ..color = dark.withValues(alpha: config.edgeOpacity * opacity),
+          ..strokeCap = StrokeCap.round
+          ..color = dark.withValues(alpha: edgeAlpha),
       );
+
+      if (config.edgeTexture > 0) {
+        final textureAlpha = edgeAlpha * (0.34 + config.edgeTexture * 0.28);
+        final offset = 0.28 + config.edgeTexture * 0.46;
+
+        for (final delta in <Offset>[
+          Offset(offset, -offset * 0.35),
+          Offset(-offset * 0.55, offset * 0.42),
+        ]) {
+          canvas.save();
+          canvas.translate(delta.dx, delta.dy);
+          canvas.drawPath(
+            bodyPath,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = edgeWidth * (0.58 + config.edgeTexture * 0.12)
+              ..strokeJoin = StrokeJoin.round
+              ..strokeCap = StrokeCap.round
+              ..color = base.withValues(alpha: textureAlpha),
+          );
+          canvas.restore();
+        }
+      }
     }
   }
 
@@ -639,6 +669,8 @@ class ShapeSpecRenderer {
       config.strokeLengthMax,
       config.gapChance,
       config.toneVariation,
+      config.edgeWidth,
+      config.edgeTexture,
     ].join(':');
   }
 
