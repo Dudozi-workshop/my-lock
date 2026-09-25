@@ -24,4 +24,27 @@ void main() {
       });
     }
   });
+
+  test('Preview 002 circle uses authored raster masks', () async {
+    await ShapeSpecRegistry.instance.load();
+
+    final bundle = ShapeSpecRegistry.instance.resolve(
+      ShapeStyle.softBasic,
+      ShapeKind.circle,
+    );
+
+    expect(bundle.shape.version, 3);
+    expect(bundle.shape.layers.length, 5);
+    expect(
+      bundle.shape.layers.every((layer) => layer.geometry.kind == 'mask'),
+      isTrue,
+    );
+
+    for (final layer in bundle.shape.layers) {
+      final asset = layer.geometry.values['asset'] as String;
+      final image = ShapeSpecRegistry.instance.resolveMask(asset);
+      expect(image.width, 128);
+      expect(image.height, 128);
+    }
+  });
 }
