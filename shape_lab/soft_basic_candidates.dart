@@ -225,10 +225,10 @@ const softBasicCircleRound11Candidates = <SoftBasicCandidate>[
     id: 'SB-C-R11-01',
     name: 'Ambient Base',
     intent: 'R10-06 Ambient Bounce 그대로. Round 11 체감 강화 비교의 기준안.',
-    state: SoftBasicCandidateState.shortlist,
+    state: SoftBasicCandidateState.selected,
     finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
     lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.ambientBounce,
-    badge: 'R10-06',
+    badge: 'SELECTED',
   ),
   SoftBasicCandidate(
     id: 'SB-C-R11-02',
@@ -270,6 +270,5 @@ const softBasicCircleRound11Candidates = <SoftBasicCandidate>[
     state: SoftBasicCandidateState.candidate,
     finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
     lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.ambientBounceCarved,
-    badge: 'TARGET',
   ),
 ];
