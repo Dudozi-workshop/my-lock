@@ -31,7 +31,7 @@ class ShapeChoiceCard extends StatelessWidget {
           CustomPaint(
             size: const Size(58, 58),
             painter: LockTokenPainter(
-              LockToken(shape: kind, tone: ShapeTone.purple),
+              LockToken(shape: kind, tone: ShapeTone.pink),
             ),
           ),
           const SizedBox(height: 8),
