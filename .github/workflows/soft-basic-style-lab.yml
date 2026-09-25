@@ -1,0 +1,52 @@
+name: Soft Basic Style Lab Build
+
+on:
+  push:
+    branches:
+      - feat/soft-basic-lab
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: soft-basic-style-lab-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Analyze test and build Soft Basic Lab
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Validate shape masks
+        run: python3 tool/validate_shape_masks.py
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Bootstrap web
+        env:
+          PLATFORMS: web
+        run: bash tool/bootstrap.sh
+
+      - name: Build Soft Basic Lab
+        run: flutter build web --release --target soft_basic_lab/main.dart --base-href "/"
+
+      - name: Upload web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: soft-basic-style-lab-web
+          path: build/web
+          if-no-files-found: error
