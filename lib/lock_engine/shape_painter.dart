@@ -165,6 +165,41 @@ Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
   }
 }
 
+Color _adjustSoftBasicTone(
+  Color base, {
+  required double lightnessDelta,
+  required double saturationDelta,
+}) {
+  final hsl = HSLColor.fromColor(base);
+  return hsl
+      .withLightness(
+        (hsl.lightness + lightnessDelta).clamp(0.0, 1.0).toDouble(),
+      )
+      .withSaturation(
+        (hsl.saturation + saturationDelta).clamp(0.0, 1.0).toDouble(),
+      )
+      .toColor();
+}
+
+({Color base, Color highlight, Color shade}) _softBasicToneColors(
+  ShapeTone tone,
+) {
+  final base = _tokenToneColors(tone).$1;
+  return (
+    base: base,
+    highlight: _adjustSoftBasicTone(
+      base,
+      lightnessDelta: 0.10,
+      saturationDelta: -0.02,
+    ),
+    shade: _adjustSoftBasicTone(
+      base,
+      lightnessDelta: -0.11,
+      saturationDelta: 0.035,
+    ),
+  );
+}
+
 void _paintStyledShape(
   Canvas canvas, {
   required Path path,
@@ -177,31 +212,41 @@ void _paintStyledShape(
   final colors = _tokenToneColors(tone);
   final bounds = Rect.fromCircle(center: center, radius: radius);
 
+  final softBasicColors = _softBasicToneColors(tone);
   final shadowAlpha = switch (texture) {
+    ShapeTexture.glossy => 0.13,
     ShapeTexture.glass => 0.12,
     ShapeTexture.chrome => 0.34,
     ShapeTexture.metal => 0.30,
     _ => 0.24,
   };
+  final shadowElevation = switch (texture) {
+    ShapeTexture.glossy => 5.0,
+    ShapeTexture.matte => 7.0,
+    _ => 12.0,
+  };
   canvas.drawShadow(
     path,
-    colors.$2.withValues(alpha: shadowAlpha * opacity),
-    texture == ShapeTexture.matte ? 7 : 12,
+    (texture == ShapeTexture.glossy ? softBasicColors.shade : colors.$2)
+        .withValues(alpha: shadowAlpha * opacity),
+    shadowElevation,
     true,
   );
 
   final fill = Paint();
   switch (texture) {
     case ShapeTexture.glossy:
-      fill.shader = RadialGradient(
-        center: const Alignment(-0.45, -0.55),
-        radius: 1.25,
+      // Soft Basic: color-first 2D rendering. The selected palette tone owns
+      // the object; tonal depth is derived from that same base color.
+      fill.shader = LinearGradient(
+        begin: const Alignment(-0.78, -0.88),
+        end: const Alignment(0.86, 0.92),
         colors: [
-          Colors.white.withValues(alpha: 0.88 * opacity),
-          colors.$1.withValues(alpha: 0.95 * opacity),
-          colors.$2.withValues(alpha: 0.98 * opacity),
+          softBasicColors.highlight.withValues(alpha: opacity),
+          softBasicColors.base.withValues(alpha: opacity),
+          softBasicColors.shade.withValues(alpha: opacity),
         ],
-        stops: const [0.0, 0.35, 1.0],
+        stops: const [0.0, 0.52, 1.0],
       ).createShader(bounds);
       break;
     case ShapeTexture.jelly:
@@ -272,33 +317,74 @@ void _paintStyledShape(
 
   canvas.drawPath(path, fill);
 
-  final borderColor = tone == ShapeTone.white
-      ? const Color(0xFFB9B9C4)
-      : Colors.white;
-  final border = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = max(1.2, radius * 0.035)
-    ..color = borderColor.withValues(
-      alpha: (texture == ShapeTexture.glass ? 0.88 : 0.58) * opacity,
-    );
-  canvas.drawPath(path, border);
-
-  if (texture != ShapeTexture.matte) {
-    final highlight = Paint()
-      ..color = Colors.white.withValues(
-        alpha: (texture == ShapeTexture.glass ? 0.58 : 0.40) * opacity,
-      );
+  if (texture == ShapeTexture.glossy) {
+    // A very light ambient shade anchors the lower-right edge without
+    // turning the token into a 3D/glass object.
     canvas.save();
     canvas.clipPath(path);
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: center.translate(-radius * 0.26, -radius * 0.28),
-        width: radius * 0.52,
-        height: radius * 0.24,
+    final ambientShade = Paint()
+      ..shader = RadialGradient(
+        center: const Alignment(0.78, 0.82),
+        radius: 0.95,
+        colors: [
+          Colors.transparent,
+          Colors.black.withValues(alpha: 0.055 * opacity),
+        ],
+        stops: const [0.48, 1.0],
+      ).createShader(bounds);
+    canvas.drawRect(bounds, ambientShade);
+
+    // Small white specular point: supportive only. The broader volume is
+    // expressed by same-hue tone changes above.
+    final highlightCenter =
+        center.translate(-radius * 0.30, -radius * 0.31);
+    canvas.save();
+    canvas.translate(highlightCenter.dx, highlightCenter.dy);
+    canvas.rotate(-0.48);
+    final specular = Paint()
+      ..color = Colors.white.withValues(alpha: 0.38 * opacity);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(
+          center: Offset.zero,
+          width: radius * 0.34,
+          height: radius * 0.14,
+        ),
+        Radius.circular(radius * 0.08),
       ),
-      highlight,
+      specular,
     );
     canvas.restore();
+    canvas.restore();
+  } else {
+    final borderColor = tone == ShapeTone.white
+        ? const Color(0xFFB9B9C4)
+        : Colors.white;
+    final border = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = max(1.2, radius * 0.035)
+      ..color = borderColor.withValues(
+        alpha: (texture == ShapeTexture.glass ? 0.88 : 0.58) * opacity,
+      );
+    canvas.drawPath(path, border);
+
+    if (texture != ShapeTexture.matte) {
+      final highlight = Paint()
+        ..color = Colors.white.withValues(
+          alpha: (texture == ShapeTexture.glass ? 0.58 : 0.40) * opacity,
+        );
+      canvas.save();
+      canvas.clipPath(path);
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: center.translate(-radius * 0.26, -radius * 0.28),
+          width: radius * 0.52,
+          height: radius * 0.24,
+        ),
+        highlight,
+      );
+      canvas.restore();
+    }
   }
 }
 
