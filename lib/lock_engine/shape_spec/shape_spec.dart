@@ -190,6 +190,8 @@ class ShapeLayerSpec {
     required this.blur,
     required this.rotationDeg,
     required this.geometry,
+    this.toneLightnessDelta,
+    this.toneSaturationDelta,
   });
 
   final String id;
@@ -199,6 +201,12 @@ class ShapeLayerSpec {
   final double blur;
   final double rotationDeg;
   final ShapeGeometrySpec geometry;
+
+  /// Optional per-layer tone override. When omitted, the Style-level
+  /// light/shade rules are used. This lets a promoted Shape Master keep
+  /// its authored color depth without changing sibling shapes.
+  final double? toneLightnessDelta;
+  final double? toneSaturationDelta;
 
   factory ShapeLayerSpec.fromJson(Map<String, dynamic> json) {
     return ShapeLayerSpec(
@@ -213,6 +221,10 @@ class ShapeLayerSpec {
       geometry: ShapeGeometrySpec.fromJson(
         json['geometry'] as Map<String, dynamic>,
       ),
+      toneLightnessDelta:
+          (json['toneLightnessDelta'] as num?)?.toDouble(),
+      toneSaturationDelta:
+          (json['toneSaturationDelta'] as num?)?.toDouble(),
     );
   }
 }
