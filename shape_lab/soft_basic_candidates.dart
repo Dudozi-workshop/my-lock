@@ -76,15 +76,15 @@ const softBasicCircleRound5Candidates = <SoftBasicCandidate>[
     id: 'SB-C-R5-06',
     name: 'Edge Leaf',
     intent: '좌상단 외곽에 조금 더 가까이 붙여 표면 반사광처럼 읽히게 한 안.',
-    state: SoftBasicCandidateState.candidate,
+    state: SoftBasicCandidateState.selected,
     highlightTechnique: SoftBasicCircleHighlightTechnique.edgeLeaf,
+    badge: 'SELECTED',
   ),
   SoftBasicCandidate(
     id: 'SB-C-R5-07',
     name: 'Refined Mockup',
     intent: 'R4-07의 장점을 유지하면서 길이·테이퍼·경계 흐림을 목업 쪽으로 정리한 최종 후보.',
-    state: SoftBasicCandidateState.candidate,
+    state: SoftBasicCandidateState.rejected,
     highlightTechnique: SoftBasicCircleHighlightTechnique.refinedMockup,
-    badge: 'TARGET',
   ),
 ];
