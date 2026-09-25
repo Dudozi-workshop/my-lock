@@ -14,8 +14,8 @@ class ShopScreen extends StatelessWidget {
         ShapeKind.values.where((item) => item.premium).toList();
     final premiumTones =
         ShapeTone.values.where((item) => item.premium).toList();
-    final premiumTextures =
-        ShapeTexture.values.where((item) => item.premium).toList();
+    final premiumStyles =
+        ShapeStyle.values.where((item) => item.premium).toList();
     final premiumBackgrounds =
         LockBackground.values.where((item) => item.locked).toList();
 
@@ -81,21 +81,21 @@ class ShopScreen extends StatelessWidget {
           const SizedBox(height: 24),
           _SectionTitle(
             title: '질감',
-            count: premiumTextures.length,
+            count: premiumStyles.length,
           ),
           const SizedBox(height: 10),
           _CatalogGrid(
             children: [
-              for (final texture in premiumTextures)
+              for (final style in premiumStyles)
                 _PreviewCard(
-                  label: texture.label,
+                  label: style.label,
                   child: CustomPaint(
                     painter: LockTokenPainter(
                       const LockToken(
                         shape: ShapeKind.circle,
                         tone: ShapeTone.pink,
                       ),
-                      texture: texture,
+                      style: style,
                     ),
                     child: const SizedBox.expand(),
                   ),
