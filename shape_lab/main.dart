@@ -85,7 +85,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 009 · Production renderer shared',
+                                  'LAB 010 · Crayon texture-first compare',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -277,9 +277,9 @@ class _CrayonCandidate {
 const _candidates = <_CrayonCandidate>[
   _CrayonCandidate(
     id: 'C01',
-    name: 'Current 008',
-    intent: '현재 기준안. 비교의 출발점.',
-    badge: 'CURRENT',
+    name: 'Basic Crayon',
+    intent: '현재 기준을 정리한 균형형. 비교의 출발점.',
+    badge: 'BASE',
     config: CrayonTextureSpec(
       darkStrokeCount: 34,
       lightStrokeCount: 18,
@@ -295,122 +295,122 @@ const _candidates = <_CrayonCandidate>[
   ),
   _CrayonCandidate(
     id: 'C02',
-    name: 'Fine Dense',
-    intent: '얇고 촘촘한 결.',
+    name: 'Diagonal Fine',
+    intent: '사선 방향이 또렷한 얇은 크레용 결.',
     config: CrayonTextureSpec(
-      darkStrokeCount: 52,
-      lightStrokeCount: 26,
+      darkStrokeCount: 46,
+      lightStrokeCount: 22,
       grainCount: 22,
-      strokeWidth: 0.86,
-      angleDeg: -18,
-      jitter: 1.5,
-      darkOpacity: 0.14,
-      lightOpacity: 0.14,
-      grainOpacity: 0.11,
-      edgeOpacity: 0.12,
+      strokeWidth: 0.95,
+      angleDeg: -28,
+      jitter: 1.6,
+      darkOpacity: 0.17,
+      lightOpacity: 0.12,
+      grainOpacity: 0.10,
+      edgeOpacity: 0.11,
     ),
   ),
   _CrayonCandidate(
     id: 'C03',
-    name: 'Bold Hand',
-    intent: '굵고 손그림다운 터치.',
+    name: 'Rough Grain',
+    intent: '끊기고 거친 손칠 느낌. grain 존재감 최대.',
     config: CrayonTextureSpec(
-      darkStrokeCount: 24,
-      lightStrokeCount: 12,
-      grainCount: 24,
-      strokeWidth: 2.05,
-      angleDeg: -16,
-      jitter: 3.3,
-      darkOpacity: 0.19,
-      lightOpacity: 0.14,
-      grainOpacity: 0.16,
-      edgeOpacity: 0.20,
+      darkStrokeCount: 28,
+      lightStrokeCount: 10,
+      grainCount: 72,
+      strokeWidth: 1.65,
+      angleDeg: -18,
+      jitter: 6.2,
+      darkOpacity: 0.23,
+      lightOpacity: 0.10,
+      grainOpacity: 0.28,
+      edgeOpacity: 0.12,
     ),
   ),
   _CrayonCandidate(
     id: 'C04',
-    name: 'Loose Grain',
-    intent: '불규칙성과 grain 강화.',
+    name: 'Soft Blend',
+    intent: '선 대비를 낮추고 밝은 결을 늘린 포근한 타입.',
     config: CrayonTextureSpec(
-      darkStrokeCount: 38,
-      lightStrokeCount: 19,
-      grainCount: 48,
-      strokeWidth: 1.14,
-      angleDeg: -24,
-      jitter: 4.6,
-      darkOpacity: 0.16,
-      lightOpacity: 0.13,
-      grainOpacity: 0.21,
-      edgeOpacity: 0.13,
+      darkStrokeCount: 26,
+      lightStrokeCount: 30,
+      grainCount: 46,
+      strokeWidth: 1.80,
+      angleDeg: -10,
+      jitter: 3.8,
+      darkOpacity: 0.07,
+      lightOpacity: 0.25,
+      grainOpacity: 0.16,
+      edgeOpacity: 0.05,
     ),
   ),
   _CrayonCandidate(
     id: 'C05',
-    name: 'Clean Edge',
-    intent: '외곽 실루엣 선명도 강화.',
+    name: 'Dense Pencil',
+    intent: '가늘고 촘촘한 터치. 작은 크기에서 결 유지.',
     config: CrayonTextureSpec(
-      darkStrokeCount: 36,
-      lightStrokeCount: 16,
+      darkStrokeCount: 64,
+      lightStrokeCount: 32,
       grainCount: 18,
-      strokeWidth: 1.16,
-      angleDeg: -18,
-      jitter: 1.9,
-      darkOpacity: 0.16,
-      lightOpacity: 0.12,
-      grainOpacity: 0.09,
-      edgeOpacity: 0.30,
+      strokeWidth: 0.72,
+      angleDeg: -21,
+      jitter: 1.15,
+      darkOpacity: 0.15,
+      lightOpacity: 0.11,
+      grainOpacity: 0.08,
+      edgeOpacity: 0.10,
     ),
   ),
   _CrayonCandidate(
     id: 'C06',
-    name: 'Soft Pastel',
-    intent: '밝고 포근한 파스텔 결.',
+    name: 'Light Pastel',
+    intent: '어두운 선을 줄인 가볍고 산뜻한 파스텔 결.',
     config: CrayonTextureSpec(
-      darkStrokeCount: 30,
+      darkStrokeCount: 32,
       lightStrokeCount: 24,
-      grainCount: 42,
-      strokeWidth: 1.42,
-      angleDeg: -12,
-      jitter: 3.0,
-      darkOpacity: 0.09,
-      lightOpacity: 0.23,
-      grainOpacity: 0.13,
-      edgeOpacity: 0.09,
+      grainCount: 35,
+      strokeWidth: 1.15,
+      angleDeg: -15,
+      jitter: 2.4,
+      darkOpacity: 0.07,
+      lightOpacity: 0.20,
+      grainOpacity: 0.10,
+      edgeOpacity: 0.08,
     ),
   ),
   _CrayonCandidate(
     id: 'C07',
-    name: 'High Contrast',
-    intent: '축소 시 질감 유지 우선.',
+    name: 'Deep Crayon',
+    intent: '진한 색감과 굵은 결. 축소 시 존재감 우선.',
     config: CrayonTextureSpec(
-      darkStrokeCount: 31,
-      lightStrokeCount: 14,
-      grainCount: 20,
-      strokeWidth: 1.56,
-      angleDeg: -22,
-      jitter: 2.4,
-      darkOpacity: 0.27,
-      lightOpacity: 0.12,
-      grainOpacity: 0.11,
-      edgeOpacity: 0.23,
+      darkStrokeCount: 30,
+      lightStrokeCount: 12,
+      grainCount: 24,
+      strokeWidth: 1.70,
+      angleDeg: -20,
+      jitter: 2.8,
+      darkOpacity: 0.31,
+      lightOpacity: 0.09,
+      grainOpacity: 0.14,
+      edgeOpacity: 0.25,
     ),
   ),
   _CrayonCandidate(
     id: 'C08',
     name: 'Mockup Aim',
-    intent: '목업의 따뜻한 사선 결 목표.',
+    intent: '목업의 따뜻한 사선 결에 가장 가까운 목표안.',
     badge: 'TARGET',
     config: CrayonTextureSpec(
-      darkStrokeCount: 42,
+      darkStrokeCount: 44,
       lightStrokeCount: 20,
-      grainCount: 28,
-      strokeWidth: 1.08,
-      angleDeg: -22,
-      jitter: 2.7,
-      darkOpacity: 0.20,
-      lightOpacity: 0.13,
-      grainOpacity: 0.15,
-      edgeOpacity: 0.15,
+      grainCount: 34,
+      strokeWidth: 1.05,
+      angleDeg: -24,
+      jitter: 3.2,
+      darkOpacity: 0.21,
+      lightOpacity: 0.11,
+      grainOpacity: 0.18,
+      edgeOpacity: 0.13,
     ),
   ),
 ];
@@ -443,8 +443,8 @@ class _CrayonStyleLabState extends State<CrayonStyleLab> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Crayon Soft · Round 1',
-          subtitle: '실제 renderer 후보를 동시에 비교하고, 좋은 방향을 골라 다음 Round로 좁힙니다.',
+          title: 'Crayon Soft · Round 1 · Texture Focus',
+          subtitle: '카드는 동일한 Pink Circle을 크게 보여 질감만 빠르게 비교하고, 선택 후 3×3 APP EXACT로 검증합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -455,7 +455,7 @@ class _CrayonStyleLabState extends State<CrayonStyleLab> {
             final gap = compact ? 8.0 : 12.0;
             final itemWidth =
                 (constraints.maxWidth - gap * (columns - 1)) / columns;
-            final cardHeight = compact ? 118.0 : 132.0;
+            final cardHeight = compact ? 224.0 : 250.0;
 
             return Wrap(
               spacing: gap,
@@ -513,19 +513,19 @@ class _CandidateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const accent = Color(0xFF7257F5);
-    final tokenSize = compact ? 32.0 : 38.0;
+    final heroScale = compact ? 1.62 : 1.92;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           padding: EdgeInsets.all(compact ? 9 : 11),
           decoration: BoxDecoration(
             color: card,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: selected ? accent : const Color(0xFFE6E3EE),
               width: selected ? 2 : 1,
@@ -554,7 +554,10 @@ class _CandidateCard extends StatelessWidget {
                   const SizedBox(width: 5),
                   if (candidate.badge != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: accent.withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(99),
@@ -573,45 +576,61 @@ class _CandidateCard extends StatelessWidget {
                     const Icon(Icons.check_circle, color: accent, size: 16),
                 ],
               ),
-              const Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _ExactToken(
-                    token: const LockToken(
-                      shape: ShapeKind.circle,
-                      tone: ShapeTone.pink,
-                    ),
-                    config: candidate.config,
-                    size: tokenSize,
+              const SizedBox(height: 8),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8F5FB),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFEEE9F3)),
                   ),
-                  _ExactToken(
-                    token: const LockToken(
-                      shape: ShapeKind.triangle,
-                      tone: ShapeTone.blue,
+                  child: Center(
+                    child: Transform.scale(
+                      scale: heroScale,
+                      child: _ExactToken(
+                        token: const LockToken(
+                          shape: ShapeKind.circle,
+                          tone: ShapeTone.pink,
+                        ),
+                        config: candidate.config,
+                        size: 58,
+                      ),
                     ),
-                    config: candidate.config,
-                    size: tokenSize,
                   ),
-                  _ExactToken(
-                    token: const LockToken(
-                      shape: ShapeKind.square,
-                      tone: ShapeTone.yellow,
-                    ),
-                    config: candidate.config,
-                    size: tokenSize,
-                  ),
-                ],
+                ),
               ),
-              const Spacer(),
+              const SizedBox(height: 9),
               Text(
                 candidate.name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: fg,
-                  fontSize: compact ? 10.5 : 11.5,
+                  fontSize: compact ? 11 : 12,
                   fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                candidate.intent,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: muted,
+                  fontSize: compact ? 9.5 : 10.5,
+                  height: 1.25,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                _shortCrayonConfig(candidate.config),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: muted,
+                  fontSize: compact ? 8.5 : 9.5,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -620,6 +639,17 @@ class _CandidateCard extends StatelessWidget {
       ),
     );
   }
+}
+
+String _shortCrayonConfig(CrayonTextureSpec config) {
+  return 'W ' +
+      config.strokeWidth.toStringAsFixed(2) +
+      ' · D ' +
+      config.darkStrokeCount.toString() +
+      ' · J ' +
+      config.jitter.toStringAsFixed(1) +
+      ' · G ' +
+      config.grainCount.toString();
 }
 
 class _SelectedCandidatePanel extends StatelessWidget {
