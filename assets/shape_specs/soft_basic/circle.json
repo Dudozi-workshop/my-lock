@@ -6,7 +6,7 @@
     "kind": "circle",
     "cx": 50,
     "cy": 50,
-    "r": 34
+    "r": 46
   },
   "layers": [
     {
@@ -16,10 +16,10 @@
       "blur": 5.5,
       "geometry": {
         "kind": "ellipse",
-        "cx": 39,
-        "cy": 36,
-        "rx": 23,
-        "ry": 18
+        "cx": 36,
+        "cy": 33,
+        "rx": 28,
+        "ry": 22
       }
     },
     {
@@ -29,10 +29,10 @@
       "blur": 7.0,
       "geometry": {
         "kind": "ellipse",
-        "cx": 63,
-        "cy": 65,
-        "rx": 24,
-        "ry": 21
+        "cx": 68,
+        "cy": 69,
+        "rx": 30,
+        "ry": 27
       }
     },
     {
@@ -43,10 +43,10 @@
       "rotationDeg": -28,
       "geometry": {
         "kind": "roundRect",
-        "x": 29,
-        "y": 27,
-        "w": 19,
-        "h": 7,
+        "x": 23,
+        "y": 22,
+        "w": 21,
+        "h": 7.5,
         "radius": 3.5
       }
     }
