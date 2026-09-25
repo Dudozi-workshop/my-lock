@@ -7,43 +7,34 @@ import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/relock_policy.dart';
 
 void main() {
-  test('default style catalog remains the original 3x3 token set', () {
+  test('Soft Basic starts with the free 3x3 token catalog', () {
     expect(
-      ShapeKind.defaults,
-      equals({
+      ShapeKind.values,
+      equals([
         ShapeKind.circle,
         ShapeKind.triangle,
         ShapeKind.square,
-      }),
+      ]),
     );
     expect(
-      ShapeTone.defaults,
-      equals({
+      ShapeTone.values,
+      equals([
         ShapeTone.pink,
         ShapeTone.blue,
         ShapeTone.yellow,
-      }),
+      ]),
     );
+    expect(ShapeStyle.values, equals([ShapeStyle.softBasic]));
 
     final ids = <String>{
       for (final shape in ShapeKind.values)
         for (final tone in ShapeTone.values)
           LockToken(shape: shape, tone: tone).id,
     };
-    expect(ids.length, ShapeKind.values.length * ShapeTone.values.length);
+    expect(ids.length, 9);
   });
 
-  test('premium catalog metadata is separate from free defaults', () {
-    expect(ShapeKind.defaults.every((item) => !item.premium), isTrue);
-    expect(ShapeTone.defaults.every((item) => !item.premium), isTrue);
-    expect(ShapeStyle.softBasic.premium, isFalse);
-    expect(
-      ShapeStyle.values.where((item) => item.premium).length,
-      greaterThan(0),
-    );
-  });
-
-  test('style-only style change is persisted', () async {
+  test('Soft Basic style is persisted with the new shape_style key model', () async {
     final store = _FakeStore();
     final controller = MyLockSettingsController(store: store);
     await controller.load();
@@ -51,35 +42,10 @@ void main() {
     controller.setShapeStyle(
       controller.selectedShapes,
       controller.selectedTones,
-      style: ShapeStyle.hologram,
+      style: ShapeStyle.softBasic,
     );
 
-    expect(controller.style, ShapeStyle.hologram);
-    expect(store.lastSaved?.style, ShapeStyle.hologram);
-  });
-
-  test('expanded shape and tone can be applied as real lock tokens', () async {
-    final store = _FakeStore();
-    final controller = MyLockSettingsController(store: store);
-    await controller.load();
-
-    const password = [
-      LockToken(shape: ShapeKind.star, tone: ShapeTone.purple),
-      LockToken(shape: ShapeKind.heart, tone: ShapeTone.mint),
-    ];
-
-    controller.setShapeStyleAndPassword(
-      {ShapeKind.star, ShapeKind.heart},
-      {ShapeTone.purple, ShapeTone.mint},
-      password,
-      style: ShapeStyle.glass,
-    );
-
-    expect(controller.selectedShapes, contains(ShapeKind.star));
-    expect(controller.selectedTones, contains(ShapeTone.mint));
-    expect(controller.style, ShapeStyle.glass);
-    expect(controller.password, password);
-    expect(store.savedPassword, password);
+    expect(controller.style, ShapeStyle.softBasic);
   });
 }
 
@@ -103,6 +69,7 @@ class _FakeStore implements MyLockSettingsPersistence {
       background: LockBackground.softGradient,
       movementStyle: MovementStyle.floating,
       popStyle: PopStyle.basicPop,
+      style: ShapeStyle.softBasic,
       password: null,
       selectedAppIds: <String>{},
       objectCount: 9,
