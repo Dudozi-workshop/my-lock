@@ -1,3 +1,89 @@
+
+class SeaTurtleRuntimeLabBootstrap extends StatefulWidget {
+  const SeaTurtleRuntimeLabBootstrap({super.key});
+
+  @override
+  State<SeaTurtleRuntimeLabBootstrap> createState() =>
+      _SeaTurtleRuntimeLabBootstrapState();
+}
+
+class _SeaTurtleRuntimeLabBootstrapState
+    extends State<SeaTurtleRuntimeLabBootstrap> {
+  late final Future<void> _loadFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFuture = SeaTurtleRuntimePoc.instance.load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _loadFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(
+            backgroundColor: Color(0xFFF4FAFF),
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text(
+                    'Loading Sea Turtle Runtime Lab...',
+                    style: TextStyle(
+                      color: Color(0xFF18304D),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Scaffold(
+            backgroundColor: const Color(0xFFF4FAFF),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Sea Turtle Lab failed to load assets.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF18304D),
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    SelectableText(
+                      '${snapshot.error}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Color(0xFF667C92),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
+        return const SeaTurtleRuntimeLabScreen();
+      },
+    );
+  }
+}
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
