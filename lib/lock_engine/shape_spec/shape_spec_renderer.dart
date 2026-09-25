@@ -137,6 +137,47 @@ class ShapeSpecRenderer {
           points,
           (v['cornerRadius'] as num).toDouble(),
         );
+      case 'path':
+        final path = Path();
+        for (final raw in v['commands'] as List<dynamic>) {
+          final command = raw as Map<String, dynamic>;
+          switch (command['op'] as String) {
+            case 'M':
+              path.moveTo(
+                (command['x'] as num).toDouble(),
+                (command['y'] as num).toDouble(),
+              );
+              break;
+            case 'L':
+              path.lineTo(
+                (command['x'] as num).toDouble(),
+                (command['y'] as num).toDouble(),
+              );
+              break;
+            case 'Q':
+              path.quadraticBezierTo(
+                (command['cx'] as num).toDouble(),
+                (command['cy'] as num).toDouble(),
+                (command['x'] as num).toDouble(),
+                (command['y'] as num).toDouble(),
+              );
+              break;
+            case 'C':
+              path.cubicTo(
+                (command['c1x'] as num).toDouble(),
+                (command['c1y'] as num).toDouble(),
+                (command['c2x'] as num).toDouble(),
+                (command['c2y'] as num).toDouble(),
+                (command['x'] as num).toDouble(),
+                (command['y'] as num).toDouble(),
+              );
+              break;
+            case 'Z':
+              path.close();
+              break;
+          }
+        }
+        return path;
       default:
         throw StateError('Unsupported ShapeSpec geometry: ${geometry.kind}');
     }
@@ -166,6 +207,8 @@ class ShapeSpecRenderer {
           y += (p[1] as num).toDouble();
         }
         return Offset(x / points.length, y / points.length);
+      case 'path':
+        return _pathFor(geometry).getBounds().center;
       default:
         return Offset.zero;
     }

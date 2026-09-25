@@ -2,8 +2,7 @@
 set -euo pipefail
 
 PLATFORMS=web bash tool/bootstrap.sh
+PREVIEW_VERSION="$(tr -d '[:space:]' < tool/preview_version.txt)"
 flutter build web --release --base-href "/" \
-  --dart-define=BUILD_SHA="${GITHUB_SHA:-local}" \
-  --dart-define=BUILD_RUN="${GITHUB_RUN_NUMBER:-dev}" \
-  --dart-define=BUILD_LABEL="${BUILD_LABEL:-ShapeSpec-v1}"
+  --dart-define=PREVIEW_VERSION="$PREVIEW_VERSION"
 echo "Flutter Web build complete: build/web"

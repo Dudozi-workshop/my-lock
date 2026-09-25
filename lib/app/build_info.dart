@@ -4,24 +4,12 @@ import 'package:flutter/material.dart';
 class BuildInfo {
   const BuildInfo._();
 
-  static const String sha = String.fromEnvironment(
-    'BUILD_SHA',
-    defaultValue: 'local',
-  );
-  static const String run = String.fromEnvironment(
-    'BUILD_RUN',
-    defaultValue: 'dev',
-  );
-  static const String label = String.fromEnvironment(
-    'BUILD_LABEL',
-    defaultValue: 'ShapeSpec-v1',
+  static const String previewVersion = String.fromEnvironment(
+    'PREVIEW_VERSION',
+    defaultValue: '000',
   );
 
-  static String get shortSha =>
-      sha.length <= 7 ? sha : sha.substring(0, 7);
-
-  static String get display =>
-      kIsWeb ? 'WEB r$run · $label · $shortSha' : '$label · $shortSha';
+  static String get display => 'PREVIEW $previewVersion';
 }
 
 class BuildStamp extends StatelessWidget {
