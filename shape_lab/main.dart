@@ -997,7 +997,7 @@ class _SoftBasicSquareRound1 extends StatefulWidget {
 }
 
 class _SoftBasicSquareRound1State extends State<_SoftBasicSquareRound1> {
-  int selectedIndex = 0;
+  int selectedIndex = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -1009,7 +1009,7 @@ class _SoftBasicSquareRound1State extends State<_SoftBasicSquareRound1> {
       children: [
         _SectionTitle(
           title: 'Soft Basic · Square · Round 1',
-          subtitle: 'Circle Master의 Color Shell · Edge Leaf · Ambient Bounce 디자인 언어를 Square에 맞게 이식합니다. 코너·하이라이트·하단 볼륨만 비교합니다.',
+          subtitle: 'Circle Master R11-01을 항상 기준으로 고정 표시하고, 선택한 Square 후보와 96px 확대 / 58px 실사용 크기를 동일 팔레트로 직접 비교합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -1050,82 +1050,219 @@ class _SoftBasicSquareRound1State extends State<_SoftBasicSquareRound1> {
           },
         ),
         const SizedBox(height: 14),
-        _Panel(
-          color: widget.card,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                selected.id + ' · ' + selected.name,
-                style: TextStyle(
-                  color: widget.fg,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                selected.intent,
-                style: TextStyle(color: widget.muted, fontSize: 12),
-              ),
-              const SizedBox(height: 14),
-              Wrap(
-                spacing: 18,
-                runSpacing: 14,
-                children: [
-                  for (final tone in const [
-                    ShapeTone.pink,
-                    ShapeTone.blue,
-                    ShapeTone.yellow,
-                  ])
-                    Column(
-                      children: [
-                        _SoftBasicSquareExactToken(
-                          tone: tone,
-                          candidate: selected,
-                          size: 96,
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          tone.label,
-                          style: TextStyle(
-                            color: widget.muted,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Text(
-                '58px APP EXACT',
-                style: TextStyle(
-                  color: widget.fg,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 12,
-                children: [
-                  for (final tone in const [
-                    ShapeTone.pink,
-                    ShapeTone.blue,
-                    ShapeTone.yellow,
-                  ])
-                    _SoftBasicSquareExactToken(
-                      tone: tone,
-                      candidate: selected,
-                      size: 58,
-                    ),
-                ],
-              ),
-            ],
+        _SoftBasicCircleSquareComparePanel(
+          squareCandidate: selected,
+          card: widget.card,
+          fg: widget.fg,
+          muted: widget.muted,
+        ),
+      ],
+    );
+  }
+}
+
+class _SoftBasicCircleSquareComparePanel extends StatelessWidget {
+  const _SoftBasicCircleSquareComparePanel({
+    required this.squareCandidate,
+    required this.card,
+    required this.fg,
+    required this.muted,
+  });
+
+  final SoftBasicSquareCandidate squareCandidate;
+  final Color card;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < 700;
+    final circleMaster = softBasicCircleRound11Candidates.first;
+    const tones = [
+      ShapeTone.pink,
+      ShapeTone.blue,
+      ShapeTone.yellow,
+    ];
+
+    return _Panel(
+      color: card,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Circle Master R11-01  ↔  ' +
+                squareCandidate.id +
+                ' · ' +
+                squareCandidate.name,
+            style: TextStyle(
+              color: fg,
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            squareCandidate.intent,
+            style: TextStyle(color: muted, fontSize: 12),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            '96px ENLARGED · SAME PALETTE',
+            style: TextStyle(
+              color: fg,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 9),
+          for (final tone in tones) ...[
+            _CircleSquareToneRow(
+              tone: tone,
+              circleMaster: circleMaster,
+              squareCandidate: squareCandidate,
+              size: 96,
+              compact: compact,
+              fg: fg,
+              muted: muted,
+            ),
+            if (tone != tones.last) const SizedBox(height: 12),
+          ],
+          const SizedBox(height: 18),
+          Divider(color: const Color(0xFFE8E5EF), height: 1),
+          const SizedBox(height: 14),
+          Text(
+            '58px APP EXACT',
+            style: TextStyle(
+              color: fg,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 9),
+          for (final tone in tones) ...[
+            _CircleSquareToneRow(
+              tone: tone,
+              circleMaster: circleMaster,
+              squareCandidate: squareCandidate,
+              size: 58,
+              compact: compact,
+              fg: fg,
+              muted: muted,
+            ),
+            if (tone != tones.last) const SizedBox(height: 9),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _CircleSquareToneRow extends StatelessWidget {
+  const _CircleSquareToneRow({
+    required this.tone,
+    required this.circleMaster,
+    required this.squareCandidate,
+    required this.size,
+    required this.compact,
+    required this.fg,
+    required this.muted,
+  });
+
+  final ShapeTone tone;
+  final SoftBasicCandidate circleMaster;
+  final SoftBasicSquareCandidate squareCandidate;
+  final double size;
+  final bool compact;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    final gap = compact ? 10.0 : 18.0;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: compact ? 42 : 58,
+          child: Text(
+            tone.label,
+            style: TextStyle(
+              color: muted,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        Expanded(
+          child: _CompareTokenCell(
+            label: 'CIRCLE · R11-01',
+            token: _SoftBasicExactToken(
+              shape: ShapeKind.circle,
+              tone: tone,
+              candidate: circleMaster,
+              size: size,
+            ),
+            fg: fg,
+            muted: muted,
+          ),
+        ),
+        SizedBox(width: gap),
+        Expanded(
+          child: _CompareTokenCell(
+            label: 'SQUARE · ' + squareCandidate.id,
+            token: _SoftBasicSquareExactToken(
+              tone: tone,
+              candidate: squareCandidate,
+              size: size,
+            ),
+            fg: fg,
+            muted: muted,
           ),
         ),
       ],
+    );
+  }
+}
+
+class _CompareTokenCell extends StatelessWidget {
+  const _CompareTokenCell({
+    required this.label,
+    required this.token,
+    required this.fg,
+    required this.muted,
+  });
+
+  final String label;
+  final Widget token;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F7FB),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFEAE7F0)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: muted,
+              fontSize: 8.5,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 7),
+          Center(child: token),
+        ],
+      ),
     );
   }
 }
