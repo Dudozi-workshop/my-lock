@@ -296,6 +296,57 @@ const drop01Palette = [
   ),
 ];
 
+const drop02Palette = [
+  PaletteEntry(
+    en: 'Sunlit Acorn',
+    ko: '볕든도토리',
+    color: Color(0xFFC97A3D),
+    hex: '#C97A3D',
+  ),
+  PaletteEntry(
+    en: 'Leaf Green',
+    ko: '잎새초록',
+    color: Color(0xFF79D34D),
+    hex: '#79D34D',
+  ),
+  PaletteEntry(
+    en: 'Mushroom Cream',
+    ko: '버섯크림',
+    color: Color(0xFFFFD98A),
+    hex: '#FFD98A',
+  ),
+  PaletteEntry(
+    en: 'Maple Orange',
+    ko: '단풍주황',
+    color: Color(0xFFFF8A3D),
+    hex: '#FF8A3D',
+  ),
+  PaletteEntry(
+    en: 'Forest Berry',
+    ko: '숲속딸기',
+    color: Color(0xFFF05A82),
+    hex: '#F05A82',
+  ),
+  PaletteEntry(
+    en: 'Forest Teal',
+    ko: '숲청록',
+    color: Color(0xFF27B8A6),
+    hex: '#27B8A6',
+  ),
+  PaletteEntry(
+    en: 'Forest Light',
+    ko: '숲빛',
+    color: Color(0xFFE5E94F),
+    hex: '#8BDD55 → #E5E94F → #FFD45A',
+    gradient: [
+      Color(0xFF8BDD55),
+      Color(0xFFE5E94F),
+      Color(0xFFFFD45A),
+    ],
+    effectLabel: 'Slow Forest Gradient',
+  ),
+];
+
 class PaletteLab extends StatefulWidget {
   const PaletteLab({
     super.key,
@@ -316,11 +367,16 @@ class PaletteLab extends StatefulWidget {
 
 class _PaletteLabState extends State<PaletteLab> {
   int selectedIndex = 0;
+  int paletteGroup = 0;
   ShapeKind previewShape = ShapeKind.dolphin;
+
+  List<PaletteEntry> get activePalette =>
+      paletteGroup == 0 ? drop01Palette : drop02Palette;
 
   @override
   Widget build(BuildContext context) {
-    final selected = drop01Palette[selectedIndex];
+    final palette = activePalette;
+    final selected = palette[selectedIndex.clamp(0, palette.length - 1)];
 
     return Column(
       children: [
@@ -330,7 +386,7 @@ class _PaletteLabState extends State<PaletteLab> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Palette Lab · Drop 01 작은 바닷속',
+                'Palette Lab',
                 style: TextStyle(
                   color: widget.fg,
                   fontSize: 20,
@@ -339,8 +395,22 @@ class _PaletteLabState extends State<PaletteLab> {
               ),
               const SizedBox(height: 4),
               Text(
-                '초기 색 이름 유지 · 확정 2D Soft HEX를 브라우저에서 직접 렌더링',
+                '확정 HEX/Gradient를 실제 Shape에 직접 적용해 비교합니다.',
                 style: TextStyle(color: widget.muted),
+              ),
+              const SizedBox(height: 12),
+              SegmentedButton<int>(
+                segments: const [
+                  ButtonSegment(value: 0, label: Text('Drop 01 · 작은 바닷속')),
+                  ButtonSegment(value: 1, label: Text('Drop 02 · 도토리숲')),
+                ],
+                selected: {paletteGroup},
+                onSelectionChanged: (value) {
+                  setState(() {
+                    paletteGroup = value.first;
+                    selectedIndex = 0;
+                  });
+                },
               ),
               const SizedBox(height: 16),
               LayoutBuilder(
@@ -352,11 +422,11 @@ class _PaletteLabState extends State<PaletteLab> {
                     spacing: 10,
                     runSpacing: 10,
                     children: [
-                      for (var i = 0; i < drop01Palette.length; i++)
+                      for (var i = 0; i < palette.length; i++)
                         SizedBox(
                           width: width,
                           child: PaletteSwatch(
-                            entry: drop01Palette[i],
+                            entry: palette[i],
                             selected: i == selectedIndex,
                             onTap: () {
                               setState(() => selectedIndex = i);
@@ -370,7 +440,9 @@ class _PaletteLabState extends State<PaletteLab> {
                 },
               ),
               const SizedBox(height: 6),
-              Text('Signature Color도 동일 목록에서 선택해 실제 Shape 적용을 확인합니다.', style: TextStyle(color: widget.muted, fontSize: 12)),
+              Text(
+                'Signature Color도 동일 목록에서 선택해 실제 Shape 적용을 확인합니다.',
+                style: TextStyle(color: widget.muted, fontSize: 12),
               ),
             ],
           ),
