@@ -25,7 +25,7 @@ void main() {
     }
   });
 
-  test('Preview 003 circle uses fixed authored lighting architecture', () async {
+  test('Preview 004 circle uses refined authored lighting architecture', () async {
     await ShapeSpecRegistry.instance.load();
 
     final bundle = ShapeSpecRegistry.instance.resolve(
@@ -33,7 +33,7 @@ void main() {
       ShapeKind.circle,
     );
 
-    expect(bundle.shape.version, 4);
+    expect(bundle.shape.version, 5);
     expect(bundle.shape.rotationMode, ShapeRotationMode.fixed);
     expect(bundle.shape.surface.kind, 'radial');
     expect(bundle.shape.layers.length, 5);
@@ -57,6 +57,7 @@ void main() {
       final image = ShapeSpecRegistry.instance.resolveMask(asset);
       expect(image.width, 128);
       expect(image.height, 128);
+      expect(asset.contains('_v2.b64'), isTrue);
     }
   });
 }
