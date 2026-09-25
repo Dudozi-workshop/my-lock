@@ -278,7 +278,7 @@ class _StyleTabBar extends StatelessWidget {
         tabs: const [
           Tab(text: '도형'),
           Tab(text: '색상'),
-          Tab(text: '질감'),
+          Tab(text: '스타일'),
         ],
       ),
     );
