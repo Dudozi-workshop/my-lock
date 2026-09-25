@@ -309,17 +309,18 @@ class ShapeSpecRenderer {
   }) {
     final base = baseColorForTone(token.tone);
 
-    // Keep every mark inside the same palette hue. Variation is only a
-    // pressure/wax-density shift, like drawing repeatedly with one crayon.
+    // Color-lock rule: Crayon Soft must preserve the exact palette identity.
+    // Marks may move only a few lightness points to reveal wax pressure;
+    // hue and saturation stay fixed across candidates.
     final pressureDark = adjustTone(
       base,
-      lightnessDelta: -0.028 - config.toneVariation * 0.055,
-      saturationDelta: 0.006,
+      lightnessDelta: -0.010,
+      saturationDelta: 0.0,
     );
     final pressureLight = adjustTone(
       base,
-      lightnessDelta: 0.020 + config.toneVariation * 0.035,
-      saturationDelta: -0.008,
+      lightnessDelta: 0.008,
+      saturationDelta: 0.0,
     );
 
     // A very light underpaint prevents 58px pinholes from reading as broken
