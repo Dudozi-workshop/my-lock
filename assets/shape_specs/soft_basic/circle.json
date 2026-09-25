@@ -1,7 +1,7 @@
 {
   "styleId": "soft_basic",
   "shapeId": "circle",
-  "version": 6,
+  "version": 7,
   "rotationMode": "fixed",
   "body": {
     "kind": "circle",
@@ -59,22 +59,22 @@
       "id": "soft_spec",
       "role": "spec",
       "blend": "screen",
-      "opacity": 0.16,
+      "opacity": 0.14,
       "blur": 0,
       "geometry": {
         "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_soft_spec_v3.b64"
+        "asset": "assets/shape_specs/soft_basic/circle_soft_spec_v4.b64"
       }
     },
     {
       "id": "core_spec",
       "role": "spec",
       "blend": "screen",
-      "opacity": 0.68,
+      "opacity": 0.64,
       "blur": 0,
       "geometry": {
         "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_core_spec_v3.b64"
+        "asset": "assets/shape_specs/soft_basic/circle_core_spec_v4.b64"
       }
     }
   ],
