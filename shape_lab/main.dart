@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+enum _LabTab { shape, palette, effect, qa }
 import 'package:flutter/services.dart';
 import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
@@ -40,6 +42,7 @@ class _ShapeLabPageState extends State<ShapeLabPage>
   ShapeTexture texture = ShapeTexture.glossy;
   bool darkBackground = false;
   bool draftMode = true;
+  _LabTab labTab = _LabTab.shape;
 
   double overallScale = 1.0;
   double scaleX = 1.0;
@@ -218,6 +221,17 @@ class _ShapeLabPageState extends State<ShapeLabPage>
                     ],
                   ),
                   const SizedBox(height: 18),
+                  SegmentedButton<_LabTab>(
+                    segments: const [
+                      ButtonSegment(value: _LabTab.shape, label: Text('Shape Lab')),
+                      ButtonSegment(value: _LabTab.palette, label: Text('Palette Lab')),
+                      ButtonSegment(value: _LabTab.effect, label: Text('Effect Lab')),
+                      ButtonSegment(value: _LabTab.qa, label: Text('Runtime QA')),
+                    ],
+                    selected: {labTab},
+                    onSelectionChanged: (value) => setState(() => labTab = value.first),
+                  ),
+                  const SizedBox(height: 18),
 
                   _Panel(
                     color: cardColor,
@@ -262,7 +276,7 @@ class _ShapeLabPageState extends State<ShapeLabPage>
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  if (labTab == _LabTab.palette) ...[
                   _Panel(
                     color: cardColor,
                     child: Column(
@@ -277,7 +291,9 @@ class _ShapeLabPageState extends State<ShapeLabPage>
                           '확정된 2D Soft 색상값을 브라우저에서 직접 렌더링 · 이미지 에셋 미사용',
                           style: TextStyle(color: muted, fontSize: 13),
                         ),
-                        const SizedBox(height: 16),
+                        ],
+
+                  const SizedBox(height: 16),
                         LayoutBuilder(builder: (context, constraints) {
                           final itemWidth = constraints.maxWidth < 720
                               ? (constraints.maxWidth - 12) / 2
