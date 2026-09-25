@@ -268,6 +268,50 @@ class _ShapeLabPageState extends State<ShapeLabPage>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text('Drop 01 · 작은 물고기 Shape Master 후보',
+                          style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 4),
+                        Text('색상·애니메이션·이펙트 제외 · 동일 58×58 슬롯 · 실루엣 비교용',
+                          style: TextStyle(color: muted, fontSize: 13)),
+                        const SizedBox(height: 16),
+                        LayoutBuilder(builder: (context, constraints) {
+                          final width = constraints.maxWidth < 720
+                              ? (constraints.maxWidth - 12) / 2
+                              : (constraints.maxWidth - 24) / 3;
+                          return Wrap(
+                            spacing: 12, runSpacing: 12,
+                            children: [
+                              for (var i = 0; i < 6; i++)
+                                SizedBox(
+                                  width: width,
+                                  child: Column(children: [
+                                    SizedBox.square(
+                                      dimension: 132,
+                                      child: Center(child: Transform.scale(
+                                        scale: 2,
+                                        child: SizedBox.square(
+                                          dimension: 58,
+                                          child: CustomPaint(painter: _FishCandidatePainter(i)),
+                                        ),
+                                      )),
+                                    ),
+                                    Text(['01 타원형','02 세로형','03 삼각 체형','04 부채꼬리형','05 통통형','06 슬림 열대어형'][i],
+                                      style: TextStyle(color: textColor, fontWeight: FontWeight.w800)),
+                                  ]),
+                                ),
+                            ],
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  _Panel(
+                    color: cardColor,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
                           'Color Effect PoC · APP EXACT',
                           style: TextStyle(
@@ -1378,4 +1422,56 @@ class _LabSlider extends StatelessWidget {
       ],
     );
   }
+}
+
+
+class _FishCandidatePainter extends CustomPainter {
+  const _FishCandidatePainter(this.variant);
+  final int variant;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()..color = const Color(0xFF72AEEA);
+    final outline = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.1
+      ..color = const Color(0xFF3979B9);
+    final cx = size.width * .47, cy = size.height * .50;
+    final specs = <List<double>>[
+      [31, 19, 13, 18], [25, 26, 13, 19], [30, 17, 18, 22],
+      [28, 19, 19, 27], [25, 23, 14, 18], [34, 14, 15, 20],
+    ];
+    final s = specs[variant];
+    final body = Rect.fromCenter(center: Offset(cx, cy), width: s[0], height: s[1]);
+    final bodyPath = Path()..addOval(body);
+    canvas.drawPath(bodyPath, p); canvas.drawPath(bodyPath, outline);
+
+    final tailX = body.right - 1;
+    final tail = Path()
+      ..moveTo(tailX, cy)
+      ..quadraticBezierTo(tailX + s[2], cy - s[3] * .58, tailX + s[2], cy - s[3] * .45)
+      ..quadraticBezierTo(tailX + s[2] * .55, cy, tailX + s[2], cy + s[3] * .45)
+      ..quadraticBezierTo(tailX + s[2], cy + s[3] * .58, tailX, cy)
+      ..close();
+    canvas.drawPath(tail, p); canvas.drawPath(tail, outline);
+
+    final fin = Path()
+      ..moveTo(cx - 2, body.top + 1)
+      ..quadraticBezierTo(cx + 4, body.top - 8 - variant % 2 * 2, cx + 9, body.top + 2)
+      ..close();
+    canvas.drawPath(fin, p); canvas.drawPath(fin, outline);
+
+    if (variant == 2 || variant == 5) {
+      final lower = Path()
+        ..moveTo(cx + 2, body.bottom - 1)
+        ..quadraticBezierTo(cx + 8, body.bottom + 7, cx + 11, body.bottom - 2)
+        ..close();
+      canvas.drawPath(lower, p); canvas.drawPath(lower, outline);
+    }
+
+    canvas.drawCircle(Offset(body.left + 7, cy - 3), 1.7, Paint()..color = const Color(0xFF173D69));
+  }
+
+  @override
+  bool shouldRepaint(covariant _FishCandidatePainter oldDelegate) => oldDelegate.variant != variant;
 }
