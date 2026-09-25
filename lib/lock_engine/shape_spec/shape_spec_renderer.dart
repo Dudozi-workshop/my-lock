@@ -66,6 +66,29 @@ class ShapeSpecRenderer {
         ShapeLayerRole.spec => rules.specColor,
       };
 
+      if (layer.geometry.kind == 'mask') {
+        final asset = layer.geometry.values['asset'] as String;
+        final image = ShapeSpecRegistry.instance.resolveMask(asset);
+        final paint = Paint()
+          ..filterQuality = FilterQuality.high
+          ..colorFilter = ColorFilter.mode(
+            layerColor.withValues(alpha: layer.opacity * opacity),
+            BlendMode.srcIn,
+          );
+        canvas.drawImageRect(
+          image,
+          Rect.fromLTWH(
+            0,
+            0,
+            image.width.toDouble(),
+            image.height.toDouble(),
+          ),
+          Rect.fromLTWH(0, 0, canvasSize, canvasSize),
+          paint,
+        );
+        continue;
+      }
+
       final geometryPath = _pathFor(layer.geometry);
       final center = _centerFor(layer.geometry);
 
