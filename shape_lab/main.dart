@@ -62,7 +62,7 @@ class _ShapeLabPageState extends State<ShapeLabPage>
     super.initState();
     _effectController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: 8),
     )..repeat();
   }
 
