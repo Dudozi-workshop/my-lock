@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../models.dart';
+import 'shape_render_overrides.dart';
 import 'shape_spec.dart';
 import 'shape_spec_registry.dart';
 
@@ -20,6 +21,7 @@ class ShapeSpecRenderer {
     required double opacity,
     double objectRotation = 0,
     CrayonTextureSpec? crayonOverride,
+    ShapeRenderOverrides? overrides,
   }) {
     final bundle = ShapeSpecRegistry.instance.resolve(style, token.shape);
     final canvasSize = bundle.style.canvasSize;
@@ -52,13 +54,17 @@ class ShapeSpecRenderer {
     }
 
     final shadow = bundle.shape.shadow;
-    if (shadow.opacity > 0) {
+    final shadowOpacity =
+        shadow.opacity * (overrides?.shadowOpacityScale ?? 1);
+    final shadowElevation =
+        shadow.elevation * (overrides?.shadowElevationScale ?? 1);
+    if (shadowOpacity > 0) {
       canvas.save();
       canvas.translate(shadow.offsetX, shadow.offsetY);
       canvas.drawShadow(
         bodyPath,
-        Colors.black.withValues(alpha: shadow.opacity * opacity),
-        shadow.elevation,
+        Colors.black.withValues(alpha: shadowOpacity * opacity),
+        shadowElevation,
         true,
       );
       canvas.restore();
@@ -93,8 +99,11 @@ class ShapeSpecRenderer {
     if (bundle.shape.surface.kind == 'radial') {
       final surface = bundle.shape.surface;
       bodyPaint.shader = RadialGradient(
-        center: Alignment(surface.centerX, surface.centerY),
-        radius: surface.radius,
+        center: Alignment(
+          overrides?.surfaceCenterX ?? surface.centerX,
+          overrides?.surfaceCenterY ?? surface.centerY,
+        ),
+        radius: overrides?.surfaceRadius ?? surface.radius,
         colors: [
           surfaceLight.withValues(alpha: opacity),
           base.withValues(alpha: opacity),
@@ -111,6 +120,8 @@ class ShapeSpecRenderer {
     canvas.save();
     canvas.clipPath(bodyPath);
     for (final layer in bundle.shape.layers) {
+      final layerOpacity =
+          overrides?.resolveLayerOpacity(layer) ?? layer.opacity;
       final layerColor = switch (layer.role) {
         ShapeLayerRole.light => light,
         ShapeLayerRole.shade => shade,
@@ -124,7 +135,7 @@ class ShapeSpecRenderer {
           ..filterQuality = FilterQuality.high
           ..blendMode = _blendModeFor(layer.blend)
           ..colorFilter = ColorFilter.mode(
-            layerColor.withValues(alpha: layer.opacity * opacity),
+            layerColor.withValues(alpha: layerOpacity * opacity),
             BlendMode.srcIn,
           );
         canvas.drawImageRect(
@@ -154,7 +165,7 @@ class ShapeSpecRenderer {
 
       final paint = Paint()
         ..blendMode = _blendModeFor(layer.blend)
-        ..color = layerColor.withValues(alpha: layer.opacity * opacity);
+        ..color = layerColor.withValues(alpha: layerOpacity * opacity);
       if (layer.blur > 0) {
         paint.maskFilter = MaskFilter.blur(BlurStyle.normal, layer.blur);
       }
