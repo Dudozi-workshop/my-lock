@@ -32,6 +32,11 @@ enum SoftBasicLowerVolumeTechnique {
   liftGradient,
   shadowCarve,
   ambientBounce,
+  ambientBounceStrong,
+  ambientBounceWide,
+  ambientBounceContrast,
+  ambientBounceAsymmetric,
+  ambientBounceCarved,
 }
 
 class SoftBasicCandidate {
@@ -211,5 +216,60 @@ const softBasicCircleRound10Candidates = <SoftBasicCandidate>[
     finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
     lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.ambientBounce,
     badge: 'REF',
+  ),
+];
+
+
+const softBasicCircleRound11Candidates = <SoftBasicCandidate>[
+  SoftBasicCandidate(
+    id: 'SB-C-R11-01',
+    name: 'Ambient Base',
+    intent: 'R10-06 Ambient Bounce 그대로. Round 11 체감 강화 비교의 기준안.',
+    state: SoftBasicCandidateState.shortlist,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.ambientBounce,
+    badge: 'R10-06',
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R11-02',
+    name: 'Bounce +25%',
+    intent: '위치와 범위는 유지하고 색상 기반 반사광의 강도만 약 25% 높인 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.ambientBounceStrong,
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R11-03',
+    name: 'Wide Bounce',
+    intent: '하단 반사광 범위를 넓혀 58px에서도 볼륨 변화가 더 쉽게 읽히도록 한 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.ambientBounceWide,
+    badge: 'WIDE',
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R11-04',
+    name: 'Color Contrast',
+    intent: '흰색 없이 현재 색상의 밝은 톤 대비만 강화해 반사광을 명확하게 만든 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.ambientBounceContrast,
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R11-05',
+    name: 'Asymmetric Bounce',
+    intent: '반사광 중심을 살짝 좌측으로 이동해 균일한 띠 대신 자연스러운 비대칭 볼륨을 만든 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.ambientBounceAsymmetric,
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R11-06',
+    name: 'Bounce + Carve',
+    intent: '넓은 반사광과 우하단 음영 완화를 함께 적용해 선을 추가하지 않고 체감 볼륨을 키운 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.ambientBounceCarved,
+    badge: 'TARGET',
   ),
 ];
