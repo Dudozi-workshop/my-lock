@@ -1,7 +1,7 @@
 {
   "styleId": "soft_basic",
   "shapeId": "circle",
-  "version": 7,
+  "version": 8,
   "rotationMode": "fixed",
   "body": {
     "kind": "circle",
@@ -11,13 +11,13 @@
   },
   "surface": {
     "kind": "radial",
-    "centerX": -0.28,
-    "centerY": -0.34,
-    "radius": 1.55,
+    "centerX": -0.22,
+    "centerY": -0.28,
+    "radius": 1.72,
     "stops": [
       0,
-      0.18,
-      0.86,
+      0.12,
+      0.9,
       1
     ]
   },
@@ -26,62 +26,62 @@
       "id": "diffuse_light",
       "role": "light",
       "blend": "softLight",
-      "opacity": 0.4,
+      "opacity": 0.32,
       "blur": 0,
       "geometry": {
         "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_diffuse_light_v2.b64"
+        "asset": "assets/shape_specs/soft_basic/circle_diffuse_light_v4.b64"
       }
     },
     {
       "id": "form_shadow",
       "role": "shade",
       "blend": "multiply",
-      "opacity": 0.245,
+      "opacity": 0.36,
       "blur": 0,
       "geometry": {
         "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_form_shadow_v2.b64"
+        "asset": "assets/shape_specs/soft_basic/circle_form_shadow_v4.b64"
       }
     },
     {
       "id": "rim_light",
       "role": "light",
       "blend": "screen",
-      "opacity": 0.035,
+      "opacity": 0.045,
       "blur": 0,
       "geometry": {
         "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_rim_light_v2.b64"
+        "asset": "assets/shape_specs/soft_basic/circle_rim_light_v4.b64"
       }
     },
     {
       "id": "soft_spec",
       "role": "spec",
       "blend": "screen",
-      "opacity": 0.14,
+      "opacity": 0.2,
       "blur": 0,
       "geometry": {
         "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_soft_spec_v4.b64"
+        "asset": "assets/shape_specs/soft_basic/circle_soft_spec_v6.b64"
       }
     },
     {
       "id": "core_spec",
       "role": "spec",
       "blend": "screen",
-      "opacity": 0.64,
+      "opacity": 0.7,
       "blur": 0,
       "geometry": {
         "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_core_spec_v4.b64"
+        "asset": "assets/shape_specs/soft_basic/circle_core_spec_v6.b64"
       }
     }
   ],
   "shadow": {
-    "opacity": 0.016,
-    "elevation": 1.2,
-    "offsetX": 0.25,
-    "offsetY": 0.65
+    "opacity": 0.014,
+    "elevation": 1.1,
+    "offsetX": 0.2,
+    "offsetY": 0.55
   }
 }
