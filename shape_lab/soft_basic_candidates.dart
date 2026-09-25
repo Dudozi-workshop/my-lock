@@ -8,12 +8,12 @@ enum SoftBasicCandidateState {
 }
 
 enum SoftBasicCircleFinishTechnique {
-  baseHold,
-  longTaper,
-  softBelly,
-  innerFade,
-  flattenedTop,
-  refinedEdgeLeaf,
+  outlineBase,
+  softInnerRim,
+  colorShell,
+  lowerRim,
+  cleanOutline,
+  premiumRim,
 }
 
 class SoftBasicCandidate {
@@ -34,49 +34,49 @@ class SoftBasicCandidate {
   final String? badge;
 }
 
-const softBasicCircleRound7Candidates = <SoftBasicCandidate>[
+const softBasicCircleRound8Candidates = <SoftBasicCandidate>[
   SoftBasicCandidate(
-    id: 'SB-C-R7-01',
-    name: 'Base Hold',
-    intent: 'Round 6에서 가장 나았던 Edge Leaf Base를 그대로 유지한 기준안.',
+    id: 'SB-C-R8-01',
+    name: 'Outline Base',
+    intent: '선택된 R7-01 Edge Leaf를 유지하고 외곽선 보강 없이 보는 기준안.',
     state: SoftBasicCandidateState.shortlist,
-    finishTechnique: SoftBasicCircleFinishTechnique.baseHold,
+    finishTechnique: SoftBasicCircleFinishTechnique.outlineBase,
     badge: 'BASE',
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R7-02',
-    name: 'Long Taper',
-    intent: '하이라이트 끝을 더 길고 가늘게 빼서 흐름을 유려하게 만든 안.',
+    id: 'SB-C-R8-02',
+    name: 'Soft Inner Rim',
+    intent: '도형 안쪽에 넓고 부드러운 밝은 림을 넣어 외곽 두께감을 만드는 안.',
     state: SoftBasicCandidateState.candidate,
-    finishTechnique: SoftBasicCircleFinishTechnique.longTaper,
+    finishTechnique: SoftBasicCircleFinishTechnique.softInnerRim,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R7-03',
-    name: 'Soft Belly',
-    intent: '중앙 폭을 살짝 키워 흰 선보다 부드러운 면광으로 읽히게 만든 안.',
+    id: 'SB-C-R8-03',
+    name: 'Color Shell',
+    intent: 'Base Hue에서 파생한 컬러 외곽선으로 실루엣을 또렷하게 잡는 안.',
     state: SoftBasicCandidateState.candidate,
-    finishTechnique: SoftBasicCircleFinishTechnique.softBelly,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R7-04',
-    name: 'Inner Fade',
-    intent: '외곽 형태는 유지하고 안쪽으로 밝기가 자연스럽게 사라지는 페이드형.',
+    id: 'SB-C-R8-04',
+    name: 'Lower Rim',
+    intent: '우하단 외곽 일부에만 도톰한 림을 넣어 전체 선 느낌 없이 형태를 받치는 안.',
     state: SoftBasicCandidateState.candidate,
-    finishTechnique: SoftBasicCircleFinishTechnique.innerFade,
+    finishTechnique: SoftBasicCircleFinishTechnique.lowerRim,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R7-05',
-    name: 'Flattened Top',
-    intent: '상단 시작부를 눌러 더 차분하고 덜 인위적인 하이라이트로 정리한 안.',
+    id: 'SB-C-R8-05',
+    name: 'Clean Outline',
+    intent: '전체 외곽을 가장 얇고 정돈된 컬러 라인으로 감싼 안.',
     state: SoftBasicCandidateState.candidate,
-    finishTechnique: SoftBasicCircleFinishTechnique.flattenedTop,
+    finishTechnique: SoftBasicCircleFinishTechnique.cleanOutline,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R7-06',
-    name: 'Refined Edge Leaf',
-    intent: 'Base Hold의 장점을 유지하면서 길이·폭·곡률·페이드를 균형 있게 정리한 최종 후보.',
+    id: 'SB-C-R8-06',
+    name: 'Premium Rim',
+    intent: '약한 컬러 Shell과 부드러운 Inner Rim을 함께 써 도톰하지만 선처럼 보이지 않게 정리한 안.',
     state: SoftBasicCandidateState.candidate,
-    finishTechnique: SoftBasicCircleFinishTechnique.refinedEdgeLeaf,
+    finishTechnique: SoftBasicCircleFinishTechnique.premiumRim,
     badge: 'TARGET',
   ),
 ];
