@@ -54,8 +54,9 @@ const softBasicCircleRound8Candidates = <SoftBasicCandidate>[
     id: 'SB-C-R8-03',
     name: 'Color Shell',
     intent: 'Base Hue에서 파생한 컬러 외곽선으로 실루엣을 또렷하게 잡는 안.',
-    state: SoftBasicCandidateState.candidate,
+    state: SoftBasicCandidateState.selected,
     finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    badge: 'SELECTED',
   ),
   SoftBasicCandidate(
     id: 'SB-C-R8-04',
