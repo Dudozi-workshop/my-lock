@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec_renderer.dart';
+import 'package:my_lock/dev/style_lab/style_lab_route.dart';
+import 'package:my_lock/dev/style_lab/style_lab_shell.dart';
 
 import 'soft_basic_candidates.dart';
 
@@ -13,73 +15,101 @@ Future<void> main() async {
 
 class SoftBasicStyleLabApp extends StatelessWidget {
   const SoftBasicStyleLabApp({super.key});
+
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    debugShowCheckedModeBanner: false,
-    title: 'MY LOCK · Soft Basic Style Lab',
-    theme: ThemeData(useMaterial3: true, colorSchemeSeed: const Color(0xFF7257F5)),
-    home: const SoftBasicStyleLabPage(),
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'MY LOCK · Style Lab',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: const Color(0xFF7257F5),
+      ),
+      home: StyleLabShell(
+        domains: const [
+          StyleLabDomain(
+            id: 'soft-basic',
+            label: 'Soft Basic',
+            builder: _buildSoftBasicDomain,
+          ),
+        ],
+        initialStyleId: resolveStyleLabInitialStyle(
+          fallbackStyleId: 'soft-basic',
+        ),
+        onStyleChanged: syncStyleLabUrl,
+        labMarker: 'LAB 001 · Round 1 Direction · 8 Candidates · APP EXACT',
+      ),
+    );
+  }
+}
+
+Widget _buildSoftBasicDomain(
+  BuildContext context,
+  StyleLabTheme theme,
+) {
+  return _SoftBasicDomain(
+    theme: theme,
   );
 }
 
-class SoftBasicStyleLabPage extends StatefulWidget {
-  const SoftBasicStyleLabPage({super.key});
+class _SoftBasicDomain extends StatefulWidget {
+  const _SoftBasicDomain({required this.theme});
+
+  final StyleLabTheme theme;
+
   @override
-  State<SoftBasicStyleLabPage> createState() => _SoftBasicStyleLabPageState();
+  State<_SoftBasicDomain> createState() => _SoftBasicDomainState();
 }
 
-class _SoftBasicStyleLabPageState extends State<SoftBasicStyleLabPage> {
+class _SoftBasicDomainState extends State<_SoftBasicDomain> {
   int selectedIndex = 0;
-  bool dark = false;
+
   @override
   Widget build(BuildContext context) {
-    final bg = dark ? const Color(0xFF101218) : const Color(0xFFF6F5FA);
-    final card = dark ? const Color(0xFF1A1D26) : Colors.white;
-    final fg = dark ? Colors.white : const Color(0xFF171923);
-    final muted = dark ? const Color(0xFFAEB4C3) : const Color(0xFF6D7382);
     final selected = softBasicRound1Candidates[selectedIndex];
-    return Scaffold(
-      backgroundColor: bg,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(12, 14, 12, 28),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1180),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(children: [
-                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('Soft Basic · Style Lab', style: TextStyle(color: fg, fontSize: 22, fontWeight: FontWeight.w900)),
-                      const SizedBox(height: 2),
-                      Text('LAB 001 · Round 1 Direction · 8 Candidates · APP EXACT', style: TextStyle(color: muted, fontSize: 11.5)),
-                    ])),
-                    Switch(value: dark, onChanged: (v) => setState(() => dark = v)),
-                  ]),
-                  const SizedBox(height: 12),
-                  LayoutBuilder(builder: (context, constraints) {
-                    final columns = constraints.maxWidth >= 980 ? 4 : 2;
-                    const gap = 8.0;
-                    final itemWidth = (constraints.maxWidth - gap * (columns - 1)) / columns;
-                    return Wrap(spacing: gap, runSpacing: gap, children: [
-                      for (var i = 0; i < softBasicRound1Candidates.length; i++)
-                        SizedBox(width: itemWidth, child: _CandidateCard(
-                          candidate: softBasicRound1Candidates[i],
-                          selected: i == selectedIndex,
-                          card: card, fg: fg, muted: muted,
-                          onTap: () => setState(() => selectedIndex = i),
-                        )),
-                    ]);
-                  }),
-                  const SizedBox(height: 14),
-                  _DetailPanel(candidate: selected, card: card, fg: fg, muted: muted),
-                ],
-              ),
-            ),
-          ),
+    final card = widget.theme.card;
+    final fg = widget.theme.foreground;
+    final muted = widget.theme.muted;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final columns = constraints.maxWidth >= 980 ? 4 : 2;
+            const gap = 8.0;
+            final itemWidth =
+                (constraints.maxWidth - gap * (columns - 1)) / columns;
+            return Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                for (var i = 0;
+                    i < softBasicRound1Candidates.length;
+                    i++)
+                  SizedBox(
+                    width: itemWidth,
+                    child: _CandidateCard(
+                      candidate: softBasicRound1Candidates[i],
+                      selected: i == selectedIndex,
+                      card: card,
+                      fg: fg,
+                      muted: muted,
+                      onTap: () => setState(() => selectedIndex = i),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
-      ),
+        const SizedBox(height: 14),
+        _DetailPanel(
+          candidate: selected,
+          card: card,
+          fg: fg,
+          muted: muted,
+        ),
+      ],
     );
   }
 }
