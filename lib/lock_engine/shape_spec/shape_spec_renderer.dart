@@ -308,27 +308,22 @@ class ShapeSpecRenderer {
     required CrayonTextureSpec config,
   }) {
     final base = baseColorForTone(token.tone);
-    final dark = adjustTone(
+
+    // Keep every mark inside the same palette hue. Variation is only a
+    // pressure/wax-density shift, like drawing repeatedly with one crayon.
+    final pressureDark = adjustTone(
       base,
-      lightnessDelta: -0.055 - config.toneVariation * 0.16,
-      saturationDelta: 0.012,
+      lightnessDelta: -0.028 - config.toneVariation * 0.055,
+      saturationDelta: 0.006,
     );
-    final light = adjustTone(
+    final pressureLight = adjustTone(
       base,
-      lightnessDelta: 0.045 + config.toneVariation * 0.10,
-      saturationDelta: -0.018,
+      lightnessDelta: 0.020 + config.toneVariation * 0.035,
+      saturationDelta: -0.008,
     );
 
-    canvas.save();
-    canvas.translate(0.10, 0.45);
-    canvas.drawShadow(
-      bodyPath,
-      Colors.black.withValues(alpha: 0.018 * opacity),
-      0.9,
-      true,
-    );
-    canvas.restore();
-
+    // A very light underpaint prevents 58px pinholes from reading as broken
+    // rendering, while the visible surface is still built by actual strokes.
     if (config.underpaintOpacity > 0) {
       canvas.drawPath(
         bodyPath,
@@ -340,7 +335,7 @@ class ShapeSpecRenderer {
     }
 
     final cacheKey =
-        '${style.id}:${style.version}:${token.id}:R3:${_crayonConfigKey(config)}';
+        '${style.id}:${style.version}:${token.id}:HAND:${_crayonConfigKey(config)}';
     final texture = _crayonTextureCache.putIfAbsent(
       cacheKey,
       () => _buildStrokeBuiltTexture(config, cacheKey),
@@ -349,11 +344,11 @@ class ShapeSpecRenderer {
     canvas.save();
     canvas.clipPath(bodyPath);
 
-    void paintStroke(_CrayonStroke stroke, Color nominal) {
-      final mixed = switch (stroke.toneBand) {
-        -1 => Color.lerp(nominal, dark, 0.72)!,
-        1 => Color.lerp(nominal, light, 0.68)!,
-        _ => nominal,
+    void paintStroke(_CrayonStroke stroke) {
+      final pigment = switch (stroke.toneBand) {
+        -1 => Color.lerp(base, pressureDark, 0.78)!,
+        1 => Color.lerp(base, pressureLight, 0.72)!,
+        _ => base,
       };
       canvas.drawPath(
         stroke.path,
@@ -362,66 +357,77 @@ class ShapeSpecRenderer {
           ..strokeCap = StrokeCap.round
           ..strokeJoin = StrokeJoin.round
           ..strokeWidth = stroke.width
-          ..color = mixed.withValues(alpha: stroke.opacity * opacity),
+          ..color = pigment.withValues(alpha: stroke.opacity * opacity),
       );
     }
 
+    // Broad passes read as the first hand-filled wax layer. Main and light
+    // passes are not different colors; they simulate pressure and overlap.
     for (final stroke in texture.broadStrokes) {
-      paintStroke(stroke, base);
+      paintStroke(stroke);
     }
     for (final stroke in texture.mainStrokes) {
-      paintStroke(stroke, dark);
+      paintStroke(stroke);
     }
     for (final stroke in texture.lightPigmentStrokes) {
-      paintStroke(stroke, light);
+      paintStroke(stroke);
     }
 
     final grainPaint = Paint()
-      ..color = base.withValues(alpha: config.grainOpacity * 0.56 * opacity);
+      ..color = base.withValues(alpha: config.grainOpacity * 0.42 * opacity);
     for (final dot in texture.grain) {
       canvas.drawCircle(dot.center, dot.radius, grainPaint);
     }
 
     canvas.restore();
 
-    if (config.edgeOpacity > 0) {
-      final edgeAlpha = config.edgeOpacity * opacity;
-      final edgeWidth = config.edgeWidth;
+    if (config.edgeOpacity <= 0) return;
 
-      // A Crayon Soft contour should read as pigment deposited along the
-      // silhouette, not as a thin vector outline. Build it from several
-      // slightly offset passes so the edge stays thick but softly irregular.
+    // The contour is drawn with the SAME crayon color, then repeated with
+    // tiny deterministic offsets. This is intentionally not a clean vector
+    // border: it mimics outlining the shape by hand before filling it in.
+    final edgeAlpha = config.edgeOpacity * opacity;
+    final edgeWidth = config.edgeWidth;
+    final contourColor = Color.lerp(base, pressureDark, 0.22)!;
+
+    void paintContour(
+      Offset delta,
+      double widthScale,
+      double alphaScale,
+    ) {
+      canvas.save();
+      canvas.translate(delta.dx, delta.dy);
       canvas.drawPath(
         bodyPath,
         Paint()
           ..style = PaintingStyle.stroke
-          ..strokeWidth = edgeWidth
+          ..strokeWidth = edgeWidth * widthScale
           ..strokeJoin = StrokeJoin.round
           ..strokeCap = StrokeCap.round
-          ..color = dark.withValues(alpha: edgeAlpha),
+          ..color = contourColor.withValues(alpha: edgeAlpha * alphaScale),
       );
+      canvas.restore();
+    }
 
-      if (config.edgeTexture > 0) {
-        final textureAlpha = edgeAlpha * (0.34 + config.edgeTexture * 0.28);
-        final offset = 0.28 + config.edgeTexture * 0.46;
+    paintContour(Offset.zero, 1.0, 0.82);
 
-        for (final delta in <Offset>[
-          Offset(offset, -offset * 0.35),
-          Offset(-offset * 0.55, offset * 0.42),
-        ]) {
-          canvas.save();
-          canvas.translate(delta.dx, delta.dy);
-          canvas.drawPath(
-            bodyPath,
-            Paint()
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = edgeWidth * (0.58 + config.edgeTexture * 0.12)
-              ..strokeJoin = StrokeJoin.round
-              ..strokeCap = StrokeCap.round
-              ..color = base.withValues(alpha: textureAlpha),
-          );
-          canvas.restore();
-        }
+    if (config.edgeTexture > 0) {
+      final roughness = config.edgeTexture.clamp(0.0, 1.0);
+      final offset = 0.18 + roughness * 0.72;
+      final extraPasses = 1 + (roughness * 3).round();
+
+      const directions = <Offset>[
+        Offset(1.0, -0.28),
+        Offset(-0.62, 0.48),
+        Offset(0.24, 0.86),
+        Offset(-0.88, -0.22),
+      ];
+
+      for (var i = 0; i < extraPasses; i++) {
+        final d = directions[i % directions.length];
+        final scale = i.isEven ? 0.72 : 0.58;
+        final alpha = i.isEven ? 0.44 : 0.32;
+        paintContour(d * offset, scale, alpha);
       }
     }
   }
