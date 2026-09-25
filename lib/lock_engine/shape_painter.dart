@@ -463,60 +463,88 @@ void _paintToneMotionEffect(
     return;
   }
 
-  // Firefly Light: the signature lives around the token, not inside it.
-  // Three fireflies follow different elliptical/wobbling orbits and pulse
-  // asynchronously. A faint reflected glow is clipped onto the surface when
-  // each firefly passes nearby.
-  const seeds = <(double, double, double, double)>[
-    (.00, 1.00, .82, .00),
-    (.34, .88, 1.06, .23),
-    (.69, 1.10, .76, .57),
-  ];
-  for (var i = 0; i < seeds.length; i++) {
-    final seed = seeds[i];
-    final local = (t + seed.$4) % 1.0;
-    final angle = 2 * pi * local;
-    final wobble = sin(angle * 2.7 + i * 1.9);
-    final orbitX = bounds.width * (.56 + .045 * wobble) * seed.$2;
-    final orbitY = bounds.height * (.57 + .055 * sin(angle * 1.9 + i)) * seed.$3;
-    final point = bounds.center + Offset(cos(angle) * orbitX, sin(angle) * orbitY);
-    final pulseWave = sin(2 * pi * (local * (1.45 + i * .19) + i * .21));
-    final pulse = pow(max(0.0, pulseWave), 2).toDouble();
-    final glow = radius * (.075 + .055 * pulse);
+  // Firefly Light: three nearby fireflies wander between deterministic
+  // pseudo-random waypoints. The motion is intentionally non-orbital:
+  // direction, distance and speed vary smoothly like real insects, while the
+  // sequence stays deterministic and allocation-free inside paint().
+  const fireflyCount = 3;
+  const waypointCount = 11;
+
+  double hash01(int value) {
+    final x = sin(value * 12.9898 + 78.233) * 43758.5453;
+    return x - x.floorToDouble();
+  }
+
+  double smoothstep(double x) => x * x * (3 - 2 * x);
+
+  Offset waypoint(int firefly, int index) {
+    final wrapped = index % waypointCount;
+    final seed = firefly * 97 + wrapped * 31;
+    final nx = hash01(seed + 11) * 2 - 1;
+    final ny = hash01(seed + 29) * 2 - 1;
+    final extentX = bounds.width * (.62 + hash01(seed + 41) * .16);
+    final extentY = bounds.height * (.64 + hash01(seed + 53) * .18);
+    var point = bounds.center + Offset(nx * extentX, ny * extentY);
+
+    // Keep the firefly itself outside the token. If a random waypoint lands
+    // inside the silhouette, push it outward along the center vector.
+    if (path.contains(point)) {
+      var vector = point - bounds.center;
+      if (vector.distance < .001) vector = const Offset(1, 0);
+      point = bounds.center +
+          vector / vector.distance * (radius * (1.10 + hash01(seed + 67) * .26));
+    }
+    return point;
+  }
+
+  for (var i = 0; i < fireflyCount; i++) {
+    final local = (t + i * .173) % 1.0;
+    final travel = local * waypointCount;
+    final segment = travel.floor();
+    final segmentT = smoothstep(travel - segment);
+    final a = waypoint(i, segment);
+    final b = waypoint(i, segment + 1);
+    final point = Offset.lerp(a, b, segmentT)!;
+
+    // Irregular bioluminescent pulse rather than a steady blink.
+    final pulseA = max(0.0, sin(2 * pi * (local * (2.1 + i * .27) + i * .19)));
+    final pulseB = max(0.0, sin(2 * pi * (local * (3.7 + i * .13) + .31)));
+    final pulse = pow((pulseA * .68 + pulseB * .32).clamp(0.0, 1.0), 2.2).toDouble();
+    final glow = radius * (.075 + .060 * pulse);
 
     canvas.drawCircle(
       point,
-      glow * 3.2,
+      glow * 3.4,
       Paint()
         ..blendMode = BlendMode.screen
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, glow * 1.8)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, glow * 1.9)
         ..color = const Color(0xFFFFDF54)
-            .withValues(alpha: (.18 + .42 * pulse) * opacity),
+            .withValues(alpha: (.16 + .48 * pulse) * opacity),
     );
     canvas.drawCircle(
       point,
-      max(.9, glow * .55),
+      max(.9, glow * .58),
       Paint()
         ..color = const Color(0xFFFFF6A6)
-            .withValues(alpha: (.62 + .36 * pulse) * opacity),
+            .withValues(alpha: (.58 + .40 * pulse) * opacity),
     );
 
-    // Short-lived surface reflection: visible on every silhouette, including
-    // illustrated shapes such as Dolphin, while the firefly itself stays out.
+    // When a firefly passes close to the token, let its light softly spill
+    // across the glossy surface without turning into an internal particle.
     final towardCenter = Offset(
-      point.dx + (bounds.center.dx - point.dx) * .34,
-      point.dy + (bounds.center.dy - point.dy) * .34,
+      point.dx + (bounds.center.dx - point.dx) * .30,
+      point.dy + (bounds.center.dy - point.dy) * .30,
     );
     canvas.save();
     canvas.clipPath(path);
     canvas.drawCircle(
       towardCenter,
-      glow * 2.4,
+      glow * 2.7,
       Paint()
         ..blendMode = BlendMode.screen
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, glow * 1.5)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, glow * 1.6)
         ..color = const Color(0xFFFFED79)
-            .withValues(alpha: (.06 + .20 * pulse) * opacity),
+            .withValues(alpha: (.05 + .24 * pulse) * opacity),
     );
     canvas.restore();
   }
