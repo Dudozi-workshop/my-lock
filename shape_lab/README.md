@@ -42,3 +42,11 @@ The active comparison deliberately moves away from fine pencil-like texture.
 All candidates are rendered by the production ShapeSpecRenderer at 58 logical
 pixels. The contour and fill share the same palette hue; no white or
 independent outline color is introduced.
+
+
+## Round 10 · E05 Edge Polish
+
+E05 (Broken + Overfill) is the current base. E02 remains as a reference.
+P01-P05 keep the internal crayon surface fixed and vary only the edge
+parameters: width, opacity, segment length/gap, offset/width/opacity jitter,
+edge band width, and overflow amount.
