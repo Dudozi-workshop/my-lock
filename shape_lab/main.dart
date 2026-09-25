@@ -85,7 +85,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 015 · Original Color Lock',
+                                  'LAB 016 · Crayon Edge Lab',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
