@@ -44,7 +44,7 @@ enum ShapeTone {
 }
 
 enum ShapeTexture {
-  glossy('Basic Glossy', false),
+  glossy('Soft Basic', false),
   jelly('Jelly', true),
   glass('Glass', true),
   metal('Metal', true),
