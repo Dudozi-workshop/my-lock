@@ -1438,3 +1438,27 @@ class _LabSlider extends StatelessWidget {
 }
 
 
+
+
+class _PaletteSwatch extends StatelessWidget {
+  const _PaletteSwatch({required this.english,required this.korean,required this.color,required this.hex,required this.dark});
+  final String english,korean,hex; final Color color; final bool dark;
+  @override Widget build(BuildContext context) {
+    final fg=dark?Colors.white:const Color(0xFF171923);
+    final muted=dark?const Color(0xFFAEB4C3):const Color(0xFF6D7382);
+    return Container(padding:const EdgeInsets.all(10),decoration:BoxDecoration(borderRadius:BorderRadius.circular(14),border:Border.all(color:muted.withValues(alpha:.25))),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+      Container(height:82,decoration:BoxDecoration(color:color,borderRadius:BorderRadius.circular(10))),
+      const SizedBox(height:8),Text(english,style:TextStyle(color:fg,fontWeight:FontWeight.w800)),Text(korean,style:TextStyle(color:muted,fontSize:12)),Text(hex,style:TextStyle(color:muted,fontSize:12)),
+    ]));
+  }
+}
+class _AuroraSeaSwatch extends StatelessWidget {
+  const _AuroraSeaSwatch({required this.dark}); final bool dark;
+  @override Widget build(BuildContext context) {
+    final muted=dark?const Color(0xFFAEB4C3):const Color(0xFF6D7382);
+    return Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+      Container(height:92,decoration:BoxDecoration(borderRadius:BorderRadius.circular(12),gradient:const LinearGradient(colors:[Color(0xFFA7D8F7),Color(0xFF7FB8FF),Color(0xFFC7B6F3)]))),
+      const SizedBox(height:6),Text('Aurora Sea · 오로라 씨 · SIGNATURE',style:TextStyle(color:muted,fontWeight:FontWeight.w800,fontSize:12)),
+    ]);
+  }
+}
