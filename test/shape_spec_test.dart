@@ -25,7 +25,7 @@ void main() {
     }
   });
 
-  test('Preview 005 circle uses final micro-finish masks', () async {
+  test('Preview 006 circle uses alpha-safe spec masks', () async {
     await ShapeSpecRegistry.instance.load();
 
     final bundle = ShapeSpecRegistry.instance.resolve(
@@ -33,7 +33,7 @@ void main() {
       ShapeKind.circle,
     );
 
-    expect(bundle.shape.version, 6);
+    expect(bundle.shape.version, 7);
     expect(bundle.shape.rotationMode, ShapeRotationMode.fixed);
     expect(bundle.shape.surface.kind, 'radial');
     expect(bundle.shape.layers.length, 5);
@@ -57,10 +57,11 @@ void main() {
       final image = ShapeSpecRegistry.instance.resolveMask(asset);
       expect(image.width, 128);
       expect(image.height, 128);
-      expect(
-        asset.contains('_v2.b64') || asset.contains('_v3.b64'),
-        isTrue,
-      );
+      if (layer.id == 'soft_spec' || layer.id == 'core_spec') {
+        expect(asset.contains('_v4.b64'), isTrue);
+      } else {
+        expect(asset.contains('_v2.b64'), isTrue);
+      }
     }
   });
 }
