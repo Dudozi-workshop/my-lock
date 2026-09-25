@@ -62,6 +62,10 @@ class CrayonTextureSpec {
     required this.lightOpacity,
     required this.grainOpacity,
     required this.edgeOpacity,
+    this.baseStrokeCount = 0,
+    this.underpaintOpacity = 1.0,
+    this.baseStrokeOpacity = 0.0,
+    this.strokeBreakChance = 0.0,
   });
 
   final int darkStrokeCount;
@@ -75,6 +79,13 @@ class CrayonTextureSpec {
   final double grainOpacity;
   final double edgeOpacity;
 
+  /// Crayon-only coverage controls used by Style Lab and future promoted
+  /// presets. Defaults preserve the existing PREVIEW 008 appearance.
+  final int baseStrokeCount;
+  final double underpaintOpacity;
+  final double baseStrokeOpacity;
+  final double strokeBreakChance;
+
   factory CrayonTextureSpec.fromJson(Map<String, dynamic> json) {
     return CrayonTextureSpec(
       darkStrokeCount: (json['darkStrokeCount'] as num).toInt(),
@@ -87,6 +98,13 @@ class CrayonTextureSpec {
       lightOpacity: (json['lightOpacity'] as num).toDouble(),
       grainOpacity: (json['grainOpacity'] as num).toDouble(),
       edgeOpacity: (json['edgeOpacity'] as num).toDouble(),
+      baseStrokeCount: (json['baseStrokeCount'] as num?)?.toInt() ?? 0,
+      underpaintOpacity:
+          (json['underpaintOpacity'] as num?)?.toDouble() ?? 1.0,
+      baseStrokeOpacity:
+          (json['baseStrokeOpacity'] as num?)?.toDouble() ?? 0.0,
+      strokeBreakChance:
+          (json['strokeBreakChance'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

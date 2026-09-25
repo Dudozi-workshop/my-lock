@@ -1,26 +1,27 @@
-# MY LOCK Crayon Soft Shape Lab
+# MY LOCK Style Lab
 
-This lab renders Crayon Soft candidates with the same production
-`LockTokenPainter` and `ShapeSpecRenderer` used by the app.
+The standalone Labs build is the comparison surface for production-rendered
+Shape/Style experiments.
 
-## Round 1
+## Style separation
 
-- C01: current PREVIEW 008 baseline
-- C02-C08: parameter-only Crayon Soft variants
-- Candidate cards use exact 58 x 58 logical rendering.
-- The 4x panel scales the exact 58 px result instead of re-rendering it.
+- Soft Basic: locked reference only in this Crayon round.
+- Crayon Soft: active experimental style.
+- Each style keeps its own candidate set; candidates are never mixed across
+  styles.
 
-The lab does not create separate PNG/SVG mockups. A selected candidate can be
-promoted by copying its parameter set into
-`assets/shape_specs/crayon_soft/style.json`.
+## Crayon Soft Round 2
 
-## Preview access
+Round 1 selected C08 as the direction. Round 2 compares only C08 derivatives:
 
-Use the preview hosts in this order:
+- C08-A: baseline C08
+- C08-B: lower underpaint coverage
+- C08-C: wider spacing / more visible paper gaps
+- C08-D: strongest broken-stroke, childlike incomplete fill
 
-1. Primary: https://my-lock-shape-lab-pages.pages.dev/
-2. Backup: https://my-lock-shape-lab.rlatkd5959.workers.dev/
-3. Recovery: GitHub Actions artifact `my-lock-crayon-shape-lab`
+All candidates use the production `LockTokenPainter` and
+`ShapeSpecRenderer`. No screenshot or separately drawn PNG/SVG is used.
 
-The full deployment policy is documented in
-`docs/shape-lab-preview-standard.md`.
+New coverage parameters default to the PREVIEW 008 behavior, so Soft Basic and
+the current app Crayon preset are unchanged until a candidate is explicitly
+promoted.

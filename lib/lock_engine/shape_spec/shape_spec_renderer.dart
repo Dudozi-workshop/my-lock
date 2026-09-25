@@ -208,7 +208,10 @@ class ShapeSpecRenderer {
 
     canvas.drawPath(
       bodyPath,
-      Paint()..color = fill.withValues(alpha: opacity),
+      Paint()
+        ..color = fill.withValues(
+          alpha: config.underpaintOpacity * opacity,
+        ),
     );
 
     final cacheKey =
@@ -220,6 +223,18 @@ class ShapeSpecRenderer {
 
     canvas.save();
     canvas.clipPath(bodyPath);
+
+    if (texture.baseStrokes.isNotEmpty && config.baseStrokeOpacity > 0) {
+      final basePaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..strokeWidth = config.strokeWidth * 1.12
+        ..color = base.withValues(alpha: config.baseStrokeOpacity * opacity);
+      for (final path in texture.baseStrokes) {
+        canvas.drawPath(path, basePaint);
+      }
+    }
 
     final darkPaint = Paint()
       ..style = PaintingStyle.stroke
@@ -278,7 +293,11 @@ class ShapeSpecRenderer {
   ) {
     final random = Random(_stableSeed(seedText));
 
-    List<Path> buildStrokes(int count, double angleOffset) {
+    List<Path> buildStrokes(
+      int count,
+      double angleOffset, {
+      double breakScale = 1.0,
+    }) {
       final angle = (config.angleDeg + angleOffset) * pi / 180;
       final direction = Offset(cos(angle), sin(angle));
       final normal = Offset(-direction.dy, direction.dx);
@@ -298,7 +317,10 @@ class ShapeSpecRenderer {
           final point = const Offset(50, 50) +
               direction * (travel + alongWobble) +
               normal * (lane + wobble);
-          if (step == 0) {
+          final shouldBreak = step > 0 &&
+              random.nextDouble() <
+                  (config.strokeBreakChance * breakScale).clamp(0.0, 0.85);
+          if (step == 0 || shouldBreak) {
             path.moveTo(point.dx, point.dy);
           } else {
             path.lineTo(point.dx, point.dy);
@@ -309,8 +331,17 @@ class ShapeSpecRenderer {
       return strokes;
     }
 
+    final baseStrokes = buildStrokes(
+      config.baseStrokeCount,
+      -3,
+      breakScale: 1.15,
+    );
     final darkStrokes = buildStrokes(config.darkStrokeCount, 0);
-    final lightStrokes = buildStrokes(config.lightStrokeCount, 9);
+    final lightStrokes = buildStrokes(
+      config.lightStrokeCount,
+      9,
+      breakScale: 0.70,
+    );
 
     final grain = <_CrayonGrainDot>[];
     for (var i = 0; i < config.grainCount; i++) {
@@ -326,6 +357,7 @@ class ShapeSpecRenderer {
     }
 
     return _CrayonTextureGeometry(
+      baseStrokes: baseStrokes,
       darkStrokes: darkStrokes,
       lightStrokes: lightStrokes,
       grain: grain,
@@ -344,6 +376,10 @@ class ShapeSpecRenderer {
       config.lightOpacity,
       config.grainOpacity,
       config.edgeOpacity,
+      config.baseStrokeCount,
+      config.underpaintOpacity,
+      config.baseStrokeOpacity,
+      config.strokeBreakChance,
     ].join(':');
   }
 
@@ -541,11 +577,13 @@ class ShapeSpecRenderer {
 
 class _CrayonTextureGeometry {
   const _CrayonTextureGeometry({
+    required this.baseStrokes,
     required this.darkStrokes,
     required this.lightStrokes,
     required this.grain,
   });
 
+  final List<Path> baseStrokes;
   final List<Path> darkStrokes;
   final List<Path> lightStrokes;
   final List<_CrayonGrainDot> grain;
