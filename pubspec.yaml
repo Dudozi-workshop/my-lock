@@ -22,6 +22,7 @@ flutter:
   assets:
     - assets/shapes/dolphin/
     - assets/shapes/dolphin_sprite/
+    - assets/shapes/dolphin_baked_v3/
 
 flutter_launcher_icons:
   android: true
