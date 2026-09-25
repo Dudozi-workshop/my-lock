@@ -388,7 +388,7 @@ class ShapeSpecRenderer {
     // border: it mimics outlining the shape by hand before filling it in.
     final edgeAlpha = config.edgeOpacity * opacity;
     final edgeWidth = config.edgeWidth;
-    final contourColor = Color.lerp(base, pressureDark, 0.22)!;
+    final contourColor = base;
 
     void paintContour(
       Offset delta,
@@ -409,24 +409,25 @@ class ShapeSpecRenderer {
       canvas.restore();
     }
 
-    paintContour(Offset.zero, 1.0, 0.82);
+    paintContour(Offset.zero, 1.0, 0.74);
 
     if (config.edgeTexture > 0) {
       final roughness = config.edgeTexture.clamp(0.0, 1.0);
-      final offset = 0.18 + roughness * 0.72;
-      final extraPasses = 1 + (roughness * 3).round();
+      final offset = 0.14 + roughness * 0.86;
+      final extraPasses = 1 + (roughness * 4).round();
 
       const directions = <Offset>[
-        Offset(1.0, -0.28),
-        Offset(-0.62, 0.48),
-        Offset(0.24, 0.86),
-        Offset(-0.88, -0.22),
+        Offset(1.0, -0.24),
+        Offset(-0.70, 0.50),
+        Offset(0.26, 0.90),
+        Offset(-0.92, -0.20),
+        Offset(0.62, 0.54),
       ];
 
       for (var i = 0; i < extraPasses; i++) {
         final d = directions[i % directions.length];
-        final scale = i.isEven ? 0.72 : 0.58;
-        final alpha = i.isEven ? 0.44 : 0.32;
+        final scale = i.isEven ? 0.90 : 0.74;
+        final alpha = i.isEven ? 0.30 : 0.22;
         paintContour(d * offset, scale, alpha);
       }
     }
