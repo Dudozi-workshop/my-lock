@@ -6,7 +6,6 @@ import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
-import 'package:my_lock/lock_engine/shape_spec/shape_spec_renderer.dart';
 
 import 'soft_basic_candidates.dart';
 
