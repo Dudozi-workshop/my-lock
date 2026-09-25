@@ -562,7 +562,7 @@ const _candidates = <_CrayonCandidate>[
       negativeGapWidth: 0.72,
     ),
   ),
-]
+];
 
 class CrayonStyleLab extends StatefulWidget {
   const CrayonStyleLab({
