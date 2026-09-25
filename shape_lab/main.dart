@@ -325,50 +325,6 @@ class _ShapeLabPageState extends State<ShapeLabPage>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Drop 01 · 작은 물고기 Shape Master 후보',
-                          style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 4),
-                        Text('색상·애니메이션·이펙트 제외 · 동일 58×58 슬롯 · 실루엣 비교용',
-                          style: TextStyle(color: muted, fontSize: 13)),
-                        const SizedBox(height: 16),
-                        LayoutBuilder(builder: (context, constraints) {
-                          final width = constraints.maxWidth < 720
-                              ? (constraints.maxWidth - 12) / 2
-                              : (constraints.maxWidth - 24) / 3;
-                          return Wrap(
-                            spacing: 12, runSpacing: 12,
-                            children: [
-                              for (var i = 0; i < 6; i++)
-                                SizedBox(
-                                  width: width,
-                                  child: Column(children: [
-                                    SizedBox.square(
-                                      dimension: 132,
-                                      child: Center(child: Transform.scale(
-                                        scale: 2,
-                                        child: SizedBox.square(
-                                          dimension: 58,
-                                          child: CustomPaint(painter: _FishCandidatePainter(i)),
-                                        ),
-                                      )),
-                                    ),
-                                    Text(['01 타원형','02 세로형','03 삼각 체형','04 부채꼬리형','05 통통형','06 슬림 열대어형'][i],
-                                      style: TextStyle(color: textColor, fontWeight: FontWeight.w800)),
-                                  ]),
-                                ),
-                            ],
-                          );
-                        }),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-                  _Panel(
-                    color: cardColor,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
                         Text(
                           'Color Effect PoC · APP EXACT',
                           style: TextStyle(
