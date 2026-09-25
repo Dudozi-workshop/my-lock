@@ -630,7 +630,7 @@ class _CrayonStyleLabState extends State<CrayonStyleLab> {
         const SizedBox(height: 12),
         LayoutBuilder(
           builder: (context, constraints) {
-            final columns = constraints.maxWidth >= 980 ? 4 : constraints.maxWidth >= 650 ? 2 : 1;
+            const columns = 2;
             final gap = compact ? 8.0 : 12.0;
             final itemWidth =
                 (constraints.maxWidth - gap * (columns - 1)) / columns;
