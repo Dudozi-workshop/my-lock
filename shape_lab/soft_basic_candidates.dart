@@ -25,6 +25,15 @@ enum SoftBasicBottomHighlightTechnique {
   premiumBottom,
 }
 
+enum SoftBasicLowerVolumeTechnique {
+  none,
+  tintedBloom,
+  embeddedLight,
+  liftGradient,
+  shadowCarve,
+  ambientBounce,
+}
+
 class SoftBasicCandidate {
   const SoftBasicCandidate({
     required this.id,
@@ -33,6 +42,7 @@ class SoftBasicCandidate {
     required this.state,
     required this.finishTechnique,
     this.bottomHighlightTechnique = SoftBasicBottomHighlightTechnique.none,
+    this.lowerVolumeTechnique = SoftBasicLowerVolumeTechnique.none,
     this.badge,
   });
 
@@ -42,6 +52,7 @@ class SoftBasicCandidate {
   final SoftBasicCandidateState state;
   final SoftBasicCircleFinishTechnique finishTechnique;
   final SoftBasicBottomHighlightTechnique bottomHighlightTechnique;
+  final SoftBasicLowerVolumeTechnique lowerVolumeTechnique;
   final String? badge;
 }
 
@@ -144,5 +155,61 @@ const softBasicCircleRound9Candidates = <SoftBasicCandidate>[
     finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
     bottomHighlightTechnique: SoftBasicBottomHighlightTechnique.premiumBottom,
     badge: 'TARGET',
+  ),
+];
+
+
+const softBasicCircleRound10Candidates = <SoftBasicCandidate>[
+  SoftBasicCandidate(
+    id: 'SB-C-R10-01',
+    name: 'Clean Base',
+    intent: 'R8-03 Color Shell + R7-01 상단 하이라이트만 유지한 기준안. 하단 추가광 없음.',
+    state: SoftBasicCandidateState.shortlist,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.none,
+    badge: 'BASE',
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R10-02',
+    name: 'Tinted Bloom',
+    intent: 'R9-02의 장점만 남겨 흰 선 없이 현재 색상의 밝은 톤이 하단 안쪽에서 넓게 번지는 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.tintedBloom,
+    badge: 'R9-02 REWORK',
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R10-03',
+    name: 'Embedded Light',
+    intent: '별도 하이라이트 경계 없이 표면 내부 밝기만 미세하게 올려 빛이 재질 안에 녹아든 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.embeddedLight,
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R10-04',
+    name: 'Bottom Lift Gradient',
+    intent: '하단으로 갈수록 같은 색 계열의 밝기가 서서히 되살아나는 그라디언트 기반 볼륨안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.liftGradient,
+    badge: 'CORE',
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R10-05',
+    name: 'Shadow Carving',
+    intent: '새 빛을 그리지 않고 우하단의 기존 깊은 음영만 완화해 하단이 자연스럽게 떠 보이게 한 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.shadowCarve,
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R10-06',
+    name: 'Ambient Bounce',
+    intent: '레퍼런스의 Diffuse Light처럼 하단에 넓은 색 반사광을 넣어 부드러운 2D 볼륨을 만드는 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    lowerVolumeTechnique: SoftBasicLowerVolumeTechnique.ambientBounce,
+    badge: 'REF',
   ),
 ];
