@@ -1,11 +1,11 @@
 {
   "id": "soft_basic",
-  "version": 1,
+  "version": 2,
   "canvasSize": 100,
   "colorRules": {
-    "lightnessUp": 0.06,
-    "lightSaturationDelta": 0.0,
-    "lightnessDown": 0.04,
+    "lightnessUp": 0.1,
+    "lightSaturationDelta": 0,
+    "lightnessDown": 0.08,
     "shadeSaturationDelta": 0.01,
     "specColor": "#FFFFFF"
   }

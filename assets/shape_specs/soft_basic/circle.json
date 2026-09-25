@@ -1,7 +1,7 @@
 {
   "styleId": "soft_basic",
   "shapeId": "circle",
-  "version": 2,
+  "version": 3,
   "body": {
     "kind": "circle",
     "cx": 50,
@@ -10,91 +10,59 @@
   },
   "layers": [
     {
-      "id": "light_field",
+      "id": "diffuse_light",
       "role": "light",
-      "opacity": 0.24,
-      "blur": 7.5,
+      "opacity": 0.58,
+      "blur": 0,
       "geometry": {
-        "kind": "ellipse",
-        "cx": 34,
-        "cy": 31,
-        "rx": 31,
-        "ry": 26
+        "kind": "mask",
+        "asset": "assets/shape_specs/soft_basic/circle_diffuse_light.b64"
       }
     },
     {
-      "id": "light_rolloff",
+      "id": "form_shadow",
+      "role": "shade",
+      "opacity": 0.62,
+      "blur": 0,
+      "geometry": {
+        "kind": "mask",
+        "asset": "assets/shape_specs/soft_basic/circle_form_shadow.b64"
+      }
+    },
+    {
+      "id": "rim_light",
       "role": "light",
-      "opacity": 0.10,
-      "blur": 4.2,
+      "opacity": 0.3,
+      "blur": 0,
       "geometry": {
-        "kind": "ellipse",
-        "cx": 43,
-        "cy": 42,
-        "rx": 27,
-        "ry": 21
+        "kind": "mask",
+        "asset": "assets/shape_specs/soft_basic/circle_rim_light.b64"
       }
     },
     {
-      "id": "shade_depth",
-      "role": "shade",
-      "opacity": 0.16,
-      "blur": 8.2,
-      "geometry": {
-        "kind": "ellipse",
-        "cx": 70,
-        "cy": 72,
-        "rx": 33,
-        "ry": 30
-      }
-    },
-    {
-      "id": "shade_edge",
-      "role": "shade",
-      "opacity": 0.07,
-      "blur": 3.8,
-      "geometry": {
-        "kind": "ellipse",
-        "cx": 78,
-        "cy": 77,
-        "rx": 24,
-        "ry": 21
-      }
-    },
-    {
-      "id": "spec_primary",
+      "id": "soft_spec",
       "role": "spec",
-      "opacity": 0.55,
-      "blur": 0.65,
+      "opacity": 0.34,
+      "blur": 0,
       "geometry": {
-        "kind": "path",
-        "commands": [
-          {"op": "M", "x": 24, "y": 34},
-          {"op": "C", "c1x": 26, "c1y": 25, "c2x": 34, "c2y": 21, "x": 41, "y": 23},
-          {"op": "C", "c1x": 44, "c1y": 24, "c2x": 44, "c2y": 27, "x": 42, "y": 30},
-          {"op": "C", "c1x": 37, "c1y": 34, "c2x": 31, "c2y": 38, "x": 27, "y": 38},
-          {"op": "C", "c1x": 24, "c1y": 38, "c2x": 23, "c2y": 36, "x": 24, "y": 34},
-          {"op": "Z"}
-        ]
+        "kind": "mask",
+        "asset": "assets/shape_specs/soft_basic/circle_soft_spec.b64"
       }
     },
     {
-      "id": "spec_micro",
+      "id": "core_spec",
       "role": "spec",
-      "opacity": 0.20,
-      "blur": 0.9,
+      "opacity": 0.72,
+      "blur": 0,
       "geometry": {
-        "kind": "ellipse",
-        "cx": 47,
-        "cy": 22,
-        "rx": 3.2,
-        "ry": 2.1
+        "kind": "mask",
+        "asset": "assets/shape_specs/soft_basic/circle_core_spec.b64"
       }
     }
   ],
   "shadow": {
     "opacity": 0.035,
-    "elevation": 2.0,
+    "elevation": 2,
     "offsetX": 0,
     "offsetY": 0.8
   }

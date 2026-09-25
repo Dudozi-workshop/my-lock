@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart';
 
@@ -12,6 +13,7 @@ class ShapeSpecRegistry {
 
   final Map<ShapeStyle, ShapeStyleSpec> _styles = {};
   final Map<(ShapeStyle, ShapeKind), ShapeSpec> _shapes = {};
+  final Map<String, ui.Image> _maskImages = {};
   bool _loaded = false;
 
   bool get loaded => _loaded;
@@ -36,6 +38,15 @@ class ShapeSpecRegistry {
           );
         }
         _shapes[(style, shape)] = spec;
+
+        for (final layer in spec.layers) {
+          if (layer.geometry.kind != 'mask') continue;
+          final asset = layer.geometry.values['asset'] as String?;
+          if (asset == null || asset.isEmpty || _maskImages.containsKey(asset)) {
+            continue;
+          }
+          _maskImages[asset] = await _loadMaskImage(asset);
+        }
       }
     }
 
@@ -56,8 +67,24 @@ class ShapeSpecRegistry {
     return ShapeSpecBundle(style: styleSpec, shape: shapeSpec);
   }
 
+  ui.Image resolveMask(String asset) {
+    final image = _maskImages[asset];
+    if (image == null) {
+      throw StateError('Missing ShapeSpec mask asset: $asset');
+    }
+    return image;
+  }
+
   Future<Map<String, dynamic>> _loadJson(String path) async {
     final raw = await rootBundle.loadString(path);
     return jsonDecode(raw) as Map<String, dynamic>;
+  }
+
+  Future<ui.Image> _loadMaskImage(String asset) async {
+    final encoded = (await rootBundle.loadString(asset)).trim();
+    final bytes = base64Decode(encoded);
+    final codec = await ui.instantiateImageCodec(bytes);
+    final frame = await codec.getNextFrame();
+    return frame.image;
   }
 }
