@@ -207,7 +207,7 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
           ),
           const SizedBox(height: 4),
           Text(
-            'One verified Aqua source asset is reused for all three slots; Pink/Sand use a temporary color filter for runtime QA.',
+            'Each palette uses its own verified transparent runtime asset.',
             style: TextStyle(color: subInk, fontSize: 12),
           ),
           const SizedBox(height: 16),
@@ -216,9 +216,9 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
             runSpacing: 12,
             children: const [
               _SingleTile(tone: ShapeTone.blue, label: 'Aqua Mint'),
-              _SingleTile(tone: ShapeTone.pink, label: 'Coral Pink QA tint'),
+              _SingleTile(tone: ShapeTone.pink, label: 'Coral Pink'),
               _SingleTile(
-                  tone: ShapeTone.yellow, label: 'Sand Beige QA tint'),
+                  tone: ShapeTone.yellow, label: 'Sand Beige'),
             ],
           ),
         ],
@@ -382,8 +382,17 @@ class _TurtleAsset extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final image = Image.asset(
-      'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
+    final asset = switch (tone) {
+      ShapeTone.blue =>
+        'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
+      ShapeTone.pink =>
+        'assets/sea_turtle_runtime_v2/sea_turtle_pink.png',
+      ShapeTone.yellow =>
+        'assets/sea_turtle_runtime_v2/sea_turtle_yellow.png',
+    };
+
+    return Image.asset(
+      asset,
       width: size,
       height: size,
       fit: BoxFit.contain,
@@ -422,19 +431,6 @@ class _TurtleAsset extends StatelessWidget {
           ),
         );
       },
-    );
-
-    final tint = switch (tone) {
-      ShapeTone.blue => null,
-      ShapeTone.pink => const Color(0xFFF7A7B5),
-      ShapeTone.yellow => const Color(0xFFEFD59A),
-    };
-
-    if (tint == null) return image;
-
-    return ColorFiltered(
-      colorFilter: ColorFilter.mode(tint, BlendMode.color),
-      child: image,
     );
   }
 }
