@@ -138,6 +138,17 @@ class ShapeSpecRenderer {
             layerColor.withValues(alpha: layerOpacity * opacity),
             BlendMode.srcIn,
           );
+        final transform = overrides?.layerTransformById[layer.id];
+        final destRect = transform == null
+            ? Rect.fromLTWH(0, 0, canvasSize, canvasSize)
+            : Rect.fromCenter(
+                center: Offset(
+                  canvasSize / 2 + transform.offsetX,
+                  canvasSize / 2 + transform.offsetY,
+                ),
+                width: canvasSize * transform.scaleX,
+                height: canvasSize * transform.scaleY,
+              );
         canvas.drawImageRect(
           image,
           Rect.fromLTWH(
@@ -146,7 +157,7 @@ class ShapeSpecRenderer {
             image.width.toDouble(),
             image.height.toDouble(),
           ),
-          Rect.fromLTWH(0, 0, canvasSize, canvasSize),
+          destRect,
           paint,
         );
         continue;
