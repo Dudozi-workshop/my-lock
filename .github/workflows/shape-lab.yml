@@ -5,6 +5,7 @@ on:
     branches:
       - feat/shape-lab
       - feat/color-effect-poc
+      - feat/labs-hub-clean
     paths:
       - 'lib/lock_engine/**'
       - 'assets/materials/**'
