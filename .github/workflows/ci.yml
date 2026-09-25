@@ -111,6 +111,9 @@ jobs:
           path.write_text(text)
           PY
 
+      - name: Validate ShapeSpec mask assets
+        run: python3 tool/validate_shape_masks.py
+
       - name: Analyze
         run: flutter analyze
 
