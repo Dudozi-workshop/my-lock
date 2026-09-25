@@ -7,6 +7,7 @@ import 'dolphin_baked_only_cache.dart';
 import 'dolphin_baked_only_renderer.dart';
 import 'models.dart';
 import 'shape_geometry.dart';
+import 'shape_palette.dart';
 
 class LockTokenPainter extends CustomPainter {
   LockTokenPainter(
@@ -194,24 +195,7 @@ Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
   }
 }
 
-(Color, Color) _tokenToneColors(ShapeTone tone) {
-  switch (tone) {
-    case ShapeTone.pink:
-      return (const Color(0xFFFF8FD1), const Color(0xFFE656AB));
-    case ShapeTone.blue:
-      return (const Color(0xFF79BFFF), const Color(0xFF3F6FEA));
-    case ShapeTone.yellow:
-      return (const Color(0xFFFFDA72), const Color(0xFFF0A632));
-    case ShapeTone.purple:
-      return (const Color(0xFFC7A4FF), const Color(0xFF7447D9));
-    case ShapeTone.mint:
-      return (const Color(0xFF9EF3D2), const Color(0xFF2FAF89));
-    case ShapeTone.black:
-      return (const Color(0xFF5A5A64), const Color(0xFF17171D));
-    case ShapeTone.white:
-      return (const Color(0xFFFFFFFF), const Color(0xFFD9D9E2));
-  }
-}
+(Color, Color) _tokenToneColors(ShapeTone tone) => shapeToneColors(tone);
 
 void _paintStyledShape(
   Canvas canvas, {
