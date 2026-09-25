@@ -576,14 +576,14 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
-    final selected = softBasicCircleRound3Candidates[selectedIndex];
+    final selected = softBasicCircleRound4Candidates[selectedIndex];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Circle · Round 3 · Technique',
-          subtitle: '수치 변형이 아니라 렌더링 방식 자체가 다른 8안을 비교합니다. 여기서 기술 방향을 먼저 고릅니다.',
+          title: 'Soft Basic · Circle · Round 4 · Highlight',
+          subtitle: 'R3-02 Airbrush Volume 몸체를 고정하고, 목업의 단일 하이라이트 면만 방식별로 비교합니다. 작은 흰 점광은 제외합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -598,11 +598,11 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
               spacing: gap,
               runSpacing: gap,
               children: [
-                for (var i = 0; i < softBasicCircleRound3Candidates.length; i++)
+                for (var i = 0; i < softBasicCircleRound4Candidates.length; i++)
                   SizedBox(
                     width: itemWidth,
                     child: _SoftBasicCandidateCard(
-                      candidate: softBasicCircleRound3Candidates[i],
+                      candidate: softBasicCircleRound4Candidates[i],
                       selected: i == selectedIndex,
                       card: widget.card,
                       fg: widget.fg,
@@ -865,21 +865,10 @@ class _SoftBasicCandidatePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (candidate.technique == SoftBasicCircleTechnique.currentLayeredMask) {
-      ShapeSpecRenderer.paintToken(
-        canvas,
-        center: size.center(Offset.zero),
-        radius: size.shortestSide / 2,
-        token: LockToken(shape: shape, tone: tone),
-        style: ShapeStyle.softBasic,
-        opacity: 1,
-      );
-      return;
-    }
-
     final center = size.center(Offset.zero);
     final radius = size.shortestSide * 0.44;
     final rect = Rect.fromCircle(center: center, radius: radius);
+
     final base = baseColorForTone(tone);
     final light = adjustTone(
       base,
@@ -891,335 +880,258 @@ class _SoftBasicCandidatePainter extends CustomPainter {
       lightnessDelta: tone == ShapeTone.yellow ? -0.13 : -0.16,
       saturationDelta: 0.03,
     );
-    final dark = adjustTone(
-      base,
-      lightnessDelta: tone == ShapeTone.yellow ? -0.20 : -0.23,
-      saturationDelta: 0.02,
-    );
 
-    switch (candidate.technique) {
-      case SoftBasicCircleTechnique.airbrushMultiBlur:
-        _paintAirbrush(canvas, rect, base, light, deep);
-      case SoftBasicCircleTechnique.glossLobePath:
-        _paintGlossLobe(canvas, rect, base, light, deep);
-      case SoftBasicCircleTechnique.dualRadialVolume:
-        _paintDualRadial(canvas, rect, base, light, deep);
-      case SoftBasicCircleTechnique.innerRimShell:
-        _paintInnerRim(canvas, rect, base, light, deep);
-      case SoftBasicCircleTechnique.meshBlend:
-        _paintMeshBlend(canvas, rect, base, light, deep, dark);
-      case SoftBasicCircleTechnique.softCandyEdge:
-        _paintCandyEdge(canvas, rect, base, light, deep, dark);
-      case SoftBasicCircleTechnique.bakedSpriteEmulation:
-        _paintBakedLook(canvas, rect, base, light, deep, dark);
-      case SoftBasicCircleTechnique.currentLayeredMask:
-        break;
+    _paintAirbrushBody(canvas, rect, base, light, deep);
+
+    switch (candidate.highlightTechnique) {
+      case SoftBasicCircleHighlightTechnique.airbrushReference:
+        _paintFeatheredCapsule(canvas, rect, width: 0.18, height: 0.37, alpha: 0.72);
+      case SoftBasicCircleHighlightTechnique.leafPath:
+        _paintLeafPath(canvas, rect, alpha: 0.80, blur: 1.8);
+      case SoftBasicCircleHighlightTechnique.featheredCapsule:
+        _paintFeatheredCapsule(canvas, rect, width: 0.20, height: 0.42, alpha: 0.76);
+      case SoftBasicCircleHighlightTechnique.stackedSingleLobe:
+        _paintStackedLobe(canvas, rect);
+      case SoftBasicCircleHighlightTechnique.paintedBrush:
+        _paintPaintedBrush(canvas, rect);
+      case SoftBasicCircleHighlightTechnique.edgeMeltedLobe:
+        _paintEdgeMeltedLobe(canvas, rect);
+      case SoftBasicCircleHighlightTechnique.targetLobe:
+        _paintTargetLobe(canvas, rect);
     }
   }
 
-  void _paintAirbrush(
+  void _paintAirbrushBody(
     Canvas canvas,
     Rect rect,
     Color base,
     Color light,
     Color deep,
   ) {
-    _drawSoftShadow(canvas, rect, deep, 0.20, 5.5);
+    _drawSoftShadow(canvas, rect, deep, 0.18, 5.5);
+
     canvas.drawOval(rect, Paint()..color = base);
+
     canvas.save();
     canvas.clipPath(Path()..addOval(rect));
+
     final r = rect.width;
     canvas.drawCircle(
-      Offset(rect.left + r * 0.28, rect.top + r * 0.28),
-      r * 0.40,
-      Paint()
-        ..color = light.withValues(alpha: 0.52)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 13),
-    );
-    canvas.drawCircle(
-      Offset(rect.right - r * 0.20, rect.bottom - r * 0.16),
+      Offset(rect.left + r * 0.29, rect.top + r * 0.28),
       r * 0.42,
       Paint()
-        ..color = deep.withValues(alpha: 0.42)
+        ..color = light.withValues(alpha: 0.48)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 13),
+    );
+
+    canvas.drawCircle(
+      Offset(rect.right - r * 0.18, rect.bottom - r * 0.14),
+      r * 0.43,
+      Paint()
+        ..color = deep.withValues(alpha: 0.40)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 16),
     );
+
     canvas.restore();
-    _drawGlossCapsule(canvas, rect, 0.26, 0.34, 0.18, 0.38, 0.78);
   }
 
-  void _paintGlossLobe(
-    Canvas canvas,
-    Rect rect,
-    Color base,
-    Color light,
-    Color deep,
-  ) {
-    _drawSoftShadow(canvas, rect, deep, 0.16, 4.0);
-    canvas.drawOval(
-      rect,
-      Paint()
-        ..shader = RadialGradient(
-          center: const Alignment(-0.30, -0.35),
-          radius: 1.12,
-          colors: [light, base, deep],
-          stops: const [0.0, 0.58, 1.0],
-        ).createShader(rect),
-    );
-    final lobe = Path()
-      ..moveTo(rect.left + rect.width * 0.20, rect.top + rect.height * 0.40)
+  Path _targetLobePath(Rect rect) {
+    return Path()
+      ..moveTo(rect.left + rect.width * 0.18, rect.top + rect.height * 0.43)
       ..cubicTo(
-        rect.left + rect.width * 0.20,
-        rect.top + rect.height * 0.23,
-        rect.left + rect.width * 0.31,
-        rect.top + rect.height * 0.13,
-        rect.left + rect.width * 0.42,
-        rect.top + rect.height * 0.15,
-      )
-      ..cubicTo(
-        rect.left + rect.width * 0.47,
-        rect.top + rect.height * 0.17,
-        rect.left + rect.width * 0.43,
-        rect.top + rect.height * 0.24,
-        rect.left + rect.width * 0.37,
+        rect.left + rect.width * 0.17,
         rect.top + rect.height * 0.31,
+        rect.left + rect.width * 0.22,
+        rect.top + rect.height * 0.20,
+        rect.left + rect.width * 0.31,
+        rect.top + rect.height * 0.14,
       )
       ..cubicTo(
-        rect.left + rect.width * 0.31,
-        rect.top + rect.height * 0.38,
-        rect.left + rect.width * 0.25,
-        rect.top + rect.height * 0.45,
-        rect.left + rect.width * 0.20,
+        rect.left + rect.width * 0.37,
+        rect.top + rect.height * 0.10,
+        rect.left + rect.width * 0.44,
+        rect.top + rect.height * 0.11,
+        rect.left + rect.width * 0.45,
+        rect.top + rect.height * 0.16,
+      )
+      ..cubicTo(
+        rect.left + rect.width * 0.46,
+        rect.top + rect.height * 0.22,
+        rect.left + rect.width * 0.40,
+        rect.top + rect.height * 0.28,
+        rect.left + rect.width * 0.34,
+        rect.top + rect.height * 0.34,
+      )
+      ..cubicTo(
+        rect.left + rect.width * 0.28,
         rect.top + rect.height * 0.40,
+        rect.left + rect.width * 0.22,
+        rect.top + rect.height * 0.47,
+        rect.left + rect.width * 0.18,
+        rect.top + rect.height * 0.43,
       )
       ..close();
+  }
+
+  void _paintLeafPath(
+    Canvas canvas,
+    Rect rect, {
+    required double alpha,
+    required double blur,
+  }) {
+    final path = _targetLobePath(rect);
     canvas.drawPath(
-      lobe,
+      path,
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.82)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.2),
+        ..color = Colors.white.withValues(alpha: alpha)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur),
     );
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(rect.left + rect.width * 0.40, rect.top + rect.height * 0.36),
-        width: rect.width * 0.07,
-        height: rect.height * 0.10,
+  }
+
+  void _paintFeatheredCapsule(
+    Canvas canvas,
+    Rect rect, {
+    required double width,
+    required double height,
+    required double alpha,
+  }) {
+    final glossRect = Rect.fromCenter(
+      center: Offset(
+        rect.left + rect.width * 0.285,
+        rect.top + rect.height * 0.295,
       ),
-      Paint()..color = Colors.white.withValues(alpha: 0.92),
+      width: rect.width * width,
+      height: rect.height * height,
     );
+
+    canvas.save();
+    canvas.translate(glossRect.center.dx, glossRect.center.dy);
+    canvas.rotate(0.52);
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        glossRect.shift(-glossRect.center),
+        Radius.circular(rect.width * 0.12),
+      ),
+      Paint()
+        ..color = Colors.white.withValues(alpha: alpha * 0.55)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0),
+    );
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        glossRect.deflate(rect.width * 0.016).shift(-glossRect.center),
+        Radius.circular(rect.width * 0.10),
+      ),
+      Paint()
+        ..color = Colors.white.withValues(alpha: alpha)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.6),
+    );
+
+    canvas.restore();
   }
 
-  void _paintDualRadial(
-    Canvas canvas,
-    Rect rect,
-    Color base,
-    Color light,
-    Color deep,
-  ) {
-    _drawSoftShadow(canvas, rect, deep, 0.15, 4.5);
-    canvas.drawOval(rect, Paint()..color = base);
-    canvas.save();
-    canvas.clipPath(Path()..addOval(rect));
-    canvas.drawOval(
-      rect,
+  void _paintStackedLobe(Canvas canvas, Rect rect) {
+    final path = _targetLobePath(rect);
+
+    canvas.drawPath(
+      path,
       Paint()
-        ..shader = RadialGradient(
-          center: const Alignment(-0.58, -0.62),
-          radius: 0.95,
-          colors: [
-            Colors.white.withValues(alpha: 0.55),
-            light.withValues(alpha: 0.18),
-            Colors.transparent,
-          ],
-          stops: const [0.0, 0.36, 0.78],
-        ).createShader(rect),
+        ..color = Colors.white.withValues(alpha: 0.34)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5.5),
     );
-    canvas.drawOval(
-      rect,
+
+    canvas.save();
+    canvas.translate(rect.width * 0.010, -rect.height * 0.004);
+    canvas.drawPath(
+      path,
       Paint()
-        ..shader = RadialGradient(
-          center: const Alignment(0.72, 0.72),
-          radius: 1.0,
-          colors: [
-            deep.withValues(alpha: 0.52),
-            deep.withValues(alpha: 0.20),
-            Colors.transparent,
-          ],
-          stops: const [0.0, 0.45, 0.84],
-        ).createShader(rect),
+        ..color = Colors.white.withValues(alpha: 0.76)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.6),
     );
     canvas.restore();
-    _drawGlossCapsule(canvas, rect, 0.24, 0.29, 0.16, 0.34, 0.72);
   }
 
-  void _paintInnerRim(
-    Canvas canvas,
-    Rect rect,
-    Color base,
-    Color light,
-    Color deep,
-  ) {
-    _drawSoftShadow(canvas, rect, deep, 0.18, 5.0);
-    canvas.drawOval(
-      rect,
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [light, base, deep],
-          stops: const [0.0, 0.52, 1.0],
-        ).createShader(rect),
-    );
-    final inner = rect.deflate(rect.width * 0.045);
-    canvas.drawOval(
-      inner,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = rect.width * 0.035
-        ..shader = SweepGradient(
-          startAngle: 0.2,
-          endAngle: 6.1,
-          colors: [
-            Colors.white.withValues(alpha: 0.04),
-            Colors.white.withValues(alpha: 0.48),
-            Colors.white.withValues(alpha: 0.10),
-            deep.withValues(alpha: 0.32),
-            Colors.white.withValues(alpha: 0.04),
-          ],
-          stops: const [0.0, 0.22, 0.48, 0.76, 1.0],
-        ).createShader(inner),
-    );
-    _drawGlossCapsule(canvas, rect, 0.23, 0.28, 0.15, 0.30, 0.70);
-  }
-
-  void _paintMeshBlend(
-    Canvas canvas,
-    Rect rect,
-    Color base,
-    Color light,
-    Color deep,
-    Color dark,
-  ) {
-    _drawSoftShadow(canvas, rect, deep, 0.16, 4.5);
-    canvas.drawOval(rect, Paint()..color = base);
-    canvas.save();
-    canvas.clipPath(Path()..addOval(rect));
-    final w = rect.width;
-    final blobs = <(Offset, double, Color)>[
-      (Offset(rect.left + w * 0.24, rect.top + w * 0.25), w * 0.34, light.withValues(alpha: 0.62)),
-      (Offset(rect.left + w * 0.62, rect.top + w * 0.40), w * 0.28, base.withValues(alpha: 0.62)),
-      (Offset(rect.left + w * 0.72, rect.top + w * 0.74), w * 0.34, dark.withValues(alpha: 0.34)),
-      (Offset(rect.left + w * 0.30, rect.top + w * 0.78), w * 0.28, light.withValues(alpha: 0.20)),
-    ];
-    for (final blob in blobs) {
-      canvas.drawCircle(
-        blob.$1,
-        blob.$2,
-        Paint()
-          ..color = blob.$3
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18),
+  void _paintPaintedBrush(Canvas canvas, Rect rect) {
+    final path = Path()
+      ..moveTo(rect.left + rect.width * 0.18, rect.top + rect.height * 0.42)
+      ..cubicTo(
+        rect.left + rect.width * 0.18,
+        rect.top + rect.height * 0.30,
+        rect.left + rect.width * 0.24,
+        rect.top + rect.height * 0.17,
+        rect.left + rect.width * 0.37,
+        rect.top + rect.height * 0.13,
       );
-    }
-    canvas.restore();
-    _drawGlossCapsule(canvas, rect, 0.24, 0.30, 0.18, 0.36, 0.84);
-  }
 
-  void _paintCandyEdge(
-    Canvas canvas,
-    Rect rect,
-    Color base,
-    Color light,
-    Color deep,
-    Color dark,
-  ) {
-    _drawSoftShadow(canvas, rect, dark, 0.24, 6.0);
-    canvas.drawOval(
-      rect,
-      Paint()
-        ..shader = RadialGradient(
-          center: const Alignment(-0.32, -0.38),
-          radius: 1.10,
-          colors: [light, base, deep],
-          stops: const [0.0, 0.62, 1.0],
-        ).createShader(rect),
-    );
-    final rimRect = rect.deflate(rect.width * 0.022);
-    canvas.drawArc(
-      rimRect,
-      0.45,
-      2.15,
-      false,
+    canvas.drawPath(
+      path,
       Paint()
         ..style = PaintingStyle.stroke
+        ..strokeWidth = rect.width * 0.115
         ..strokeCap = StrokeCap.round
-        ..strokeWidth = rect.width * 0.030
-        ..color = dark.withValues(alpha: 0.28)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.4),
+        ..color = Colors.white.withValues(alpha: 0.72)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.0),
     );
-    canvas.drawArc(
-      rimRect,
-      2.75,
-      1.48,
-      false,
+
+    canvas.drawPath(
+      path,
       Paint()
         ..style = PaintingStyle.stroke
+        ..strokeWidth = rect.width * 0.060
         ..strokeCap = StrokeCap.round
-        ..strokeWidth = rect.width * 0.022
-        ..color = Colors.white.withValues(alpha: 0.32),
+        ..color = Colors.white.withValues(alpha: 0.32)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.4),
     );
-    _drawGlossCapsule(canvas, rect, 0.22, 0.25, 0.18, 0.40, 0.92);
   }
 
-  void _paintBakedLook(
-    Canvas canvas,
-    Rect rect,
-    Color base,
-    Color light,
-    Color deep,
-    Color dark,
-  ) {
-    _drawSoftShadow(canvas, rect, dark, 0.22, 7.0);
-    canvas.drawOval(rect, Paint()..color = base);
+  void _paintEdgeMeltedLobe(Canvas canvas, Rect rect) {
+    final path = _targetLobePath(rect);
+
     canvas.save();
     canvas.clipPath(Path()..addOval(rect));
-    canvas.drawOval(
-      rect.inflate(rect.width * 0.04),
+
+    canvas.drawPath(
+      path,
       Paint()
-        ..shader = LinearGradient(
-          begin: const Alignment(-0.8, -0.9),
-          end: const Alignment(0.8, 0.9),
-          colors: [
-            light.withValues(alpha: 0.95),
-            base,
-            deep.withValues(alpha: 0.92),
-          ],
-          stops: const [0.0, 0.50, 1.0],
-        ).createShader(rect),
+        ..color = Colors.white.withValues(alpha: 0.28)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7.0),
     );
-    canvas.drawCircle(
-      Offset(rect.left + rect.width * 0.30, rect.top + rect.height * 0.31),
-      rect.width * 0.30,
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = Colors.white.withValues(alpha: 0.66)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.4),
+    );
+
+    canvas.restore();
+  }
+
+  void _paintTargetLobe(Canvas canvas, Rect rect) {
+    final path = _targetLobePath(rect);
+
+    canvas.drawPath(
+      path,
       Paint()
         ..color = Colors.white.withValues(alpha: 0.24)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5.0),
     );
-    canvas.drawCircle(
-      Offset(rect.right - rect.width * 0.16, rect.bottom - rect.height * 0.12),
-      rect.width * 0.28,
+
+    canvas.drawPath(
+      path,
       Paint()
-        ..color = dark.withValues(alpha: 0.24)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 14),
-    );
-    canvas.restore();
-    _drawGlossCapsule(canvas, rect, 0.22, 0.26, 0.19, 0.42, 0.86);
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(rect.left + rect.width * 0.42, rect.top + rect.height * 0.38),
-        width: rect.width * 0.065,
-        height: rect.height * 0.090,
-      ),
-      Paint()
-        ..color = Colors.white.withValues(alpha: 0.90)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.8),
+        ..shader = const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xEEFFFFFF),
+            Color(0xBFFFFFFF),
+            Color(0x4DFFFFFF),
+          ],
+          stops: [0.0, 0.52, 1.0],
+        ).createShader(rect)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.4),
     );
   }
 
@@ -1236,38 +1148,6 @@ class _SoftBasicCandidatePainter extends CustomPainter {
         ..color = color.withValues(alpha: alpha)
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, sigma),
     );
-  }
-
-  void _drawGlossCapsule(
-    Canvas canvas,
-    Rect rect,
-    double x,
-    double y,
-    double width,
-    double height,
-    double alpha,
-  ) {
-    final glossRect = Rect.fromCenter(
-      center: Offset(
-        rect.left + rect.width * x,
-        rect.top + rect.height * y,
-      ),
-      width: rect.width * width,
-      height: rect.height * height,
-    );
-    canvas.save();
-    canvas.translate(glossRect.center.dx, glossRect.center.dy);
-    canvas.rotate(0.52);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        glossRect.shift(-glossRect.center),
-        Radius.circular(rect.width * 0.11),
-      ),
-      Paint()
-        ..color = Colors.white.withValues(alpha: alpha)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.4),
-    );
-    canvas.restore();
   }
 
   @override
