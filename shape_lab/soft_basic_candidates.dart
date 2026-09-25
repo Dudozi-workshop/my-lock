@@ -16,6 +16,15 @@ enum SoftBasicCircleFinishTechnique {
   premiumRim,
 }
 
+enum SoftBasicBottomHighlightTechnique {
+  none,
+  softBloom,
+  narrowBloom,
+  crescent,
+  liftedGlow,
+  premiumBottom,
+}
+
 class SoftBasicCandidate {
   const SoftBasicCandidate({
     required this.id,
@@ -23,6 +32,7 @@ class SoftBasicCandidate {
     required this.intent,
     required this.state,
     required this.finishTechnique,
+    this.bottomHighlightTechnique = SoftBasicBottomHighlightTechnique.none,
     this.badge,
   });
 
@@ -31,6 +41,7 @@ class SoftBasicCandidate {
   final String intent;
   final SoftBasicCandidateState state;
   final SoftBasicCircleFinishTechnique finishTechnique;
+  final SoftBasicBottomHighlightTechnique bottomHighlightTechnique;
   final String? badge;
 }
 
@@ -78,6 +89,60 @@ const softBasicCircleRound8Candidates = <SoftBasicCandidate>[
     intent: '약한 컬러 Shell과 부드러운 Inner Rim을 함께 써 도톰하지만 선처럼 보이지 않게 정리한 안.',
     state: SoftBasicCandidateState.candidate,
     finishTechnique: SoftBasicCircleFinishTechnique.premiumRim,
+    badge: 'TARGET',
+  ),
+];
+
+
+const softBasicCircleRound9Candidates = <SoftBasicCandidate>[
+  SoftBasicCandidate(
+    id: 'SB-C-R9-01',
+    name: 'Base',
+    intent: 'R8-03 Color Shell + R7-01 상단 하이라이트만 유지한 하단 무처리 기준안.',
+    state: SoftBasicCandidateState.shortlist,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    bottomHighlightTechnique: SoftBasicBottomHighlightTechnique.none,
+    badge: 'BASE',
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R9-02',
+    name: 'Soft Bloom',
+    intent: '하단 안쪽에 넓고 흐린 빛 번짐을 넣어 말랑한 볼륨을 받치는 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    bottomHighlightTechnique: SoftBasicBottomHighlightTechnique.softBloom,
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R9-03',
+    name: 'Narrow Bloom',
+    intent: '하단 중심부에 폭이 좁고 선명한 밝기를 넣어 형태를 가볍게 들어 올리는 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    bottomHighlightTechnique: SoftBasicBottomHighlightTechnique.narrowBloom,
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R9-04',
+    name: 'Crescent',
+    intent: '하단 곡률을 따라 짧은 초승달형 하이라이트를 배치해 입체감을 강조한 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    bottomHighlightTechnique: SoftBasicBottomHighlightTechnique.crescent,
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R9-05',
+    name: 'Lifted Glow',
+    intent: '외곽선에서 살짝 띄운 내부 광점을 두어 둥근 표면이 떠 보이게 만드는 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    bottomHighlightTechnique: SoftBasicBottomHighlightTechnique.liftedGlow,
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R9-06',
+    name: 'Premium Bottom',
+    intent: '넓은 Bloom과 얇은 코어 하이라이트를 겹쳐 과하지 않게 깊이를 만드는 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    bottomHighlightTechnique: SoftBasicBottomHighlightTechnique.premiumBottom,
     badge: 'TARGET',
   ),
 ];
