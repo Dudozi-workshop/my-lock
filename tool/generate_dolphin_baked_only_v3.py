@@ -19,15 +19,25 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "lib" / "lock_engine" / "dolphin_tripo_baked_data.dart"
 OUTPUT = ROOT / "assets" / "shapes" / "dolphin_baked_v3"
 
-TONES = {
-    "pink": "#FF8CCB",
-    "blue": "#7DD3FF",
-    "yellow": "#FFD76B",
-    "purple": "#C7A6FF",
-    "mint": "#7EF0D2",
-    "black": "#39445A",
-    "white": "#EEF7FF",
-}
+PALETTE_SOURCE = ROOT / "lib" / "lock_engine" / "shape_palette.dart"
+
+
+def _load_palette() -> dict[str, str]:
+    text = PALETTE_SOURCE.read_text(encoding="utf-8")
+    tones: dict[str, str] = {}
+    pattern = re.compile(
+        r"ShapeTone\.(pink|blue|yellow|purple|mint|black|white):\s*"
+        r"ShapeTonePalette\(\s*"
+        r"base:\s*Color\(0xFF([0-9A-Fa-f]{6})\)",
+        flags=re.S,
+    )
+    for tone, hex_value in pattern.findall(text):
+        tones[tone] = f"#{hex_value.upper()}"
+    expected = {"pink", "blue", "yellow", "purple", "mint", "black", "white"}
+    missing = expected - tones.keys()
+    if missing:
+        raise RuntimeError(f"Missing palette tones: {sorted(missing)}")
+    return tones
 
 
 def _master() -> Image.Image:
@@ -116,7 +126,9 @@ def main() -> None:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     master = _master()
 
-    for tone, color in TONES.items():
+    tones = _load_palette()
+
+    for tone, color in tones.items():
         image = _recolor(master, color, tone)
         image.save(
             OUTPUT / f"dolphin_{tone}.webp",
@@ -125,7 +137,7 @@ def main() -> None:
             method=6,
         )
 
-    print(f"Generated {len(TONES)} baked-only dolphin assets in {OUTPUT}")
+    print(f"Generated {len(tones)} baked-only dolphin assets in {OUTPUT}")
 
 
 if __name__ == "__main__":
