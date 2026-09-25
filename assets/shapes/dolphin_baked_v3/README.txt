@@ -1,0 +1,1 @@
+Generated WebP assets are created by tool/generate_dolphin_baked_only_v3.py during the PoC build.\n
