@@ -1,0 +1,66 @@
+name: MY LOCK Crayon Shape Lab
+
+on:
+  push:
+    branches:
+      - feat/crayon-style-lab
+    paths:
+      - 'lib/lock_engine/shape_spec/**'
+      - 'lib/lock_engine/shape_painter.dart'
+      - 'assets/shape_specs/**'
+      - 'shape_lab/**'
+      - 'tool/build_shape_lab.sh'
+      - 'tool/validate_shape_masks.py'
+      - 'pubspec.yaml'
+      - '.github/workflows/shape-lab.yml'
+      - 'wrangler.shape-lab.jsonc'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mylock-crayon-shape-lab
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Validate ShapeSpec masks
+        run: python3 tool/validate_shape_masks.py
+
+      - name: Test ShapeSpec
+        run: flutter test test/shape_spec_test.dart
+
+      - name: Build Shape Lab
+        run: bash tool/build_shape_lab.sh
+
+      - name: Upload Shape Lab artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-lock-crayon-shape-lab
+          path: build/shape_lab
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Deploy Shape Lab
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config wrangler.shape-lab.jsonc

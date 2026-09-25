@@ -19,6 +19,7 @@ class ShapeSpecRenderer {
     required ShapeStyle style,
     required double opacity,
     double objectRotation = 0,
+    CrayonTextureSpec? crayonOverride,
   }) {
     final bundle = ShapeSpecRegistry.instance.resolve(style, token.shape);
     final canvasSize = bundle.style.canvasSize;
@@ -44,6 +45,7 @@ class ShapeSpecRenderer {
         style: bundle.style,
         token: token,
         opacity: opacity,
+        configOverride: crayonOverride,
       );
       canvas.restore();
       return;
@@ -170,8 +172,9 @@ class ShapeSpecRenderer {
     required ShapeStyleSpec style,
     required LockToken token,
     required double opacity,
+    CrayonTextureSpec? configOverride,
   }) {
-    final config = style.crayon;
+    final config = configOverride ?? style.crayon;
     if (config == null) {
       throw StateError('Crayon render mode requires crayon style config.');
     }
@@ -208,7 +211,8 @@ class ShapeSpecRenderer {
       Paint()..color = fill.withValues(alpha: opacity),
     );
 
-    final cacheKey = '${style.id}:${style.version}:${token.id}';
+    final cacheKey =
+        '${style.id}:${style.version}:${token.id}:${_crayonConfigKey(config)}';
     final texture = _crayonTextureCache.putIfAbsent(
       cacheKey,
       () => _buildCrayonTexture(config, cacheKey),
@@ -326,6 +330,21 @@ class ShapeSpecRenderer {
       lightStrokes: lightStrokes,
       grain: grain,
     );
+  }
+
+  static String _crayonConfigKey(CrayonTextureSpec config) {
+    return [
+      config.darkStrokeCount,
+      config.lightStrokeCount,
+      config.grainCount,
+      config.strokeWidth,
+      config.angleDeg,
+      config.jitter,
+      config.darkOpacity,
+      config.lightOpacity,
+      config.grainOpacity,
+      config.edgeOpacity,
+    ].join(':');
   }
 
   static int _stableSeed(String value) {

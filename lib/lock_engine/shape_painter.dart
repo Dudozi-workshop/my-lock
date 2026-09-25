@@ -11,10 +11,15 @@ class LockTokenPainter extends CustomPainter {
   const LockTokenPainter(
     this.token, {
     this.style = ShapeStyle.softBasic,
+    this.crayonOverride,
   });
 
   final LockToken token;
   final ShapeStyle style;
+
+  /// Shape Lab only: try alternate Crayon Soft parameters through the same
+  /// production renderer without changing the active app style spec.
+  final CrayonTextureSpec? crayonOverride;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -27,12 +32,15 @@ class LockTokenPainter extends CustomPainter {
       token: token,
       style: style,
       opacity: 1,
+      crayonOverride: crayonOverride,
     );
   }
 
   @override
   bool shouldRepaint(covariant LockTokenPainter oldDelegate) =>
-      oldDelegate.token.id != token.id || oldDelegate.style != style;
+      oldDelegate.token.id != token.id ||
+      oldDelegate.style != style ||
+      oldDelegate.crayonOverride != crayonOverride;
 }
 
 class FloatingShapePainter extends CustomPainter {
