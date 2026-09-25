@@ -109,11 +109,19 @@ class ShapeSpecRenderer {
     canvas.save();
     canvas.clipPath(bodyPath);
     for (final layer in bundle.shape.layers) {
-      final layerColor = switch (layer.role) {
+      final defaultLayerColor = switch (layer.role) {
         ShapeLayerRole.light => light,
         ShapeLayerRole.shade => shade,
         ShapeLayerRole.spec => rules.specColor,
       };
+      final layerColor = layer.toneLightnessDelta == null &&
+              layer.toneSaturationDelta == null
+          ? defaultLayerColor
+          : adjustTone(
+              base,
+              lightnessDelta: layer.toneLightnessDelta ?? 0,
+              saturationDelta: layer.toneSaturationDelta ?? 0,
+            );
 
       if (layer.geometry.kind == 'mask') {
         final asset = layer.geometry.values['asset'] as String;
