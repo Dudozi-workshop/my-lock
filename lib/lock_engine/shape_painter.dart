@@ -428,32 +428,24 @@ void _paintToneMotionEffect(
   required double opacity,
 }) {
   final t = phase % 1.0;
-  if (tone != ShapeTone.dawnDew && tone != ShapeTone.fireflyLight) {
-    return;
-  }
-
-  canvas.save();
-  canvas.clipPath(path);
+  if (tone != ShapeTone.dawnDew && tone != ShapeTone.fireflyLight) return;
 
   if (tone == ShapeTone.dawnDew) {
-    // A cool refracted band traverses the token while two dew highlights
-    // orbit slowly. Everything stays inside the authentication silhouette.
+    canvas.save();
+    canvas.clipPath(path);
     final sweepX = bounds.left - radius * .55 +
         (bounds.width + radius * 1.10) * t;
-    final bandRect = Rect.fromCenter(
-      center: Offset(sweepX, bounds.center.dy - radius * .12),
-      width: radius * .42,
-      height: bounds.height * 1.45,
-    );
     canvas.drawOval(
-      bandRect,
+      Rect.fromCenter(
+        center: Offset(sweepX, bounds.center.dy - radius * .12),
+        width: radius * .42,
+        height: bounds.height * 1.45,
+      ),
       Paint()
         ..blendMode = BlendMode.screen
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, radius * .12)
-        ..color = const Color(0xFFDDFBFF)
-            .withValues(alpha: .34 * opacity),
+        ..color = const Color(0xFFDDFBFF).withValues(alpha: .34 * opacity),
     );
-
     for (var i = 0; i < 2; i++) {
       final angle = 2 * pi * (t + i * .46);
       final point = bounds.center +
@@ -466,51 +458,68 @@ void _paintToneMotionEffect(
           ..maskFilter = MaskFilter.blur(BlurStyle.normal, radius * .045)
           ..color = Colors.white.withValues(alpha: .68 * opacity),
       );
-      canvas.drawCircle(
-        point.translate(-radius * .018, -radius * .020),
-        max(.65, radius * .030),
-        Paint()..color = Colors.white.withValues(alpha: .92 * opacity),
-      );
     }
-  } else {
-    // Fireflies use deterministic phase offsets so tokens can later receive
-    // independent phase seeds without random allocations inside paint().
-    const seeds = <(double, double, double)>[
-      (-.48, -.18, .00),
-      (-.16, .31, .19),
-      (.18, -.34, .37),
-      (.43, .12, .58),
-      (.05, .05, .76),
-    ];
-    for (var i = 0; i < seeds.length; i++) {
-      final seed = seeds[i];
-      final local = (t + seed.$3) % 1.0;
-      final pulse = .5 + .5 * sin(2 * pi * local);
-      final driftX = sin(2 * pi * local) * radius * .10;
-      final driftY = cos(2 * pi * (local * .78 + i * .11)) * radius * .08;
-      final point = bounds.center +
-          Offset(seed.$1 * radius + driftX, seed.$2 * radius + driftY);
-      final glowRadius = radius * (.055 + .055 * pulse);
-      canvas.drawCircle(
-        point,
-        glowRadius * 2.6,
-        Paint()
-          ..blendMode = BlendMode.screen
-          ..maskFilter = MaskFilter.blur(BlurStyle.normal, glowRadius * 1.7)
-          ..color = const Color(0xFFFFE66D)
-              .withValues(alpha: (.12 + .32 * pulse) * opacity),
-      );
-      canvas.drawCircle(
-        point,
-        max(.7, glowRadius * .55),
-        Paint()
-          ..color = const Color(0xFFFFF4A3)
-              .withValues(alpha: (.35 + .60 * pulse) * opacity),
-      );
-    }
+    canvas.restore();
+    return;
   }
 
-  canvas.restore();
+  // Firefly Light: the signature lives around the token, not inside it.
+  // Three fireflies follow different elliptical/wobbling orbits and pulse
+  // asynchronously. A faint reflected glow is clipped onto the surface when
+  // each firefly passes nearby.
+  const seeds = <(double, double, double, double)>[
+    (.00, 1.00, .82, .00),
+    (.34, .88, 1.06, .23),
+    (.69, 1.10, .76, .57),
+  ];
+  for (var i = 0; i < seeds.length; i++) {
+    final seed = seeds[i];
+    final local = (t + seed.$4) % 1.0;
+    final angle = 2 * pi * local;
+    final wobble = sin(angle * 2.7 + i * 1.9);
+    final orbitX = bounds.width * (.56 + .045 * wobble) * seed.$2;
+    final orbitY = bounds.height * (.57 + .055 * sin(angle * 1.9 + i)) * seed.$3;
+    final point = bounds.center + Offset(cos(angle) * orbitX, sin(angle) * orbitY);
+    final pulseWave = sin(2 * pi * (local * (1.45 + i * .19) + i * .21));
+    final pulse = pow(max(0.0, pulseWave), 2).toDouble();
+    final glow = radius * (.075 + .055 * pulse);
+
+    canvas.drawCircle(
+      point,
+      glow * 3.2,
+      Paint()
+        ..blendMode = BlendMode.screen
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, glow * 1.8)
+        ..color = const Color(0xFFFFDF54)
+            .withValues(alpha: (.18 + .42 * pulse) * opacity),
+    );
+    canvas.drawCircle(
+      point,
+      max(.9, glow * .55),
+      Paint()
+        ..color = const Color(0xFFFFF6A6)
+            .withValues(alpha: (.62 + .36 * pulse) * opacity),
+    );
+
+    // Short-lived surface reflection: visible on every silhouette, including
+    // illustrated shapes such as Dolphin, while the firefly itself stays out.
+    final towardCenter = Offset(
+      point.dx + (bounds.center.dx - point.dx) * .34,
+      point.dy + (bounds.center.dy - point.dy) * .34,
+    );
+    canvas.save();
+    canvas.clipPath(path);
+    canvas.drawCircle(
+      towardCenter,
+      glow * 2.4,
+      Paint()
+        ..blendMode = BlendMode.screen
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, glow * 1.5)
+        ..color = const Color(0xFFFFED79)
+            .withValues(alpha: (.06 + .20 * pulse) * opacity),
+    );
+    canvas.restore();
+  }
 }
 
 // A round brilliant cut: a continuous table, a ring of angled crown facets,
