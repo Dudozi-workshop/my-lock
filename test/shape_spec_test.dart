@@ -60,12 +60,16 @@ void main() {
       switch (layer.id) {
         case 'diffuse_light':
         case 'form_shadow':
-        case 'rim_light':
           expect(asset.contains('_v4.b64'), isTrue);
           break;
+        case 'rim_light':
+          expect(asset.contains('_v2.b64'), isTrue);
+          break;
         case 'soft_spec':
-        case 'core_spec':
           expect(asset.contains('_v6.b64'), isTrue);
+          break;
+        case 'core_spec':
+          expect(asset.contains('_v4.b64'), isTrue);
           break;
       }
     }
