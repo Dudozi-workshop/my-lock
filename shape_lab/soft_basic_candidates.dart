@@ -7,14 +7,13 @@ enum SoftBasicCandidateState {
   hold,
 }
 
-enum SoftBasicCircleHighlightTechnique {
-  mockupReference,
-  longLeaf,
-  taperedLeaf,
-  curvedLeaf,
-  broadSoftLeaf,
-  edgeLeaf,
-  refinedMockup,
+enum SoftBasicCircleFinishTechnique {
+  edgeLeafReference,
+  bottomBloom,
+  innerRimShell,
+  crescentBounce,
+  dualRim,
+  mockupPush,
 }
 
 class SoftBasicCandidate {
@@ -23,7 +22,7 @@ class SoftBasicCandidate {
     required this.name,
     required this.intent,
     required this.state,
-    required this.highlightTechnique,
+    required this.finishTechnique,
     this.badge,
   });
 
@@ -31,60 +30,53 @@ class SoftBasicCandidate {
   final String name;
   final String intent;
   final SoftBasicCandidateState state;
-  final SoftBasicCircleHighlightTechnique highlightTechnique;
+  final SoftBasicCircleFinishTechnique finishTechnique;
   final String? badge;
 }
 
-const softBasicCircleRound5Candidates = <SoftBasicCandidate>[
+const softBasicCircleRound6Candidates = <SoftBasicCandidate>[
   SoftBasicCandidate(
-    id: 'SB-C-R5-01',
-    name: 'R4-07 Reference',
-    intent: 'Round 4에서 가장 양호했던 Mockup Lobe를 그대로 유지한 기준안.',
+    id: 'SB-C-R6-01',
+    name: 'Edge Leaf Base',
+    intent: '선택된 R5-06 Edge Leaf를 그대로 유지한 비교 기준안.',
     state: SoftBasicCandidateState.shortlist,
-    highlightTechnique: SoftBasicCircleHighlightTechnique.mockupReference,
+    finishTechnique: SoftBasicCircleFinishTechnique.edgeLeafReference,
     badge: 'BASE',
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R5-02',
-    name: 'Long Leaf',
-    intent: '목업처럼 세로 길이를 조금 더 확보하고 폭은 억제한 자연스러운 긴 Leaf형.',
+    id: 'SB-C-R6-02',
+    name: 'Bottom Bloom',
+    intent: '4~6시 방향에 넓은 확산광을 넣어 목업의 아래쪽 빛 번짐을 직접 추가.',
     state: SoftBasicCandidateState.candidate,
-    highlightTechnique: SoftBasicCircleHighlightTechnique.longLeaf,
+    finishTechnique: SoftBasicCircleFinishTechnique.bottomBloom,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R5-03',
-    name: 'Tapered Leaf',
-    intent: '상·하단을 더 가늘게 테이퍼해 스티커 느낌을 줄이고 자연스러운 광면을 탐색.',
+    id: 'SB-C-R6-03',
+    name: 'Inner Rim Shell',
+    intent: '외곽 안쪽에 도톰한 밝은 Shell을 만들어 테두리 자체의 존재감을 키운 방식.',
     state: SoftBasicCandidateState.candidate,
-    highlightTechnique: SoftBasicCircleHighlightTechnique.taperedLeaf,
+    finishTechnique: SoftBasicCircleFinishTechnique.innerRimShell,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R5-04',
-    name: 'Curved Leaf',
-    intent: '도형 곡률을 따라 안쪽으로 살짝 휘는 비대칭 Lobe. 2번 Leaf Path의 자연스러움을 참고.',
+    id: 'SB-C-R6-04',
+    name: 'Crescent Bounce',
+    intent: '하단을 따라 휘는 초승달형 반사광으로 점광 없이 아래쪽 볼륨을 살린 방식.',
     state: SoftBasicCandidateState.candidate,
-    highlightTechnique: SoftBasicCircleHighlightTechnique.curvedLeaf,
+    finishTechnique: SoftBasicCircleFinishTechnique.crescentBounce,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R5-05',
-    name: 'Broad Soft Leaf',
-    intent: '폭은 약간 넓히되 경계를 더 부드럽게 녹여 인위적인 흰 덩어리 느낌을 줄인 안.',
+    id: 'SB-C-R6-05',
+    name: 'Dual Rim',
+    intent: '색상 외곽선 + 밝은 하단 Inner Rim을 분리해 실루엣을 더 또렷하게 잡는 방식.',
     state: SoftBasicCandidateState.candidate,
-    highlightTechnique: SoftBasicCircleHighlightTechnique.broadSoftLeaf,
+    finishTechnique: SoftBasicCircleFinishTechnique.dualRim,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R5-06',
-    name: 'Edge Leaf',
-    intent: '좌상단 외곽에 조금 더 가까이 붙여 표면 반사광처럼 읽히게 한 안.',
-    state: SoftBasicCandidateState.selected,
-    highlightTechnique: SoftBasicCircleHighlightTechnique.edgeLeaf,
-    badge: 'SELECTED',
-  ),
-  SoftBasicCandidate(
-    id: 'SB-C-R5-07',
-    name: 'Refined Mockup',
-    intent: 'R4-07의 장점을 유지하면서 길이·테이퍼·경계 흐림을 목업 쪽으로 정리한 최종 후보.',
-    state: SoftBasicCandidateState.rejected,
-    highlightTechnique: SoftBasicCircleHighlightTechnique.refinedMockup,
+    id: 'SB-C-R6-06',
+    name: 'Mockup Push',
+    intent: '하단 확산광 + 도톰한 컬러 림 + 밝은 하단 림을 함께 써 목표 목업에 가장 직접적으로 접근.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.mockupPush,
+    badge: 'TARGET',
   ),
 ];
