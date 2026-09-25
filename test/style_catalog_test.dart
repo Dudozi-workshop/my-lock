@@ -36,14 +36,14 @@ void main() {
   test('premium catalog metadata is separate from free defaults', () {
     expect(ShapeKind.defaults.every((item) => !item.premium), isTrue);
     expect(ShapeTone.defaults.every((item) => !item.premium), isTrue);
-    expect(ShapeTexture.glossy.premium, isFalse);
+    expect(ShapeStyle.softBasic.premium, isFalse);
     expect(
-      ShapeTexture.values.where((item) => item.premium).length,
+      ShapeStyle.values.where((item) => item.premium).length,
       greaterThan(0),
     );
   });
 
-  test('texture-only style change is persisted', () async {
+  test('style-only style change is persisted', () async {
     final store = _FakeStore();
     final controller = MyLockSettingsController(store: store);
     await controller.load();
@@ -51,11 +51,11 @@ void main() {
     controller.setShapeStyle(
       controller.selectedShapes,
       controller.selectedTones,
-      texture: ShapeTexture.hologram,
+      style: ShapeStyle.hologram,
     );
 
-    expect(controller.texture, ShapeTexture.hologram);
-    expect(store.lastSaved?.texture, ShapeTexture.hologram);
+    expect(controller.style, ShapeStyle.hologram);
+    expect(store.lastSaved?.style, ShapeStyle.hologram);
   });
 
   test('expanded shape and tone can be applied as real lock tokens', () async {
@@ -72,12 +72,12 @@ void main() {
       {ShapeKind.star, ShapeKind.heart},
       {ShapeTone.purple, ShapeTone.mint},
       password,
-      texture: ShapeTexture.glass,
+      style: ShapeStyle.glass,
     );
 
     expect(controller.selectedShapes, contains(ShapeKind.star));
     expect(controller.selectedTones, contains(ShapeTone.mint));
-    expect(controller.texture, ShapeTexture.glass);
+    expect(controller.style, ShapeStyle.glass);
     expect(controller.password, password);
     expect(store.savedPassword, password);
   });
