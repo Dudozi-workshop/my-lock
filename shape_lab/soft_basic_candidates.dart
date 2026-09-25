@@ -7,15 +7,14 @@ enum SoftBasicCandidateState {
   hold,
 }
 
-enum SoftBasicCircleTechnique {
-  currentLayeredMask,
-  airbrushMultiBlur,
-  glossLobePath,
-  dualRadialVolume,
-  innerRimShell,
-  meshBlend,
-  softCandyEdge,
-  bakedSpriteEmulation,
+enum SoftBasicCircleHighlightTechnique {
+  airbrushReference,
+  leafPath,
+  featheredCapsule,
+  stackedSingleLobe,
+  paintedBrush,
+  edgeMeltedLobe,
+  targetLobe,
 }
 
 class SoftBasicCandidate {
@@ -24,7 +23,7 @@ class SoftBasicCandidate {
     required this.name,
     required this.intent,
     required this.state,
-    required this.technique,
+    required this.highlightTechnique,
     this.badge,
   });
 
@@ -32,69 +31,60 @@ class SoftBasicCandidate {
   final String name;
   final String intent;
   final SoftBasicCandidateState state;
-  final SoftBasicCircleTechnique technique;
+  final SoftBasicCircleHighlightTechnique highlightTechnique;
   final String? badge;
 }
 
-const softBasicCircleRound3Candidates = <SoftBasicCandidate>[
+const softBasicCircleRound4Candidates = <SoftBasicCandidate>[
   SoftBasicCandidate(
-    id: 'SB-C-R3-01',
-    name: 'Current Layered',
-    intent: '현재 Production Mask Layer 합성 방식. 비교용 기준안.',
+    id: 'SB-C-R4-01',
+    name: 'Airbrush Reference',
+    intent: 'R3-02의 전체 볼륨 구성을 기준으로 고정한 비교 기준안.',
     state: SoftBasicCandidateState.candidate,
-    technique: SoftBasicCircleTechnique.currentLayeredMask,
-    badge: 'CURRENT',
+    highlightTechnique: SoftBasicCircleHighlightTechnique.airbrushReference,
+    badge: 'BASE',
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R3-02',
-    name: 'Airbrush Volume',
-    intent: '큰 Blur Light/Shadow를 직접 겹쳐 면 전체를 부드럽게 조형하는 방식.',
+    id: 'SB-C-R4-02',
+    name: 'Soft Leaf Path',
+    intent: '목업처럼 길고 살짝 휘어진 Leaf형 Path를 하나의 연속 하이라이트로 사용.',
     state: SoftBasicCandidateState.candidate,
-    technique: SoftBasicCircleTechnique.airbrushMultiBlur,
+    highlightTechnique: SoftBasicCircleHighlightTechnique.leafPath,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R3-03',
-    name: 'Gloss Lobe',
-    intent: '목업의 길쭉한 광택을 Path로 직접 그리고 Base와 분리하는 방식.',
+    id: 'SB-C-R4-03',
+    name: 'Feathered Capsule',
+    intent: '긴 Capsule 외곽을 강하게 흐려 면광처럼 녹이는 방식. 별도 점광 없음.',
     state: SoftBasicCandidateState.candidate,
-    technique: SoftBasicCircleTechnique.glossLobePath,
-    badge: 'PATH',
+    highlightTechnique: SoftBasicCircleHighlightTechnique.featheredCapsule,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R3-04',
-    name: 'Dual Radial',
-    intent: '좌상단 Light Radial과 우하단 Shadow Radial을 독립 합성해 깊이를 만드는 방식.',
+    id: 'SB-C-R4-04',
+    name: 'Layered Lobe',
+    intent: '하나의 Lobe를 Blur층과 밝은 내부층으로 겹쳐 단일 하이라이트 안에서 깊이를 표현.',
     state: SoftBasicCandidateState.candidate,
-    technique: SoftBasicCircleTechnique.dualRadialVolume,
+    highlightTechnique: SoftBasicCircleHighlightTechnique.stackedSingleLobe,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R3-05',
-    name: 'Inner Rim Shell',
-    intent: '외곽 안쪽의 밝은 Shell/Rim과 내부 그라데이션으로 탱글한 외곽을 만드는 방식.',
+    id: 'SB-C-R4-05',
+    name: 'Painted Brush',
+    intent: '붓으로 한 번 쓸어낸 듯한 비대칭 곡면 Path로 자연스러운 광택 형태를 탐색.',
     state: SoftBasicCandidateState.candidate,
-    technique: SoftBasicCircleTechnique.innerRimShell,
+    highlightTechnique: SoftBasicCircleHighlightTechnique.paintedBrush,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R3-06',
-    name: 'Mesh Blend',
-    intent: '여러 컬러 Blob을 Blur 합성해 Gradient Mesh처럼 풍부한 면색을 만드는 방식.',
+    id: 'SB-C-R4-06',
+    name: 'Edge Melt',
+    intent: '하이라이트 경계 일부를 Diffuse Light에 녹여 흰 스티커처럼 보이지 않게 만드는 방식.',
     state: SoftBasicCandidateState.candidate,
-    technique: SoftBasicCircleTechnique.meshBlend,
-    badge: 'MESH',
+    highlightTechnique: SoftBasicCircleHighlightTechnique.edgeMeltedLobe,
   ),
   SoftBasicCandidate(
-    id: 'SB-C-R3-07',
-    name: 'Soft Candy Edge',
-    intent: '강한 하단 Edge와 넓은 Gloss를 조합해 목업의 캔디형 볼륨을 직접 노리는 방식.',
+    id: 'SB-C-R4-07',
+    name: 'Mockup Lobe',
+    intent: '목표 목업의 길이·곡률·부드러운 경계를 가장 직접적으로 재현한 단일 Lobe.',
     state: SoftBasicCandidateState.candidate,
-    technique: SoftBasicCircleTechnique.softCandyEdge,
+    highlightTechnique: SoftBasicCircleHighlightTechnique.targetLobe,
     badge: 'TARGET',
-  ),
-  SoftBasicCandidate(
-    id: 'SB-C-R3-08',
-    name: 'Baked-look',
-    intent: '여러 Blur/Spec 레이어를 한 번에 굽는 스프라이트 같은 결과를 Canvas로 재현하는 방식.',
-    state: SoftBasicCandidateState.candidate,
-    technique: SoftBasicCircleTechnique.bakedSpriteEmulation,
   ),
 ];
