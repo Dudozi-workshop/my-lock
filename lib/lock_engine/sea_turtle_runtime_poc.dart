@@ -85,9 +85,11 @@ class SeaTurtleRuntimePoc {
 
   Future<ui.Image> _loadImage(String asset) async {
     final data = await rootBundle.load(asset);
-    final codec = await ui.instantiateImageCodec(
-      data.buffer.asUint8List(),
+    final bytes = data.buffer.asUint8List(
+      data.offsetInBytes,
+      data.lengthInBytes,
     );
+    final codec = await ui.instantiateImageCodec(bytes);
     final frame = await codec.getNextFrame();
     return frame.image;
   }
