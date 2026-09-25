@@ -16,12 +16,20 @@ class ShapeSpecRenderer {
     required LockToken token,
     required ShapeStyle style,
     required double opacity,
+    double objectRotation = 0,
   }) {
     final bundle = ShapeSpecRegistry.instance.resolve(style, token.shape);
     final canvasSize = bundle.style.canvasSize;
     final scale = radius * 2 / canvasSize;
 
     canvas.save();
+    if (bundle.shape.rotationMode == ShapeRotationMode.rotateWithObject &&
+        objectRotation != 0) {
+      canvas
+        ..translate(center.dx, center.dy)
+        ..rotate(objectRotation)
+        ..translate(-center.dx, -center.dy);
+    }
     canvas.translate(center.dx - radius, center.dy - radius);
     canvas.scale(scale, scale);
 
@@ -52,10 +60,35 @@ class ShapeSpecRenderer {
       saturationDelta: rules.shadeSaturationDelta,
     );
 
-    canvas.drawPath(
-      bodyPath,
-      Paint()..color = base.withValues(alpha: opacity),
+    final surfaceLight = adjustTone(
+      base,
+      lightnessDelta: rules.lightnessUp * 0.48,
+      saturationDelta: rules.lightSaturationDelta,
     );
+    final surfaceShade = adjustTone(
+      base,
+      lightnessDelta: -rules.lightnessDown * 0.40,
+      saturationDelta: rules.shadeSaturationDelta * 0.5,
+    );
+
+    final bodyPaint = Paint();
+    if (bundle.shape.surface.kind == 'radial') {
+      final surface = bundle.shape.surface;
+      bodyPaint.shader = RadialGradient(
+        center: Alignment(surface.centerX, surface.centerY),
+        radius: surface.radius,
+        colors: [
+          surfaceLight.withValues(alpha: opacity),
+          base.withValues(alpha: opacity),
+          base.withValues(alpha: opacity),
+          surfaceShade.withValues(alpha: opacity),
+        ],
+        stops: surface.stops,
+      ).createShader(Rect.fromLTWH(0, 0, canvasSize, canvasSize));
+    } else {
+      bodyPaint.color = base.withValues(alpha: opacity);
+    }
+    canvas.drawPath(bodyPath, bodyPaint);
 
     canvas.save();
     canvas.clipPath(bodyPath);
@@ -71,6 +104,7 @@ class ShapeSpecRenderer {
         final image = ShapeSpecRegistry.instance.resolveMask(asset);
         final paint = Paint()
           ..filterQuality = FilterQuality.high
+          ..blendMode = _blendModeFor(layer.blend)
           ..colorFilter = ColorFilter.mode(
             layerColor.withValues(alpha: layer.opacity * opacity),
             BlendMode.srcIn,
@@ -101,6 +135,7 @@ class ShapeSpecRenderer {
       }
 
       final paint = Paint()
+        ..blendMode = _blendModeFor(layer.blend)
         ..color = layerColor.withValues(alpha: layer.opacity * opacity);
       if (layer.blur > 0) {
         paint.maskFilter = MaskFilter.blur(BlurStyle.normal, layer.blur);
@@ -234,6 +269,19 @@ class ShapeSpecRenderer {
         return _pathFor(geometry).getBounds().center;
       default:
         return Offset.zero;
+    }
+  }
+
+  static BlendMode _blendModeFor(ShapeLayerBlend blend) {
+    switch (blend) {
+      case ShapeLayerBlend.normal:
+        return BlendMode.srcOver;
+      case ShapeLayerBlend.softLight:
+        return BlendMode.softLight;
+      case ShapeLayerBlend.multiply:
+        return BlendMode.multiply;
+      case ShapeLayerBlend.screen:
+        return BlendMode.screen;
     }
   }
 
