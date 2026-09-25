@@ -6,93 +6,15 @@ import 'package:flutter/scheduler.dart';
 import '../../lock_engine/effects.dart';
 import '../../lock_engine/floating_engine.dart';
 import '../../lock_engine/models.dart';
-import '../../lock_engine/sea_turtle_runtime_poc.dart';
 
-class SeaTurtleRuntimeLabBootstrap extends StatefulWidget {
+class SeaTurtleRuntimeLabBootstrap extends StatelessWidget {
   const SeaTurtleRuntimeLabBootstrap({super.key});
 
   @override
-  State<SeaTurtleRuntimeLabBootstrap> createState() =>
-      _SeaTurtleRuntimeLabBootstrapState();
-}
-
-class _SeaTurtleRuntimeLabBootstrapState
-    extends State<SeaTurtleRuntimeLabBootstrap> {
-  late final Future<void> _loadFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadFuture = SeaTurtleRuntimePoc.instance.load();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: _loadFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const Scaffold(
-            backgroundColor: Color(0xFFF4FAFF),
-            body: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text(
-                    'Loading Sea Turtle Runtime Lab...',
-                    style: TextStyle(
-                      color: Color(0xFF18304D),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-
-        if (snapshot.hasError) {
-          return Scaffold(
-            backgroundColor: const Color(0xFFF4FAFF),
-            body: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Sea Turtle Lab failed to load assets.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF18304D),
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    SelectableText(
-                      '${snapshot.error}',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xFF667C92),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }
-
-        return const SeaTurtleRuntimeLabScreen();
-      },
-    );
+    return const SeaTurtleRuntimeLabScreen();
   }
 }
-
 
 class SeaTurtleRuntimeLabScreen extends StatefulWidget {
   const SeaTurtleRuntimeLabScreen({super.key});
@@ -349,8 +271,31 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
           SizedBox(
             width: 190,
             height: 150,
-            child: CustomPaint(
-              painter: _SeaTurtleSinglePainter(tone),
+            child: Center(
+              child: Image.asset(
+                _assetForTone(tone),
+                width: 132,
+                height: 132,
+                fit: BoxFit.contain,
+                gaplessPlayback: true,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: 132,
+                  height: 132,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFECEC),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Text(
+                    'Asset load failed\n$error',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Color(0xFF9F2F2F),
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 4),
@@ -431,9 +376,15 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
                             ],
                           ),
                   ),
-                  child: CustomPaint(
-                    painter: _SeaTurtleRuntimeStagePainter(_engine.objects),
-                    child: const SizedBox.expand(),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      for (final object in _engine.objects)
+                        _SeaTurtleRuntimeObject(
+                          key: ValueKey(object.id),
+                          object: object,
+                        ),
+                    ],
                   ),
                 ),
               );
@@ -445,48 +396,56 @@ class _SeaTurtleRuntimeLabScreenState extends State<SeaTurtleRuntimeLabScreen>
   }
 }
 
-class _SeaTurtleSinglePainter extends CustomPainter {
-  const _SeaTurtleSinglePainter(this.tone);
 
-  final ShapeTone tone;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    SeaTurtleRuntimePoc.instance.paint(
-      canvas,
-      center: size.center(Offset.zero),
-      radius: min(size.width, size.height) * 0.34,
-      tone: tone,
-      opacity: 1,
-      objectRotation: 0,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _SeaTurtleSinglePainter oldDelegate) =>
-      oldDelegate.tone != tone;
+String _assetForTone(ShapeTone tone) {
+  return switch (tone) {
+    ShapeTone.blue => 'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
+    ShapeTone.pink => 'assets/sea_turtle_runtime_v2/sea_turtle_pink.png',
+    ShapeTone.yellow => 'assets/sea_turtle_runtime_v2/sea_turtle_yellow.png',
+  };
 }
 
-class _SeaTurtleRuntimeStagePainter extends CustomPainter {
-  const _SeaTurtleRuntimeStagePainter(this.objects);
+class _SeaTurtleRuntimeObject extends StatelessWidget {
+  const _SeaTurtleRuntimeObject({
+    super.key,
+    required this.object,
+  });
 
-  final List<FloatingObject> objects;
+  final FloatingObject object;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    for (final object in objects) {
-      SeaTurtleRuntimePoc.instance.paint(
-        canvas,
-        center: object.position,
-        radius: object.radius,
-        tone: object.token.tone,
-        opacity: 1,
-        objectRotation: object.rotation,
-      );
-    }
+  Widget build(BuildContext context) {
+    final side = object.radius * 2.34;
+    return Positioned(
+      left: object.position.dx - side / 2,
+      top: object.position.dy - side / 2,
+      width: side,
+      height: side,
+      child: IgnorePointer(
+        child: Transform.rotate(
+          angle: object.rotation,
+          child: Image.asset(
+            _assetForTone(object.token.tone),
+            width: side,
+            height: side,
+            fit: BoxFit.contain,
+            gaplessPlayback: true,
+            filterQuality: FilterQuality.high,
+            errorBuilder: (context, error, stackTrace) => Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0x66FF0000),
+                borderRadius: BorderRadius.circular(side / 2),
+              ),
+              child: const Icon(
+                Icons.broken_image_outlined,
+                size: 18,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
-
-  @override
-  bool shouldRepaint(covariant _SeaTurtleRuntimeStagePainter oldDelegate) =>
-      true;
 }
