@@ -27,7 +27,7 @@ class ShopScreen extends StatelessWidget {
           Text('상점', style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 6),
           Text(
-            'PLUS 스타일 카탈로그',
+            '스타일 카탈로그',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 18),
@@ -80,7 +80,7 @@ class ShopScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           _SectionTitle(
-            title: '질감',
+            title: '스타일',
             count: premiumStyles.length,
           ),
           const SizedBox(height: 10),
