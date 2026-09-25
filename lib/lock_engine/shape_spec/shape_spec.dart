@@ -76,6 +76,8 @@ class CrayonTextureSpec {
     this.strokeLengthMax = 1.0,
     this.gapChance = 0.0,
     this.toneVariation = 0.0,
+    this.edgeWidth = 0.72,
+    this.edgeTexture = 0.0,
   });
 
   final int darkStrokeCount;
@@ -108,6 +110,12 @@ class CrayonTextureSpec {
   final double strokeLengthMax;
   final double gapChance;
   final double toneVariation;
+
+  /// Crayon outline controls. edgeWidth is in the 100x100 design space.
+  /// edgeTexture adds deterministic offset passes so the contour reads like
+  /// a wax-crayon edge instead of a clean vector stroke.
+  final double edgeWidth;
+  final double edgeTexture;
 
   factory CrayonTextureSpec.fromJson(Map<String, dynamic> json) {
     return CrayonTextureSpec(
@@ -147,6 +155,10 @@ class CrayonTextureSpec {
           (json['gapChance'] as num?)?.toDouble() ?? 0.0,
       toneVariation:
           (json['toneVariation'] as num?)?.toDouble() ?? 0.0,
+      edgeWidth:
+          (json['edgeWidth'] as num?)?.toDouble() ?? 0.72,
+      edgeTexture:
+          (json['edgeTexture'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }
