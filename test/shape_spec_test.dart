@@ -25,7 +25,7 @@ void main() {
     }
   });
 
-  test('Production Circle v9 uses Airbrush + Edge Leaf geometry', () async {
+  test('Production Circle v10 uses finalized Soft Basic master', () async {
     await ShapeSpecRegistry.instance.load();
 
     final bundle = ShapeSpecRegistry.instance.resolve(
@@ -33,22 +33,37 @@ void main() {
       ShapeKind.circle,
     );
 
-    expect(bundle.shape.version, 9);
+    expect(bundle.shape.version, 10);
     expect(bundle.shape.rotationMode, ShapeRotationMode.fixed);
     expect(bundle.shape.surface.kind, 'solid');
-    expect(bundle.shape.layers.length, 4);
+    expect(bundle.shape.layers.length, 9);
     expect(
       bundle.shape.layers.map((layer) => layer.id).toList(),
       [
+        'color_shell',
+        'color_shell_inner',
         'airbrush_light',
         'airbrush_shade',
+        'ambient_bounce',
+        'ambient_core',
+        'ambient_depth',
         'edge_leaf_halo',
         'edge_leaf',
       ],
     );
     expect(
       bundle.shape.layers.map((layer) => layer.geometry.kind).toList(),
-      ['circle', 'circle', 'path', 'path'],
+      [
+        'circle',
+        'circle',
+        'circle',
+        'circle',
+        'ellipse',
+        'circle',
+        'ellipse',
+        'path',
+        'path',
+      ],
     );
     expect(
       bundle.shape.layers.any((layer) => layer.id == 'core_spec'),
@@ -59,12 +74,25 @@ void main() {
       isFalse,
     );
 
-    final light = bundle.shape.layers.first;
-    final shade = bundle.shape.layers[1];
+    final light = bundle.shape.layers.firstWhere(
+      (layer) => layer.id == 'airbrush_light',
+    );
+    final shade = bundle.shape.layers.firstWhere(
+      (layer) => layer.id == 'airbrush_shade',
+    );
+    final bounce = bundle.shape.layers.firstWhere(
+      (layer) => layer.id == 'ambient_bounce',
+    );
+    final shell = bundle.shape.layers.firstWhere(
+      (layer) => layer.id == 'color_shell',
+    );
     final leaf = bundle.shape.layers.last;
 
     expect(light.toneLightnessDelta, closeTo(0.16, 0.0001));
     expect(shade.toneLightnessDelta, closeTo(-0.16, 0.0001));
+    expect(bounce.opacity, closeTo(0.16, 0.0001));
+    expect(bounce.toneLightnessDelta, closeTo(0.11, 0.0001));
+    expect(shell.opacity, closeTo(0.28, 0.0001));
     expect(leaf.role, ShapeLayerRole.spec);
     expect(leaf.blur, greaterThan(0));
   });
