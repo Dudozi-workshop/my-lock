@@ -467,7 +467,7 @@ const _candidates = <_CrayonCandidate>[
       toneVariation: 0.0,
     ),
   ),
-]
+];
 
 class CrayonStyleLab extends StatefulWidget {
   const CrayonStyleLab({
