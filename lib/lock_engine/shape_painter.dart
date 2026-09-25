@@ -35,22 +35,49 @@ class LockTokenPainter extends CustomPainter {
       oldDelegate.token.id != token.id || oldDelegate.texture != texture;
 }
 
+Path _roundedPolygonPath(List<Offset> points, double cornerRadius) {
+  if (points.length < 3) return Path();
+
+  Offset toward(Offset from, Offset to, double distance) {
+    final delta = to - from;
+    final length = delta.distance;
+    if (length == 0) return from;
+    return from + delta / length * distance;
+  }
+
+  final path = Path();
+  for (var i = 0; i < points.length; i++) {
+    final previous = points[(i - 1 + points.length) % points.length];
+    final current = points[i];
+    final next = points[(i + 1) % points.length];
+    final start = toward(current, previous, cornerRadius);
+    final end = toward(current, next, cornerRadius);
+
+    if (i == 0) {
+      path.moveTo(start.dx, start.dy);
+    } else {
+      path.lineTo(start.dx, start.dy);
+    }
+    path.quadraticBezierTo(current.dx, current.dy, end.dx, end.dy);
+  }
+  return path..close();
+}
+
 Path _tokenShapePath(ShapeKind kind, Offset center, double radius) {
   switch (kind) {
     case ShapeKind.circle:
       return Path()..addOval(Rect.fromCircle(center: center, radius: radius));
     case ShapeKind.triangle:
-      final path = Path();
-      for (var i = 0; i < 3; i++) {
-        final angle = -pi / 2 + i * pi * 2 / 3;
-        final point = center + Offset(cos(angle), sin(angle)) * radius;
-        if (i == 0) {
-          path.moveTo(point.dx, point.dy);
-        } else {
-          path.lineTo(point.dx, point.dy);
-        }
-      }
-      return path..close();
+      final points = <Offset>[
+        for (var i = 0; i < 3; i++)
+          center +
+              Offset(
+                    cos(-pi / 2 + i * pi * 2 / 3),
+                    sin(-pi / 2 + i * pi * 2 / 3),
+                  ) *
+                  radius,
+      ];
+      return _roundedPolygonPath(points, radius * 0.16);
     case ShapeKind.square:
       final rect = Rect.fromCenter(
         center: center,
@@ -189,13 +216,13 @@ Color _adjustSoftBasicTone(
     base: base,
     highlight: _adjustSoftBasicTone(
       base,
-      lightnessDelta: 0.10,
-      saturationDelta: -0.02,
+      lightnessDelta: 0.12,
+      saturationDelta: -0.025,
     ),
     shade: _adjustSoftBasicTone(
       base,
-      lightnessDelta: -0.11,
-      saturationDelta: 0.035,
+      lightnessDelta: -0.085,
+      saturationDelta: 0.025,
     ),
   );
 }
@@ -214,14 +241,14 @@ void _paintStyledShape(
 
   final softBasicColors = _softBasicToneColors(tone);
   final shadowAlpha = switch (texture) {
-    ShapeTexture.glossy => 0.13,
+    ShapeTexture.glossy => 0.10,
     ShapeTexture.glass => 0.12,
     ShapeTexture.chrome => 0.34,
     ShapeTexture.metal => 0.30,
     _ => 0.24,
   };
   final shadowElevation = switch (texture) {
-    ShapeTexture.glossy => 5.0,
+    ShapeTexture.glossy => 4.0,
     ShapeTexture.matte => 7.0,
     _ => 12.0,
   };
@@ -236,17 +263,17 @@ void _paintStyledShape(
   final fill = Paint();
   switch (texture) {
     case ShapeTexture.glossy:
-      // Soft Basic: color-first 2D rendering. The selected palette tone owns
-      // the object; tonal depth is derived from that same base color.
-      fill.shader = LinearGradient(
-        begin: const Alignment(-0.78, -0.88),
-        end: const Alignment(0.86, 0.92),
+      // Soft Basic: color-first 2D volume. A broad same-hue light field
+      // shapes the object; white is reserved for a small specular accent.
+      fill.shader = RadialGradient(
+        center: const Alignment(-0.52, -0.58),
+        radius: 1.30,
         colors: [
           softBasicColors.highlight.withValues(alpha: opacity),
           softBasicColors.base.withValues(alpha: opacity),
           softBasicColors.shade.withValues(alpha: opacity),
         ],
-        stops: const [0.0, 0.52, 1.0],
+        stops: const [0.0, 0.56, 1.0],
       ).createShader(bounds);
       break;
     case ShapeTexture.jelly:
@@ -318,43 +345,60 @@ void _paintStyledShape(
   canvas.drawPath(path, fill);
 
   if (texture == ShapeTexture.glossy) {
-    // A very light ambient shade anchors the lower-right edge without
-    // turning the token into a 3D/glass object.
     canvas.save();
     canvas.clipPath(path);
-    final ambientShade = Paint()
+
+    // Broad colored light: this is what the concept mockup shows most
+    // strongly. It stays in the selected hue instead of washing to white.
+    final toneLight = Paint()
       ..shader = RadialGradient(
-        center: const Alignment(0.78, 0.82),
-        radius: 0.95,
+        center: const Alignment(-0.72, -0.74),
+        radius: 0.86,
+        colors: [
+          softBasicColors.highlight.withValues(alpha: 0.30 * opacity),
+          Colors.transparent,
+        ],
+        stops: const [0.0, 1.0],
+      ).createShader(bounds);
+    canvas.drawRect(bounds, toneLight);
+
+    // Same-hue depth on the lower-right. Avoid black-heavy shading so Pink,
+    // Blue and Yellow keep their identity.
+    final toneShade = Paint()
+      ..shader = RadialGradient(
+        center: const Alignment(0.82, 0.84),
+        radius: 0.92,
         colors: [
           Colors.transparent,
-          Colors.black.withValues(alpha: 0.055 * opacity),
+          softBasicColors.shade.withValues(alpha: 0.20 * opacity),
         ],
-        stops: const [0.48, 1.0],
+        stops: const [0.45, 1.0],
       ).createShader(bounds);
-    canvas.drawRect(bounds, ambientShade);
+    canvas.drawRect(bounds, toneShade);
 
-    // Small white specular point: supportive only. The broader volume is
-    // expressed by same-hue tone changes above.
+    // Small soft specular accent. Larger and rounder than the previous dash,
+    // but still secondary to the palette color.
     final highlightCenter =
-        center.translate(-radius * 0.30, -radius * 0.31);
+        center.translate(-radius * 0.28, -radius * 0.31);
     canvas.save();
     canvas.translate(highlightCenter.dx, highlightCenter.dy);
-    canvas.rotate(-0.48);
+    canvas.rotate(-0.52);
     final specular = Paint()
-      ..color = Colors.white.withValues(alpha: 0.38 * opacity);
+      ..color = Colors.white.withValues(alpha: 0.46 * opacity)
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, max(0.7, radius * 0.018));
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromCenter(
           center: Offset.zero,
-          width: radius * 0.34,
-          height: radius * 0.14,
+          width: radius * 0.42,
+          height: radius * 0.17,
         ),
-        Radius.circular(radius * 0.08),
+        Radius.circular(radius * 0.10),
       ),
       specular,
     );
     canvas.restore();
+
     canvas.restore();
   } else {
     final borderColor = tone == ShapeTone.white
