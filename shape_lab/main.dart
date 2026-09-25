@@ -1343,7 +1343,7 @@ class _SoftBasicCircleSquareComparePanel extends StatelessWidget {
             if (tone != tones.last) const SizedBox(height: 12),
           ],
           const SizedBox(height: 18),
-          Divider(color: const Color(0xFFE8E5EF), height: 1),
+          const Divider(color: Color(0xFFE8E5EF), height: 1),
           const SizedBox(height: 14),
           Text(
             '58px APP EXACT',
