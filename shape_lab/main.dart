@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:my_lock/lock_engine/effects.dart';
 import 'package:my_lock/lock_engine/floating_preview.dart';
 import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
+import 'package:my_lock/lock_engine/shape_spec/shape_spec_renderer.dart';
+
+import 'soft_basic_candidates.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -378,7 +382,9 @@ class CrayonStyleLab extends StatefulWidget {
 
 class _CrayonStyleLabState extends State<CrayonStyleLab> {
   int selectedIndex = 0;
-  ShapeStyle selectedStyle = ShapeStyle.crayonSoft;
+  ShapeStyle selectedStyle = Uri.base.queryParameters['style'] == 'soft-basic'
+      ? ShapeStyle.softBasic
+      : ShapeStyle.crayonSoft;
 
   @override
   Widget build(BuildContext context) {
@@ -394,10 +400,13 @@ class _CrayonStyleLabState extends State<CrayonStyleLab> {
             card: widget.card,
             fg: widget.fg,
             muted: widget.muted,
-            onChanged: (value) => setState(() => selectedStyle = value),
+            onChanged: (value) {
+              setState(() => selectedStyle = value);
+              _syncStyleQuery(value);
+            },
           ),
           const SizedBox(height: 12),
-          _SoftBasicLockedReference(
+          _SoftBasicCandidateLab(
             card: widget.card,
             fg: widget.fg,
             muted: widget.muted,
@@ -466,6 +475,15 @@ class _CrayonStyleLabState extends State<CrayonStyleLab> {
   }
 }
 
+
+void _syncStyleQuery(ShapeStyle style) {
+  final query = Map<String, String>.from(Uri.base.queryParameters)
+    ..['lab'] = 'style'
+    ..['style'] = style == ShapeStyle.softBasic ? 'soft-basic' : 'crayon-soft';
+  final next = Uri.base.replace(queryParameters: query);
+  // Web build uses browser history through route information updates.
+  SystemNavigator.routeInformationUpdated(uri: next, replace: true);
+}
 
 class _StyleSelector extends StatelessWidget {
   const _StyleSelector({
@@ -537,8 +555,8 @@ class _StyleSelector extends StatelessWidget {
   }
 }
 
-class _SoftBasicLockedReference extends StatelessWidget {
-  const _SoftBasicLockedReference({
+class _SoftBasicCandidateLab extends StatefulWidget {
+  const _SoftBasicCandidateLab({
     required this.card,
     required this.fg,
     required this.muted,
@@ -549,8 +567,181 @@ class _SoftBasicLockedReference extends StatelessWidget {
   final Color muted;
 
   @override
+  State<_SoftBasicCandidateLab> createState() => _SoftBasicCandidateLabState();
+}
+
+class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
+  int selectedIndex = 0;
+
+  @override
   Widget build(BuildContext context) {
-    const shapes = [ShapeKind.circle, ShapeKind.triangle, ShapeKind.square];
+    final compact = MediaQuery.sizeOf(context).width < 700;
+    final selected = softBasicRound1Candidates[selectedIndex];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SectionTitle(
+          title: 'Soft Basic · Round 1 · Direction',
+          subtitle: 'SB-R1-01~08을 한 화면에서 비교합니다. Production Master는 변경하지 않습니다.',
+          fg: widget.fg,
+          muted: widget.muted,
+        ),
+        const SizedBox(height: 12),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final columns = constraints.maxWidth >= 980 ? 4 : 2;
+            final gap = compact ? 8.0 : 12.0;
+            final itemWidth =
+                (constraints.maxWidth - gap * (columns - 1)) / columns;
+            return Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                for (var i = 0; i < softBasicRound1Candidates.length; i++)
+                  SizedBox(
+                    width: itemWidth,
+                    child: _SoftBasicCandidateCard(
+                      candidate: softBasicRound1Candidates[i],
+                      selected: i == selectedIndex,
+                      card: widget.card,
+                      fg: widget.fg,
+                      muted: widget.muted,
+                      onTap: () => setState(() => selectedIndex = i),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 14),
+        _SoftBasicDetailPanel(
+          candidate: selected,
+          card: widget.card,
+          fg: widget.fg,
+          muted: widget.muted,
+        ),
+      ],
+    );
+  }
+}
+
+class _SoftBasicCandidateCard extends StatelessWidget {
+  const _SoftBasicCandidateCard({
+    required this.candidate,
+    required this.selected,
+    required this.card,
+    required this.fg,
+    required this.muted,
+    required this.onTap,
+  });
+
+  final SoftBasicCandidate candidate;
+  final bool selected;
+  final Color card;
+  final Color fg;
+  final Color muted;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    const shapes = [ShapeKind.circle, ShapeKind.square, ShapeKind.triangle];
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          height: 150,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: card,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: selected
+                  ? const Color(0xFF7257F5)
+                  : const Color(0xFFE6E3EE),
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      candidate.id,
+                      style: TextStyle(
+                        color: fg,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  if (candidate.badge != null)
+                    Text(
+                      candidate.badge!,
+                      style: const TextStyle(
+                        color: Color(0xFF7257F5),
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                ],
+              ),
+              Text(
+                candidate.name,
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const Spacer(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  for (final shape in shapes)
+                    _SoftBasicExactToken(
+                      shape: shape,
+                      tone: ShapeTone.blue,
+                      candidate: candidate,
+                      size: 46,
+                    ),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                candidate.intent,
+                style: TextStyle(color: muted, fontSize: 9.5, height: 1.2),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SoftBasicDetailPanel extends StatelessWidget {
+  const _SoftBasicDetailPanel({
+    required this.candidate,
+    required this.card,
+    required this.fg,
+    required this.muted,
+  });
+
+  final SoftBasicCandidate candidate;
+  final Color card;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    const shapes = [ShapeKind.circle, ShapeKind.square, ShapeKind.triangle];
     const tones = [ShapeTone.pink, ShapeTone.blue, ShapeTone.yellow];
     return _Panel(
       color: card,
@@ -558,37 +749,114 @@ class _SoftBasicLockedReference extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Soft Basic · LOCKED REFERENCE',
+            candidate.id + ' · ' + candidate.name,
             style: TextStyle(
               color: fg,
               fontSize: 17,
               fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 3),
+          Text(candidate.intent, style: TextStyle(color: muted, fontSize: 12)),
+          const SizedBox(height: 14),
           Text(
-            '이번 Crayon 최적화에서는 수정하지 않습니다. 현재 앱 렌더만 확인합니다.',
-            style: TextStyle(color: muted, fontSize: 12),
+            '3 Shapes × 3 Colors · 58px APP EXACT',
+            style: TextStyle(
+              color: fg,
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           Wrap(
             spacing: 14,
             runSpacing: 14,
             children: [
               for (final shape in shapes)
                 for (final tone in tones)
-                  _TokenWithLabel(
-                    shape: shape,
-                    tone: tone,
-                    style: ShapeStyle.softBasic,
-                    label: '${shape.label}·${tone.label}',
-                    muted: muted,
+                  SizedBox(
+                    width: 76,
+                    child: Column(
+                      children: [
+                        _SoftBasicExactToken(
+                          shape: shape,
+                          tone: tone,
+                          candidate: candidate,
+                          size: 58,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          shape.label + '·' + tone.label,
+                          style: TextStyle(color: muted, fontSize: 9),
+                        ),
+                      ],
+                    ),
                   ),
             ],
           ),
         ],
       ),
     );
+  }
+}
+
+class _SoftBasicExactToken extends StatelessWidget {
+  const _SoftBasicExactToken({
+    required this.shape,
+    required this.tone,
+    required this.candidate,
+    required this.size,
+  });
+
+  final ShapeKind shape;
+  final ShapeTone tone;
+  final SoftBasicCandidate candidate;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(
+        painter: _SoftBasicCandidatePainter(
+          shape: shape,
+          tone: tone,
+          candidate: candidate,
+        ),
+      ),
+    );
+  }
+}
+
+class _SoftBasicCandidatePainter extends CustomPainter {
+  const _SoftBasicCandidatePainter({
+    required this.shape,
+    required this.tone,
+    required this.candidate,
+  });
+
+  final ShapeKind shape;
+  final ShapeTone tone;
+  final SoftBasicCandidate candidate;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    ShapeSpecRenderer.paintToken(
+      canvas,
+      center: size.center(Offset.zero),
+      radius: size.shortestSide / 2,
+      token: LockToken(shape: shape, tone: tone),
+      style: ShapeStyle.softBasic,
+      opacity: 1,
+      overrides: candidate.forShape(shape),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _SoftBasicCandidatePainter oldDelegate) {
+    return oldDelegate.shape != shape ||
+        oldDelegate.tone != tone ||
+        oldDelegate.candidate.id != candidate.id;
   }
 }
 
