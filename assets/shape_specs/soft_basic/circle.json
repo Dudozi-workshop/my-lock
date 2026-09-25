@@ -1,7 +1,7 @@
 {
   "styleId": "soft_basic",
   "shapeId": "circle",
-  "version": 8,
+  "version": 9,
   "rotationMode": "fixed",
   "body": {
     "kind": "circle",
@@ -10,78 +10,80 @@
     "r": 46
   },
   "surface": {
-    "kind": "radial",
-    "centerX": -0.22,
-    "centerY": -0.28,
-    "radius": 1.72,
-    "stops": [
-      0,
-      0.12,
-      0.9,
-      1
-    ]
+    "kind": "solid"
   },
   "layers": [
     {
-      "id": "diffuse_light",
+      "id": "airbrush_light",
       "role": "light",
-      "blend": "softLight",
-      "opacity": 0.32,
-      "blur": 0,
+      "blend": "normal",
+      "opacity": 0.48,
+      "blur": 22.0,
+      "toneLightnessDelta": 0.16,
+      "toneSaturationDelta": -0.04,
       "geometry": {
-        "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_diffuse_light_v4.b64"
+        "kind": "circle",
+        "cx": 31.52,
+        "cy": 30.64,
+        "r": 36.96
       }
     },
     {
-      "id": "form_shadow",
+      "id": "airbrush_shade",
       "role": "shade",
-      "blend": "multiply",
-      "opacity": 0.36,
-      "blur": 0,
+      "blend": "normal",
+      "opacity": 0.40,
+      "blur": 27.0,
+      "toneLightnessDelta": -0.16,
+      "toneSaturationDelta": 0.03,
       "geometry": {
-        "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_form_shadow_v4.b64"
+        "kind": "circle",
+        "cx": 78.16,
+        "cy": 81.68,
+        "r": 37.84
       }
     },
     {
-      "id": "rim_light",
-      "role": "light",
-      "blend": "screen",
-      "opacity": 0.045,
-      "blur": 0,
-      "geometry": {
-        "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_rim_light_v2.b64"
-      }
-    },
-    {
-      "id": "soft_spec",
+      "id": "edge_leaf_halo",
       "role": "spec",
-      "blend": "screen",
-      "opacity": 0.2,
-      "blur": 0,
+      "blend": "normal",
+      "opacity": 0.20,
+      "blur": 8.5,
       "geometry": {
-        "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_soft_spec_v6.b64"
+        "kind": "path",
+        "commands": [
+          {"op": "M", "x": 17.44, "y": 41.20},
+          {"op": "C", "c1x": 17.44, "c1y": 30.64, "c2x": 21.84, "c2y": 20.96, "x": 29.76, "y": 16.56},
+          {"op": "C", "c1x": 35.04, "c1y": 13.92, "c2x": 40.32, "c2y": 14.80, "x": 41.20, "y": 19.20},
+          {"op": "C", "c1x": 42.08, "c1y": 24.48, "c2x": 36.80, "c2y": 29.76, "x": 31.52, "y": 35.04},
+          {"op": "C", "c1x": 26.24, "c1y": 40.32, "c2x": 20.96, "c2y": 45.60, "x": 17.44, "y": 41.20},
+          {"op": "Z"}
+        ]
       }
     },
     {
-      "id": "core_spec",
+      "id": "edge_leaf",
       "role": "spec",
-      "blend": "screen",
-      "opacity": 0.7,
-      "blur": 0,
+      "blend": "normal",
+      "opacity": 0.76,
+      "blur": 3.1,
       "geometry": {
-        "kind": "mask",
-        "asset": "assets/shape_specs/soft_basic/circle_core_spec_v4.b64"
+        "kind": "path",
+        "commands": [
+          {"op": "M", "x": 17.44, "y": 41.20},
+          {"op": "C", "c1x": 17.44, "c1y": 30.64, "c2x": 21.84, "c2y": 20.96, "x": 29.76, "y": 16.56},
+          {"op": "C", "c1x": 35.04, "c1y": 13.92, "c2x": 40.32, "c2y": 14.80, "x": 41.20, "y": 19.20},
+          {"op": "C", "c1x": 42.08, "c1y": 24.48, "c2x": 36.80, "c2y": 29.76, "x": 31.52, "y": 35.04},
+          {"op": "C", "c1x": 26.24, "c1y": 40.32, "c2x": 20.96, "c2y": 45.60, "x": 17.44, "y": 41.20},
+          {"op": "Z"}
+        ]
       }
     }
   ],
   "shadow": {
-    "opacity": 0.014,
-    "elevation": 1.1,
-    "offsetX": 0.2,
-    "offsetY": 0.55
+    "opacity": 0.018,
+    "elevation": 1.35,
+    "offsetX": 0.0,
+    "offsetY": 1.0
   }
 }
