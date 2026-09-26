@@ -31,3 +31,22 @@ Every decision change is recorded as **Before → After → Why → Impact**. Pr
 - **After:** Static Master → part/region split → Static Lock → whole-turtle animation image mockup → 3–4 key-pose approval → Near Flipper implementation → Far Flipper implementation → loop QA.
 - **Why:** approve visual motion before spending production cost on assets and code.
 - **Impact:** no animation code is added during Canonical v3 preparation.
+
+
+## 2026-09-26 · Bake-only → Hybrid Material Compositor
+- **Before:** production planning could be interpreted as baking the finished turtle appearance into static sprites and only applying limited palette changes.
+- **After:** Geometry/structural lighting stays baked or pre-derived, while palette/material color and time-varying effects can remain runtime inputs inside region masks. Aurora Sea is the reference stress-test.
+- **Why:** a moving Aurora shell cannot be represented correctly by a fully baked static color layer, while a raw overlay would look detached from the shell.
+- **Impact:** Shell/Belly regions are prepared for Albedo + Shadow + Highlight + Detail + Outline composition. Dynamic material uses shape-local coordinates and is composited before whole-object Motion Set transforms.
+
+## 2026-09-26 · Layer QA/QC Gate
+- **Before:** masks were visually checked individually and then registered.
+- **After:** every layer follows Generate → QC → QA → Register, including containment, overlap/gap, ownership, hidden-underlap reveal and rebuild checks.
+- **Why:** visually plausible masks can still fail when a moving part reveals hidden areas or when multiple layers are composited.
+- **Impact:** Static Master Lock is blocked while any geometry/material QA or QC gate fails.
+
+## 2026-09-26 · Belly Hidden Underlap correction
+- **Before:** the first Belly mask represented primarily the currently visible belly surface and was interrupted by the Near front flipper.
+- **After:** Belly is defined as a continuous static-body surface that extends behind the moving front flippers.
+- **Why:** moving/removing a flipper must reveal a complete belly instead of an empty gap.
+- **Impact:** the previously registered Belly mask is marked for replacement; Shell Detail work pauses until the corrected Belly passes reveal QA.
