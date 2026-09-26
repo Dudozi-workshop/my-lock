@@ -575,3 +575,52 @@ const softBasicSquareRound5Candidates = <SoftBasicSquareCandidate>[
 ];
 
 const softBasicSquareSelectedMasterId = 'SB-S-R5-03';
+
+
+class SoftBasicTriangleGeometryCandidate {
+  const SoftBasicTriangleGeometryCandidate({
+    required this.id,
+    required this.name,
+    required this.cornerRadius,
+    required this.intent,
+    this.badge,
+  });
+
+  final String id;
+  final String name;
+  final double cornerRadius;
+  final String intent;
+  final String? badge;
+}
+
+const softBasicTriangleGeometryRound1Candidates =
+    <SoftBasicTriangleGeometryCandidate>[
+  SoftBasicTriangleGeometryCandidate(
+    id: 'SB-T-G1-01',
+    name: 'Sharp Soft',
+    cornerRadius: 2.0,
+    intent: '정삼각형 직선감을 가장 강하게 유지하고 꼭짓점의 날카로움만 최소한으로 완화.',
+    badge: '2px',
+  ),
+  SoftBasicTriangleGeometryCandidate(
+    id: 'SB-T-G1-02',
+    name: 'Light Round',
+    cornerRadius: 3.0,
+    intent: '정삼각형 인상은 그대로 두고 꼭짓점 끝만 가볍게 둥글린 균형안.',
+    badge: '3px',
+  ),
+  SoftBasicTriangleGeometryCandidate(
+    id: 'SB-T-G1-03',
+    name: 'Current Soft',
+    cornerRadius: 4.0,
+    intent: '현재 Soft Basic Triangle Master 기준. 직선 구간을 충분히 남긴 소프트 코너.',
+    badge: 'CURRENT',
+  ),
+  SoftBasicTriangleGeometryCandidate(
+    id: 'SB-T-G1-04',
+    name: 'Max Soft',
+    cornerRadius: 5.0,
+    intent: '정삼각형으로 읽히는 범위에서 코너 라운드를 가장 강하게 준 상한 확인안.',
+    badge: '5px',
+  ),
+];
