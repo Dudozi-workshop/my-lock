@@ -1,0 +1,44 @@
+{
+  "masterId": "core_triangle",
+  "version": 1,
+  "status": "master",
+  "approvedDate": "2026-09-26",
+  "viewBox": {
+    "width": 100,
+    "height": 100
+  },
+  "geometry": {
+    "kind": "roundedPolygon",
+    "cornerRadius": 10,
+    "points": [
+      [
+        50,
+        4
+      ],
+      [
+        96,
+        91
+      ],
+      [
+        4,
+        91
+      ]
+    ]
+  },
+  "opticalBounds": {
+    "left": 4,
+    "top": 4,
+    "right": 96,
+    "bottom": 91
+  },
+  "source": {
+    "promotedFrom": "assets/shape_specs/crayon_soft/triangle.json",
+    "sourceBlobSha": "d021c82e2e175780216b51a07cc91744eb6dcfdf"
+  },
+  "policy": {
+    "geometryLocked": true,
+    "styleIndependent": true,
+    "preserveVertexPositions": true,
+    "preserveCornerRadius": true
+  }
+}
