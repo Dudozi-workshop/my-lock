@@ -2,6 +2,7 @@
   "styleId": "soft_basic",
   "shapeId": "square",
   "version": 1,
+  "geometryMaster": "assets/shape_masters/core/basic_v1/square_master_v1.json",
   "body": {
     "kind": "roundRect",
     "x": 6,
