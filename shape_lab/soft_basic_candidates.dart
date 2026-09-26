@@ -190,10 +190,10 @@ const softBasicCircleRound9NaturalCandidates = <SoftBasicCandidate>[
     id: 'SB-C-R9N-03',
     name: 'Edge Fade',
     intent: '우하단 외곽 일부만 같은 색 계열로 살짝 밝아졌다 사라지게 해 별도 장식처럼 보이지 않는 안.',
-    state: SoftBasicCandidateState.candidate,
+    state: SoftBasicCandidateState.selected,
     finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
     bottomHighlightTechnique: SoftBasicBottomHighlightTechnique.edgeFade,
-    badge: 'NATURAL',
+    badge: 'SELECTED',
   ),
 ];
 
@@ -322,6 +322,9 @@ enum SoftBasicSquareHighlightTechnique {
   flatInset,
   shortCompact,
   taperedEdge,
+  cornerKiss,
+  softFacet,
+  edgeFade,
 }
 
 class SoftBasicSquareCandidate {
@@ -408,5 +411,33 @@ const softBasicSquareRound2Candidates = <SoftBasicSquareCandidate>[
     technique: SoftBasicSquareTechnique.tighterCorner,
     highlightTechnique: SoftBasicSquareHighlightTechnique.taperedEdge,
     badge: 'EDGE',
+  ),
+];
+
+
+const softBasicSquareRound3Candidates = <SoftBasicSquareCandidate>[
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R3-01',
+    name: 'Corner Kiss',
+    intent: '좌상단 코너 한쪽에만 짧은 색상광을 두어 하이라이트를 장식이 아닌 작은 포인트로 읽히게 한 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    highlightTechnique: SoftBasicSquareHighlightTechnique.cornerKiss,
+    badge: 'POINT',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R3-02',
+    name: 'Soft Facet',
+    intent: '선이나 pill 없이 좌상단 면 자체의 밝기만 살짝 올려 자연스러운 면광으로 처리한 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    highlightTechnique: SoftBasicSquareHighlightTechnique.softFacet,
+    badge: 'SOFT',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R3-03',
+    name: 'Edge Fade',
+    intent: '상단과 좌측 엣지 일부가 같은 색 계열로 자연스럽게 밝아졌다 사라지도록 한 가장 절제된 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    highlightTechnique: SoftBasicSquareHighlightTechnique.edgeFade,
+    badge: 'NATURAL',
   ),
 ];
