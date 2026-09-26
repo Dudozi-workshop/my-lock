@@ -10,6 +10,43 @@ SPEC = ROOT / "assets/shape_masters/drop01/sea_turtle_v2/spec.json"
 RUNTIME = ROOT / "assets/sea_turtle_runtime_v2"
 SHAPE_LAB = ROOT / "shape_lab/main.dart"
 
+SOURCE_ROOT = ROOT / "assets/shape_masters/drop01/sea_turtle_v2"
+
+EXPECTED_SOURCE = {
+    "master/sea_turtle_master_v2_512.png": {
+        "size": 160609,
+        "sha256": "42b1bdcc353f478e8e384c49223264ca98ea696982218495b53ffdb36d4a69b4",
+    },
+    "masks/master_alpha.png": {
+        "size": 11784,
+        "sha256": "8cfa7a7025df4a3d899fc770d626c1f5ba80c95ce5d4003320feb4faf2f1c6b7",
+    },
+    "masks/outline_mask.png": {
+        "size": 6634,
+        "sha256": "6b5f90c34329731d87cd56b760fce31829a8fce67fe2e8665f87cd57c5292d0a",
+    },
+    "masks/shell_detail_mask.png": {
+        "size": 3883,
+        "sha256": "c7dd1b9834b7c503801a1c839c014808e46cf7471a56c65ae628dc3a9859ee1e",
+    },
+    "masks/shell_mask.png": {
+        "size": 5629,
+        "sha256": "17180bb5271209c72ea1ced2c34d186837651b0c13de389d24acc511e7ed01ca",
+    },
+    "masks/underbelly_mask.png": {
+        "size": 2600,
+        "sha256": "76e378788f4317fbb14f0f09be47b41dea28ed289eb89fa1afe5b65401abfe77",
+    },
+    "overlays/highlight_overlay.png": {
+        "size": 32647,
+        "sha256": "22dae382d327367f81cd192c481ca8cd1a1f7c055f55d4202d395cae4b3081fe",
+    },
+    "overlays/shadow_overlay.png": {
+        "size": 45449,
+        "sha256": "6f67d70bf372007411197d83dec0101b8a632a1409aa686820f18d82fe769208",
+    },
+}
+
 EXPECTED_RUNTIME = {
     "sea_turtle_blue.png": {
         "size": 7944,
@@ -74,6 +111,26 @@ def main() -> None:
         if layers.get(layer_id, {}).get("token") != token:
             fail(f"layer token mismatch: {layer_id}")
 
+    source_present = []
+    source_missing = []
+    for relative, expected in EXPECTED_SOURCE.items():
+        path = SOURCE_ROOT / relative
+        if not path.is_file():
+            source_missing.append(relative)
+            continue
+        source_present.append(relative)
+        if path.stat().st_size != expected["size"]:
+            fail(f"source size mismatch: {relative}")
+        digest = sha256(path)
+        if digest != expected["sha256"]:
+            fail(f"source SHA-256 mismatch: {relative}")
+
+    if source_present and source_missing:
+        fail(
+            "partial Sea Turtle source pack detected; missing: "
+            + ", ".join(source_missing)
+        )
+
     for name, expected in EXPECTED_RUNTIME.items():
         path = RUNTIME / name
         if not path.is_file():
@@ -102,6 +159,10 @@ def main() -> None:
     print("- Geometry: source_locked_no_redraw")
     print("- Region tokens: main / underbelly / deep / detail / outline")
     print("- Shape-local motion: disabled")
+    if source_present:
+        print("- Source pack: complete; byte size + SHA-256 verified")
+    else:
+        print("- Source pack: not yet committed; metadata/checksums locked")
     print("- Derived runtime QA PNGs: byte size + SHA-256 verified")
 
 
