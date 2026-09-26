@@ -2,21 +2,22 @@
   "styleId": "soft_basic",
   "shapeId": "triangle",
   "version": 2,
+  "geometryMaster": "assets/shape_masters/core/basic_v1/triangle_master_v1.json",
   "body": {
     "kind": "roundedPolygon",
-    "cornerRadius": 4,
+    "cornerRadius": 10,
     "points": [
       [
         50,
-        11.9
+        4
       ],
       [
-        94,
-        88.1
+        96,
+        91
       ],
       [
-        6,
-        88.1
+        4,
+        91
       ]
     ]
   },
