@@ -1,0 +1,34 @@
+{
+  "masterId": "core_square",
+  "version": 1,
+  "status": "master",
+  "approvedDate": "2026-09-26",
+  "viewBox": {
+    "width": 100,
+    "height": 100
+  },
+  "geometry": {
+    "kind": "roundRect",
+    "x": 6,
+    "y": 6,
+    "w": 88,
+    "h": 88,
+    "radius": 23
+  },
+  "opticalBounds": {
+    "left": 6,
+    "top": 6,
+    "right": 94,
+    "bottom": 94
+  },
+  "source": {
+    "promotedFrom": "assets/shape_specs/crayon_soft/square.json",
+    "sourceBlobSha": "fcc7f36b6a57e4d0a85cc9d52a2c0d007269a535"
+  },
+  "policy": {
+    "geometryLocked": true,
+    "styleIndependent": true,
+    "preserveAspectRatio": true,
+    "preserveCornerRadius": true
+  }
+}
