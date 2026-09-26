@@ -675,13 +675,6 @@ const softBasicTriangleFinalCandidates = <SoftBasicTriangleMaterialCandidate>[
     badge: 'SPEC',
   ),
   SoftBasicTriangleMaterialCandidate(
-    id: 'SB-T-D1-03',
-    name: 'Edge Sweep',
-    intent: '삼각형 좌상단 변을 따라 길게 흐르는 곡선 하이라이트로 면 방향과 실루엣을 동시에 살리는 방식.',
-    approach: SoftBasicTriangleApproach.edgeSweep,
-    badge: 'EDGE',
-  ),
-  SoftBasicTriangleMaterialCandidate(
     id: 'SB-T-D1-04',
     name: 'Soft Bevel Rim',
     intent: '밝은 좌상단 Rim과 어두운 우하단 Rim을 짝으로 사용해 둥근 모서리와 두께감을 만드는 방식.',
