@@ -317,6 +317,8 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
   int _objectCount = 9;
   MovementStyle _movement = MovementStyle.underwater;
   bool _darkBackground = false;
+  bool _frameLoop = true;
+  double _frameElapsedSeconds = 0;
 
   @override
   void initState() {
@@ -344,6 +346,7 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
 
     if (delta > 0) {
       final safeDelta = delta.clamp(0.0, 0.035).toDouble();
+      _frameElapsedSeconds += safeDelta;
       _engine.step(safeDelta);
       setState(() {});
     }
@@ -365,7 +368,7 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
           _SectionTitle(
             title: 'Drop 01 · Sea Turtle · Long Flipper',
             subtitle:
-                'Static Runtime QA PASS · 투명 Runtime Asset 3색 · Shape 자체 Motion 없음 · 이동은 Motion Set이 담당',
+                'Static Master 유지 · 3-Frame Swim PoC · 이동/충돌/회전은 Motion Set이 담당',
             fg: widget.fg,
             muted: widget.muted,
           ),
@@ -387,6 +390,53 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
                 label: 'Sand Beige',
               ),
             ],
+          ),
+          const SizedBox(height: 18),
+          Text(
+            '3-Frame Swim PoC',
+            style: TextStyle(
+              color: widget.fg,
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Long Flipper Static Master에서 앞지느러미 Region만 3개 고정 포즈로 전환합니다. 재생 순서: F1 → F2 → F3 → F2.',
+            style: TextStyle(color: widget.muted, fontSize: 11.5),
+          ),
+          const SizedBox(height: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxWidth < 720;
+              final previewWidth = compact
+                  ? constraints.maxWidth
+                  : (constraints.maxWidth - 20) * 0.34;
+              final stripWidth = compact
+                  ? constraints.maxWidth
+                  : (constraints.maxWidth - 20) * 0.66;
+
+              return Wrap(
+                spacing: 20,
+                runSpacing: 14,
+                crossAxisAlignment: WrapCrossAlignment.start,
+                children: [
+                  SizedBox(
+                    width: previewWidth,
+                    child: _SeaTurtleLoopPreview(
+                      frameIndex: _frameLoop
+                          ? _seaTurtleFrameIndex(_frameElapsedSeconds)
+                          : 0,
+                      muted: widget.muted,
+                    ),
+                  ),
+                  SizedBox(
+                    width: stripWidth,
+                    child: _SeaTurtleFrameStrip(muted: widget.muted),
+                  ),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 18),
           Text(
@@ -430,6 +480,11 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
                     _engine.setMovementStyle(value);
                   });
                 },
+              ),
+              FilterChip(
+                label: const Text('3-Frame Swim'),
+                selected: _frameLoop,
+                onSelected: (value) => setState(() => _frameLoop = value),
               ),
               FilterChip(
                 label: const Text('Dark BG'),
@@ -484,6 +539,11 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
                         _SeaTurtleRuntimeObject(
                           key: ValueKey(object.id),
                           object: object,
+                          frameIndex: _frameLoop
+                              ? _seaTurtleFrameIndex(
+                                  _frameElapsedSeconds + object.id * 0.11,
+                                )
+                              : 0,
                         ),
                     ],
                   ),
@@ -536,9 +596,11 @@ class _SeaTurtleRuntimeObject extends StatelessWidget {
   const _SeaTurtleRuntimeObject({
     super.key,
     required this.object,
+    required this.frameIndex,
   });
 
   final FloatingObject object;
+  final int frameIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -551,9 +613,10 @@ class _SeaTurtleRuntimeObject extends StatelessWidget {
       child: IgnorePointer(
         child: Transform.rotate(
           angle: object.rotation,
-          child: _SeaTurtleStaticAsset(
+          child: _SeaTurtleFrameAsset(
             tone: object.token.tone,
             size: side,
+            frameIndex: frameIndex,
             compactError: true,
           ),
         ),
@@ -617,6 +680,356 @@ class _SeaTurtleStaticAsset extends StatelessWidget {
       },
     );
   }
+}
+
+int _seaTurtleFrameIndex(double seconds) {
+  const sequence = <int>[0, 1, 2, 1];
+  const frameDurationSeconds = 0.36;
+  final step = (seconds / frameDurationSeconds).floor();
+  return sequence[step % sequence.length];
+}
+
+class _SeaTurtleLoopPreview extends StatelessWidget {
+  const _SeaTurtleLoopPreview({
+    required this.frameIndex,
+    required this.muted,
+  });
+
+  final int frameIndex;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FBFD),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5EDF2)),
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 170,
+            child: Center(
+              child: _SeaTurtleFrameAsset(
+                tone: ShapeTone.blue,
+                size: 158,
+                frameIndex: frameIndex,
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'LIVE · F${frameIndex + 1}',
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            'F1 → F2 → F3 → F2 · 360ms/step',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: muted, fontSize: 10.5),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SeaTurtleFrameStrip extends StatelessWidget {
+  const _SeaTurtleFrameStrip({required this.muted});
+
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FBFD),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5EDF2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Frame Structure',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (var frame = 0; frame < 3; frame++)
+                SizedBox(
+                  width: 106,
+                  child: Column(
+                    children: [
+                      _SeaTurtleFrameAsset(
+                        tone: ShapeTone.blue,
+                        size: 96,
+                        frameIndex: frame,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        switch (frame) {
+                          0 => 'F1 · Neutral',
+                          1 => 'F2 · Down',
+                          _ => 'F3 · Up',
+                        },
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '현재는 같은 3색 Runtime PNG에서 Region 좌표만 바꾸는 PoC입니다. 포즈 확정 후 실제 프레임 Asset으로 bake 가능.',
+            style: TextStyle(color: muted, fontSize: 10.5, height: 1.35),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SeaTurtleFrameAsset extends StatelessWidget {
+  const _SeaTurtleFrameAsset({
+    required this.tone,
+    required this.size,
+    required this.frameIndex,
+    this.compactError = false,
+  });
+
+  final ShapeTone tone;
+  final double size;
+  final int frameIndex;
+  final bool compactError;
+
+  static const _nearPivot = Offset(204 / 512, 234 / 512);
+  static const _farPivot = Offset(124 / 512, 239 / 512);
+
+  @override
+  Widget build(BuildContext context) {
+    final asset = switch (tone) {
+      ShapeTone.blue =>
+        'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
+      ShapeTone.pink =>
+        'assets/sea_turtle_runtime_v2/sea_turtle_pink.png',
+      ShapeTone.yellow =>
+        'assets/sea_turtle_runtime_v2/sea_turtle_yellow.png',
+    };
+
+    final pose = switch (frameIndex.clamp(0, 2)) {
+      1 => (near: 5.5, far: -3.2),
+      2 => (near: -3.0, far: 2.0),
+      _ => (near: 0.0, far: 0.0),
+    };
+
+    Widget image({bool showError = false}) => Image.asset(
+          asset,
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+          gaplessPlayback: true,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (context, error, stackTrace) {
+            if (!showError) return const SizedBox.shrink();
+            if (compactError) {
+              return const Center(
+                child: Icon(
+                  Icons.broken_image_outlined,
+                  size: 18,
+                  color: Color(0xFFB64242),
+                ),
+              );
+            }
+            return Container(
+              width: size,
+              height: size,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFECEC),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                'Asset error',
+                style: TextStyle(color: Color(0xFF9F2F2F), fontSize: 10),
+              ),
+            );
+          },
+        );
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        clipBehavior: Clip.none,
+        fit: StackFit.expand,
+        children: [
+          Transform.rotate(
+            angle: _degrees(pose.far),
+            alignment: _alignmentFor(_farPivot),
+            child: ClipPath(
+              clipper: const _SeaTurtleFramePartClipper(_TurtleFramePart.far),
+              child: image(),
+            ),
+          ),
+          ClipPath(
+            clipper: const _SeaTurtleFrameBaseClipper(),
+            child: image(showError: true),
+          ),
+          Transform.rotate(
+            angle: _degrees(pose.near),
+            alignment: _alignmentFor(_nearPivot),
+            child: ClipPath(
+              clipper: const _SeaTurtleFramePartClipper(_TurtleFramePart.near),
+              child: image(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static double _degrees(double value) => value * pi / 180;
+
+  static Alignment _alignmentFor(Offset pivot) {
+    return Alignment(pivot.dx * 2 - 1, pivot.dy * 2 - 1);
+  }
+}
+
+enum _TurtleFramePart { near, far }
+
+class _SeaTurtleFramePartClipper extends CustomClipper<Path> {
+  const _SeaTurtleFramePartClipper(this.part);
+
+  final _TurtleFramePart part;
+
+  static const _near = <Offset>[
+    Offset(196 / 512, 224 / 512),
+    Offset(218 / 512, 222 / 512),
+    Offset(236 / 512, 238 / 512),
+    Offset(249 / 512, 263 / 512),
+    Offset(265 / 512, 292 / 512),
+    Offset(282 / 512, 318 / 512),
+    Offset(302 / 512, 340 / 512),
+    Offset(323 / 512, 357 / 512),
+    Offset(317 / 512, 371 / 512),
+    Offset(296 / 512, 373 / 512),
+    Offset(276 / 512, 365 / 512),
+    Offset(255 / 512, 350 / 512),
+    Offset(236 / 512, 329 / 512),
+    Offset(220 / 512, 305 / 512),
+    Offset(207 / 512, 280 / 512),
+    Offset(199 / 512, 255 / 512),
+  ];
+
+  static const _far = <Offset>[
+    Offset(108 / 512, 231 / 512),
+    Offset(132 / 512, 228 / 512),
+    Offset(151 / 512, 238 / 512),
+    Offset(160 / 512, 255 / 512),
+    Offset(155 / 512, 282 / 512),
+    Offset(147 / 512, 312 / 512),
+    Offset(139 / 512, 340 / 512),
+    Offset(128 / 512, 357 / 512),
+    Offset(115 / 512, 354 / 512),
+    Offset(103 / 512, 342 / 512),
+    Offset(96 / 512, 322 / 512),
+    Offset(92 / 512, 296 / 512),
+    Offset(93 / 512, 269 / 512),
+    Offset(101 / 512, 244 / 512),
+  ];
+
+  @override
+  Path getClip(Size size) {
+    final points = part == _TurtleFramePart.near ? _near : _far;
+    return Path()
+      ..addPolygon(
+        [
+          for (final point in points)
+            Offset(point.dx * size.width, point.dy * size.height),
+        ],
+        true,
+      );
+  }
+
+  @override
+  bool shouldReclip(covariant _SeaTurtleFramePartClipper oldClipper) =>
+      oldClipper.part != part;
+}
+
+class _SeaTurtleFrameBaseClipper extends CustomClipper<Path> {
+  const _SeaTurtleFrameBaseClipper();
+
+  static const _nearCut = <Offset>[
+    Offset(201 / 512, 230 / 512),
+    Offset(218 / 512, 229 / 512),
+    Offset(232 / 512, 241 / 512),
+    Offset(245 / 512, 266 / 512),
+    Offset(261 / 512, 295 / 512),
+    Offset(278 / 512, 319 / 512),
+    Offset(300 / 512, 341 / 512),
+    Offset(319 / 512, 358 / 512),
+    Offset(313 / 512, 367 / 512),
+    Offset(298 / 512, 368 / 512),
+    Offset(280 / 512, 360 / 512),
+    Offset(259 / 512, 346 / 512),
+    Offset(240 / 512, 325 / 512),
+    Offset(225 / 512, 303 / 512),
+    Offset(213 / 512, 278 / 512),
+    Offset(205 / 512, 255 / 512),
+  ];
+
+  static const _farCut = <Offset>[
+    Offset(112 / 512, 236 / 512),
+    Offset(132 / 512, 234 / 512),
+    Offset(147 / 512, 242 / 512),
+    Offset(155 / 512, 257 / 512),
+    Offset(151 / 512, 281 / 512),
+    Offset(143 / 512, 309 / 512),
+    Offset(136 / 512, 336 / 512),
+    Offset(127 / 512, 351 / 512),
+    Offset(118 / 512, 349 / 512),
+    Offset(108 / 512, 338 / 512),
+    Offset(101 / 512, 319 / 512),
+    Offset(98 / 512, 296 / 512),
+    Offset(99 / 512, 271 / 512),
+    Offset(105 / 512, 248 / 512),
+  ];
+
+  @override
+  Path getClip(Size size) {
+    final path = Path()
+      ..fillType = PathFillType.evenOdd
+      ..addRect(Offset.zero & size);
+
+    for (final points in [_nearCut, _farCut]) {
+      path.addPolygon(
+        [
+          for (final point in points)
+            Offset(point.dx * size.width, point.dy * size.height),
+        ],
+        true,
+      );
+    }
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant _SeaTurtleFrameBaseClipper oldClipper) => false;
 }
 
 class _CrayonCandidate {
