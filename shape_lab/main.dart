@@ -9,7 +9,9 @@ import 'package:my_lock/lock_engine/floating_preview.dart';
 import 'package:my_lock/lock_engine/floating_engine.dart';
 import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
+import 'package:my_lock/lock_engine/shape_spec/shape_render_overrides.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec.dart';
+import 'package:my_lock/lock_engine/shape_spec/shape_spec_renderer.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
 
 import 'soft_basic_candidates.dart';
@@ -1976,7 +1978,7 @@ class _SoftBasicSquareRound2State extends State<_SoftBasicSquareRound2> {
   }
 }
 
-class _SharedTriangleMasterLab extends StatelessWidget {
+class _SharedTriangleMasterLab extends StatefulWidget {
   const _SharedTriangleMasterLab({
     required this.card,
     required this.fg,
@@ -1992,18 +1994,27 @@ class _SharedTriangleMasterLab extends StatelessWidget {
   final VoidCallback onBackToCircle;
 
   @override
+  State<_SharedTriangleMasterLab> createState() =>
+      _SharedTriangleMasterLabState();
+}
+
+class _SharedTriangleMasterLabState extends State<_SharedTriangleMasterLab> {
+  int selectedIndex = 2;
+
+  @override
   Widget build(BuildContext context) {
-    const tones = [ShapeTone.pink, ShapeTone.blue, ShapeTone.yellow];
+    final compact = MediaQuery.sizeOf(context).width < 700;
+    final selected = softBasicTriangleGeometryRound1Candidates[selectedIndex];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Triangle · Soft Basic Shape Master',
+          title: 'Soft Basic · Triangle · Geometry Round 1',
           subtitle:
-              'Soft Basic은 정삼각형 + 약한 corner round를 Shape Master로 확정 중입니다. Crayon Soft는 현재 외형을 Frozen Reference로 고정하여 이번 작업에서 변경하지 않습니다.',
-          fg: fg,
-          muted: muted,
+              '정삼각형 비율은 고정하고 꼭짓점 corner round만 2/3/4/5px로 비교합니다. Crayon Soft는 현재 외형을 Frozen Reference로 유지하며 이번 라운드에서 변경하지 않습니다.',
+          fg: widget.fg,
+          muted: widget.muted,
         ),
         const SizedBox(height: 10),
         Wrap(
@@ -2011,136 +2022,373 @@ class _SharedTriangleMasterLab extends StatelessWidget {
           runSpacing: 4,
           children: [
             TextButton.icon(
-              onPressed: onBackToSquare,
+              onPressed: widget.onBackToSquare,
               icon: const Icon(Icons.crop_square_rounded, size: 16),
               label: const Text('Square Master 보기'),
             ),
             TextButton.icon(
-              onPressed: onBackToCircle,
+              onPressed: widget.onBackToCircle,
               icon: const Icon(Icons.check_circle_outline, size: 16),
               label: const Text('Circle Master 보기'),
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        _Panel(
-          color: card,
+        const SizedBox(height: 10),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final columns = constraints.maxWidth >= 980 ? 4 : 2;
+            final gap = compact ? 8.0 : 12.0;
+            final itemWidth =
+                (constraints.maxWidth - gap * (columns - 1)) / columns;
+
+            return Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                for (var i = 0;
+                    i < softBasicTriangleGeometryRound1Candidates.length;
+                    i++)
+                  SizedBox(
+                    width: itemWidth,
+                    child: _TriangleGeometryCandidateCard(
+                      candidate:
+                          softBasicTriangleGeometryRound1Candidates[i],
+                      selected: selectedIndex == i,
+                      card: widget.card,
+                      fg: widget.fg,
+                      muted: widget.muted,
+                      onTap: () => setState(() => selectedIndex = i),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 14),
+        _TriangleGeometryComparePanel(
+          candidate: selected,
+          card: widget.card,
+          fg: widget.fg,
+          muted: widget.muted,
+        ),
+      ],
+    );
+  }
+}
+
+class _TriangleGeometryCandidateCard extends StatelessWidget {
+  const _TriangleGeometryCandidateCard({
+    required this.candidate,
+    required this.selected,
+    required this.card,
+    required this.fg,
+    required this.muted,
+    required this.onTap,
+  });
+
+  final SoftBasicTriangleGeometryCandidate candidate;
+  final bool selected;
+  final Color card;
+  final Color fg;
+  final Color muted;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          height: 174,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: card,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: selected
+                  ? const Color(0xFF7257F5)
+                  : const Color(0xFFE6E3EE),
+              width: selected ? 2 : 1,
+            ),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      candidate.id,
+                      style: TextStyle(
+                        color: fg,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  if (candidate.badge != null)
+                    Text(
+                      candidate.badge!,
+                      style: const TextStyle(
+                        color: Color(0xFF7257F5),
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                ],
+              ),
               Text(
-                'BASIC MASTER + CRAYON FROZEN · 96px',
+                candidate.name,
                 style: TextStyle(
                   color: fg,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
-              const SizedBox(height: 10),
-              for (final tone in tones) ...[
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 50,
-                      child: Text(
-                        tone.label,
-                        style: TextStyle(
-                          color: muted,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
+              const Spacer(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  for (final tone in const [
+                    ShapeTone.pink,
+                    ShapeTone.blue,
+                    ShapeTone.yellow,
+                  ])
+                    _TriangleGeometryToken(
+                      tone: tone,
+                      candidate: candidate,
+                      size: 54,
                     ),
-                    Expanded(
-                      child: _CompareTokenCell(
-                        label: 'SOFT BASIC',
-                        token: _ProductionTriangleToken(
-                          tone: tone,
-                          style: ShapeStyle.softBasic,
-                          size: 96,
-                        ),
-                        fg: fg,
-                        muted: muted,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: _CompareTokenCell(
-                        label: 'CRAYON · FROZEN',
-                        token: _ProductionTriangleToken(
-                          tone: tone,
-                          style: ShapeStyle.crayonSoft,
-                          size: 96,
-                        ),
-                        fg: fg,
-                        muted: muted,
-                      ),
-                    ),
-                  ],
-                ),
-                if (tone != tones.last) const SizedBox(height: 12),
-              ],
-              const SizedBox(height: 18),
-              const Divider(color: Color(0xFFE8E5EF), height: 1),
-              const SizedBox(height: 14),
+                ],
+              ),
+              const Spacer(),
               Text(
-                '58px APP EXACT',
+                candidate.intent,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: fg,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
+                  color: muted,
+                  fontSize: 9.5,
+                  height: 1.2,
                 ),
               ),
-              const SizedBox(height: 10),
-              for (final tone in tones) ...[
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 50,
-                      child: Text(
-                        tone.label,
-                        style: TextStyle(
-                          color: muted,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: _CompareTokenCell(
-                        label: 'SOFT BASIC',
-                        token: _ProductionTriangleToken(
-                          tone: tone,
-                          style: ShapeStyle.softBasic,
-                          size: 58,
-                        ),
-                        fg: fg,
-                        muted: muted,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: _CompareTokenCell(
-                        label: 'CRAYON · FROZEN',
-                        token: _ProductionTriangleToken(
-                          tone: tone,
-                          style: ShapeStyle.crayonSoft,
-                          size: 58,
-                        ),
-                        fg: fg,
-                        muted: muted,
-                      ),
-                    ),
-                  ],
-                ),
-                if (tone != tones.last) const SizedBox(height: 9),
-              ],
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TriangleGeometryComparePanel extends StatelessWidget {
+  const _TriangleGeometryComparePanel({
+    required this.candidate,
+    required this.card,
+    required this.fg,
+    required this.muted,
+  });
+
+  final SoftBasicTriangleGeometryCandidate candidate;
+  final Color card;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    const tones = [ShapeTone.pink, ShapeTone.blue, ShapeTone.yellow];
+
+    return _Panel(
+      color: card,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${candidate.id} · ${candidate.name} · R=${candidate.cornerRadius.toStringAsFixed(0)}px',
+            style: TextStyle(
+              color: fg,
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            candidate.intent,
+            style: TextStyle(color: muted, fontSize: 12),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            '96px ENLARGED · BASIC CANDIDATE ↔ CRAYON FROZEN',
+            style: TextStyle(
+              color: fg,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 9),
+          for (final tone in tones) ...[
+            _TriangleGeometryToneRow(
+              tone: tone,
+              candidate: candidate,
+              size: 96,
+              fg: fg,
+              muted: muted,
+            ),
+            if (tone != tones.last) const SizedBox(height: 12),
+          ],
+          const SizedBox(height: 18),
+          const Divider(color: Color(0xFFE8E5EF), height: 1),
+          const SizedBox(height: 14),
+          Text(
+            '58px APP EXACT SCALE',
+            style: TextStyle(
+              color: fg,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 9),
+          for (final tone in tones) ...[
+            _TriangleGeometryToneRow(
+              tone: tone,
+              candidate: candidate,
+              size: 58,
+              fg: fg,
+              muted: muted,
+            ),
+            if (tone != tones.last) const SizedBox(height: 9),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _TriangleGeometryToneRow extends StatelessWidget {
+  const _TriangleGeometryToneRow({
+    required this.tone,
+    required this.candidate,
+    required this.size,
+    required this.fg,
+    required this.muted,
+  });
+
+  final ShapeTone tone;
+  final SoftBasicTriangleGeometryCandidate candidate;
+  final double size;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 50,
+          child: Text(
+            tone.label,
+            style: TextStyle(
+              color: muted,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        Expanded(
+          child: _CompareTokenCell(
+            label: 'SOFT BASIC · R=${candidate.cornerRadius.toStringAsFixed(0)}',
+            token: _TriangleGeometryToken(
+              tone: tone,
+              candidate: candidate,
+              size: size,
+            ),
+            fg: fg,
+            muted: muted,
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: _CompareTokenCell(
+            label: 'CRAYON · FROZEN',
+            token: _ProductionTriangleToken(
+              tone: tone,
+              style: ShapeStyle.crayonSoft,
+              size: size,
+            ),
+            fg: fg,
+            muted: muted,
           ),
         ),
       ],
     );
   }
+}
+
+class _TriangleGeometryToken extends StatelessWidget {
+  const _TriangleGeometryToken({
+    required this.tone,
+    required this.candidate,
+    required this.size,
+  });
+
+  final ShapeTone tone;
+  final SoftBasicTriangleGeometryCandidate candidate;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(
+        painter: _TriangleGeometryPainter(
+          tone: tone,
+          candidate: candidate,
+        ),
+      ),
+    );
+  }
+}
+
+class _TriangleGeometryPainter extends CustomPainter {
+  const _TriangleGeometryPainter({
+    required this.tone,
+    required this.candidate,
+  });
+
+  final ShapeTone tone;
+  final SoftBasicTriangleGeometryCandidate candidate;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    ShapeSpecRenderer.paintToken(
+      canvas,
+      center: size.center(Offset.zero),
+      radius: size.shortestSide * 0.43,
+      token: LockToken(shape: ShapeKind.triangle, tone: tone),
+      style: ShapeStyle.softBasic,
+      opacity: 1,
+      overrides: ShapeRenderOverrides(
+        bodyGeometry: ShapeGeometrySpec(
+          'roundedPolygon',
+          <String, dynamic>{
+            'kind': 'roundedPolygon',
+            'cornerRadius': candidate.cornerRadius,
+            'points': const <dynamic>[
+              <dynamic>[50.0, 11.9],
+              <dynamic>[94.0, 88.1],
+              <dynamic>[6.0, 88.1],
+            ],
+          },
+        ),
+      ),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _TriangleGeometryPainter oldDelegate) =>
+      oldDelegate.tone != tone ||
+      oldDelegate.candidate.id != candidate.id;
 }
 
 class _ProductionTriangleToken extends StatelessWidget {
