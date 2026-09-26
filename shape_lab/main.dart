@@ -978,7 +978,7 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
           _SectionTitle(
             title: 'Drop 01 · Sea Turtle · Long Flipper',
             subtitle:
-                'Static Region Lock · 앱 Palette 3색 · Shape 자체 Motion 없음 · 이동/충돌/회전은 Motion Set 담당',
+                'v3 Canonical Draft 준비 · 앞지느러미 Shape Animation 분리 · 이동/충돌/회전은 Motion Set 담당',
             fg: widget.fg,
             muted: widget.muted,
           ),
@@ -1045,7 +1045,7 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
           ),
           const SizedBox(height: 4),
           Text(
-            'Sea Turtle Shape는 정적 Runtime Asset으로 고정합니다. FloatingEngine이 Shape 전체의 이동·충돌·크기·회전만 담당합니다.',
+            '현재 Runtime Stage는 F0 정지형 QA를 유지합니다. FloatingEngine은 Shape 전체의 이동·충돌·크기·회전을 담당하고, 앞지느러미 내부 Shape Animation은 v3 Static Master Lock 이후 별도 연결합니다.',
             style: TextStyle(color: widget.muted, fontSize: 11.5),
           ),
           const SizedBox(height: 12),
