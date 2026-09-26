@@ -113,7 +113,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 029 · Soft Basic Square R4 Mockup Gloss',
+                                  'LAB 030 · Soft Basic Square R5 Spec Balance',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -1895,14 +1895,14 @@ class _SoftBasicSquareRound2State extends State<_SoftBasicSquareRound2> {
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
-    final selected = softBasicSquareRound4Candidates[selectedIndex];
+    final selected = softBasicSquareRound5Candidates[selectedIndex];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Square · Round 4 · Mockup Gloss',
-          subtitle: 'Tighter Corner를 고정하고 선형 Corner Flow를 제거합니다. 목업처럼 좌상단의 넓은 Soft Spec 면광 + 내부 Core Spec + 하단 Diffuse Bounce를 6안으로 비교합니다.',
+          title: 'Soft Basic · Square · Round 5 · High Spec × Balanced',
+          subtitle: 'Round 4의 05 High Spec과 06 Balanced Gloss만 남겨 각각 3안씩 디벨롭합니다. 사각 형태는 고정하고 Soft Spec 면광 · Core Spec · 하단 Diffuse Bounce만 미세 조정합니다.'
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -1926,11 +1926,11 @@ class _SoftBasicSquareRound2State extends State<_SoftBasicSquareRound2> {
               spacing: gap,
               runSpacing: gap,
               children: [
-                for (var i = 0; i < softBasicSquareRound4Candidates.length; i++)
+                for (var i = 0; i < softBasicSquareRound5Candidates.length; i++)
                   SizedBox(
                     width: itemWidth,
                     child: _SoftBasicSquareCandidateCard(
-                      candidate: softBasicSquareRound4Candidates[i],
+                      candidate: softBasicSquareRound5Candidates[i],
                       selected: i == selectedIndex,
                       card: widget.card,
                       fg: widget.fg,
@@ -2396,7 +2396,7 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
       SoftBasicSquareMaterialProfile.highSpec => 0.37,
       _ => profile == SoftBasicSquareMaterialProfile.legacy ? 0.34 : 0.36,
     };
-    final bounceAlpha = switch (profile) {
+    final baseBounceAlpha = switch (profile) {
       SoftBasicSquareMaterialProfile.mockupGloss => 0.31,
       SoftBasicSquareMaterialProfile.wideDiffuse => 0.34,
       SoftBasicSquareMaterialProfile.balancedGloss => 0.28,
@@ -2408,19 +2408,40 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
             ? 0.22
             : 0.16,
     };
-    final bounceWidth = switch (profile) {
+    final baseBounceWidth = switch (profile) {
       SoftBasicSquareMaterialProfile.wideDiffuse => 0.96,
       SoftBasicSquareMaterialProfile.mockupGloss => 0.86,
       SoftBasicSquareMaterialProfile.balancedGloss => 0.84,
       SoftBasicSquareMaterialProfile.circleTransfer => 0.82,
       _ => 0.76,
     };
-    final bounceHeight = switch (profile) {
+    final baseBounceHeight = switch (profile) {
       SoftBasicSquareMaterialProfile.wideDiffuse => 0.38,
       SoftBasicSquareMaterialProfile.mockupGloss => 0.35,
       SoftBasicSquareMaterialProfile.balancedGloss => 0.33,
       SoftBasicSquareMaterialProfile.circleTransfer => 0.32,
       _ => 0.30,
+    };
+    final bounceAlpha = baseBounceAlpha * switch (candidate.glossRefinement) {
+      SoftBasicSquareGlossRefinement.base => 1.0,
+      SoftBasicSquareGlossRefinement.highSoftPatch => 1.05,
+      SoftBasicSquareGlossRefinement.highCompactCore => 0.98,
+      SoftBasicSquareGlossRefinement.balancedBright => 1.06,
+      SoftBasicSquareGlossRefinement.balancedWide => 1.12,
+    };
+    final bounceWidth = baseBounceWidth * switch (candidate.glossRefinement) {
+      SoftBasicSquareGlossRefinement.base => 1.0,
+      SoftBasicSquareGlossRefinement.highSoftPatch => 1.03,
+      SoftBasicSquareGlossRefinement.highCompactCore => 1.0,
+      SoftBasicSquareGlossRefinement.balancedBright => 1.0,
+      SoftBasicSquareGlossRefinement.balancedWide => 1.10,
+    };
+    final bounceHeight = baseBounceHeight * switch (candidate.glossRefinement) {
+      SoftBasicSquareGlossRefinement.base => 1.0,
+      SoftBasicSquareGlossRefinement.highSoftPatch => 1.03,
+      SoftBasicSquareGlossRefinement.highCompactCore => 1.0,
+      SoftBasicSquareGlossRefinement.balancedBright => 1.0,
+      SoftBasicSquareGlossRefinement.balancedWide => 1.12,
     };
 
     canvas.save();
@@ -2481,7 +2502,7 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
         candidate.highlightTechnique,
       );
     } else {
-      _paintSquareGlossProfile(canvas, rect, size, base, light, profile);
+      _paintSquareGlossProfile(canvas, rect, size, base, light, profile, candidate.glossRefinement);
     }
   }
 
@@ -2492,6 +2513,7 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
     Color base,
     Color light,
     SoftBasicSquareMaterialProfile profile,
+    SoftBasicSquareGlossRefinement refinement,
   ) {
     final edgeGlow = adjustTone(
       base,
@@ -2499,7 +2521,7 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
       saturationDelta: -0.025,
     );
 
-    final patchScale = switch (profile) {
+    final basePatchScale = switch (profile) {
       SoftBasicSquareMaterialProfile.mockupGloss => 1.08,
       SoftBasicSquareMaterialProfile.highSpec => 0.96,
       SoftBasicSquareMaterialProfile.balancedGloss => 1.00,
@@ -2508,7 +2530,14 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
       SoftBasicSquareMaterialProfile.wideDiffuse => 1.16,
       SoftBasicSquareMaterialProfile.legacy => 0.92,
     };
-    final patchAlpha = switch (profile) {
+    final patchScale = basePatchScale * switch (refinement) {
+      SoftBasicSquareGlossRefinement.base => 1.0,
+      SoftBasicSquareGlossRefinement.highSoftPatch => 1.13,
+      SoftBasicSquareGlossRefinement.highCompactCore => 1.02,
+      SoftBasicSquareGlossRefinement.balancedBright => 1.02,
+      SoftBasicSquareGlossRefinement.balancedWide => 1.15,
+    };
+    final basePatchAlpha = switch (profile) {
       SoftBasicSquareMaterialProfile.mockupGloss => 0.72,
       SoftBasicSquareMaterialProfile.highSpec => 0.76,
       SoftBasicSquareMaterialProfile.balancedGloss => 0.64,
@@ -2517,6 +2546,13 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
       SoftBasicSquareMaterialProfile.wideDiffuse => 0.44,
       SoftBasicSquareMaterialProfile.legacy => 0.54,
     };
+    final patchAlpha = (basePatchAlpha * switch (refinement) {
+      SoftBasicSquareGlossRefinement.base => 1.0,
+      SoftBasicSquareGlossRefinement.highSoftPatch => 0.90,
+      SoftBasicSquareGlossRefinement.highCompactCore => 0.98,
+      SoftBasicSquareGlossRefinement.balancedBright => 1.12,
+      SoftBasicSquareGlossRefinement.balancedWide => 0.92,
+    }).clamp(0.0, 1.0).toDouble();
     final haloAlpha = switch (profile) {
       SoftBasicSquareMaterialProfile.mockupGloss => 0.28,
       SoftBasicSquareMaterialProfile.highSpec => 0.22,
@@ -2526,7 +2562,7 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
       SoftBasicSquareMaterialProfile.wideDiffuse => 0.30,
       SoftBasicSquareMaterialProfile.legacy => 0.18,
     };
-    final coreAlpha = switch (profile) {
+    final baseCoreAlpha = switch (profile) {
       SoftBasicSquareMaterialProfile.mockupGloss => 0.92,
       SoftBasicSquareMaterialProfile.highSpec => 1.00,
       SoftBasicSquareMaterialProfile.balancedGloss => 0.88,
@@ -2535,7 +2571,14 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
       SoftBasicSquareMaterialProfile.wideDiffuse => 0.54,
       SoftBasicSquareMaterialProfile.legacy => 0.76,
     };
-    final coreScale = switch (profile) {
+    final coreAlpha = (baseCoreAlpha * switch (refinement) {
+      SoftBasicSquareGlossRefinement.base => 1.0,
+      SoftBasicSquareGlossRefinement.highSoftPatch => 0.92,
+      SoftBasicSquareGlossRefinement.highCompactCore => 1.0,
+      SoftBasicSquareGlossRefinement.balancedBright => 1.08,
+      SoftBasicSquareGlossRefinement.balancedWide => 0.88,
+    }).clamp(0.0, 1.0).toDouble();
+    final baseCoreScale = switch (profile) {
       SoftBasicSquareMaterialProfile.mockupGloss => 1.00,
       SoftBasicSquareMaterialProfile.highSpec => 0.90,
       SoftBasicSquareMaterialProfile.balancedGloss => 0.95,
