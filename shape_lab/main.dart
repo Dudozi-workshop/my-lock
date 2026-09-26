@@ -113,7 +113,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 030 · Soft Basic Square R5 Spec Balance',
+                                  'LAB 031 · Soft Basic Triangle Geometry Lock',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -1999,9 +1999,9 @@ class _SharedTriangleMasterLab extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Triangle · Shared Shape Master',
+          title: 'Triangle · Soft Basic Shape Master',
           subtitle:
-              '정삼각형 + 약한 corner round를 단일 Geometry로 사용합니다. Soft Basic과 Crayon Soft는 같은 Shape Master를 공유하고 Material/Finish만 달라집니다.',
+              'Soft Basic은 정삼각형 + 약한 corner round를 Shape Master로 확정 중입니다. Crayon Soft는 현재 외형을 Frozen Reference로 고정하여 이번 작업에서 변경하지 않습니다.',
           fg: fg,
           muted: muted,
         ),
@@ -2066,7 +2066,7 @@ class _SharedTriangleMasterLab extends StatelessWidget {
                     const SizedBox(width: 14),
                     Expanded(
                       child: _CompareTokenCell(
-                        label: 'CRAYON SOFT',
+                        label: 'CRAYON · FROZEN',
                         token: _ProductionTriangleToken(
                           tone: tone,
                           style: ShapeStyle.crayonSoft,
@@ -2121,7 +2121,7 @@ class _SharedTriangleMasterLab extends StatelessWidget {
                     const SizedBox(width: 14),
                     Expanded(
                       child: _CompareTokenCell(
-                        label: 'CRAYON SOFT',
+                        label: 'CRAYON · FROZEN',
                         token: _ProductionTriangleToken(
                           tone: tone,
                           style: ShapeStyle.crayonSoft,
