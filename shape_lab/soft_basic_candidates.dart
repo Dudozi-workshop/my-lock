@@ -23,6 +23,9 @@ enum SoftBasicBottomHighlightTechnique {
   crescent,
   liftedGlow,
   premiumBottom,
+  sideKiss,
+  softSpot,
+  edgeFade,
 }
 
 enum SoftBasicLowerVolumeTechnique {
@@ -160,6 +163,37 @@ const softBasicCircleRound9Candidates = <SoftBasicCandidate>[
     finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
     bottomHighlightTechnique: SoftBasicBottomHighlightTechnique.premiumBottom,
     badge: 'TARGET',
+  ),
+];
+
+
+const softBasicCircleRound9NaturalCandidates = <SoftBasicCandidate>[
+  SoftBasicCandidate(
+    id: 'SB-C-R9N-01',
+    name: 'Side Kiss',
+    intent: '하단 전체를 따라가지 않고 우하단 한쪽에만 짧은 색상광을 얹어 작은 포인트만 남긴 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    bottomHighlightTechnique: SoftBasicBottomHighlightTechnique.sideKiss,
+    badge: 'POINT',
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R9N-02',
+    name: 'Soft Spot',
+    intent: '선 대신 작은 타원형 밝은 면을 표면 안쪽에 녹여 우연히 빛이 맺힌 듯 보이게 한 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    bottomHighlightTechnique: SoftBasicBottomHighlightTechnique.softSpot,
+    badge: 'SOFT',
+  ),
+  SoftBasicCandidate(
+    id: 'SB-C-R9N-03',
+    name: 'Edge Fade',
+    intent: '우하단 외곽 일부만 같은 색 계열로 살짝 밝아졌다 사라지게 해 별도 장식처럼 보이지 않는 안.',
+    state: SoftBasicCandidateState.candidate,
+    finishTechnique: SoftBasicCircleFinishTechnique.colorShell,
+    bottomHighlightTechnique: SoftBasicBottomHighlightTechnique.edgeFade,
+    badge: 'NATURAL',
   ),
 ];
 
