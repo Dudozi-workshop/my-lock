@@ -283,12 +283,20 @@ enum SoftBasicSquareTechnique {
   strongerBounce,
 }
 
+enum SoftBasicSquareHighlightTechnique {
+  round1Base,
+  flatInset,
+  shortCompact,
+  taperedEdge,
+}
+
 class SoftBasicSquareCandidate {
   const SoftBasicSquareCandidate({
     required this.id,
     required this.name,
     required this.intent,
     required this.technique,
+    this.highlightTechnique = SoftBasicSquareHighlightTechnique.round1Base,
     this.badge,
   });
 
@@ -296,6 +304,7 @@ class SoftBasicSquareCandidate {
   final String name;
   final String intent;
   final SoftBasicSquareTechnique technique;
+  final SoftBasicSquareHighlightTechnique highlightTechnique;
   final String? badge;
 }
 
@@ -337,5 +346,33 @@ const softBasicSquareRound1Candidates = <SoftBasicSquareCandidate>[
     intent: '하단 Ambient Bounce를 조금 강화해 사각 면에서도 볼륨이 읽히게 한 안.',
     technique: SoftBasicSquareTechnique.strongerBounce,
     badge: 'VOLUME',
+  ),
+];
+
+
+const softBasicSquareRound2Candidates = <SoftBasicSquareCandidate>[
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R2-01',
+    name: 'Flat Inset',
+    intent: 'R1-03 Tighter Corner를 고정하고 상단 하이라이트를 더 납작하게 눌러 코너에서 약간 안쪽으로 이동한 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    highlightTechnique: SoftBasicSquareHighlightTechnique.flatInset,
+    badge: 'A',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R2-02',
+    name: 'Short Compact',
+    intent: 'R1-03의 코너감은 유지하면서 하이라이트 길이와 세로 두께를 함께 줄여 사각 면감을 더 선명하게 만든 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    highlightTechnique: SoftBasicSquareHighlightTechnique.shortCompact,
+    badge: 'B',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R2-03',
+    name: 'Tapered Edge',
+    intent: '하이라이트 시작부는 유지하고 우측 끝을 더 가늘게 테이퍼 처리해 선처럼 보이지 않도록 정리한 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    highlightTechnique: SoftBasicSquareHighlightTechnique.taperedEdge,
+    badge: 'C',
   ),
 ];
