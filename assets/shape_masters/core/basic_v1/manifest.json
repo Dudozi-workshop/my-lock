@@ -1,0 +1,35 @@
+{
+  "assetFamily": "MY_LOCK_CORE_SHAPE_MASTERS",
+  "version": 1,
+  "status": "master",
+  "approvedDate": "2026-09-26",
+  "sourcePolicy": "promoted_from_approved_crayon_geometry",
+  "masterLayer": "geometry_only",
+  "derivedAssetPolicy": "style_and_runtime_assets_must_derive_without_geometry_drift",
+  "masters": [
+    {
+      "id": "core_circle",
+      "file": "circle_master_v1.json",
+      "derivedStyles": [
+        "soft_basic",
+        "crayon_soft"
+      ]
+    },
+    {
+      "id": "core_triangle",
+      "file": "triangle_master_v1.json",
+      "derivedStyles": [
+        "soft_basic",
+        "crayon_soft"
+      ]
+    },
+    {
+      "id": "core_square",
+      "file": "square_master_v1.json",
+      "derivedStyles": [
+        "soft_basic",
+        "crayon_soft"
+      ]
+    }
+  ]
+}
