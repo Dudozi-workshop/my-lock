@@ -33,14 +33,19 @@ Updated: 2026-09-26
 
 ### Belly Mask
 - File: `belly_mask_2048.png`
-- Drive ID: `12FysUfX-i4qdGU9E4KftGbDcWMjteTek`
-- SHA-256: `fb3fa0c869c194edeffa1992edc360dba3895f04186b7e05810e11f4c832e118`
-- Status: DRAFT QA COMPLETE / semantic refinement may continue
+- Previous Drive ID: `12FysUfX-i4qdGU9E4KftGbDcWMjteTek`
+- Previous SHA-256: `fb3fa0c869c194edeffa1992edc360dba3895f04186b7e05810e11f4c832e118`
+- Status: **REWORK REQUIRED — visible-only mask invalid**
+- Requirement: continuous hidden underlap behind Near/Far front flippers; replacement must pass Reveal QA before registration
 
 ## Next
-1. Shell detail mask
-2. Static / Near / Far F0 split
-3. Per-part alpha / outline / shadow / highlight
-4. F0 rebuild QA
-5. Asset Split QA
-6. Static Master Lock
+1. Correct Belly hidden-underlap mask
+2. Belly Reveal QA/QC
+3. Shell detail mask
+4. Static / Near / Far F0 split
+5. Geometry ownership / overlap / gap QA
+6. Material decomposition
+7. Basic recomposition QA
+8. Aurora Sea dynamic-material PoC
+9. Runtime compositor
+10. Static Master Lock
