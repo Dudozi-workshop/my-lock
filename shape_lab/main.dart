@@ -115,7 +115,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 031 · Soft Basic Triangle Geometry Lock',
+                                  'LAB 032 · Core Basic 3-Shape Master Compare',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -251,6 +251,12 @@ class ShapeLab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        _CoreBasicMasterComparePanel(
+          card: card,
+          fg: fg,
+          muted: muted,
+        ),
+        const SizedBox(height: 14),
         _Panel(
           color: card,
           child: Column(
@@ -293,6 +299,127 @@ class ShapeLab extends StatelessWidget {
         const SizedBox(height: 14),
         _SeaTurtleRegionCrayonPanel(card: card, fg: fg, muted: muted),
       ],
+    );
+  }
+}
+
+
+class _CoreBasicMasterComparePanel extends StatelessWidget {
+  const _CoreBasicMasterComparePanel({
+    required this.card,
+    required this.fg,
+    required this.muted,
+  });
+
+  final Color card;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    const shapes = [
+      ShapeKind.circle,
+      ShapeKind.triangle,
+      ShapeKind.square,
+    ];
+    const tones = [
+      ShapeTone.pink,
+      ShapeTone.blue,
+      ShapeTone.yellow,
+    ];
+
+    return _Panel(
+      color: card,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: 'Core Basic · Canonical Master · 3 Shape Compare',
+            subtitle:
+                'Circle / Triangle / Square의 확정 Geometry를 그대로 사용한 Soft Basic 58px 비교. 모양은 고정하고 Style Layer의 균형만 확인합니다.',
+            fg: fg,
+            muted: muted,
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1EFF8),
+              borderRadius: BorderRadius.circular(99),
+            ),
+            child: const Text(
+              'MASTER LOCKED · 58px APP SCALE',
+              style: TextStyle(
+                color: Color(0xFF5A4EA3),
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.2,
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              const SizedBox(width: 54),
+              for (final shape in shapes)
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      shape.label,
+                      style: TextStyle(
+                        color: fg,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          for (final tone in tones) ...[
+            Row(
+              children: [
+                SizedBox(
+                  width: 54,
+                  child: Text(
+                    tone.label,
+                    style: TextStyle(
+                      color: muted,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                for (final shape in shapes)
+                  Expanded(
+                    child: Center(
+                      child: SizedBox.square(
+                        dimension: 58,
+                        child: CustomPaint(
+                          painter: LockTokenPainter(
+                            LockToken(shape: shape, tone: tone),
+                            style: ShapeStyle.softBasic,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            if (tone != tones.last) const SizedBox(height: 12),
+          ],
+          const SizedBox(height: 14),
+          Text(
+            'Check: silhouette 크기 · optical mass · 상단 highlight · 하단 bounce · 색상별 명암 균형',
+            style: TextStyle(
+              color: muted,
+              fontSize: 10.5,
+              height: 1.35,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
