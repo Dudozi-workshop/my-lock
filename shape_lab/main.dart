@@ -115,7 +115,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 034 · Soft Basic Triangle Direction Round 1',
+                                  'LAB 035 · Sea Turtle v3 Static Split QA · Decode Fix',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -470,7 +470,7 @@ class _SeaTurtleV3StaticSplitPanel extends StatelessWidget {
               width: double.infinity,
               color: const Color(0xFFF3F6FA),
               child: Image.asset(
-                'assets/shape_masters/drop01/sea_turtle_v3/lab_preview/static_split_contact.png',
+                'assets/shape_masters/drop01/sea_turtle_v3/lab_preview/static_split_contact_lab035.png',
                 fit: BoxFit.fitWidth,
                 filterQuality: FilterQuality.high,
                 errorBuilder: (context, error, stackTrace) => SizedBox(
