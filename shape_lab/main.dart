@@ -464,31 +464,7 @@ class _SeaTurtleV3StaticSplitPanel extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              width: double.infinity,
-              color: const Color(0xFFF3F6FA),
-              child: Image.asset(
-                'assets/shape_masters/drop01/sea_turtle_v3/lab_preview/static_split_contact_lab035.png',
-                fit: BoxFit.fitWidth,
-                filterQuality: FilterQuality.high,
-                errorBuilder: (context, error, stackTrace) => SizedBox(
-                  height: 220,
-                  child: Center(
-                    child: Text(
-                      'v3 split preview decode failed',
-                      style: TextStyle(
-                        color: muted,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          _SeaTurtleV3SplitPreview(muted: muted),
           const SizedBox(height: 10),
           Text(
             'QA 기준: Canonical 실루엣 유지 · Static Body에 기존 지느러미 선/하이라이트 잔류 없음 · Near/Far F0 접합부 자연스러움 · Static Master Lock 전 Shape Animation 구현 금지.',
@@ -502,6 +478,201 @@ class _SeaTurtleV3StaticSplitPanel extends StatelessWidget {
       ),
     );
   }
+}
+
+
+enum _SeaTurtleV3SplitPart {
+  canonical,
+  staticBody,
+  farF0,
+  nearF0,
+}
+
+class _SeaTurtleV3SplitPreview extends StatelessWidget {
+  const _SeaTurtleV3SplitPreview({required this.muted});
+
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const gap = 10.0;
+        final columns = constraints.maxWidth >= 720 ? 4 : 2;
+        final itemWidth =
+            (constraints.maxWidth - gap * (columns - 1)) / columns;
+
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: [
+            for (final entry in const [
+              (_SeaTurtleV3SplitPart.canonical, 'Canonical'),
+              (_SeaTurtleV3SplitPart.staticBody, 'Static Body'),
+              (_SeaTurtleV3SplitPart.farF0, 'Far F0'),
+              (_SeaTurtleV3SplitPart.nearF0, 'Near F0'),
+            ])
+              SizedBox(
+                width: itemWidth,
+                child: _SeaTurtleV3SplitCard(
+                  part: entry.$1,
+                  label: entry.$2,
+                  muted: muted,
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _SeaTurtleV3SplitCard extends StatelessWidget {
+  const _SeaTurtleV3SplitCard({
+    required this.part,
+    required this.label,
+    required this.muted,
+  });
+
+  final _SeaTurtleV3SplitPart part;
+  final String label;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 9),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7F9FC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE2E7EF)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AspectRatio(
+            aspectRatio: 1,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: ColoredBox(
+                color: Colors.white,
+                child: ClipPath(
+                  clipper: _SeaTurtleV3SplitClipper(part),
+                  clipBehavior: Clip.antiAlias,
+                  child: Image.asset(
+                    'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                    gaplessPlayback: true,
+                    errorBuilder: (context, error, stackTrace) => Center(
+                      child: Text(
+                        'Runtime asset error',
+                        style: TextStyle(
+                          color: muted,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SeaTurtleV3SplitClipper extends CustomClipper<Path> {
+  const _SeaTurtleV3SplitClipper(this.part);
+
+  final _SeaTurtleV3SplitPart part;
+
+  static const _near = <Offset>[
+    Offset(176, 198),
+    Offset(191, 191),
+    Offset(205, 193),
+    Offset(219, 206),
+    Offset(233, 227),
+    Offset(247, 253),
+    Offset(263, 281),
+    Offset(281, 309),
+    Offset(301, 337),
+    Offset(319, 353),
+    Offset(323, 366),
+    Offset(317, 375),
+    Offset(306, 380),
+    Offset(291, 376),
+    Offset(271, 366),
+    Offset(251, 352),
+    Offset(232, 334),
+    Offset(215, 314),
+    Offset(199, 291),
+    Offset(187, 268),
+    Offset(179, 244),
+    Offset(175, 221),
+  ];
+
+  static const _far = <Offset>[
+    Offset(107, 211),
+    Offset(121, 211),
+    Offset(136, 222),
+    Offset(147, 240),
+    Offset(154, 261),
+    Offset(155, 281),
+    Offset(150, 305),
+    Offset(142, 328),
+    Offset(133, 349),
+    Offset(124, 359),
+    Offset(115, 355),
+    Offset(106, 343),
+    Offset(99, 327),
+    Offset(94, 306),
+    Offset(92, 283),
+    Offset(94, 258),
+    Offset(99, 233),
+  ];
+
+  List<Offset> _scaled(List<Offset> points, Size size) => points
+      .map(
+        (point) => Offset(
+          point.dx / 512 * size.width,
+          point.dy / 512 * size.height,
+        ),
+      )
+      .toList(growable: false);
+
+  @override
+  Path getClip(Size size) {
+    final rect = Offset.zero & size;
+    final near = _scaled(_near, size);
+    final far = _scaled(_far, size);
+
+    return switch (part) {
+      _SeaTurtleV3SplitPart.canonical => Path()..addRect(rect),
+      _SeaTurtleV3SplitPart.nearF0 => Path()..addPolygon(near, true),
+      _SeaTurtleV3SplitPart.farF0 => Path()..addPolygon(far, true),
+      _SeaTurtleV3SplitPart.staticBody => Path()
+        ..fillType = PathFillType.evenOdd
+        ..addRect(rect)
+        ..addPolygon(near, true)
+        ..addPolygon(far, true),
+    };
+  }
+
+  @override
+  bool shouldReclip(covariant _SeaTurtleV3SplitClipper oldClipper) =>
+      oldClipper.part != part;
 }
 
 
