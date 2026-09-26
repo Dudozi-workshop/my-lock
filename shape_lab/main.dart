@@ -1136,7 +1136,7 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
     if (squareMode) {
-      return _SoftBasicSquareRound1(
+      return _SoftBasicSquareRound2(
         card: widget.card,
         fg: widget.fg,
         muted: widget.muted,
@@ -1194,8 +1194,8 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
 }
 
 
-class _SoftBasicSquareRound1 extends StatefulWidget {
-  const _SoftBasicSquareRound1({
+class _SoftBasicSquareRound2 extends StatefulWidget {
+  const _SoftBasicSquareRound2({
     required this.card,
     required this.fg,
     required this.muted,
@@ -1208,23 +1208,23 @@ class _SoftBasicSquareRound1 extends StatefulWidget {
   final VoidCallback onBackToCircle;
 
   @override
-  State<_SoftBasicSquareRound1> createState() => _SoftBasicSquareRound1State();
+  State<_SoftBasicSquareRound2> createState() => _SoftBasicSquareRound2State();
 }
 
-class _SoftBasicSquareRound1State extends State<_SoftBasicSquareRound1> {
-  int selectedIndex = 2;
+class _SoftBasicSquareRound2State extends State<_SoftBasicSquareRound2> {
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
-    final selected = softBasicSquareRound1Candidates[selectedIndex];
+    final selected = softBasicSquareRound2Candidates[selectedIndex];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Square · Round 1',
-          subtitle: 'Circle Master R11-01을 항상 기준으로 고정 표시하고, 선택한 Square 후보와 96px 확대 / 58px 실사용 크기를 동일 팔레트로 직접 비교합니다.',
+          title: 'Soft Basic · Square · Round 2 · Highlight Refinement',
+          subtitle: 'R1-03 Tighter Corner를 고정하고 상단 하이라이트만 미세 조정합니다. A/B/C 3안을 96px 확대와 58px 실사용 크기로 비교합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -1248,11 +1248,11 @@ class _SoftBasicSquareRound1State extends State<_SoftBasicSquareRound1> {
               spacing: gap,
               runSpacing: gap,
               children: [
-                for (var i = 0; i < softBasicSquareRound1Candidates.length; i++)
+                for (var i = 0; i < softBasicSquareRound2Candidates.length; i++)
                   SizedBox(
                     width: itemWidth,
                     child: _SoftBasicSquareCandidateCard(
-                      candidate: softBasicSquareRound1Candidates[i],
+                      candidate: softBasicSquareRound2Candidates[i],
                       selected: i == selectedIndex,
                       card: widget.card,
                       fg: widget.fg,
@@ -1731,58 +1731,167 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
 
     canvas.restore();
 
-    final wide =
-        candidate.technique == SoftBasicSquareTechnique.wideHighlight;
-    final compact =
-        candidate.technique == SoftBasicSquareTechnique.compactHighlight;
+    final highlight = switch (candidate.highlightTechnique) {
+      SoftBasicSquareHighlightTechnique.flatInset => Path()
+        ..moveTo(
+          rect.left + rect.width * 0.16,
+          rect.top + rect.height * 0.34,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.16,
+          rect.top + rect.height * 0.23,
+          rect.left + rect.width * 0.22,
+          rect.top + rect.height * 0.16,
+          rect.left + rect.width * 0.30,
+          rect.top + rect.height * 0.14,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.36,
+          rect.top + rect.height * 0.13,
+          rect.left + rect.width * 0.40,
+          rect.top + rect.height * 0.17,
+          rect.left + rect.width * 0.38,
+          rect.top + rect.height * 0.22,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.35,
+          rect.top + rect.height * 0.27,
+          rect.left + rect.width * 0.23,
+          rect.top + rect.height * 0.36,
+          rect.left + rect.width * 0.16,
+          rect.top + rect.height * 0.34,
+        )
+        ..close(),
+      SoftBasicSquareHighlightTechnique.shortCompact => Path()
+        ..moveTo(
+          rect.left + rect.width * 0.17,
+          rect.top + rect.height * 0.32,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.17,
+          rect.top + rect.height * 0.24,
+          rect.left + rect.width * 0.22,
+          rect.top + rect.height * 0.17,
+          rect.left + rect.width * 0.29,
+          rect.top + rect.height * 0.15,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.34,
+          rect.top + rect.height * 0.14,
+          rect.left + rect.width * 0.37,
+          rect.top + rect.height * 0.18,
+          rect.left + rect.width * 0.35,
+          rect.top + rect.height * 0.22,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.32,
+          rect.top + rect.height * 0.26,
+          rect.left + rect.width * 0.23,
+          rect.top + rect.height * 0.33,
+          rect.left + rect.width * 0.17,
+          rect.top + rect.height * 0.32,
+        )
+        ..close(),
+      SoftBasicSquareHighlightTechnique.taperedEdge => Path()
+        ..moveTo(
+          rect.left + rect.width * 0.16,
+          rect.top + rect.height * 0.35,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.16,
+          rect.top + rect.height * 0.24,
+          rect.left + rect.width * 0.22,
+          rect.top + rect.height * 0.16,
+          rect.left + rect.width * 0.30,
+          rect.top + rect.height * 0.14,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.36,
+          rect.top + rect.height * 0.13,
+          rect.left + rect.width * 0.41,
+          rect.top + rect.height * 0.17,
+          rect.left + rect.width * 0.40,
+          rect.top + rect.height * 0.20,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.39,
+          rect.top + rect.height * 0.22,
+          rect.left + rect.width * 0.36,
+          rect.top + rect.height * 0.23,
+          rect.left + rect.width * 0.34,
+          rect.top + rect.height * 0.24,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.29,
+          rect.top + rect.height * 0.29,
+          rect.left + rect.width * 0.22,
+          rect.top + rect.height * 0.36,
+          rect.left + rect.width * 0.16,
+          rect.top + rect.height * 0.35,
+        )
+        ..close(),
+      SoftBasicSquareHighlightTechnique.round1Base => Path()
+        ..moveTo(
+          rect.left + rect.width * 0.12,
+          rect.top + rect.height * 0.36,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.12,
+          rect.top + rect.height * 0.23,
+          rect.left + rect.width * 0.18,
+          rect.top + rect.height * 0.13,
+          rect.left + rect.width * 0.30,
+          rect.top + rect.height * 0.11,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.39,
+          rect.top + rect.height * 0.10,
+          rect.left + rect.width * 0.42,
+          rect.top + rect.height * 0.16,
+          rect.left + rect.width * 0.39,
+          rect.top + rect.height * 0.22,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.34,
+          rect.top + rect.height * 0.29,
+          rect.left + rect.width * 0.18,
+          rect.top + rect.height * 0.40,
+          rect.left + rect.width * 0.12,
+          rect.top + rect.height * 0.36,
+        )
+        ..close(),
+    };
 
-    final highlight = Path()
-      ..moveTo(
-        rect.left + rect.width * 0.12,
-        rect.top + rect.height * (wide ? 0.39 : 0.36),
-      )
-      ..cubicTo(
-        rect.left + rect.width * 0.12,
-        rect.top + rect.height * 0.23,
-        rect.left + rect.width * (compact ? 0.20 : 0.18),
-        rect.top + rect.height * 0.13,
-        rect.left + rect.width * (compact ? 0.27 : 0.30),
-        rect.top + rect.height * 0.11,
-      )
-      ..cubicTo(
-        rect.left + rect.width * (compact ? 0.32 : 0.39),
-        rect.top + rect.height * 0.10,
-        rect.left + rect.width * (compact ? 0.34 : 0.42),
-        rect.top + rect.height * 0.16,
-        rect.left + rect.width * (compact ? 0.31 : 0.39),
-        rect.top + rect.height * 0.22,
-      )
-      ..cubicTo(
-        rect.left + rect.width * (compact ? 0.27 : 0.34),
-        rect.top + rect.height * 0.29,
-        rect.left + rect.width * 0.18,
-        rect.top + rect.height * (wide ? 0.43 : 0.40),
-        rect.left + rect.width * 0.12,
-        rect.top + rect.height * (wide ? 0.39 : 0.36),
-      )
-      ..close();
+    final highlightAlpha = switch (candidate.highlightTechnique) {
+      SoftBasicSquareHighlightTechnique.flatInset => 0.70,
+      SoftBasicSquareHighlightTechnique.shortCompact => 0.72,
+      SoftBasicSquareHighlightTechnique.taperedEdge => 0.70,
+      SoftBasicSquareHighlightTechnique.round1Base => 0.74,
+    };
+
+    final softBlur = switch (candidate.highlightTechnique) {
+      SoftBasicSquareHighlightTechnique.flatInset => 0.066,
+      SoftBasicSquareHighlightTechnique.shortCompact => 0.058,
+      SoftBasicSquareHighlightTechnique.taperedEdge => 0.060,
+      SoftBasicSquareHighlightTechnique.round1Base => 0.080,
+    };
 
     canvas.drawPath(
       highlight,
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.18)
+        ..color = Colors.white.withValues(alpha: 0.15)
         ..maskFilter = MaskFilter.blur(
           BlurStyle.normal,
-          size.shortestSide * 0.08,
+          size.shortestSide * softBlur,
         ),
     );
     canvas.drawPath(
       highlight,
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.74)
+        ..color = Colors.white.withValues(alpha: highlightAlpha)
         ..maskFilter = MaskFilter.blur(
           BlurStyle.normal,
-          size.shortestSide * 0.026,
+          size.shortestSide * 0.022,
         ),
     );
   }
