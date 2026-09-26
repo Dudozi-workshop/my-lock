@@ -538,8 +538,8 @@ const softBasicSquareRound5Candidates = <SoftBasicSquareCandidate>[
   ),
   SoftBasicSquareCandidate(
     id: 'SB-S-R5-03',
-    name: 'High Spec · Compact Core',
-    intent: 'Soft Spec은 유지하되 Core Spec을 더 작고 응축되게 만들어 광택은 선명하지만 장식처럼 튀지 않게 한 안. Round 5 최종 선택 Master.',
+    name: 'High Spec · No Core',
+    intent: '넓은 Soft Spec은 유지하고 Core Spec과 secondary sparkle을 제거해 가장 깔끔한 glossy patch만 남긴 Round 5 최종 Master.',
     technique: SoftBasicSquareTechnique.tighterCorner,
     materialProfile: SoftBasicSquareMaterialProfile.highSpec,
     glossRefinement: SoftBasicSquareGlossRefinement.highCompactCore,
@@ -576,3 +576,71 @@ const softBasicSquareRound5Candidates = <SoftBasicSquareCandidate>[
 
 const softBasicSquareSelectedMasterId = 'SB-S-R5-03';
 
+
+
+enum SoftBasicTriangleTechnique {
+  balanced,
+  widerBase,
+  softerApex,
+  taller,
+  wideSpec,
+  compactSpec,
+}
+
+class SoftBasicTriangleCandidate {
+  const SoftBasicTriangleCandidate({
+    required this.id,
+    required this.name,
+    required this.intent,
+    required this.technique,
+    this.badge,
+  });
+
+  final String id;
+  final String name;
+  final String intent;
+  final SoftBasicTriangleTechnique technique;
+  final String? badge;
+}
+
+const softBasicTriangleRound1Candidates = <SoftBasicTriangleCandidate>[
+  SoftBasicTriangleCandidate(
+    id: 'SB-T-R1-01',
+    name: 'Balanced Transfer',
+    intent: 'Square 최종 Master의 Soft Spec / no-core / diffuse bounce 언어를 가장 중립적인 둥근 삼각형에 이식한 기준안.',
+    technique: SoftBasicTriangleTechnique.balanced,
+    badge: 'BASE',
+  ),
+  SoftBasicTriangleCandidate(
+    id: 'SB-T-R1-02',
+    name: 'Wider Base',
+    intent: '밑변을 넓혀 안정감을 높이고 꼭짓점의 날카로운 인상을 줄인 안.',
+    technique: SoftBasicTriangleTechnique.widerBase,
+  ),
+  SoftBasicTriangleCandidate(
+    id: 'SB-T-R1-03',
+    name: 'Softer Apex',
+    intent: '상단 꼭짓점을 더 둥글게 눌러 Soft Basic 특유의 말랑한 실루엣을 강화한 안.',
+    technique: SoftBasicTriangleTechnique.softerApex,
+    badge: 'SOFT',
+  ),
+  SoftBasicTriangleCandidate(
+    id: 'SB-T-R1-04',
+    name: 'Taller Form',
+    intent: '세로 비율을 조금 늘려 삼각형 정체성을 살리되 코너는 충분히 둥글게 유지한 안.',
+    technique: SoftBasicTriangleTechnique.taller,
+  ),
+  SoftBasicTriangleCandidate(
+    id: 'SB-T-R1-05',
+    name: 'Wide Soft Spec',
+    intent: '좌상단 면광을 넓게 퍼뜨려 꼭짓점이 아닌 면 자체가 빛나는 느낌을 강조한 안.',
+    technique: SoftBasicTriangleTechnique.wideSpec,
+    badge: 'GLOSS',
+  ),
+  SoftBasicTriangleCandidate(
+    id: 'SB-T-R1-06',
+    name: 'Compact Soft Spec',
+    intent: '면광 면적을 줄여 실루엣을 더 또렷하게 보여주면서 no-dot 원칙을 유지한 안.',
+    technique: SoftBasicTriangleTechnique.compactSpec,
+  ),
+];
