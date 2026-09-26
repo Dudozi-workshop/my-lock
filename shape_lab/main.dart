@@ -113,7 +113,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 028 · Soft Basic Square R4 Corner Flow',
+                                  'LAB 029 · Soft Basic Square R4 Mockup Gloss',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -1901,8 +1901,8 @@ class _SoftBasicSquareRound2State extends State<_SoftBasicSquareRound2> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Square · Round 4 · Corner Flow Gloss',
-          subtitle: 'Tighter Corner를 고정하고 pill 하이라이트를 제거합니다. 좌상단 코너 광점에서 상단·좌측 edge로 짧게 흐르는 Corner Flow와 하단 Bounce 강도를 6안으로 비교합니다.',
+          title: 'Soft Basic · Square · Round 4 · Mockup Gloss',
+          subtitle: 'Tighter Corner를 고정하고 선형 Corner Flow를 제거합니다. 목업처럼 좌상단의 넓은 Soft Spec 면광 + 내부 Core Spec + 하단 Diffuse Bounce를 6안으로 비교합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -2495,194 +2495,165 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
   ) {
     final edgeGlow = adjustTone(
       base,
-      lightnessDelta: tone == ShapeTone.yellow ? 0.075 : 0.115,
-      saturationDelta: -0.02,
+      lightnessDelta: tone == ShapeTone.yellow ? 0.080 : 0.125,
+      saturationDelta: -0.025,
     );
 
-    final topEnd = switch (profile) {
-      SoftBasicSquareMaterialProfile.mockupGloss => 0.47,
-      SoftBasicSquareMaterialProfile.highSpec => 0.42,
-      SoftBasicSquareMaterialProfile.balancedGloss => 0.44,
-      SoftBasicSquareMaterialProfile.circleTransfer => 0.40,
-      SoftBasicSquareMaterialProfile.softGloss => 0.41,
-      SoftBasicSquareMaterialProfile.wideDiffuse => 0.45,
-      SoftBasicSquareMaterialProfile.legacy => 0.40,
+    final patchScale = switch (profile) {
+      SoftBasicSquareMaterialProfile.mockupGloss => 1.08,
+      SoftBasicSquareMaterialProfile.highSpec => 0.96,
+      SoftBasicSquareMaterialProfile.balancedGloss => 1.00,
+      SoftBasicSquareMaterialProfile.circleTransfer => 0.92,
+      SoftBasicSquareMaterialProfile.softGloss => 1.02,
+      SoftBasicSquareMaterialProfile.wideDiffuse => 1.16,
+      SoftBasicSquareMaterialProfile.legacy => 0.92,
     };
-    final leftEnd = switch (profile) {
-      SoftBasicSquareMaterialProfile.mockupGloss => 0.43,
-      SoftBasicSquareMaterialProfile.highSpec => 0.38,
-      SoftBasicSquareMaterialProfile.balancedGloss => 0.40,
-      SoftBasicSquareMaterialProfile.circleTransfer => 0.37,
-      SoftBasicSquareMaterialProfile.softGloss => 0.39,
-      SoftBasicSquareMaterialProfile.wideDiffuse => 0.42,
-      SoftBasicSquareMaterialProfile.legacy => 0.37,
-    };
-    final lineWidth = switch (profile) {
-      SoftBasicSquareMaterialProfile.mockupGloss => 0.043,
-      SoftBasicSquareMaterialProfile.highSpec => 0.036,
-      SoftBasicSquareMaterialProfile.balancedGloss => 0.039,
-      SoftBasicSquareMaterialProfile.circleTransfer => 0.036,
-      SoftBasicSquareMaterialProfile.softGloss => 0.038,
-      SoftBasicSquareMaterialProfile.wideDiffuse => 0.052,
-      SoftBasicSquareMaterialProfile.legacy => 0.036,
-    };
-    final faceAlpha = switch (profile) {
-      SoftBasicSquareMaterialProfile.mockupGloss => 0.78,
-      SoftBasicSquareMaterialProfile.highSpec => 0.82,
-      SoftBasicSquareMaterialProfile.balancedGloss => 0.68,
-      SoftBasicSquareMaterialProfile.circleTransfer => 0.58,
-      SoftBasicSquareMaterialProfile.softGloss => 0.56,
-      SoftBasicSquareMaterialProfile.wideDiffuse => 0.45,
-      SoftBasicSquareMaterialProfile.legacy => 0.58,
+    final patchAlpha = switch (profile) {
+      SoftBasicSquareMaterialProfile.mockupGloss => 0.72,
+      SoftBasicSquareMaterialProfile.highSpec => 0.76,
+      SoftBasicSquareMaterialProfile.balancedGloss => 0.64,
+      SoftBasicSquareMaterialProfile.circleTransfer => 0.54,
+      SoftBasicSquareMaterialProfile.softGloss => 0.52,
+      SoftBasicSquareMaterialProfile.wideDiffuse => 0.44,
+      SoftBasicSquareMaterialProfile.legacy => 0.54,
     };
     final haloAlpha = switch (profile) {
-      SoftBasicSquareMaterialProfile.mockupGloss => 0.25,
-      SoftBasicSquareMaterialProfile.highSpec => 0.21,
-      SoftBasicSquareMaterialProfile.balancedGloss => 0.22,
-      SoftBasicSquareMaterialProfile.circleTransfer => 0.17,
-      SoftBasicSquareMaterialProfile.softGloss => 0.18,
-      SoftBasicSquareMaterialProfile.wideDiffuse => 0.28,
-      SoftBasicSquareMaterialProfile.legacy => 0.17,
+      SoftBasicSquareMaterialProfile.mockupGloss => 0.28,
+      SoftBasicSquareMaterialProfile.highSpec => 0.22,
+      SoftBasicSquareMaterialProfile.balancedGloss => 0.24,
+      SoftBasicSquareMaterialProfile.circleTransfer => 0.18,
+      SoftBasicSquareMaterialProfile.softGloss => 0.20,
+      SoftBasicSquareMaterialProfile.wideDiffuse => 0.30,
+      SoftBasicSquareMaterialProfile.legacy => 0.18,
     };
     final coreAlpha = switch (profile) {
-      SoftBasicSquareMaterialProfile.mockupGloss => 0.94,
+      SoftBasicSquareMaterialProfile.mockupGloss => 0.92,
       SoftBasicSquareMaterialProfile.highSpec => 1.00,
       SoftBasicSquareMaterialProfile.balancedGloss => 0.88,
-      SoftBasicSquareMaterialProfile.circleTransfer => 0.72,
+      SoftBasicSquareMaterialProfile.circleTransfer => 0.76,
       SoftBasicSquareMaterialProfile.softGloss => 0.70,
-      SoftBasicSquareMaterialProfile.wideDiffuse => 0.52,
-      SoftBasicSquareMaterialProfile.legacy => 0.72,
+      SoftBasicSquareMaterialProfile.wideDiffuse => 0.54,
+      SoftBasicSquareMaterialProfile.legacy => 0.76,
     };
-    final faceDiffuseAlpha = switch (profile) {
-      SoftBasicSquareMaterialProfile.mockupGloss => 0.17,
-      SoftBasicSquareMaterialProfile.wideDiffuse => 0.20,
-      SoftBasicSquareMaterialProfile.balancedGloss => 0.14,
-      SoftBasicSquareMaterialProfile.circleTransfer => 0.12,
-      SoftBasicSquareMaterialProfile.softGloss => 0.11,
-      SoftBasicSquareMaterialProfile.highSpec => 0.10,
-      SoftBasicSquareMaterialProfile.legacy => 0.12,
+    final coreScale = switch (profile) {
+      SoftBasicSquareMaterialProfile.mockupGloss => 1.00,
+      SoftBasicSquareMaterialProfile.highSpec => 0.90,
+      SoftBasicSquareMaterialProfile.balancedGloss => 0.95,
+      SoftBasicSquareMaterialProfile.circleTransfer => 0.88,
+      SoftBasicSquareMaterialProfile.softGloss => 1.04,
+      SoftBasicSquareMaterialProfile.wideDiffuse => 1.08,
+      SoftBasicSquareMaterialProfile.legacy => 0.88,
     };
 
     final clip = RRect.fromRectAndRadius(
       rect,
       Radius.circular(rect.width * 0.20),
     );
-    final x = rect.left + rect.width * 0.135;
-    final y = rect.top + rect.height * 0.135;
-    final corner = Offset(
-      rect.left + rect.width * 0.170,
-      rect.top + rect.height * 0.170,
-    );
 
-    final flow = Path()
-      ..moveTo(
-        rect.left + rect.width * 0.145,
-        rect.top + rect.height * leftEnd,
-      )
-      ..cubicTo(
-        rect.left + rect.width * 0.135,
-        rect.top + rect.height * 0.270,
-        x,
-        y,
-        corner.dx,
-        corner.dy,
-      )
-      ..cubicTo(
-        rect.left + rect.width * 0.205,
-        rect.top + rect.height * 0.135,
-        rect.left + rect.width * 0.285,
-        rect.top + rect.height * 0.135,
-        rect.left + rect.width * topEnd,
-        rect.top + rect.height * 0.145,
-      );
+    Path buildPatch(double scale) {
+      final p = Path()
+        ..moveTo(
+          rect.left + rect.width * (0.105),
+          rect.top + rect.height * (0.390 * scale),
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.085,
+          rect.top + rect.height * 0.285,
+          rect.left + rect.width * 0.090,
+          rect.top + rect.height * 0.165,
+          rect.left + rect.width * 0.205,
+          rect.top + rect.height * 0.105,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.275,
+          rect.top + rect.height * 0.070,
+          rect.left + rect.width * (0.405 * scale),
+          rect.top + rect.height * 0.085,
+          rect.left + rect.width * (0.430 * scale),
+          rect.top + rect.height * 0.150,
+        )
+        ..cubicTo(
+          rect.left + rect.width * (0.445 * scale),
+          rect.top + rect.height * 0.205,
+          rect.left + rect.width * (0.365 * scale),
+          rect.top + rect.height * 0.245,
+          rect.left + rect.width * 0.305,
+          rect.top + rect.height * 0.285,
+        )
+        ..cubicTo(
+          rect.left + rect.width * 0.245,
+          rect.top + rect.height * 0.325,
+          rect.left + rect.width * 0.165,
+          rect.top + rect.height * (0.420 * scale),
+          rect.left + rect.width * 0.105,
+          rect.top + rect.height * (0.390 * scale),
+        )
+        ..close();
+      return p;
+    }
 
-    final coreFlow = Path()
-      ..moveTo(
-        rect.left + rect.width * 0.153,
-        rect.top + rect.height * 0.285,
-      )
-      ..cubicTo(
-        rect.left + rect.width * 0.145,
-        rect.top + rect.height * 0.215,
-        rect.left + rect.width * 0.145,
-        rect.top + rect.height * 0.162,
-        corner.dx,
-        corner.dy,
-      )
-      ..cubicTo(
-        rect.left + rect.width * 0.205,
-        rect.top + rect.height * 0.145,
-        rect.left + rect.width * 0.255,
-        rect.top + rect.height * 0.142,
-        rect.left + rect.width * 0.305,
-        rect.top + rect.height * 0.145,
-      );
+    final patch = buildPatch(patchScale);
 
     canvas.save();
     canvas.clipRRect(clip);
 
+    // Wide face light: the mockup reads as a lit corner surface, not a line.
     canvas.drawOval(
       Rect.fromCenter(
         center: Offset(
-          rect.left + rect.width * 0.245,
-          rect.top + rect.height * 0.245,
+          rect.left + rect.width * 0.235,
+          rect.top + rect.height * 0.235,
         ),
-        width: rect.width * 0.37,
-        height: rect.height * 0.34,
+        width: rect.width * 0.50 * patchScale,
+        height: rect.height * 0.47 * patchScale,
       ),
       Paint()
-        ..color = light.withValues(alpha: faceDiffuseAlpha)
+        ..color = edgeGlow.withValues(alpha: haloAlpha * 0.72)
         ..maskFilter = MaskFilter.blur(
           BlurStyle.normal,
-          size.shortestSide * 0.075,
+          size.shortestSide * 0.090,
         ),
     );
 
+    // Soft Spec: broad filled patch that wraps the upper-left corner.
     canvas.drawPath(
-      flow,
+      patch,
       Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round
-        ..strokeWidth = rect.width * lineWidth * 2.15
-        ..color = edgeGlow.withValues(alpha: haloAlpha)
+        ..color = Colors.white.withValues(alpha: haloAlpha)
         ..maskFilter = MaskFilter.blur(
           BlurStyle.normal,
-          size.shortestSide * 0.035,
+          size.shortestSide * 0.052,
         ),
     );
-
     canvas.drawPath(
-      flow,
+      patch,
       Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round
-        ..strokeWidth = rect.width * lineWidth
-        ..color = Colors.white.withValues(alpha: faceAlpha)
+        ..color = Colors.white.withValues(alpha: patchAlpha)
         ..maskFilter = MaskFilter.blur(
           BlurStyle.normal,
-          size.shortestSide * 0.010,
+          size.shortestSide * 0.017,
         ),
     );
 
-    canvas.drawPath(
-      coreFlow,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round
-        ..strokeWidth = rect.width * 0.012
-        ..color = Colors.white.withValues(alpha: coreAlpha)
-        ..maskFilter = MaskFilter.blur(
-          BlurStyle.normal,
-          size.shortestSide * 0.0045,
-        ),
+    // Core Spec: a compact interior glint, never an edge stroke.
+    final coreRect = Rect.fromCenter(
+      center: Offset(
+        rect.left + rect.width * 0.235,
+        rect.top + rect.height * 0.205,
+      ),
+      width: rect.width * 0.105 * coreScale,
+      height: rect.height * 0.165 * coreScale,
     );
-
-    canvas.drawCircle(
-      corner,
-      rect.width * 0.025,
+    final core = RRect.fromRectAndRadius(
+      coreRect,
+      Radius.circular(coreRect.width * 0.50),
+    );
+    canvas.save();
+    canvas.translate(coreRect.center.dx, coreRect.center.dy);
+    canvas.rotate(0.34);
+    canvas.translate(-coreRect.center.dx, -coreRect.center.dy);
+    canvas.drawRRect(
+      core,
       Paint()
         ..color = Colors.white.withValues(alpha: coreAlpha)
         ..maskFilter = MaskFilter.blur(
@@ -2690,6 +2661,29 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
           size.shortestSide * 0.007,
         ),
     );
+    canvas.restore();
+
+    // Small secondary sparkle only for the glossier profiles.
+    if (profile == SoftBasicSquareMaterialProfile.mockupGloss ||
+        profile == SoftBasicSquareMaterialProfile.highSpec ||
+        profile == SoftBasicSquareMaterialProfile.balancedGloss) {
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(
+            rect.left + rect.width * 0.320,
+            rect.top + rect.height * 0.145,
+          ),
+          width: rect.width * 0.030,
+          height: rect.height * 0.046,
+        ),
+        Paint()
+          ..color = Colors.white.withValues(alpha: coreAlpha * 0.82)
+          ..maskFilter = MaskFilter.blur(
+            BlurStyle.normal,
+            size.shortestSide * 0.004,
+          ),
+      );
+    }
 
     canvas.restore();
   }
