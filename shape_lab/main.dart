@@ -2422,27 +2422,27 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
       SoftBasicSquareMaterialProfile.circleTransfer => 0.32,
       _ => 0.30,
     };
-    final bounceAlpha = baseBounceAlpha * switch (candidate.glossRefinement) {
+    final bounceAlpha = baseBounceAlpha * (switch (candidate.glossRefinement) {
       SoftBasicSquareGlossRefinement.base => 1.0,
       SoftBasicSquareGlossRefinement.highSoftPatch => 1.05,
       SoftBasicSquareGlossRefinement.highCompactCore => 0.98,
       SoftBasicSquareGlossRefinement.balancedBright => 1.06,
       SoftBasicSquareGlossRefinement.balancedWide => 1.12,
-    };
-    final bounceWidth = baseBounceWidth * switch (candidate.glossRefinement) {
+    });
+    final bounceWidth = baseBounceWidth * (switch (candidate.glossRefinement) {
       SoftBasicSquareGlossRefinement.base => 1.0,
       SoftBasicSquareGlossRefinement.highSoftPatch => 1.03,
       SoftBasicSquareGlossRefinement.highCompactCore => 1.0,
       SoftBasicSquareGlossRefinement.balancedBright => 1.0,
       SoftBasicSquareGlossRefinement.balancedWide => 1.10,
-    };
-    final bounceHeight = baseBounceHeight * switch (candidate.glossRefinement) {
+    });
+    final bounceHeight = baseBounceHeight * (switch (candidate.glossRefinement) {
       SoftBasicSquareGlossRefinement.base => 1.0,
       SoftBasicSquareGlossRefinement.highSoftPatch => 1.03,
       SoftBasicSquareGlossRefinement.highCompactCore => 1.0,
       SoftBasicSquareGlossRefinement.balancedBright => 1.0,
       SoftBasicSquareGlossRefinement.balancedWide => 1.12,
-    };
+    });
 
     canvas.save();
     canvas.clipRRect(inner);
@@ -2530,13 +2530,13 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
       SoftBasicSquareMaterialProfile.wideDiffuse => 1.16,
       SoftBasicSquareMaterialProfile.legacy => 0.92,
     };
-    final patchScale = basePatchScale * switch (refinement) {
+    final patchScale = basePatchScale * (switch (refinement) {
       SoftBasicSquareGlossRefinement.base => 1.0,
       SoftBasicSquareGlossRefinement.highSoftPatch => 1.13,
       SoftBasicSquareGlossRefinement.highCompactCore => 1.02,
       SoftBasicSquareGlossRefinement.balancedBright => 1.02,
       SoftBasicSquareGlossRefinement.balancedWide => 1.15,
-    };
+    });
     final basePatchAlpha = switch (profile) {
       SoftBasicSquareMaterialProfile.mockupGloss => 0.72,
       SoftBasicSquareMaterialProfile.highSpec => 0.76,
@@ -2546,13 +2546,13 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
       SoftBasicSquareMaterialProfile.wideDiffuse => 0.44,
       SoftBasicSquareMaterialProfile.legacy => 0.54,
     };
-    final patchAlpha = (basePatchAlpha * switch (refinement) {
+    final patchAlpha = (basePatchAlpha * (switch (refinement) {
       SoftBasicSquareGlossRefinement.base => 1.0,
       SoftBasicSquareGlossRefinement.highSoftPatch => 0.90,
       SoftBasicSquareGlossRefinement.highCompactCore => 0.98,
       SoftBasicSquareGlossRefinement.balancedBright => 1.12,
       SoftBasicSquareGlossRefinement.balancedWide => 0.92,
-    }).clamp(0.0, 1.0).toDouble();
+    })).clamp(0.0, 1.0).toDouble();
     final haloAlpha = switch (profile) {
       SoftBasicSquareMaterialProfile.mockupGloss => 0.28,
       SoftBasicSquareMaterialProfile.highSpec => 0.22,
@@ -2571,13 +2571,13 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
       SoftBasicSquareMaterialProfile.wideDiffuse => 0.54,
       SoftBasicSquareMaterialProfile.legacy => 0.76,
     };
-    final coreAlpha = (baseCoreAlpha * switch (refinement) {
+    final coreAlpha = (baseCoreAlpha * (switch (refinement) {
       SoftBasicSquareGlossRefinement.base => 1.0,
       SoftBasicSquareGlossRefinement.highSoftPatch => 0.92,
       SoftBasicSquareGlossRefinement.highCompactCore => 1.0,
       SoftBasicSquareGlossRefinement.balancedBright => 1.08,
       SoftBasicSquareGlossRefinement.balancedWide => 0.88,
-    }).clamp(0.0, 1.0).toDouble();
+    })).clamp(0.0, 1.0).toDouble();
     final baseCoreScale = switch (profile) {
       SoftBasicSquareMaterialProfile.mockupGloss => 1.00,
       SoftBasicSquareMaterialProfile.highSpec => 0.90,
@@ -2587,13 +2587,13 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
       SoftBasicSquareMaterialProfile.wideDiffuse => 1.08,
       SoftBasicSquareMaterialProfile.legacy => 0.88,
     };
-    final coreScale = baseCoreScale * switch (refinement) {
+    final coreScale = baseCoreScale * (switch (refinement) {
       SoftBasicSquareGlossRefinement.base => 1.0,
       SoftBasicSquareGlossRefinement.highSoftPatch => 0.96,
       SoftBasicSquareGlossRefinement.highCompactCore => 0.74,
       SoftBasicSquareGlossRefinement.balancedBright => 0.94,
       SoftBasicSquareGlossRefinement.balancedWide => 0.88,
-    };
+    });
 
     final clip = RRect.fromRectAndRadius(
       rect,
