@@ -1,8 +1,8 @@
 {
   "id": "crayon_soft",
-  "version": 1,
+  "version": 2,
   "canvasSize": 100,
-  "shapeSourceId": "soft_basic",
+  "shapeSourceId": "crayon_soft",
   "renderMode": "crayon",
   "colorRules": {
     "lightnessUp": 0.08,
