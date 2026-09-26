@@ -1,8 +1,9 @@
 {
   "styleId": "soft_basic",
   "shapeId": "square",
-  "version": 1,
+  "version": 2,
   "geometryMaster": "assets/shape_masters/core/basic_v1/square_master_v1.json",
+  "rotationMode": "fixed",
   "body": {
     "kind": "roundRect",
     "x": 6,
@@ -11,53 +12,240 @@
     "h": 88,
     "radius": 23
   },
+  "surface": {
+    "kind": "solid"
+  },
   "layers": [
     {
-      "id": "light",
-      "role": "light",
-      "opacity": 0.22,
-      "blur": 5.0,
-      "geometry": {
-        "kind": "ellipse",
-        "cx": 35,
-        "cy": 31,
-        "rx": 31,
-        "ry": 23
-      }
-    },
-    {
-      "id": "shade",
+      "id": "color_shell",
       "role": "shade",
-      "opacity": 0.13,
-      "blur": 6.5,
-      "geometry": {
-        "kind": "ellipse",
-        "cx": 72,
-        "cy": 73,
-        "rx": 32,
-        "ry": 26
-      }
-    },
-    {
-      "id": "spec",
-      "role": "spec",
-      "opacity": 0.56,
-      "blur": 0.7,
-      "rotationDeg": -30,
+      "blend": "normal",
+      "opacity": 0.28,
+      "blur": 1.7,
+      "toneLightnessDelta": -0.1,
+      "toneSaturationDelta": 0.02,
       "geometry": {
         "kind": "roundRect",
-        "x": 20,
-        "y": 20,
-        "w": 21,
-        "h": 7,
-        "radius": 3.2
+        "x": 6,
+        "y": 6,
+        "w": 88,
+        "h": 88,
+        "radius": 23
+      }
+    },
+    {
+      "id": "color_shell_inner",
+      "role": "light",
+      "blend": "normal",
+      "opacity": 1,
+      "blur": 0,
+      "toneLightnessDelta": 0,
+      "toneSaturationDelta": 0,
+      "geometry": {
+        "kind": "roundRect",
+        "x": 7.5,
+        "y": 7.5,
+        "w": 85,
+        "h": 85,
+        "radius": 21.5
+      }
+    },
+    {
+      "id": "airbrush_light",
+      "role": "light",
+      "blend": "normal",
+      "opacity": 0.48,
+      "blur": 22,
+      "toneLightnessDelta": 0.16,
+      "toneSaturationDelta": -0.04,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 31,
+        "cy": 29,
+        "rx": 38,
+        "ry": 33
+      }
+    },
+    {
+      "id": "airbrush_shade",
+      "role": "shade",
+      "blend": "normal",
+      "opacity": 0.4,
+      "blur": 27,
+      "toneLightnessDelta": -0.16,
+      "toneSaturationDelta": 0.03,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 78,
+        "cy": 82,
+        "rx": 39,
+        "ry": 36
+      }
+    },
+    {
+      "id": "ambient_bounce",
+      "role": "light",
+      "blend": "normal",
+      "opacity": 0.16,
+      "blur": 10,
+      "toneLightnessDelta": 0.11,
+      "toneSaturationDelta": -0.025,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 56.5,
+        "cy": 78,
+        "rx": 35.5,
+        "ry": 15.5
+      }
+    },
+    {
+      "id": "ambient_core",
+      "role": "light",
+      "blend": "normal",
+      "opacity": 0.09,
+      "blur": 7,
+      "toneLightnessDelta": 0.16,
+      "toneSaturationDelta": -0.04,
+      "geometry": {
+        "kind": "circle",
+        "cx": 62,
+        "cy": 70,
+        "r": 12
+      }
+    },
+    {
+      "id": "ambient_depth",
+      "role": "shade",
+      "blend": "normal",
+      "opacity": 0.045,
+      "blur": 5,
+      "toneLightnessDelta": -0.16,
+      "toneSaturationDelta": 0.03,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 50,
+        "cy": 89,
+        "rx": 26,
+        "ry": 5.5
+      }
+    },
+    {
+      "id": "edge_leaf_halo",
+      "role": "spec",
+      "blend": "normal",
+      "opacity": 0.2,
+      "blur": 8.5,
+      "geometry": {
+        "kind": "path",
+        "commands": [
+          {
+            "op": "M",
+            "x": 15.5,
+            "y": 40
+          },
+          {
+            "op": "C",
+            "c1x": 15.5,
+            "c1y": 28,
+            "c2x": 19.5,
+            "c2y": 18.5,
+            "x": 28,
+            "y": 14.5
+          },
+          {
+            "op": "C",
+            "c1x": 34,
+            "c1y": 11.5,
+            "c2x": 40.5,
+            "c2y": 12,
+            "x": 42,
+            "y": 16.5
+          },
+          {
+            "op": "C",
+            "c1x": 43.5,
+            "c1y": 21.5,
+            "c2x": 38,
+            "c2y": 27,
+            "x": 32,
+            "y": 32.5
+          },
+          {
+            "op": "C",
+            "c1x": 26,
+            "c1y": 38,
+            "c2x": 19.5,
+            "c2y": 44.5,
+            "x": 15.5,
+            "y": 40
+          },
+          {
+            "op": "Z"
+          }
+        ]
+      }
+    },
+    {
+      "id": "edge_leaf",
+      "role": "spec",
+      "blend": "normal",
+      "opacity": 0.76,
+      "blur": 3.1,
+      "geometry": {
+        "kind": "path",
+        "commands": [
+          {
+            "op": "M",
+            "x": 15.5,
+            "y": 40
+          },
+          {
+            "op": "C",
+            "c1x": 15.5,
+            "c1y": 28,
+            "c2x": 19.5,
+            "c2y": 18.5,
+            "x": 28,
+            "y": 14.5
+          },
+          {
+            "op": "C",
+            "c1x": 34,
+            "c1y": 11.5,
+            "c2x": 40.5,
+            "c2y": 12,
+            "x": 42,
+            "y": 16.5
+          },
+          {
+            "op": "C",
+            "c1x": 43.5,
+            "c1y": 21.5,
+            "c2x": 38,
+            "c2y": 27,
+            "x": 32,
+            "y": 32.5
+          },
+          {
+            "op": "C",
+            "c1x": 26,
+            "c1y": 38,
+            "c2x": 19.5,
+            "c2y": 44.5,
+            "x": 15.5,
+            "y": 40
+          },
+          {
+            "op": "Z"
+          }
+        ]
       }
     }
   ],
   "shadow": {
-    "opacity": 0.04,
-    "elevation": 2.2,
+    "opacity": 0.018,
+    "elevation": 1.35,
     "offsetX": 0,
-    "offsetY": 1.0
+    "offsetY": 1
   }
 }
