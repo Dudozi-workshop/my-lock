@@ -624,3 +624,147 @@ const softBasicTriangleGeometryRound1Candidates =
     badge: '5px',
   ),
 ];
+
+class SoftBasicTriangleMaterialCandidate {
+  const SoftBasicTriangleMaterialCandidate({
+    required this.id,
+    required this.name,
+    required this.intent,
+    this.highlightOpacityScale = 1.0,
+    this.haloOpacityScale = 1.0,
+    this.highlightScaleX = 1.0,
+    this.highlightScaleY = 1.0,
+    this.highlightOffsetX = 0.0,
+    this.highlightOffsetY = 0.0,
+    this.lightOpacityScale = 1.0,
+    this.lightScaleX = 1.0,
+    this.lightScaleY = 1.0,
+    this.lightOffsetX = 0.0,
+    this.lightOffsetY = 0.0,
+    this.shadeOpacityScale = 1.0,
+    this.shadeScaleX = 1.0,
+    this.shadeScaleY = 1.0,
+    this.shadeOffsetX = 0.0,
+    this.shadeOffsetY = 0.0,
+    this.bounceOpacityScale = 1.0,
+    this.bounceScaleX = 1.0,
+    this.bounceScaleY = 1.0,
+    this.bounceOffsetX = 0.0,
+    this.bounceOffsetY = 0.0,
+    this.coreOpacityScale = 1.0,
+    this.depthOpacityScale = 1.0,
+    this.shadowOpacityScale = 1.0,
+    this.shadowElevationScale = 1.0,
+    this.badge,
+  });
+
+  final String id;
+  final String name;
+  final String intent;
+  final double highlightOpacityScale;
+  final double haloOpacityScale;
+  final double highlightScaleX;
+  final double highlightScaleY;
+  final double highlightOffsetX;
+  final double highlightOffsetY;
+  final double lightOpacityScale;
+  final double lightScaleX;
+  final double lightScaleY;
+  final double lightOffsetX;
+  final double lightOffsetY;
+  final double shadeOpacityScale;
+  final double shadeScaleX;
+  final double shadeScaleY;
+  final double shadeOffsetX;
+  final double shadeOffsetY;
+  final double bounceOpacityScale;
+  final double bounceScaleX;
+  final double bounceScaleY;
+  final double bounceOffsetX;
+  final double bounceOffsetY;
+  final double coreOpacityScale;
+  final double depthOpacityScale;
+  final double shadowOpacityScale;
+  final double shadowElevationScale;
+  final String? badge;
+}
+
+const softBasicTriangleFinalCandidates = <SoftBasicTriangleMaterialCandidate>[
+  SoftBasicTriangleMaterialCandidate(
+    id: 'SB-T-F1-01',
+    name: 'Current Transfer',
+    intent: '현재 Triangle에 이식된 Soft Basic 재질을 그대로 보는 기준안.',
+    badge: 'BASE',
+  ),
+  SoftBasicTriangleMaterialCandidate(
+    id: 'SB-T-F1-02',
+    name: 'Inset Highlight',
+    intent: '좌상단 하이라이트를 약간 안쪽으로 당겨 꼭짓점과 겹치는 느낌을 줄인 안.',
+    highlightOpacityScale: 0.92,
+    haloOpacityScale: 0.92,
+    highlightScaleX: 0.90,
+    highlightScaleY: 0.94,
+    highlightOffsetX: 2.2,
+    highlightOffsetY: 1.0,
+    badge: 'INSET',
+  ),
+  SoftBasicTriangleMaterialCandidate(
+    id: 'SB-T-F1-03',
+    name: 'Wide Soft Light',
+    intent: '상단 면광과 하이라이트를 조금 넓혀 삼각형에서도 부드러운 재질감을 키운 안.',
+    highlightOpacityScale: 0.88,
+    haloOpacityScale: 1.12,
+    highlightScaleX: 1.12,
+    highlightScaleY: 1.06,
+    lightOpacityScale: 1.08,
+    lightScaleX: 1.08,
+    lightScaleY: 1.05,
+    badge: 'SOFT',
+  ),
+  SoftBasicTriangleMaterialCandidate(
+    id: 'SB-T-F1-04',
+    name: 'Soft Shade',
+    intent: '우하단 음영을 낮춰 삼각형의 중심이 너무 무겁게 보이지 않도록 정리한 안.',
+    shadeOpacityScale: 0.82,
+    shadeScaleX: 1.04,
+    shadeScaleY: 1.04,
+    shadeOffsetX: 1.0,
+    shadeOffsetY: 1.0,
+    bounceOpacityScale: 1.06,
+    depthOpacityScale: 0.84,
+    badge: 'LIGHT',
+  ),
+  SoftBasicTriangleMaterialCandidate(
+    id: 'SB-T-F1-05',
+    name: 'Wide Bounce',
+    intent: '하단 Ambient Bounce를 넓히고 살짝 낮춰 58px에서도 바닥 볼륨이 잘 읽히게 한 안.',
+    bounceOpacityScale: 1.18,
+    bounceScaleX: 1.18,
+    bounceScaleY: 1.12,
+    bounceOffsetY: 1.2,
+    coreOpacityScale: 0.92,
+    badge: 'VOLUME',
+  ),
+  SoftBasicTriangleMaterialCandidate(
+    id: 'SB-T-F1-06',
+    name: 'Balanced Final',
+    intent: '하이라이트는 안쪽으로 정리하고 음영은 완화, 하단 반사광은 넓혀 세 요소의 균형을 맞춘 최종 후보.',
+    highlightOpacityScale: 0.92,
+    haloOpacityScale: 0.96,
+    highlightScaleX: 0.94,
+    highlightScaleY: 0.97,
+    highlightOffsetX: 1.6,
+    highlightOffsetY: 0.8,
+    lightOpacityScale: 1.04,
+    shadeOpacityScale: 0.90,
+    bounceOpacityScale: 1.12,
+    bounceScaleX: 1.12,
+    bounceScaleY: 1.08,
+    bounceOffsetY: 0.8,
+    coreOpacityScale: 0.90,
+    depthOpacityScale: 0.90,
+    shadowOpacityScale: 0.94,
+    badge: 'TARGET',
+  ),
+];
+
