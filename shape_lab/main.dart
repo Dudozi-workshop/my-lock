@@ -295,6 +295,8 @@ class ShapeLab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
+        _SeaTurtleV3StaticSplitPanel(card: card, fg: fg, muted: muted),
+        const SizedBox(height: 14),
         _SeaTurtleShapePanel(card: card, fg: fg, muted: muted),
         const SizedBox(height: 14),
         _SeaTurtleRegionCrayonPanel(card: card, fg: fg, muted: muted),
@@ -412,6 +414,84 @@ class _CoreBasicMasterComparePanel extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             'Check: silhouette 크기 · optical mass · 상단 highlight · 하단 bounce · 색상별 명암 균형',
+            style: TextStyle(
+              color: muted,
+              fontSize: 10.5,
+              height: 1.35,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+class _SeaTurtleV3StaticSplitPanel extends StatelessWidget {
+  const _SeaTurtleV3StaticSplitPanel({
+    required this.card,
+    required this.fg,
+    required this.muted,
+  });
+
+  final Color card;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return _Panel(
+      color: card,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: 'Sea Turtle · v3 Static Master Split QA',
+            subtitle:
+                '애니메이션 전 단계. Canonical v3 Draft를 Static Body / Far F0 / Near F0로 분리한 결과를 한 화면에서 확인합니다.',
+            fg: fg,
+            muted: muted,
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 7,
+            runSpacing: 7,
+            children: const [
+              _ValueChip(label: 'Source', value: '2048 draft'),
+              _ValueChip(label: 'F0 rebuild diff', value: '0'),
+              _ValueChip(label: 'PNG CRC', value: 'PASS'),
+              _ValueChip(label: 'Animation', value: 'NOT YET'),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              width: double.infinity,
+              color: const Color(0xFFF3F6FA),
+              child: Image.asset(
+                'assets/shape_masters/drop01/sea_turtle_v3/lab_preview/static_split_contact.png',
+                fit: BoxFit.fitWidth,
+                filterQuality: FilterQuality.high,
+                errorBuilder: (context, error, stackTrace) => SizedBox(
+                  height: 220,
+                  child: Center(
+                    child: Text(
+                      'v3 split preview decode failed',
+                      style: TextStyle(
+                        color: muted,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'QA 기준: Canonical 실루엣 유지 · Static Body에 기존 지느러미 선/하이라이트 잔류 없음 · Near/Far F0 접합부 자연스러움 · Static Master Lock 전 Shape Animation 구현 금지.',
             style: TextStyle(
               color: muted,
               fontSize: 10.5,

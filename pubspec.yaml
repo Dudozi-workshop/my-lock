@@ -24,6 +24,7 @@ flutter:
     - assets/shape_specs/crayon_soft/
     - assets/shape_masters/core/basic_v1/
     - assets/sea_turtle_runtime_v2/
+    - assets/shape_masters/drop01/sea_turtle_v3/lab_preview/
 
 flutter_launcher_icons:
   android: true
