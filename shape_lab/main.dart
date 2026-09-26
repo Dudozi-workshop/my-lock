@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:my_lock/lock_engine/effects.dart';
 import 'package:my_lock/lock_engine/floating_preview.dart';
@@ -85,7 +86,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 026 · 4× Master → 58px Runtime',
+                                  'LAB 027 · Lily Bubble HQ · 58px Runtime',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -261,6 +262,7 @@ class ShapeLab extends StatelessWidget {
 }
 
 
+
 class _HighResRuntimeDemo extends StatelessWidget {
   const _HighResRuntimeDemo({required this.fg, required this.muted});
 
@@ -273,13 +275,20 @@ class _HighResRuntimeDemo extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF0B1914),
+        color: const Color(0xFF07120D),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF284535)),
+        border: Border.all(color: const Color(0xFF234534)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x22000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Wrap(
         spacing: 18,
-        runSpacing: 12,
+        runSpacing: 14,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           SizedBox(
@@ -288,7 +297,7 @@ class _HighResRuntimeDemo extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  '4× Master → 58px Runtime',
+                  'Lily Bubble · HQ Runtime',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -297,19 +306,19 @@ class _HighResRuntimeDemo extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '은방울꽃 Glass Bubble 예시. 내부 좌표는 232×232로 제작하고 실제 잠금 도형은 정확히 58×58로 축소 표시합니다.',
+                  '레퍼런스의 짙은 숲색 유리구슬, 좌상단 백색 반사광, 우하단 금빛 글로우, 은방울꽃과 내부 반딧불 움직임을 8× Master에서 구성합니다.',
                   style: TextStyle(
-                    color: muted.withValues(alpha: 0.95),
+                    color: muted.withValues(alpha: 0.98),
                     fontSize: 11,
                     height: 1.4,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'MASTER 232px  ·  DISPLAY 58px  ·  SCALE 25%',
+                  'MASTER 464px  ·  DISPLAY 58px  ·  SCALE 12.5%  ·  FIREFLY LIVE',
                   style: TextStyle(
-                    color: Color(0xFF9FD9A9),
-                    fontSize: 9.5,
+                    color: Color(0xFFC4E98B),
+                    fontSize: 9.2,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -323,7 +332,7 @@ class _HighResRuntimeDemo extends StatelessWidget {
                 height: 96,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF08100D),
+                  color: const Color(0xFF030A07),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const _LilyBubbleAsset(displaySize: 58),
@@ -332,7 +341,7 @@ class _HighResRuntimeDemo extends StatelessWidget {
               const Text(
                 'ACTUAL 58×58',
                 style: TextStyle(
-                  color: Color(0xFFDCF6E1),
+                  color: Color(0xFFE7F7D1),
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
                 ),
@@ -342,11 +351,11 @@ class _HighResRuntimeDemo extends StatelessWidget {
           Column(
             children: [
               Container(
-                width: 132,
-                height: 132,
+                width: 140,
+                height: 140,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF08100D),
+                  color: const Color(0xFF030A07),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const _LilyBubbleAsset(displaySize: 116),
@@ -355,7 +364,7 @@ class _HighResRuntimeDemo extends StatelessWidget {
               const Text(
                 '2× INSPECTION',
                 style: TextStyle(
-                  color: Color(0xFF8EAE98),
+                  color: Color(0xFF9BB9A1),
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
                 ),
@@ -368,21 +377,40 @@ class _HighResRuntimeDemo extends StatelessWidget {
   }
 }
 
-class _LilyBubbleAsset extends StatelessWidget {
+class _LilyBubbleAsset extends StatefulWidget {
   const _LilyBubbleAsset({required this.displaySize});
 
   final double displaySize;
 
   @override
+  State<_LilyBubbleAsset> createState() => _LilyBubbleAssetState();
+}
+
+class _LilyBubbleAssetState extends State<_LilyBubbleAsset>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 9200),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox.square(
-      dimension: displaySize,
+      dimension: widget.displaySize,
       child: FittedBox(
         fit: BoxFit.contain,
         child: RepaintBoundary(
           child: SizedBox.square(
-            dimension: 232,
-            child: CustomPaint(painter: _LilyBubblePainter()),
+            dimension: 464,
+            child: CustomPaint(
+              painter: _LilyBubblePainter(_controller),
+            ),
           ),
         ),
       ),
@@ -391,9 +419,13 @@ class _LilyBubbleAsset extends StatelessWidget {
 }
 
 class _LilyBubblePainter extends CustomPainter {
-  const _LilyBubblePainter();
+  _LilyBubblePainter(this.animation) : super(repaint: animation);
 
-  static const _master = 232.0;
+  final Animation<double> animation;
+
+  static const _master = 464.0;
+  static const _center = Offset(232, 229);
+  static const _radius = 194.0;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -401,212 +433,449 @@ class _LilyBubblePainter extends CustomPainter {
     canvas.save();
     canvas.scale(scale, scale);
 
-    const center = Offset(116, 116);
-    final orbRect = Rect.fromCircle(center: center, radius: 101);
+    final t = animation.value * math.pi * 2;
+    final orbRect = Rect.fromCircle(center: _center, radius: _radius);
 
-    canvas.drawCircle(
-      center + const Offset(0, 5),
-      104,
-      Paint()
-        ..color = const Color(0xA0000000)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
-    );
-
-    canvas.drawCircle(
-      center,
-      103,
-      Paint()
-        ..shader = const RadialGradient(
-          center: Alignment(-0.34, -0.30),
-          radius: 1.08,
-          colors: [
-            Color(0xCC174C35),
-            Color(0xE6102E20),
-            Color(0xF20B1712),
-          ],
-          stops: [0.0, 0.54, 1.0],
-        ).createShader(orbRect),
-    );
+    _drawOuterShadow(canvas);
+    _drawGlassBase(canvas, orbRect);
 
     canvas.save();
     canvas.clipPath(Path()..addOval(orbRect));
 
-    final glowRect = Rect.fromCircle(
-      center: const Offset(174, 171),
-      radius: 82,
+    _drawForestDepth(canvas, orbRect);
+    _drawMossFloor(canvas);
+    _drawGoldenBloom(canvas);
+    _drawStaticLightDust(canvas);
+    _drawFlower(canvas);
+    _drawAnimatedFireflies(canvas, t);
+    _drawInnerRefractions(canvas);
+
+    canvas.restore();
+
+    _drawGlassRim(canvas, orbRect);
+    _drawPrimaryReflection(canvas);
+    _drawLowerGoldReflection(canvas);
+    _drawMicroHighlights(canvas);
+
+    canvas.restore();
+  }
+
+  static void _drawOuterShadow(Canvas canvas) {
+    canvas.drawOval(
+      const Rect.fromLTWH(72, 404, 320, 38),
+      Paint()
+        ..color = const Color(0x62000000)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20),
     );
     canvas.drawCircle(
-      const Offset(174, 171),
-      82,
+      _center + const Offset(0, 8),
+      _radius + 5,
+      Paint()
+        ..color = const Color(0x42000000)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
+    );
+  }
+
+  static void _drawGlassBase(Canvas canvas, Rect orbRect) {
+    canvas.drawCircle(
+      _center,
+      _radius,
+      Paint()
+        ..shader = const RadialGradient(
+          center: Alignment(-0.32, -0.40),
+          radius: 1.10,
+          colors: [
+            Color(0xFF124A38),
+            Color(0xFF0A3022),
+            Color(0xFF071C15),
+            Color(0xFF030B08),
+          ],
+          stops: [0.0, 0.38, 0.72, 1.0],
+        ).createShader(orbRect),
+    );
+  }
+
+  static void _drawForestDepth(Canvas canvas, Rect orbRect) {
+    final vignette = Paint()
+      ..shader = const RadialGradient(
+        center: Alignment(-0.18, -0.10),
+        radius: 1.05,
+        colors: [
+          Color(0x00182C1F),
+          Color(0x22030906),
+          Color(0xA8000000),
+        ],
+        stops: [0.0, 0.64, 1.0],
+      ).createShader(orbRect);
+    canvas.drawCircle(_center, _radius, vignette);
+
+    _softBlob(canvas, const Offset(104, 96), 76, const Color(0x442D8168), 30);
+    _softBlob(canvas, const Offset(142, 62), 46, const Color(0x1E83B5A0), 22);
+    _softBlob(canvas, const Offset(330, 86), 72, const Color(0x24598437), 30);
+    _softBlob(canvas, const Offset(362, 150), 38, const Color(0x3C6B6E29), 24);
+    _softBlob(canvas, const Offset(80, 250), 54, const Color(0x1E244F33), 24);
+
+    for (final spot in const [
+      (Offset(74, 86), 16.0, Color(0x33579F81)),
+      (Offset(99, 142), 13.0, Color(0x24307454)),
+      (Offset(306, 62), 13.0, Color(0x244D7831)),
+      (Offset(344, 113), 18.0, Color(0x315A6B2F)),
+      (Offset(371, 220), 14.0, Color(0x28496E28)),
+      (Offset(127, 215), 11.0, Color(0x263F6B49)),
+    ]) {
+      _softBlob(canvas, spot.$1, spot.$2, spot.$3, 10);
+    }
+  }
+
+  static void _drawMossFloor(Canvas canvas) {
+    final moss = Path()
+      ..moveTo(62, 350)
+      ..cubicTo(106, 324, 143, 336, 175, 328)
+      ..cubicTo(217, 316, 251, 340, 287, 324)
+      ..cubicTo(322, 309, 356, 321, 404, 344)
+      ..lineTo(420, 430)
+      ..lineTo(44, 430)
+      ..close();
+
+    canvas.drawPath(
+      moss,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF426F28),
+            Color(0xFF173A19),
+            Color(0xFF07150C),
+          ],
+        ).createShader(const Rect.fromLTWH(45, 315, 380, 120)),
+    );
+
+    for (var i = 0; i < 24; i++) {
+      final x = 64.0 + ((i * 37) % 330);
+      final y = 347.0 + ((i * 17) % 50);
+      final r = 2.0 + (i % 4) * 1.2;
+      canvas.drawCircle(
+        Offset(x, y),
+        r,
+        Paint()..color = Color.lerp(
+          const Color(0xFF87A934),
+          const Color(0xFF22421B),
+          (i % 5) / 4,
+        )!,
+      );
+    }
+  }
+
+  static void _drawGoldenBloom(Canvas canvas) {
+    final bloomRect = Rect.fromCircle(
+      center: const Offset(341, 320),
+      radius: 154,
+    );
+    canvas.drawCircle(
+      const Offset(341, 320),
+      154,
       Paint()
         ..shader = const RadialGradient(
           colors: [
-            Color(0xB8FFF44E),
-            Color(0x806FD51C),
-            Color(0x001A3D17),
+            Color(0xE8FFF65D),
+            Color(0xB8EAC72C),
+            Color(0x557F8B1D),
+            Color(0x001C2E10),
           ],
-          stops: [0.0, 0.36, 1.0],
-        ).createShader(glowRect),
+          stops: [0.0, 0.20, 0.48, 1.0],
+        ).createShader(bloomRect),
     );
 
-    final coolRect = Rect.fromCircle(
-      center: const Offset(73, 68),
-      radius: 72,
-    );
-    canvas.drawCircle(
-      const Offset(73, 68),
-      72,
-      Paint()
-        ..shader = const RadialGradient(
-          colors: [
-            Color(0x5A77E6D4),
-            Color(0x2238A58B),
-            Color(0x000B1712),
-          ],
-          stops: [0.0, 0.48, 1.0],
-        ).createShader(coolRect),
-    );
+    _softBlob(canvas, const Offset(368, 340), 50, const Color(0x9EFFF879), 18);
+    _softBlob(canvas, const Offset(329, 368), 38, const Color(0x6AF3E14B), 14);
+  }
 
-    _drawGlow(canvas, const Offset(55, 76), 10, const Color(0xFFFFE85A));
-    _drawGlow(canvas, const Offset(170, 63), 5, const Color(0xFFFFF29A));
-    _drawGlow(canvas, const Offset(183, 132), 7, const Color(0xFFFFF164));
-    _drawGlow(canvas, const Offset(62, 155), 6, const Color(0xFFFFEE59));
-    _drawGlow(canvas, const Offset(148, 180), 4, const Color(0xFFCEFF85));
-    _drawGlow(canvas, const Offset(87, 96), 3.5, const Color(0xFFB9F8D1));
-    _drawGlow(canvas, const Offset(150, 94), 2.7, const Color(0xFFFFF4A4));
+  static void _drawStaticLightDust(Canvas canvas) {
+    const lights = [
+      (Offset(73, 117), 9.0),
+      (Offset(121, 205), 5.5),
+      (Offset(160, 100), 5.0),
+      (Offset(184, 310), 5.4),
+      (Offset(263, 95), 4.4),
+      (Offset(316, 128), 6.0),
+      (Offset(372, 182), 7.0),
+      (Offset(339, 258), 5.2),
+      (Offset(286, 331), 5.5),
+      (Offset(117, 329), 4.5),
+    ];
 
+    for (var i = 0; i < lights.length; i++) {
+      final light = lights[i];
+      _drawGlow(
+        canvas,
+        light.$1,
+        light.$2,
+        i.isEven ? const Color(0xFFFFF36D) : const Color(0xFFCFFF90),
+        coreOpacity: 0.90,
+      );
+    }
+  }
+
+  static void _drawFlower(Canvas canvas) {
     final stemGlow = Paint()
-      ..color = const Color(0x667AD53A)
+      ..color = const Color(0x454EAF34)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 9
+      ..strokeWidth = 15
       ..strokeCap = StrokeCap.round
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
     final stem = Paint()
-      ..color = const Color(0xFFD4E748)
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFFE8ED53), Color(0xFF8FB32F), Color(0xFF4F7B24)],
+      ).createShader(const Rect.fromLTWH(170, 106, 150, 260))
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 4.2
+      ..strokeWidth = 6.5
       ..strokeCap = StrokeCap.round;
 
     final mainStem = Path()
-      ..moveTo(112, 184)
-      ..cubicTo(111, 153, 111, 118, 120, 80)
-      ..cubicTo(124, 65, 131, 57, 140, 56);
+      ..moveTo(231, 362)
+      ..cubicTo(230, 316, 229, 274, 233, 229)
+      ..cubicTo(238, 182, 249, 151, 269, 134)
+      ..cubicTo(280, 124, 289, 122, 299, 127);
     canvas.drawPath(mainStem, stemGlow);
     canvas.drawPath(mainStem, stem);
 
-    final branch1 = Path()
-      ..moveTo(117, 121)
-      ..cubicTo(102, 113, 91, 108, 80, 97);
-    final branch2 = Path()
-      ..moveTo(119, 104)
-      ..cubicTo(134, 97, 145, 89, 151, 78);
-    final branch3 = Path()
-      ..moveTo(114, 139)
-      ..cubicTo(132, 132, 144, 124, 153, 114);
-    canvas.drawPath(branch1, stem);
-    canvas.drawPath(branch2, stem);
-    canvas.drawPath(branch3, stem);
+    final branches = <Path>[
+      Path()
+        ..moveTo(237, 250)
+        ..cubicTo(216, 235, 197, 226, 177, 210),
+      Path()
+        ..moveTo(240, 218)
+        ..cubicTo(263, 207, 281, 193, 293, 176),
+      Path()
+        ..moveTo(245, 190)
+        ..cubicTo(266, 177, 277, 161, 282, 145),
+      Path()
+        ..moveTo(232, 285)
+        ..cubicTo(252, 271, 271, 260, 293, 250),
+    ];
+    for (final branch in branches) {
+      canvas.drawPath(branch, stemGlow..strokeWidth = 9);
+      canvas.drawPath(branch, stem..strokeWidth = 5.2);
+    }
 
     _drawLeaf(
       canvas,
       Path()
-        ..moveTo(111, 159)
-        ..cubicTo(88, 144, 72, 146, 65, 157)
-        ..cubicTo(78, 174, 94, 174, 111, 165)
+        ..moveTo(230, 319)
+        ..cubicTo(190, 282, 154, 281, 128, 302)
+        ..cubicTo(153, 340, 192, 347, 230, 331)
         ..close(),
+      const Rect.fromLTWH(125, 278, 112, 72),
     );
     _drawLeaf(
       canvas,
       Path()
-        ..moveTo(114, 169)
-        ..cubicTo(131, 150, 149, 147, 161, 153)
-        ..cubicTo(153, 171, 136, 181, 114, 176)
+        ..moveTo(236, 333)
+        ..cubicTo(272, 292, 312, 287, 341, 303)
+        ..cubicTo(320, 345, 278, 360, 236, 344)
         ..close(),
+      const Rect.fromLTWH(232, 286, 112, 78),
     );
     _drawLeaf(
       canvas,
       Path()
-        ..moveTo(116, 132)
-        ..cubicTo(100, 122, 91, 123, 85, 130)
-        ..cubicTo(95, 140, 105, 141, 116, 137)
+        ..moveTo(234, 274)
+        ..cubicTo(208, 252, 187, 252, 171, 266)
+        ..cubicTo(188, 288, 210, 294, 234, 284)
         ..close(),
+      const Rect.fromLTWH(168, 248, 72, 50),
       small: true,
     );
 
-    _drawBell(canvas, const Offset(77, 91), 0.78, -0.14);
-    _drawBell(canvas, const Offset(144, 69), 0.92, 0.10);
-    _drawBell(canvas, const Offset(157, 84), 0.78, 0.12);
-    _drawBell(canvas, const Offset(149, 107), 0.72, 0.10);
-    _drawBell(canvas, const Offset(106, 116), 0.84, -0.10);
+    _drawBell(canvas, const Offset(174, 205), 1.02, -0.16);
+    _drawBell(canvas, const Offset(292, 170), 1.12, 0.10);
+    _drawBell(canvas, const Offset(283, 141), 1.18, 0.09);
+    _drawBell(canvas, const Offset(301, 246), 0.96, 0.10);
+    _drawBell(canvas, const Offset(211, 234), 1.08, -0.08);
+  }
 
-    final reflection = Path()
-      ..moveTo(49, 74)
-      ..cubicTo(66, 45, 93, 31, 121, 28)
-      ..cubicTo(91, 32, 67, 49, 56, 78);
-    canvas.drawPath(
-      reflection,
-      Paint()
-        ..color = const Color(0xB9E5FFF0)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 8
-        ..strokeCap = StrokeCap.round,
-    );
-    canvas.drawPath(
-      reflection,
-      Paint()
-        ..color = const Color(0xBFFFFFFF)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.3
-        ..strokeCap = StrokeCap.round,
-    );
+  static void _drawAnimatedFireflies(Canvas canvas, double t) {
+    final particles = <(Offset, double, double, double)>[
+      (const Offset(122, 142), 12, 1.0, 0.0),
+      (const Offset(314, 112), 9, 0.8, 1.4),
+      (const Offset(348, 224), 10, 1.1, 2.2),
+      (const Offset(154, 292), 8, 0.9, 3.3),
+      (const Offset(288, 308), 7, 1.3, 4.1),
+      (const Offset(95, 258), 6, 1.2, 5.0),
+    ];
 
-    final lowerReflection = Path()
-      ..moveTo(171, 175)
-      ..cubicTo(188, 157, 199, 139, 204, 118);
+    for (var i = 0; i < particles.length; i++) {
+      final item = particles[i];
+      final base = item.$1;
+      final radius = item.$2;
+      final speed = item.$3;
+      final phase = item.$4;
+      final dx = math.sin(t * speed + phase) * (4.5 + (i % 3) * 2.0);
+      final dy = math.cos(t * (speed * 0.73) + phase * 1.2) *
+          (5.5 + (i % 2) * 2.5);
+      final pulse = 0.62 + 0.38 * (0.5 + 0.5 * math.sin(t * 2.1 + phase));
+      _drawGlow(
+        canvas,
+        base + Offset(dx, dy),
+        radius * (0.74 + pulse * 0.26),
+        i.isEven ? const Color(0xFFFFEE57) : const Color(0xFFD6FF79),
+        coreOpacity: pulse,
+      );
+    }
+  }
+
+  static void _drawInnerRefractions(Canvas canvas) {
+    final leftRefraction = Path()
+      ..moveTo(78, 174)
+      ..cubicTo(99, 126, 135, 91, 187, 73);
     canvas.drawPath(
-      lowerReflection,
+      leftRefraction,
       Paint()
-        ..color = const Color(0xA6FFF65D)
+        ..color = const Color(0x2E9BE8C0)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 10
+        ..strokeWidth = 22
         ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
     );
 
-    canvas.restore();
-
-    canvas.drawCircle(
-      center,
-      102,
+    final goldRefraction = Path()
+      ..moveTo(334, 351)
+      ..cubicTo(367, 329, 386, 291, 399, 249);
+    canvas.drawPath(
+      goldRefraction,
       Paint()
-        ..color = const Color(0xC6A9FFC1)
+        ..color = const Color(0x7AFFF672)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.2,
+        ..strokeWidth = 18
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
+    );
+  }
+
+  static void _drawGlassRim(Canvas canvas, Rect orbRect) {
+    canvas.drawCircle(
+      _center,
+      _radius,
+      Paint()
+        ..shader = const SweepGradient(
+          colors: [
+            Color(0xFFE7FFF1),
+            Color(0xFF80F0B3),
+            Color(0xFF245F47),
+            Color(0xFFECFFF0),
+            Color(0xFFF6F45A),
+            Color(0xFF3A815C),
+            Color(0xFFE7FFF1),
+          ],
+          stops: [0.0, 0.14, 0.34, 0.51, 0.67, 0.85, 1.0],
+        ).createShader(orbRect)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 7.0,
     );
     canvas.drawCircle(
-      center,
-      99.2,
+      _center,
+      _radius - 7,
       Paint()
-        ..color = const Color(0x6639CB7A)
+        ..color = const Color(0x6AB8F5D0)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.4,
+        ..strokeWidth = 2.1,
     );
+  }
 
-    canvas.restore();
+  static void _drawPrimaryReflection(Canvas canvas) {
+    final reflection = Path()
+      ..moveTo(86, 184)
+      ..cubicTo(103, 125, 145, 83, 202, 64)
+      ..cubicTo(226, 56, 250, 55, 274, 59);
+
+    canvas.drawPath(
+      reflection,
+      Paint()
+        ..color = const Color(0x62C8FFE5)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 27
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
+    );
+    canvas.drawPath(
+      reflection,
+      Paint()
+        ..shader = const LinearGradient(
+          colors: [
+            Color(0xFFFFFFFF),
+            Color(0xFFDFFFEF),
+            Color(0x66FFFFFF),
+          ],
+        ).createShader(const Rect.fromLTWH(80, 54, 200, 135))
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 12
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.drawPath(
+      reflection,
+      Paint()
+        ..color = const Color(0xFFFFFFFF)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3.0
+        ..strokeCap = StrokeCap.round,
+    );
+  }
+
+  static void _drawLowerGoldReflection(Canvas canvas) {
+    final lower = Path()
+      ..moveTo(334, 366)
+      ..cubicTo(374, 343, 401, 307, 414, 260);
+    canvas.drawPath(
+      lower,
+      Paint()
+        ..color = const Color(0xB6FFF36A)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 22
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
+    );
+    canvas.drawPath(
+      lower,
+      Paint()
+        ..color = const Color(0xEFFFF7AE)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 5
+        ..strokeCap = StrokeCap.round,
+    );
+  }
+
+  static void _drawMicroHighlights(Canvas canvas) {
+    for (final item in const [
+      (Offset(318, 77), 4.5),
+      (Offset(352, 101), 3.0),
+      (Offset(385, 164), 5.0),
+      (Offset(82, 240), 3.5),
+      (Offset(115, 322), 4.0),
+    ]) {
+      canvas.drawCircle(
+        item.$1,
+        item.$2,
+        Paint()..color = const Color(0xEFFFFFFF),
+      );
+    }
   }
 
   static void _drawGlow(
     Canvas canvas,
     Offset center,
     double radius,
-    Color color,
-  ) {
+    Color color, {
+    double coreOpacity = 1.0,
+  }) {
     canvas.drawCircle(
       center,
-      radius * 2.2,
+      radius * 2.4,
       Paint()
-        ..color = color.withValues(alpha: 0.16)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, radius * 1.6),
+        ..color = color.withValues(alpha: 0.20 * coreOpacity)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, radius * 1.4),
     );
     canvas.drawCircle(
       center,
@@ -614,32 +883,69 @@ class _LilyBubblePainter extends CustomPainter {
       Paint()
         ..shader = RadialGradient(
           colors: [
-            Colors.white.withValues(alpha: 0.98),
-            color.withValues(alpha: 0.92),
+            Colors.white.withValues(alpha: 0.98 * coreOpacity),
+            color.withValues(alpha: 0.95 * coreOpacity),
             color.withValues(alpha: 0.0),
           ],
-          stops: const [0.0, 0.42, 1.0],
+          stops: const [0.0, 0.38, 1.0],
         ).createShader(Rect.fromCircle(center: center, radius: radius)),
     );
   }
 
-  static void _drawLeaf(Canvas canvas, Path path, {bool small = false}) {
-    final bounds = path.getBounds();
+  static void _softBlob(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    Color color,
+    double blur,
+  ) {
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..color = color
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur),
+    );
+  }
+
+  static void _drawLeaf(
+    Canvas canvas,
+    Path path,
+    Rect bounds, {
+    bool small = false,
+  }) {
     canvas.drawPath(
       path,
       Paint()
         ..shader = const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFE6EF4D), Color(0xFF327B2F), Color(0xFF123B24)],
+          colors: [
+            Color(0xFFD6E74D),
+            Color(0xFF60912B),
+            Color(0xFF255421),
+            Color(0xFF102E18),
+          ],
+          stops: [0.0, 0.35, 0.72, 1.0],
         ).createShader(bounds),
     );
     canvas.drawPath(
       path,
       Paint()
-        ..color = const Color(0xB6DDF25B)
+        ..color = const Color(0xA9EAF466)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = small ? 2.2 : 2.8,
+        ..strokeWidth = small ? 3.0 : 4.2,
+    );
+
+    final vein = Path()
+      ..moveTo(bounds.left + bounds.width * 0.18, bounds.bottom - bounds.height * 0.20)
+      ..lineTo(bounds.right - bounds.width * 0.12, bounds.top + bounds.height * 0.26);
+    canvas.drawPath(
+      vein,
+      Paint()
+        ..color = const Color(0x7294C644)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = small ? 1.5 : 2.0,
     );
   }
 
@@ -654,46 +960,61 @@ class _LilyBubblePainter extends CustomPainter {
     canvas.rotate(rotation);
     canvas.scale(scale, scale);
 
-    final path = Path()
-      ..moveTo(0, -14)
-      ..cubicTo(-9, -13, -13, -2, -12, 7)
-      ..cubicTo(-10, 11, -7, 12, -4, 9)
-      ..cubicTo(-2, 14, 2, 14, 4, 9)
-      ..cubicTo(7, 12, 11, 11, 13, 7)
-      ..cubicTo(12, -3, 8, -13, 0, -14)
+    final bell = Path()
+      ..moveTo(0, -24)
+      ..cubicTo(-15, -22, -22, -7, -20, 9)
+      ..cubicTo(-18, 15, -12, 18, -7, 13)
+      ..cubicTo(-4, 21, 3, 21, 7, 13)
+      ..cubicTo(12, 18, 19, 15, 22, 9)
+      ..cubicTo(21, -8, 14, -22, 0, -24)
       ..close();
 
-    final bounds = path.getBounds();
+    final bounds = bell.getBounds();
+
     canvas.drawPath(
-      path,
+      bell,
       Paint()
-        ..color = const Color(0x99FFF55C)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
+        ..color = const Color(0x66FFF46A)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
     );
+
     canvas.drawPath(
-      path,
+      bell,
       Paint()
         ..shader = const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
             Color(0xFFFFFFFF),
-            Color(0xFFF7FFE9),
-            Color(0xFFFFF39A),
+            Color(0xFFF2FFF1),
+            Color(0xFFFFFFD1),
+            Color(0xFFF0D95D),
           ],
-          stops: [0.0, 0.55, 1.0],
+          stops: [0.0, 0.42, 0.76, 1.0],
         ).createShader(bounds),
     );
+
     canvas.drawPath(
-      path,
+      bell,
       Paint()
-        ..color = const Color(0xFFD8E65E)
+        ..color = const Color(0xFFCBDD63)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.1,
+        ..strokeWidth = 3.0,
+    );
+
+    canvas.drawOval(
+      const Rect.fromLTWH(-11, -17, 7, 19),
+      Paint()..color = const Color(0xB8FFFFFF),
     );
     canvas.drawOval(
-      const Rect.fromLTWH(-5, -10, 4, 11),
-      Paint()..color = const Color(0x96FFFFFF),
+      const Rect.fromLTWH(5, -12, 5, 13),
+      Paint()..color = const Color(0x72F7FFEE),
+    );
+
+    canvas.drawCircle(
+      const Offset(0, 10),
+      3.1,
+      Paint()..color = const Color(0xFFE8C347),
     );
 
     canvas.restore();
