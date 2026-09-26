@@ -2,6 +2,7 @@
   "styleId": "crayon_soft",
   "shapeId": "triangle",
   "version": 1,
+  "geometryMaster": "assets/shape_masters/core/basic_v1/triangle_master_v1.json",
   "body": {
     "kind": "roundedPolygon",
     "cornerRadius": 10,
