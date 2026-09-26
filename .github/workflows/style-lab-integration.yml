@@ -35,6 +35,9 @@ jobs:
       - name: Validate ShapeSpec masks
         run: python3 tool/validate_shape_masks.py
 
+      - name: Validate Sea Turtle master
+        run: python3 tool/validate_sea_turtle_master.py
+
       - name: Analyze
         run: flutter analyze
 
