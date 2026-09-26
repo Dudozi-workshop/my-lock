@@ -112,7 +112,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 015 · Soft Basic Square R1',
+                                  'LAB 016 · Soft Basic Square R2 · Reference Highlight',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -2097,169 +2097,204 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
 
     canvas.restore();
 
-    final highlight = switch (candidate.highlightTechnique) {
-      SoftBasicSquareHighlightTechnique.flatInset => Path()
-        ..moveTo(
-          rect.left + rect.width * 0.16,
-          rect.top + rect.height * 0.34,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.16,
-          rect.top + rect.height * 0.23,
-          rect.left + rect.width * 0.22,
-          rect.top + rect.height * 0.16,
-          rect.left + rect.width * 0.30,
-          rect.top + rect.height * 0.14,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.36,
-          rect.top + rect.height * 0.13,
-          rect.left + rect.width * 0.40,
-          rect.top + rect.height * 0.17,
-          rect.left + rect.width * 0.38,
-          rect.top + rect.height * 0.22,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.35,
-          rect.top + rect.height * 0.27,
-          rect.left + rect.width * 0.23,
-          rect.top + rect.height * 0.36,
-          rect.left + rect.width * 0.16,
-          rect.top + rect.height * 0.34,
-        )
-        ..close(),
-      SoftBasicSquareHighlightTechnique.shortCompact => Path()
-        ..moveTo(
-          rect.left + rect.width * 0.17,
-          rect.top + rect.height * 0.32,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.17,
-          rect.top + rect.height * 0.24,
-          rect.left + rect.width * 0.22,
-          rect.top + rect.height * 0.17,
-          rect.left + rect.width * 0.29,
-          rect.top + rect.height * 0.15,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.34,
-          rect.top + rect.height * 0.14,
-          rect.left + rect.width * 0.37,
-          rect.top + rect.height * 0.18,
-          rect.left + rect.width * 0.35,
-          rect.top + rect.height * 0.22,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.32,
-          rect.top + rect.height * 0.26,
-          rect.left + rect.width * 0.23,
-          rect.top + rect.height * 0.33,
-          rect.left + rect.width * 0.17,
-          rect.top + rect.height * 0.32,
-        )
-        ..close(),
-      SoftBasicSquareHighlightTechnique.taperedEdge => Path()
-        ..moveTo(
-          rect.left + rect.width * 0.16,
-          rect.top + rect.height * 0.35,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.16,
-          rect.top + rect.height * 0.24,
-          rect.left + rect.width * 0.22,
-          rect.top + rect.height * 0.16,
-          rect.left + rect.width * 0.30,
-          rect.top + rect.height * 0.14,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.36,
-          rect.top + rect.height * 0.13,
-          rect.left + rect.width * 0.41,
-          rect.top + rect.height * 0.17,
-          rect.left + rect.width * 0.40,
-          rect.top + rect.height * 0.20,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.39,
-          rect.top + rect.height * 0.22,
-          rect.left + rect.width * 0.36,
-          rect.top + rect.height * 0.23,
-          rect.left + rect.width * 0.34,
-          rect.top + rect.height * 0.24,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.29,
-          rect.top + rect.height * 0.29,
-          rect.left + rect.width * 0.22,
-          rect.top + rect.height * 0.36,
-          rect.left + rect.width * 0.16,
-          rect.top + rect.height * 0.35,
-        )
-        ..close(),
-      SoftBasicSquareHighlightTechnique.round1Base => Path()
-        ..moveTo(
-          rect.left + rect.width * 0.12,
-          rect.top + rect.height * 0.36,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.12,
-          rect.top + rect.height * 0.23,
-          rect.left + rect.width * 0.18,
-          rect.top + rect.height * 0.13,
-          rect.left + rect.width * 0.30,
-          rect.top + rect.height * 0.11,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.39,
-          rect.top + rect.height * 0.10,
-          rect.left + rect.width * 0.42,
-          rect.top + rect.height * 0.16,
-          rect.left + rect.width * 0.39,
-          rect.top + rect.height * 0.22,
-        )
-        ..cubicTo(
-          rect.left + rect.width * 0.34,
-          rect.top + rect.height * 0.29,
-          rect.left + rect.width * 0.18,
-          rect.top + rect.height * 0.40,
-          rect.left + rect.width * 0.12,
-          rect.top + rect.height * 0.36,
-        )
-        ..close(),
-    };
+    _paintSquareReferenceHighlight(
+      canvas,
+      rect,
+      size,
+      candidate.highlightTechnique,
+    );
+  }
 
-    final highlightAlpha = switch (candidate.highlightTechnique) {
-      SoftBasicSquareHighlightTechnique.flatInset => 0.70,
-      SoftBasicSquareHighlightTechnique.shortCompact => 0.72,
-      SoftBasicSquareHighlightTechnique.taperedEdge => 0.70,
-      SoftBasicSquareHighlightTechnique.round1Base => 0.74,
-    };
+  void _paintSquareReferenceHighlight(
+    Canvas canvas,
+    Rect rect,
+    Size size,
+    SoftBasicSquareHighlightTechnique technique,
+  ) {
+    switch (technique) {
+      case SoftBasicSquareHighlightTechnique.flatInset:
+        _paintGlossPill(
+          canvas,
+          center: Offset(
+            rect.left + rect.width * 0.245,
+            rect.top + rect.height * 0.255,
+          ),
+          width: rect.width * 0.145,
+          height: rect.height * 0.285,
+          rotation: 0.30,
+          softAlpha: 0.20,
+          faceAlpha: 0.76,
+          blur: size.shortestSide * 0.020,
+        );
+      case SoftBasicSquareHighlightTechnique.shortCompact:
+        _paintGlossPill(
+          canvas,
+          center: Offset(
+            rect.left + rect.width * 0.235,
+            rect.top + rect.height * 0.245,
+          ),
+          width: rect.width * 0.170,
+          height: rect.height * 0.245,
+          rotation: 0.26,
+          softAlpha: 0.22,
+          faceAlpha: 0.70,
+          blur: size.shortestSide * 0.024,
+        );
+      case SoftBasicSquareHighlightTechnique.taperedEdge:
+        final path = Path()
+          ..moveTo(
+            rect.left + rect.width * 0.185,
+            rect.top + rect.height * 0.365,
+          )
+          ..cubicTo(
+            rect.left + rect.width * 0.150,
+            rect.top + rect.height * 0.305,
+            rect.left + rect.width * 0.165,
+            rect.top + rect.height * 0.205,
+            rect.left + rect.width * 0.235,
+            rect.top + rect.height * 0.135,
+          )
+          ..cubicTo(
+            rect.left + rect.width * 0.275,
+            rect.top + rect.height * 0.095,
+            rect.left + rect.width * 0.330,
+            rect.top + rect.height * 0.105,
+            rect.left + rect.width * 0.342,
+            rect.top + rect.height * 0.145,
+          )
+          ..cubicTo(
+            rect.left + rect.width * 0.350,
+            rect.top + rect.height * 0.175,
+            rect.left + rect.width * 0.325,
+            rect.top + rect.height * 0.205,
+            rect.left + rect.width * 0.300,
+            rect.top + rect.height * 0.235,
+          )
+          ..cubicTo(
+            rect.left + rect.width * 0.260,
+            rect.top + rect.height * 0.285,
+            rect.left + rect.width * 0.220,
+            rect.top + rect.height * 0.350,
+            rect.left + rect.width * 0.185,
+            rect.top + rect.height * 0.365,
+          )
+          ..close();
 
-    final softBlur = switch (candidate.highlightTechnique) {
-      SoftBasicSquareHighlightTechnique.flatInset => 0.066,
-      SoftBasicSquareHighlightTechnique.shortCompact => 0.058,
-      SoftBasicSquareHighlightTechnique.taperedEdge => 0.060,
-      SoftBasicSquareHighlightTechnique.round1Base => 0.080,
-    };
+        canvas.drawPath(
+          path,
+          Paint()
+            ..color = Colors.white.withValues(alpha: 0.18)
+            ..maskFilter = MaskFilter.blur(
+              BlurStyle.normal,
+              size.shortestSide * 0.055,
+            ),
+        );
+        canvas.drawPath(
+          path,
+          Paint()
+            ..color = Colors.white.withValues(alpha: 0.72)
+            ..maskFilter = MaskFilter.blur(
+              BlurStyle.normal,
+              size.shortestSide * 0.018,
+            ),
+        );
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(
+              rect.left + rect.width * 0.280,
+              rect.top + rect.height * 0.145,
+            ),
+            width: rect.width * 0.040,
+            height: rect.height * 0.065,
+          ),
+          Paint()
+            ..color = Colors.white.withValues(alpha: 0.92)
+            ..maskFilter = MaskFilter.blur(
+              BlurStyle.normal,
+              size.shortestSide * 0.009,
+            ),
+        );
+      case SoftBasicSquareHighlightTechnique.round1Base:
+        _paintGlossPill(
+          canvas,
+          center: Offset(
+            rect.left + rect.width * 0.225,
+            rect.top + rect.height * 0.245,
+          ),
+          width: rect.width * 0.130,
+          height: rect.height * 0.225,
+          rotation: 0.22,
+          softAlpha: 0.16,
+          faceAlpha: 0.68,
+          blur: size.shortestSide * 0.023,
+        );
+    }
+  }
 
-    canvas.drawPath(
-      highlight,
+  void _paintGlossPill(
+    Canvas canvas, {
+    required Offset center,
+    required double width,
+    required double height,
+    required double rotation,
+    required double softAlpha,
+    required double faceAlpha,
+    required double blur,
+  }) {
+    final pillRect = Rect.fromCenter(
+      center: center,
+      width: width,
+      height: height,
+    );
+    final pill = RRect.fromRectAndRadius(
+      pillRect,
+      Radius.circular(width * 0.52),
+    );
+
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    canvas.rotate(rotation);
+    canvas.translate(-center.dx, -center.dy);
+
+    canvas.drawRRect(
+      pill.inflate(width * 0.12),
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.15)
+        ..color = Colors.white.withValues(alpha: softAlpha)
         ..maskFilter = MaskFilter.blur(
           BlurStyle.normal,
-          size.shortestSide * softBlur,
+          blur * 2.6,
         ),
     );
-    canvas.drawPath(
-      highlight,
+
+    canvas.drawRRect(
+      pill,
       Paint()
-        ..color = Colors.white.withValues(alpha: highlightAlpha)
+        ..color = Colors.white.withValues(alpha: faceAlpha)
         ..maskFilter = MaskFilter.blur(
           BlurStyle.normal,
-          size.shortestSide * 0.022,
+          blur,
         ),
     );
+
+    final coreCenter = Offset(
+      center.dx + width * 0.05,
+      center.dy - height * 0.29,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: coreCenter,
+        width: width * 0.30,
+        height: height * 0.16,
+      ),
+      Paint()
+        ..color = Colors.white.withValues(alpha: 0.94)
+        ..maskFilter = MaskFilter.blur(
+          BlurStyle.normal,
+          blur * 0.45,
+        ),
+    );
+
+    canvas.restore();
   }
 
   @override
