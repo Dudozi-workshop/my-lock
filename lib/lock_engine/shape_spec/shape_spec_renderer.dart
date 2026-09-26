@@ -443,6 +443,76 @@ class ShapeSpecRenderer {
     canvas.restore();
     canvas.restore();
 
+    // Round 2: restore the deliberately thick hand-drawn contour as its own
+    // layer. Sparse erasures are applied only to this contour layer, so the
+    // outline can look dry and imperfect without losing its structural role.
+    if (config.contourBaseWidth > 0 && config.contourBaseOpacity > 0) {
+      final contourBounds =
+          bodyPath.getBounds().inflate(config.contourBaseWidth * 1.8 + 2.0);
+      canvas.saveLayer(contourBounds, Paint());
+      canvas.drawPath(
+        bodyPath,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeJoin = StrokeJoin.round
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = config.contourBaseWidth
+          ..color = pressureDark.withValues(
+            alpha: config.contourBaseOpacity * opacity,
+          ),
+      );
+
+      if (config.contourGapCount > 0 && config.contourGapStrength > 0) {
+        final contourRandom = Random(
+          _stableSeed(
+            '${style.id}:${token.id}:CONTOUR:${_crayonConfigKey(config)}',
+          ),
+        );
+        final metrics = bodyPath.computeMetrics().toList(growable: false);
+        if (metrics.isNotEmpty) {
+          final totalLength = metrics.fold<double>(
+            0.0,
+            (sum, metric) => sum + metric.length,
+          );
+          final minLength = max(0.5, config.contourGapLengthMin);
+          final maxLength = max(minLength, config.contourGapLengthMax);
+          for (var i = 0; i < config.contourGapCount; i++) {
+            var target = contourRandom.nextDouble() * totalLength;
+            for (final metric in metrics) {
+              if (target <= metric.length) {
+                final gapLength =
+                    minLength +
+                    contourRandom.nextDouble() * (maxLength - minLength);
+                final startGap = max(0.0, target - gapLength / 2);
+                final endGap = min(metric.length, target + gapLength / 2);
+                if (endGap > startGap + 0.2) {
+                  canvas.drawPath(
+                    metric.extractPath(startGap, endGap),
+                    Paint()
+                      ..style = PaintingStyle.stroke
+                      ..strokeJoin = StrokeJoin.round
+                      ..strokeCap = StrokeCap.round
+                      ..strokeWidth = max(
+                        0.45,
+                        config.contourBaseWidth *
+                            config.contourGapWidthScale,
+                      )
+                      ..blendMode = BlendMode.dstOut
+                      ..color = Colors.white.withValues(
+                        alpha: config.contourGapStrength * opacity,
+                      ),
+                  );
+                }
+                break;
+              }
+              target -= metric.length;
+            }
+          }
+        }
+      }
+      canvas.restore();
+    }
+
     if (config.edgeOpacity <= 0 ||
         config.edgeMode == CrayonEdgeMode.none) {
       return;
@@ -1075,6 +1145,13 @@ class ShapeSpecRenderer {
       config.paperToothStrength,
       config.grainRadiusMin,
       config.grainRadiusMax,
+      config.contourBaseWidth,
+      config.contourBaseOpacity,
+      config.contourGapCount,
+      config.contourGapLengthMin,
+      config.contourGapLengthMax,
+      config.contourGapWidthScale,
+      config.contourGapStrength,
     ].join(':');
   }
 
