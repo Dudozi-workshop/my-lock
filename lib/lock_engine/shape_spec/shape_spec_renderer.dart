@@ -400,12 +400,32 @@ class ShapeSpecRenderer {
       paintStroke(stroke);
     }
 
+    // Pigment clumps are wax deposits, not pale decorative dots.
+    // Darker low-alpha flecks make overlapping pigment visible while the
+    // paper-tooth pass below removes pigment to expose the real background.
     final grainPaint = Paint()
-      ..color = pressureLight.withValues(
-        alpha: config.grainOpacity * 0.72 * opacity,
+      ..color = pressureDark.withValues(
+        alpha: config.grainOpacity * 0.78 * opacity,
       );
     for (final dot in texture.grain) {
       canvas.drawCircle(dot.center, dot.radius, grainPaint);
+    }
+
+    if (texture.paperTooth.isNotEmpty) {
+      for (final tooth in texture.paperTooth) {
+        canvas.drawPath(
+          tooth.path,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeCap = StrokeCap.round
+            ..strokeJoin = StrokeJoin.round
+            ..strokeWidth = tooth.width
+            ..blendMode = BlendMode.dstOut
+            ..color = Colors.white.withValues(
+              alpha: tooth.strength * opacity,
+            ),
+        );
+      }
     }
 
     if (texture.negativeGaps.isNotEmpty && config.negativeGapWidth > 0) {
@@ -607,12 +627,23 @@ class ShapeSpecRenderer {
         }
 
         final fraction = count <= 1 ? 0.5 : i / (count - 1);
-        final lane = -66 +
-            fraction * 132 +
+        final evenLane = -66 + fraction * 132;
+        final randomLane = -66 + random.nextDouble() * 132;
+        final laneScatter = config.laneScatter.clamp(0.0, 1.0);
+        final lane = evenLane * (1 - laneScatter) +
+            randomLane * laneScatter +
             (random.nextDouble() - 0.5) * config.jitter * 2.2;
+
+        final passCount = config.directionPassCount.clamp(1, 5);
+        final passIndex = i % passCount;
+        final passPosition = passCount <= 1
+            ? 0.0
+            : -1.0 + 2.0 * passIndex / (passCount - 1);
+        final passAngle = passPosition * config.directionSpreadDeg;
         final localAngle =
             config.angleDeg +
             angleOffset +
+            passAngle +
             (random.nextDouble() - 0.5) * 2 * config.angleJitterDeg;
         final angle = localAngle * pi / 180;
         final direction = Offset(cos(angle), sin(angle));
@@ -663,10 +694,20 @@ class ShapeSpecRenderer {
           }
         }
 
+        final pressureVariation =
+            config.pressureVariation.clamp(0.0, 1.0);
         final widthJitter =
-            1 + (random.nextDouble() - 0.5) * 2 * config.strokeWidthJitter;
+            1 +
+            (random.nextDouble() - 0.5) * 2 * config.strokeWidthJitter +
+            (random.nextDouble() - 0.5) * 2 * pressureVariation * 0.42;
         final actualWidth = max(0.35, nominalWidth * widthJitter);
-        final opacityJitter = 0.78 + random.nextDouble() * 0.36;
+        final opacityJitter =
+            (0.78 + random.nextDouble() * 0.36) *
+            (1 +
+                (random.nextDouble() - 0.5) *
+                    2 *
+                    pressureVariation *
+                    0.48);
         final toneRoll = random.nextDouble();
         final toneBand = toneRoll < 0.24
             ? -1
@@ -823,7 +864,53 @@ class ShapeSpecRenderer {
       }
     }
 
+    final paperTooth = <_CrayonPaperToothMark>[];
+    if (config.paperToothCount > 0 && config.paperToothStrength > 0) {
+      final minWidth = max(0.12, config.paperToothWidthMin);
+      final maxWidth = max(minWidth, config.paperToothWidthMax);
+      final minLength = max(0.35, config.paperToothLengthMin);
+      final maxLength = max(minLength, config.paperToothLengthMax);
+      for (var i = 0; i < config.paperToothCount; i++) {
+        final center = Offset(
+          4 + random.nextDouble() * 92,
+          4 + random.nextDouble() * 92,
+        );
+        final localAngle =
+            (config.angleDeg +
+                    (random.nextDouble() - 0.5) *
+                        max(26.0, config.directionSpreadDeg * 2.2 + 18.0))
+                * pi /
+                180;
+        final direction = Offset(cos(localAngle), sin(localAngle));
+        final length =
+            minLength + random.nextDouble() * (maxLength - minLength);
+        final sideJitter =
+            Offset(-direction.dy, direction.dx) *
+            ((random.nextDouble() - 0.5) * config.jitter * 0.35);
+        final start = center - direction * (length / 2) + sideJitter;
+        final end = center + direction * (length / 2) - sideJitter * 0.3;
+        final mid =
+            Offset.lerp(start, end, 0.5)! +
+            Offset(-direction.dy, direction.dx) *
+                ((random.nextDouble() - 0.5) * min(0.9, config.jitter * 0.22));
+        final path = Path()
+          ..moveTo(start.dx, start.dy)
+          ..quadraticBezierTo(mid.dx, mid.dy, end.dx, end.dy);
+        paperTooth.add(
+          _CrayonPaperToothMark(
+            path: path,
+            width: minWidth + random.nextDouble() * (maxWidth - minWidth),
+            strength: (config.paperToothStrength *
+                    (0.62 + random.nextDouble() * 0.38))
+                .clamp(0.0, 1.0),
+          ),
+        );
+      }
+    }
+
     final grain = <_CrayonGrainDot>[];
+    final minGrainRadius = max(0.08, config.grainRadiusMin);
+    final maxGrainRadius = max(minGrainRadius, config.grainRadiusMax);
     for (var i = 0; i < config.grainCount; i++) {
       grain.add(
         _CrayonGrainDot(
@@ -831,7 +918,8 @@ class ShapeSpecRenderer {
             5 + random.nextDouble() * 90,
             5 + random.nextDouble() * 90,
           ),
-          0.18 + random.nextDouble() * 0.58,
+          minGrainRadius +
+              random.nextDouble() * (maxGrainRadius - minGrainRadius),
         ),
       );
     }
@@ -841,6 +929,7 @@ class ShapeSpecRenderer {
       mainStrokes: mainStrokes,
       lightPigmentStrokes: lightPigmentStrokes,
       negativeGaps: negativeGaps,
+      paperTooth: paperTooth,
       baseStrokes: const [],
       darkStrokes: const [],
       lightStrokes: const [],
@@ -974,6 +1063,18 @@ class ShapeSpecRenderer {
       config.internalStrandCount,
       config.internalStrandSpread,
       config.internalGapOffsetJitter,
+      config.directionPassCount,
+      config.directionSpreadDeg,
+      config.laneScatter,
+      config.pressureVariation,
+      config.paperToothCount,
+      config.paperToothWidthMin,
+      config.paperToothWidthMax,
+      config.paperToothLengthMin,
+      config.paperToothLengthMax,
+      config.paperToothStrength,
+      config.grainRadiusMin,
+      config.grainRadiusMax,
     ].join(':');
   }
 
@@ -1175,6 +1276,7 @@ class _CrayonTextureGeometry {
     this.mainStrokes = const [],
     this.lightPigmentStrokes = const [],
     this.negativeGaps = const [],
+    this.paperTooth = const [],
     required this.baseStrokes,
     required this.darkStrokes,
     required this.lightStrokes,
@@ -1185,6 +1287,7 @@ class _CrayonTextureGeometry {
   final List<_CrayonStroke> mainStrokes;
   final List<_CrayonStroke> lightPigmentStrokes;
   final List<Path> negativeGaps;
+  final List<_CrayonPaperToothMark> paperTooth;
   final List<Path> baseStrokes;
   final List<Path> darkStrokes;
   final List<Path> lightStrokes;
@@ -1209,6 +1312,18 @@ class _CrayonStroke {
 
 class _CrayonInternalGap {
   const _CrayonInternalGap({
+    required this.path,
+    required this.width,
+    required this.strength,
+  });
+
+  final Path path;
+  final double width;
+  final double strength;
+}
+
+class _CrayonPaperToothMark {
+  const _CrayonPaperToothMark({
     required this.path,
     required this.width,
     required this.strength,
