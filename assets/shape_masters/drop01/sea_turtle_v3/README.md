@@ -37,14 +37,18 @@ from the approved reference while preserving the locked silhouette and proportio
 1. Locked Master Shape Reference
 2. 2048 transparent Canonical Master
 3. Master Alpha
-4. Shell / Belly / Shell Detail semantic masks
+4. Shell / Belly / Shell Detail semantic masks, including hidden underlap
 5. Static Body / Front Far F0 / Front Near F0
-6. Per-part Alpha / Outline / Shadow / Highlight ownership
-7. F0 rebuild QA
-8. Asset Split QA
-9. Static Master Lock
-10. runtime_v3 export
-11. Shape Animation
+6. Geometry QA/QC: ownership / overlap / gap / reveal checks
+7. Material decomposition: Albedo / Shadow / Highlight / Detail / Outline
+8. Basic material recomposition QA
+9. Aurora Sea dynamic-material PoC
+10. Runtime ShapeMaterialCompositor
+11. Static Master Lock
+12. runtime_v3 export
+13. Shape Animation
+
+See `MATERIAL_COMPOSITOR.md` for the hybrid bake/runtime policy.
 
 ## Animation policy
 Shape Animation remains deferred until Static Master Lock. Whole-object movement belongs to Motion Set / FloatingEngine. Internal front-flipper articulation belongs to Shape Animation.
