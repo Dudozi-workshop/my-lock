@@ -115,7 +115,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 033 · Soft Basic Triangle Final Material Round',
+                                  'LAB 034 · Soft Basic Triangle Direction Round 1',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -2141,9 +2141,9 @@ class _SharedTriangleMasterLabState extends State<_SharedTriangleMasterLab> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Triangle · Final Material Round',
+          title: 'Soft Basic · Triangle · Direction Round 1',
           subtitle:
-              'Triangle Geometry는 Canonical Master(R10)로 고정. 모양은 건드리지 않고 Highlight · Shade · Ambient Bounce의 위치와 강도만 최종 비교합니다.',
+              'Triangle Geometry는 Canonical Master(R10)로 고정. 1차에서는 미세 수치 조정이 아니라 Gloss Cap · Dual Spec · Edge Sweep · Bevel · Dome · Bounce처럼 서로 다른 입체 표현 방식 자체를 비교합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -2565,12 +2565,80 @@ class _TriangleMaterialPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final highlightTransform = ShapeLayerTransform(
-      scaleX: candidate.highlightScaleX,
-      scaleY: candidate.highlightScaleY,
-      offsetX: candidate.highlightOffsetX,
-      offsetY: candidate.highlightOffsetY,
-    );
+    final baseOverrides = switch (candidate.approach) {
+      SoftBasicTriangleApproach.current => const ShapeRenderOverrides(),
+      SoftBasicTriangleApproach.glossCap => const ShapeRenderOverrides(
+          layerOpacityScaleById: <String, double>{
+            'edge_leaf': 0.15,
+            'edge_leaf_halo': 0.18,
+            'airbrush_light': 1.05,
+            'airbrush_shade': 1.12,
+            'ambient_bounce': 0.85,
+            'ambient_core': 0.55,
+          },
+        ),
+      SoftBasicTriangleApproach.dualSpec => const ShapeRenderOverrides(
+          layerOpacityScaleById: <String, double>{
+            'edge_leaf': 0.0,
+            'edge_leaf_halo': 0.0,
+            'airbrush_light': 0.92,
+            'airbrush_shade': 1.08,
+            'ambient_bounce': 0.88,
+            'ambient_core': 0.45,
+          },
+        ),
+      SoftBasicTriangleApproach.edgeSweep => const ShapeRenderOverrides(
+          layerOpacityScaleById: <String, double>{
+            'edge_leaf': 0.0,
+            'edge_leaf_halo': 0.0,
+            'airbrush_light': 0.88,
+            'airbrush_shade': 1.0,
+            'ambient_bounce': 0.90,
+          },
+        ),
+      SoftBasicTriangleApproach.bevelRim => const ShapeRenderOverrides(
+          layerOpacityScaleById: <String, double>{
+            'edge_leaf': 0.0,
+            'edge_leaf_halo': 0.0,
+            'airbrush_light': 0.68,
+            'airbrush_shade': 0.78,
+            'ambient_bounce': 0.55,
+            'ambient_core': 0.35,
+          },
+        ),
+      SoftBasicTriangleApproach.domeVolume => const ShapeRenderOverrides(
+          layerOpacityScaleById: <String, double>{
+            'edge_leaf': 0.22,
+            'edge_leaf_halo': 0.26,
+            'airbrush_light': 1.25,
+            'airbrush_shade': 1.22,
+            'ambient_bounce': 1.05,
+            'ambient_core': 0.70,
+          },
+        ),
+      SoftBasicTriangleApproach.bottomBounce => const ShapeRenderOverrides(
+          layerOpacityScaleById: <String, double>{
+            'edge_leaf': 0.30,
+            'edge_leaf_halo': 0.34,
+            'airbrush_light': 0.78,
+            'airbrush_shade': 1.28,
+            'ambient_bounce': 1.35,
+            'ambient_core': 0.85,
+            'ambient_depth': 1.25,
+          },
+        ),
+      SoftBasicTriangleApproach.sculptedHybrid => const ShapeRenderOverrides(
+          layerOpacityScaleById: <String, double>{
+            'edge_leaf': 0.0,
+            'edge_leaf_halo': 0.0,
+            'airbrush_light': 1.08,
+            'airbrush_shade': 1.20,
+            'ambient_bounce': 1.16,
+            'ambient_core': 0.62,
+            'ambient_depth': 1.08,
+          },
+        ),
+    };
 
     ShapeSpecRenderer.paintToken(
       canvas,
@@ -2579,42 +2647,259 @@ class _TriangleMaterialPainter extends CustomPainter {
       token: LockToken(shape: ShapeKind.triangle, tone: tone),
       style: ShapeStyle.softBasic,
       opacity: 1,
-      overrides: ShapeRenderOverrides(
-        layerOpacityScaleById: <String, double>{
-          'edge_leaf': candidate.highlightOpacityScale,
-          'edge_leaf_halo': candidate.haloOpacityScale,
-          'airbrush_light': candidate.lightOpacityScale,
-          'airbrush_shade': candidate.shadeOpacityScale,
-          'ambient_bounce': candidate.bounceOpacityScale,
-          'ambient_core': candidate.coreOpacityScale,
-          'ambient_depth': candidate.depthOpacityScale,
-        },
-        layerTransformById: <String, ShapeLayerTransform>{
-          'edge_leaf': highlightTransform,
-          'edge_leaf_halo': highlightTransform,
-          'airbrush_light': ShapeLayerTransform(
-            scaleX: candidate.lightScaleX,
-            scaleY: candidate.lightScaleY,
-            offsetX: candidate.lightOffsetX,
-            offsetY: candidate.lightOffsetY,
-          ),
-          'airbrush_shade': ShapeLayerTransform(
-            scaleX: candidate.shadeScaleX,
-            scaleY: candidate.shadeScaleY,
-            offsetX: candidate.shadeOffsetX,
-            offsetY: candidate.shadeOffsetY,
-          ),
-          'ambient_bounce': ShapeLayerTransform(
-            scaleX: candidate.bounceScaleX,
-            scaleY: candidate.bounceScaleY,
-            offsetX: candidate.bounceOffsetX,
-            offsetY: candidate.bounceOffsetY,
-          ),
-        },
-        shadowOpacityScale: candidate.shadowOpacityScale,
-        shadowElevationScale: candidate.shadowElevationScale,
-      ),
+      overrides: baseOverrides,
     );
+
+    if (candidate.approach != SoftBasicTriangleApproach.current) {
+      _paintDirectionOverlay(canvas, size);
+    }
+  }
+
+  void _paintDirectionOverlay(Canvas canvas, Size size) {
+    final sx = size.width / 100;
+    final sy = size.height / 100;
+    final triangle = Path()
+      ..moveTo(50 * sx, 4 * sy)
+      ..lineTo(96 * sx, 91 * sy)
+      ..lineTo(4 * sx, 91 * sy)
+      ..close();
+
+    canvas.save();
+    canvas.clipPath(triangle);
+
+    final white = Colors.white;
+    final deep = _deepTone(tone);
+
+    switch (candidate.approach) {
+      case SoftBasicTriangleApproach.current:
+        break;
+
+      case SoftBasicTriangleApproach.glossCap:
+        _paintGlossEllipse(
+          canvas,
+          Rect.fromCenter(
+            center: Offset(34 * sx, 31 * sy),
+            width: 29 * sx,
+            height: 48 * sy,
+          ),
+          white,
+          0.74,
+          -0.55,
+        );
+        _paintFormShade(canvas, size, deep, 0.23, 72, 72, 43, 34);
+        break;
+
+      case SoftBasicTriangleApproach.dualSpec:
+        _paintGlossEllipse(
+          canvas,
+          Rect.fromCenter(
+            center: Offset(33 * sx, 30 * sy),
+            width: 26 * sx,
+            height: 43 * sy,
+          ),
+          white,
+          0.52,
+          -0.58,
+        );
+        _paintGlossEllipse(
+          canvas,
+          Rect.fromCenter(
+            center: Offset(39 * sx, 43 * sy),
+            width: 10 * sx,
+            height: 20 * sy,
+          ),
+          white,
+          0.86,
+          -0.58,
+        );
+        _paintFormShade(canvas, size, deep, 0.20, 72, 72, 41, 33);
+        break;
+
+      case SoftBasicTriangleApproach.edgeSweep:
+        final p = Path()
+          ..moveTo(28 * sx, 49 * sy)
+          ..cubicTo(
+            30 * sx,
+            36 * sy,
+            36 * sx,
+            21 * sy,
+            45 * sx,
+            13 * sy,
+          );
+        final paint = Paint()
+          ..color = white.withValues(alpha: 0.72)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 7.5 * sx
+          ..strokeCap = StrokeCap.round
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, 2.2 * sx);
+        canvas.drawPath(p, paint);
+        _paintFormShade(canvas, size, deep, 0.20, 72, 74, 42, 34);
+        break;
+
+      case SoftBasicTriangleApproach.bevelRim:
+        final lightPath = Path()
+          ..moveTo(21 * sx, 65 * sy)
+          ..lineTo(47 * sx, 14 * sy);
+        final lightPaint = Paint()
+          ..color = white.withValues(alpha: 0.50)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 5.2 * sx
+          ..strokeCap = StrokeCap.round
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, 1.8 * sx);
+        canvas.drawPath(lightPath, lightPaint);
+
+        final shadePath = Path()
+          ..moveTo(55 * sx, 17 * sy)
+          ..lineTo(88 * sx, 80 * sy)
+          ..lineTo(23 * sx, 85 * sy);
+        final shadePaint = Paint()
+          ..color = deep.withValues(alpha: 0.22)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 5.8 * sx
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, 2.2 * sx);
+        canvas.drawPath(shadePath, shadePaint);
+        break;
+
+      case SoftBasicTriangleApproach.domeVolume:
+        final lightPaint = Paint()
+          ..shader = ui.Gradient.radial(
+            Offset(39 * sx, 35 * sy),
+            42 * sx,
+            [
+              white.withValues(alpha: 0.44),
+              white.withValues(alpha: 0.12),
+              white.withValues(alpha: 0.0),
+            ],
+            const [0.0, 0.56, 1.0],
+          );
+        canvas.drawRect(Offset.zero & size, lightPaint);
+        _paintFormShade(canvas, size, deep, 0.28, 72, 75, 46, 38);
+        break;
+
+      case SoftBasicTriangleApproach.bottomBounce:
+        _paintFormShade(canvas, size, deep, 0.31, 73, 69, 46, 37);
+        final bounce = Paint()
+          ..shader = ui.Gradient.radial(
+            Offset(49 * sx, 79 * sy),
+            35 * sx,
+            [
+              white.withValues(alpha: 0.32),
+              white.withValues(alpha: 0.08),
+              white.withValues(alpha: 0.0),
+            ],
+            const [0.0, 0.62, 1.0],
+          );
+        canvas.drawRect(Offset.zero & size, bounce);
+        break;
+
+      case SoftBasicTriangleApproach.sculptedHybrid:
+        _paintGlossEllipse(
+          canvas,
+          Rect.fromCenter(
+            center: Offset(34 * sx, 30 * sy),
+            width: 27 * sx,
+            height: 46 * sy,
+          ),
+          white,
+          0.64,
+          -0.56,
+        );
+        _paintGlossEllipse(
+          canvas,
+          Rect.fromCenter(
+            center: Offset(38 * sx, 42 * sy),
+            width: 8 * sx,
+            height: 15 * sy,
+          ),
+          white,
+          0.86,
+          -0.56,
+        );
+        _paintFormShade(canvas, size, deep, 0.29, 72, 72, 45, 36);
+        final bounce = Paint()
+          ..shader = ui.Gradient.radial(
+            Offset(49 * sx, 80 * sy),
+            31 * sx,
+            [
+              white.withValues(alpha: 0.25),
+              white.withValues(alpha: 0.06),
+              white.withValues(alpha: 0.0),
+            ],
+            const [0.0, 0.60, 1.0],
+          );
+        canvas.drawRect(Offset.zero & size, bounce);
+        break;
+    }
+
+    canvas.restore();
+  }
+
+  void _paintGlossEllipse(
+    Canvas canvas,
+    Rect rect,
+    Color color,
+    double opacity,
+    double rotation,
+  ) {
+    canvas.save();
+    canvas.translate(rect.center.dx, rect.center.dy);
+    canvas.rotate(rotation);
+    canvas.translate(-rect.center.dx, -rect.center.dy);
+    final paint = Paint()
+      ..shader = ui.Gradient.linear(
+        rect.topLeft,
+        rect.bottomRight,
+        [
+          color.withValues(alpha: opacity),
+          color.withValues(alpha: opacity * 0.40),
+          color.withValues(alpha: 0.0),
+        ],
+        const [0.0, 0.58, 1.0],
+      )
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, rect.width * 0.055);
+    canvas.drawOval(rect, paint);
+    canvas.restore();
+  }
+
+  void _paintFormShade(
+    Canvas canvas,
+    Size size,
+    Color color,
+    double opacity,
+    double cx,
+    double cy,
+    double rx,
+    double ry,
+  ) {
+    final sx = size.width / 100;
+    final sy = size.height / 100;
+    final rect = Rect.fromCenter(
+      center: Offset(cx * sx, cy * sy),
+      width: rx * 2 * sx,
+      height: ry * 2 * sy,
+    );
+    final paint = Paint()
+      ..shader = ui.Gradient.radial(
+        rect.center,
+        rect.width * 0.52,
+        [
+          color.withValues(alpha: opacity),
+          color.withValues(alpha: opacity * 0.30),
+          color.withValues(alpha: 0.0),
+        ],
+        const [0.0, 0.62, 1.0],
+      );
+    canvas.drawOval(rect, paint);
+  }
+
+  Color _deepTone(ShapeTone tone) {
+    return switch (tone) {
+      ShapeTone.pink => const Color(0xFFB72F86),
+      ShapeTone.blue => const Color(0xFF2874BC),
+      ShapeTone.yellow => const Color(0xFFC99A18),
+    };
   }
 
   @override
