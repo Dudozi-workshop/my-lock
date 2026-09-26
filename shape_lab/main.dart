@@ -1496,7 +1496,7 @@ class _SoftBasicCandidateLab extends StatefulWidget {
 
 class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
   int selectedIndex = 0;
-  bool squareMode = true;
+  bool squareMode = false;
 
   @override
   Widget build(BuildContext context) {
@@ -1509,18 +1509,27 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
         onBackToCircle: () => setState(() => squareMode = false),
       );
     }
-    final selected = softBasicCircleRound11Candidates[selectedIndex];
+    final selected = softBasicCircleRound9NaturalCandidates[selectedIndex];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Circle · Round 11 · Ambient Bounce Refinement',
-          subtitle: 'R10-06 Ambient Bounce를 기준으로 58px 실사용 체감을 강화합니다. 흰색 선은 추가하지 않고 강도·범위·색 대비·비대칭·음영 완화만 비교합니다.',
+          title: 'Soft Basic · Circle · Round 9N · Natural Micro Light',
+          subtitle: 'R7-01 상단 하이라이트와 R8-03 Color Shell은 고정. 하단 전체 띠를 버리고 비대칭·소면적·색상 기반 미세광 3안만 비교합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: () => setState(() => squareMode = true),
+            icon: const Icon(Icons.crop_square_rounded, size: 16),
+            label: const Text('Square Round 2 보기'),
+          ),
+        ),
+        const SizedBox(height: 8),
         LayoutBuilder(
           builder: (context, constraints) {
             final columns = constraints.maxWidth >= 980 ? 4 : 2;
@@ -1531,11 +1540,11 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
               spacing: gap,
               runSpacing: gap,
               children: [
-                for (var i = 0; i < softBasicCircleRound11Candidates.length; i++)
+                for (var i = 0; i < softBasicCircleRound9NaturalCandidates.length; i++)
                   SizedBox(
                     width: itemWidth,
                     child: _SoftBasicCandidateCard(
-                      candidate: softBasicCircleRound11Candidates[i],
+                      candidate: softBasicCircleRound9NaturalCandidates[i],
                       selected: i == selectedIndex,
                       card: widget.card,
                       fg: widget.fg,
@@ -3112,6 +3121,104 @@ class _SoftBasicCandidatePainter extends CustomPainter {
             ..strokeCap = StrokeCap.round
             ..color = Colors.white.withValues(alpha: 0.58)
             ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.05),
+        );
+
+      case SoftBasicBottomHighlightTechnique.sideKiss:
+        final sideRect = Rect.fromCenter(
+          center: Offset(
+            rect.left + rect.width * 0.68,
+            rect.top + rect.height * 0.72,
+          ),
+          width: rect.width * 0.34,
+          height: rect.height * 0.22,
+        );
+        canvas.drawArc(
+          sideRect,
+          0.42,
+          1.08,
+          false,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = rect.width * 0.036
+            ..strokeCap = StrokeCap.round
+            ..color = rimLight.withValues(alpha: 0.26)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.4),
+        );
+        canvas.drawArc(
+          sideRect.deflate(rect.width * 0.014),
+          0.50,
+          0.72,
+          false,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = rect.width * 0.015
+            ..strokeCap = StrokeCap.round
+            ..color = rimLight.withValues(alpha: 0.34)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.9),
+        );
+
+      case SoftBasicBottomHighlightTechnique.softSpot:
+        final spotRect = Rect.fromCenter(
+          center: Offset(
+            rect.left + rect.width * 0.61,
+            rect.top + rect.height * 0.73,
+          ),
+          width: rect.width * 0.24,
+          height: rect.height * 0.105,
+        );
+        canvas.drawOval(
+          spotRect,
+          Paint()
+            ..color = rimLight.withValues(alpha: 0.18)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.6),
+        );
+        canvas.drawOval(
+          spotRect.deflate(rect.width * 0.032),
+          Paint()
+            ..color = rimLight.withValues(alpha: 0.14)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.8),
+        );
+
+      case SoftBasicBottomHighlightTechnique.edgeFade:
+        final fadeRect = rect.deflate(rect.width * 0.028);
+        final fadeBounds = Rect.fromLTWH(
+          rect.left + rect.width * 0.46,
+          rect.top + rect.height * 0.55,
+          rect.width * 0.46,
+          rect.height * 0.40,
+        );
+        canvas.drawArc(
+          fadeRect,
+          0.34,
+          1.20,
+          false,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = rect.width * 0.024
+            ..strokeCap = StrokeCap.round
+            ..shader = const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0x00FFFFFF),
+                Color(0x33FFFFFF),
+                Color(0x00FFFFFF),
+              ],
+              stops: [0.0, 0.58, 1.0],
+            ).createShader(fadeBounds)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.8),
+        );
+        canvas.drawArc(
+          fadeRect.deflate(rect.width * 0.010),
+          0.50,
+          0.72,
+          false,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = rect.width * 0.012
+            ..strokeCap = StrokeCap.round
+            ..color = rimLight.withValues(alpha: 0.22)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.7),
         );
     }
 
