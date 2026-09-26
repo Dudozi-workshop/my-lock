@@ -1807,7 +1807,7 @@ class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
     if (geometryMode == 2) {
-      return _SoftBasicTriangleRound1(
+      return _SharedTriangleMasterLab(
         card: widget.card,
         fg: widget.fg,
         muted: widget.muted,
@@ -1933,7 +1933,7 @@ class _SoftBasicSquareRound2State extends State<_SoftBasicSquareRound2> {
             TextButton.icon(
               onPressed: widget.onOpenTriangle,
               icon: const Icon(Icons.change_history_rounded, size: 16),
-              label: const Text('Triangle Round 1 보기'),
+              label: const Text('Triangle Master 보기'),
             ),
           ],
         ),
@@ -1976,8 +1976,8 @@ class _SoftBasicSquareRound2State extends State<_SoftBasicSquareRound2> {
   }
 }
 
-class _SoftBasicTriangleRound1 extends StatefulWidget {
-  const _SoftBasicTriangleRound1({
+class _SharedTriangleMasterLab extends StatelessWidget {
+  const _SharedTriangleMasterLab({
     required this.card,
     required this.fg,
     required this.muted,
@@ -1992,27 +1992,18 @@ class _SoftBasicTriangleRound1 extends StatefulWidget {
   final VoidCallback onBackToCircle;
 
   @override
-  State<_SoftBasicTriangleRound1> createState() =>
-      _SoftBasicTriangleRound1State();
-}
-
-class _SoftBasicTriangleRound1State extends State<_SoftBasicTriangleRound1> {
-  int selectedIndex = 0;
-
-  @override
   Widget build(BuildContext context) {
-    final compact = MediaQuery.sizeOf(context).width < 700;
-    final selected = softBasicTriangleRound1Candidates[selectedIndex];
+    const tones = [ShapeTone.pink, ShapeTone.blue, ShapeTone.yellow];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Triangle · Round 1 · Shape + Soft Spec',
+          title: 'Triangle · Shared Shape Master',
           subtitle:
-              'Square 최종 Master의 no-dot / no-core / 넓은 Soft Spec / 하단 Diffuse Bounce를 공통 베이스로 고정하고, 삼각형 실루엣과 면광 비율만 비교합니다.',
-          fg: widget.fg,
-          muted: widget.muted,
+              '정삼각형 + 약한 corner round를 단일 Geometry로 사용합니다. Soft Basic과 Crayon Soft는 같은 Shape Master를 공유하고 Material/Finish만 달라집니다.',
+          fg: fg,
+          muted: muted,
         ),
         const SizedBox(height: 10),
         Wrap(
@@ -2020,319 +2011,131 @@ class _SoftBasicTriangleRound1State extends State<_SoftBasicTriangleRound1> {
           runSpacing: 4,
           children: [
             TextButton.icon(
-              onPressed: widget.onBackToSquare,
+              onPressed: onBackToSquare,
               icon: const Icon(Icons.crop_square_rounded, size: 16),
               label: const Text('Square Master 보기'),
             ),
             TextButton.icon(
-              onPressed: widget.onBackToCircle,
+              onPressed: onBackToCircle,
               icon: const Icon(Icons.check_circle_outline, size: 16),
               label: const Text('Circle Master 보기'),
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final columns = constraints.maxWidth >= 980 ? 3 : 2;
-            final gap = compact ? 8.0 : 12.0;
-            final itemWidth =
-                (constraints.maxWidth - gap * (columns - 1)) / columns;
-            return Wrap(
-              spacing: gap,
-              runSpacing: gap,
-              children: [
-                for (var i = 0;
-                    i < softBasicTriangleRound1Candidates.length;
-                    i++)
-                  SizedBox(
-                    width: itemWidth,
-                    child: _SoftBasicTriangleCandidateCard(
-                      candidate: softBasicTriangleRound1Candidates[i],
-                      selected: i == selectedIndex,
-                      card: widget.card,
-                      fg: widget.fg,
-                      muted: widget.muted,
-                      onTap: () => setState(() => selectedIndex = i),
-                    ),
-                  ),
-              ],
-            );
-          },
-        ),
-        const SizedBox(height: 14),
-        _SoftBasicSquareTriangleComparePanel(
-          triangleCandidate: selected,
-          card: widget.card,
-          fg: widget.fg,
-          muted: widget.muted,
-        ),
-      ],
-    );
-  }
-}
-
-class _SoftBasicTriangleCandidateCard extends StatelessWidget {
-  const _SoftBasicTriangleCandidateCard({
-    required this.candidate,
-    required this.selected,
-    required this.card,
-    required this.fg,
-    required this.muted,
-    required this.onTap,
-  });
-
-  final SoftBasicTriangleCandidate candidate;
-  final bool selected;
-  final Color card;
-  final Color fg;
-  final Color muted;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Container(
-          height: 176,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: card,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: selected
-                  ? const Color(0xFF7257F5)
-                  : const Color(0xFFE6E3EE),
-              width: selected ? 2 : 1,
-            ),
-          ),
+        const SizedBox(height: 12),
+        _Panel(
+          color: card,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      candidate.id,
-                      style: TextStyle(
-                        color: fg,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                  if (candidate.badge != null)
-                    Text(
-                      candidate.badge!,
-                      style: const TextStyle(
-                        color: Color(0xFF7257F5),
-                        fontSize: 9,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                ],
-              ),
               Text(
-                candidate.name,
+                'COMMON GEOMETRY · 96px',
                 style: TextStyle(
                   color: fg,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w900,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
-              const Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  for (final tone in const [
-                    ShapeTone.pink,
-                    ShapeTone.blue,
-                    ShapeTone.yellow,
-                  ])
-                    _SoftBasicTriangleExactToken(
-                      tone: tone,
-                      candidate: candidate,
-                      size: 58,
+              const SizedBox(height: 10),
+              for (final tone in tones) ...[
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 50,
+                      child: Text(
+                        tone.label,
+                        style: TextStyle(
+                          color: muted,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
                     ),
-                ],
-              ),
-              const Spacer(),
-              Text(
-                candidate.intent,
-                style: TextStyle(
-                  color: muted,
-                  fontSize: 9.5,
-                  height: 1.2,
+                    Expanded(
+                      child: _CompareTokenCell(
+                        label: 'SOFT BASIC',
+                        token: _ProductionTriangleToken(
+                          tone: tone,
+                          style: ShapeStyle.softBasic,
+                          size: 96,
+                        ),
+                        fg: fg,
+                        muted: muted,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: _CompareTokenCell(
+                        label: 'CRAYON SOFT',
+                        token: _ProductionTriangleToken(
+                          tone: tone,
+                          style: ShapeStyle.crayonSoft,
+                          size: 96,
+                        ),
+                        fg: fg,
+                        muted: muted,
+                      ),
+                    ),
+                  ],
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+                if (tone != tones.last) const SizedBox(height: 12),
+              ],
+              const SizedBox(height: 18),
+              const Divider(color: Color(0xFFE8E5EF), height: 1),
+              const SizedBox(height: 14),
+              Text(
+                '58px APP EXACT',
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
+              const SizedBox(height: 10),
+              for (final tone in tones) ...[
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 50,
+                      child: Text(
+                        tone.label,
+                        style: TextStyle(
+                          color: muted,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: _CompareTokenCell(
+                        label: 'SOFT BASIC',
+                        token: _ProductionTriangleToken(
+                          tone: tone,
+                          style: ShapeStyle.softBasic,
+                          size: 58,
+                        ),
+                        fg: fg,
+                        muted: muted,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: _CompareTokenCell(
+                        label: 'CRAYON SOFT',
+                        token: _ProductionTriangleToken(
+                          tone: tone,
+                          style: ShapeStyle.crayonSoft,
+                          size: 58,
+                        ),
+                        fg: fg,
+                        muted: muted,
+                      ),
+                    ),
+                  ],
+                ),
+                if (tone != tones.last) const SizedBox(height: 9),
+              ],
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SoftBasicSquareTriangleComparePanel extends StatelessWidget {
-  const _SoftBasicSquareTriangleComparePanel({
-    required this.triangleCandidate,
-    required this.card,
-    required this.fg,
-    required this.muted,
-  });
-
-  final SoftBasicTriangleCandidate triangleCandidate;
-  final Color card;
-  final Color fg;
-  final Color muted;
-
-  @override
-  Widget build(BuildContext context) {
-    final compact = MediaQuery.sizeOf(context).width < 700;
-    final squareMaster = softBasicSquareRound5Candidates[2];
-    const tones = [
-      ShapeTone.pink,
-      ShapeTone.blue,
-      ShapeTone.yellow,
-    ];
-
-    return _Panel(
-      color: card,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Square Master R5-03  ↔  ' +
-                triangleCandidate.id +
-                ' · ' +
-                triangleCandidate.name,
-            style: TextStyle(
-              color: fg,
-              fontSize: 17,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            triangleCandidate.intent,
-            style: TextStyle(color: muted, fontSize: 12),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            '96px ENLARGED · SAME PALETTE',
-            style: TextStyle(
-              color: fg,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 9),
-          for (final tone in tones) ...[
-            _SquareTriangleToneRow(
-              tone: tone,
-              squareMaster: squareMaster,
-              triangleCandidate: triangleCandidate,
-              size: 96,
-              compact: compact,
-              fg: fg,
-              muted: muted,
-            ),
-            if (tone != tones.last) const SizedBox(height: 12),
-          ],
-          const SizedBox(height: 18),
-          const Divider(color: Color(0xFFE8E5EF), height: 1),
-          const SizedBox(height: 14),
-          Text(
-            '58px APP EXACT',
-            style: TextStyle(
-              color: fg,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 9),
-          for (final tone in tones) ...[
-            _SquareTriangleToneRow(
-              tone: tone,
-              squareMaster: squareMaster,
-              triangleCandidate: triangleCandidate,
-              size: 58,
-              compact: compact,
-              fg: fg,
-              muted: muted,
-            ),
-            if (tone != tones.last) const SizedBox(height: 9),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _SquareTriangleToneRow extends StatelessWidget {
-  const _SquareTriangleToneRow({
-    required this.tone,
-    required this.squareMaster,
-    required this.triangleCandidate,
-    required this.size,
-    required this.compact,
-    required this.fg,
-    required this.muted,
-  });
-
-  final ShapeTone tone;
-  final SoftBasicSquareCandidate squareMaster;
-  final SoftBasicTriangleCandidate triangleCandidate;
-  final double size;
-  final bool compact;
-  final Color fg;
-  final Color muted;
-
-  @override
-  Widget build(BuildContext context) {
-    final gap = compact ? 10.0 : 18.0;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: compact ? 42 : 58,
-          child: Text(
-            tone.label,
-            style: TextStyle(
-              color: muted,
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-        Expanded(
-          child: _CompareTokenCell(
-            label: 'SQUARE · R5-03 NO CORE',
-            token: _SoftBasicSquareExactToken(
-              tone: tone,
-              candidate: squareMaster,
-              size: size,
-            ),
-            fg: fg,
-            muted: muted,
-          ),
-        ),
-        SizedBox(width: gap),
-        Expanded(
-          child: _CompareTokenCell(
-            label: 'TRIANGLE · ' + triangleCandidate.id,
-            token: _SoftBasicTriangleExactToken(
-              tone: tone,
-              candidate: triangleCandidate,
-              size: size,
-            ),
-            fg: fg,
-            muted: muted,
           ),
         ),
       ],
@@ -2340,15 +2143,15 @@ class _SquareTriangleToneRow extends StatelessWidget {
   }
 }
 
-class _SoftBasicTriangleExactToken extends StatelessWidget {
-  const _SoftBasicTriangleExactToken({
+class _ProductionTriangleToken extends StatelessWidget {
+  const _ProductionTriangleToken({
     required this.tone,
-    required this.candidate,
+    required this.style,
     required this.size,
   });
 
   final ShapeTone tone;
-  final SoftBasicTriangleCandidate candidate;
+  final ShapeStyle style;
   final double size;
 
   @override
@@ -2356,243 +2159,12 @@ class _SoftBasicTriangleExactToken extends StatelessWidget {
     return SizedBox.square(
       dimension: size,
       child: CustomPaint(
-        painter: _SoftBasicTriangleCandidatePainter(
-          tone: tone,
-          candidate: candidate,
+        painter: LockTokenPainter(
+          LockToken(shape: ShapeKind.triangle, tone: tone),
+          style: style,
         ),
       ),
     );
-  }
-}
-
-class _SoftBasicTriangleCandidatePainter extends CustomPainter {
-  const _SoftBasicTriangleCandidatePainter({
-    required this.tone,
-    required this.candidate,
-  });
-
-  final ShapeTone tone;
-  final SoftBasicTriangleCandidate candidate;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final base = baseColorForTone(tone);
-    final light = adjustTone(
-      base,
-      lightnessDelta: tone == ShapeTone.yellow ? 0.10 : 0.16,
-      saturationDelta: -0.04,
-    );
-    final deep = adjustTone(
-      base,
-      lightnessDelta: tone == ShapeTone.yellow ? -0.10 : -0.13,
-      saturationDelta: 0.02,
-    );
-    final bounce = adjustTone(
-      base,
-      lightnessDelta: tone == ShapeTone.yellow ? 0.075 : 0.11,
-      saturationDelta: -0.025,
-    );
-
-    final inset = size.shortestSide * 0.065;
-    final rect = Rect.fromLTWH(
-      inset,
-      inset,
-      size.width - inset * 2,
-      size.height - inset * 2,
-    );
-    final bodyPath = _buildTrianglePath(rect, candidate.technique);
-
-    canvas.drawShadow(
-      bodyPath,
-      Colors.black.withValues(alpha: 0.058),
-      size.shortestSide * 0.042,
-      true,
-    );
-
-    canvas.drawPath(
-      bodyPath,
-      Paint()..color = deep.withValues(alpha: 0.38),
-    );
-
-    final innerRect = rect.deflate(rect.width * 0.018);
-    final innerPath = _buildTrianglePath(innerRect, candidate.technique);
-    canvas.drawPath(innerPath, Paint()..color = base);
-
-    final wideSpec =
-        candidate.technique == SoftBasicTriangleTechnique.wideSpec;
-    final compactSpec =
-        candidate.technique == SoftBasicTriangleTechnique.compactSpec;
-
-    canvas.save();
-    canvas.clipPath(innerPath);
-
-    canvas.drawCircle(
-      Offset(
-        rect.left + rect.width * 0.34,
-        rect.top + rect.height * 0.30,
-      ),
-      rect.width * (wideSpec ? 0.46 : compactSpec ? 0.36 : 0.41),
-      Paint()
-        ..color = light.withValues(alpha: wideSpec ? 0.62 : 0.58)
-        ..maskFilter = MaskFilter.blur(
-          BlurStyle.normal,
-          size.shortestSide * 0.17,
-        ),
-    );
-
-    canvas.drawCircle(
-      Offset(
-        rect.right - rect.width * 0.18,
-        rect.bottom - rect.height * 0.14,
-      ),
-      rect.width * 0.42,
-      Paint()
-        ..color = deep.withValues(alpha: 0.37)
-        ..maskFilter = MaskFilter.blur(
-          BlurStyle.normal,
-          size.shortestSide * 0.20,
-        ),
-    );
-
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(
-          rect.left + rect.width * 0.53,
-          rect.top + rect.height * 0.76,
-        ),
-        width: rect.width *
-            (candidate.technique == SoftBasicTriangleTechnique.widerBase
-                ? 0.82
-                : 0.74),
-        height: rect.height * 0.27,
-      ),
-      Paint()
-        ..color = bounce.withValues(alpha: 0.25)
-        ..maskFilter = MaskFilter.blur(
-          BlurStyle.normal,
-          size.shortestSide * 0.090,
-        ),
-    );
-
-    final specScale = wideSpec ? 1.16 : compactSpec ? 0.82 : 1.0;
-    final spec = Path()
-      ..moveTo(
-        rect.left + rect.width * 0.245,
-        rect.top + rect.height * 0.225,
-      )
-      ..cubicTo(
-        rect.left + rect.width * 0.20,
-        rect.top + rect.height * 0.30,
-        rect.left + rect.width * 0.205,
-        rect.top + rect.height * (0.40 * specScale),
-        rect.left + rect.width * 0.285,
-        rect.top + rect.height * (0.46 * specScale),
-      )
-      ..cubicTo(
-        rect.left + rect.width * 0.35,
-        rect.top + rect.height * (0.50 * specScale),
-        rect.left + rect.width * (0.44 * specScale),
-        rect.top + rect.height * 0.40,
-        rect.left + rect.width * (0.46 * specScale),
-        rect.top + rect.height * 0.31,
-      )
-      ..cubicTo(
-        rect.left + rect.width * (0.47 * specScale),
-        rect.top + rect.height * 0.245,
-        rect.left + rect.width * 0.39,
-        rect.top + rect.height * 0.18,
-        rect.left + rect.width * 0.315,
-        rect.top + rect.height * 0.18,
-      )
-      ..cubicTo(
-        rect.left + rect.width * 0.285,
-        rect.top + rect.height * 0.18,
-        rect.left + rect.width * 0.26,
-        rect.top + rect.height * 0.195,
-        rect.left + rect.width * 0.245,
-        rect.top + rect.height * 0.225,
-      )
-      ..close();
-
-    canvas.drawPath(
-      spec,
-      Paint()
-        ..color = Colors.white.withValues(alpha: wideSpec ? 0.22 : 0.19)
-        ..maskFilter = MaskFilter.blur(
-          BlurStyle.normal,
-          size.shortestSide * 0.055,
-        ),
-    );
-    canvas.drawPath(
-      spec,
-      Paint()
-        ..color = Colors.white.withValues(alpha: wideSpec ? 0.70 : 0.74)
-        ..maskFilter = MaskFilter.blur(
-          BlurStyle.normal,
-          size.shortestSide * 0.018,
-        ),
-    );
-
-    // Intentionally no Core Spec and no secondary sparkle.
-    canvas.restore();
-  }
-
-  Path _buildTrianglePath(
-    Rect rect,
-    SoftBasicTriangleTechnique technique,
-  ) {
-    final wider =
-        technique == SoftBasicTriangleTechnique.widerBase ? 0.035 : 0.0;
-    final taller = technique == SoftBasicTriangleTechnique.taller;
-    final softApex =
-        technique == SoftBasicTriangleTechnique.softerApex;
-
-    final topY = rect.top + rect.height * (taller ? 0.045 : 0.075);
-    final baseY = rect.top + rect.height * (taller ? 0.90 : 0.86);
-    final leftX = rect.left + rect.width * (0.105 - wider);
-    final rightX = rect.right - rect.width * (0.105 - wider);
-    final cx = rect.center.dx;
-
-    final apexHalf = rect.width * (softApex ? 0.070 : 0.048);
-    final sideRound = rect.width * (softApex ? 0.075 : 0.060);
-    final baseRound = rect.width * 0.070;
-
-    return Path()
-      ..moveTo(cx - apexHalf, topY + rect.height * 0.050)
-      ..quadraticBezierTo(
-        cx,
-        topY - rect.height * (softApex ? 0.006 : 0.018),
-        cx + apexHalf,
-        topY + rect.height * 0.050,
-      )
-      ..lineTo(
-        rightX - sideRound,
-        baseY - baseRound * 0.55,
-      )
-      ..quadraticBezierTo(
-        rightX,
-        baseY,
-        rightX - baseRound,
-        baseY,
-      )
-      ..lineTo(leftX + baseRound, baseY)
-      ..quadraticBezierTo(
-        leftX,
-        baseY,
-        leftX + sideRound,
-        baseY - baseRound * 0.55,
-      )
-      ..lineTo(
-        cx - apexHalf,
-        topY + rect.height * 0.050,
-      )
-      ..close();
-  }
-
-  @override
-  bool shouldRepaint(covariant _SoftBasicTriangleCandidatePainter oldDelegate) {
-    return oldDelegate.tone != tone ||
-        oldDelegate.candidate.id != candidate.id;
   }
 }
 
