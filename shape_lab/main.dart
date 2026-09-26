@@ -85,7 +85,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 024 · CR-R3 Outline-Led Fill',
+                                  'LAB 025 · Crayon Soft Approved',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -595,8 +595,8 @@ class _CrayonStyleLabState extends State<CrayonStyleLab> {
         ),
         const SizedBox(height: 12),
         _SectionTitle(
-          title: 'Crayon Soft · Round 3 · Outline-Led Fill',
-          subtitle: 'CR-R2-02 Broken Thick Outline을 외곽 기준으로 고정합니다. 내부도 같은 굵고 거친 wax stroke 문법으로 바꾸고, 본색을 유지한 채 굵은 획의 끊김·압력·겹침 정도만 4안으로 비교합니다.',
+          title: 'Crayon Soft · Approved Master · R3-04',
+          subtitle: 'CR-R3-04 Balanced Same Brush를 1차 승인 Master로 승격했습니다. 외곽은 CR-R2-02의 Broken Thick Outline 구조를 유지하고, 내부는 같은 굵은 wax stroke 문법으로 통일합니다. R3-02는 보조 레퍼런스로 보존합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
