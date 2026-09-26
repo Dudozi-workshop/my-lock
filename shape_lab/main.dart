@@ -2029,7 +2029,7 @@ class _SharedTriangleMasterLab extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'COMMON GEOMETRY · 96px',
+                'BASIC MASTER + CRAYON FROZEN · 96px',
                 style: TextStyle(
                   color: fg,
                   fontSize: 11,
