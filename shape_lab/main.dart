@@ -931,10 +931,6 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
   MovementStyle _movement = MovementStyle.underwater;
   bool _darkBackground = false;
 
-  double _shapeAnimationSeconds = 0;
-  int _shapeAnimationVariant = 1;
-  bool _shapeAnimationEnabled = true;
-
   @override
   void initState() {
     super.initState();
@@ -961,7 +957,6 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
 
     if (delta > 0) {
       final safeDelta = delta.clamp(0.0, 0.035).toDouble();
-      _shapeAnimationSeconds += safeDelta;
       _engine.step(safeDelta);
       setState(() {});
     }
@@ -983,7 +978,7 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
           _SectionTitle(
             title: 'Drop 01 · Sea Turtle · Long Flipper',
             subtitle:
-                'Geometry Lock 유지 · 앱 Palette 3색 · Shape Animation 분리 · 전체 이동/충돌/회전은 Motion Set 담당',
+                'Static Region Lock · 앱 Palette 3색 · Shape 자체 Motion 없음 · 이동/충돌/회전은 Motion Set 담당',
             fg: widget.fg,
             muted: widget.muted,
           ),
@@ -1007,71 +1002,6 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
             ],
           ),
           const SizedBox(height: 20),
-          Text(
-            'Shape Animation Comparison · Motion Set OFF',
-            style: TextStyle(
-              color: widget.fg,
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Long Flipper Master의 내부 지느러미 움직임만 비교합니다. Shape 전체 위치·회전 이동은 포함하지 않습니다.',
-            style: TextStyle(color: widget.muted, fontSize: 11.5),
-          ),
-          const SizedBox(height: 12),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final compact = constraints.maxWidth < 760;
-              final cardWidth = compact
-                  ? constraints.maxWidth
-                  : (constraints.maxWidth - 20) / 3;
-              return Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SeaTurtleAnimationCard(
-                      animationSeconds: _shapeAnimationSeconds,
-                      variant: 0,
-                      selected: _shapeAnimationVariant == 0,
-                      title: 'A · Long Sweep',
-                      subtitle: '긴 앞지느러미를 크게 천천히 쓸어내리는 유영',
-                      onTap: () => setState(() => _shapeAnimationVariant = 0),
-                      muted: widget.muted,
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SeaTurtleAnimationCard(
-                      animationSeconds: _shapeAnimationSeconds,
-                      variant: 1,
-                      selected: _shapeAnimationVariant == 1,
-                      title: 'B · Natural Swim',
-                      subtitle: '양쪽 지느러미 위상차로 자연스러운 실제 유영감',
-                      onTap: () => setState(() => _shapeAnimationVariant = 1),
-                      muted: widget.muted,
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _SeaTurtleAnimationCard(
-                      animationSeconds: _shapeAnimationSeconds,
-                      variant: 2,
-                      selected: _shapeAnimationVariant == 2,
-                      title: 'C · Soft Flow',
-                      subtitle: '작은 진폭과 서로 다른 주기로 잔잔하게 흐르는 움직임',
-                      onTap: () => setState(() => _shapeAnimationVariant = 2),
-                      muted: widget.muted,
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 18),
           Text(
             'Crayon Soft Apply Test',
             style: TextStyle(
@@ -1106,7 +1036,7 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
           ),
           const SizedBox(height: 18),
           Text(
-            'Motion Set × Shape Animation QA',
+            'Runtime Motion Set QA',
             style: TextStyle(
               color: widget.fg,
               fontSize: 14,
@@ -1115,7 +1045,7 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
           ),
           const SizedBox(height: 4),
           Text(
-            'FloatingEngine은 Shape 전체의 이동·충돌·크기·회전을 담당하고, 선택한 Shape Animation은 거북이 내부 지느러미 움직임만 담당합니다.',
+            'Sea Turtle Shape는 정적 Runtime Asset으로 고정합니다. FloatingEngine이 Shape 전체의 이동·충돌·크기·회전만 담당합니다.',
             style: TextStyle(color: widget.muted, fontSize: 11.5),
           ),
           const SizedBox(height: 12),
@@ -1146,12 +1076,6 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
                     _engine.setMovementStyle(value);
                   });
                 },
-              ),
-              FilterChip(
-                label: const Text('Shape Animation'),
-                selected: _shapeAnimationEnabled,
-                onSelected: (value) =>
-                    setState(() => _shapeAnimationEnabled = value),
               ),
               FilterChip(
                 label: const Text('Dark BG'),
@@ -1206,10 +1130,6 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
                         _SeaTurtleRuntimeObject(
                           key: ValueKey(object.id),
                           object: object,
-                          animationSeconds:
-                              _shapeAnimationSeconds + object.id * 0.17,
-                          animationVariant: _shapeAnimationVariant,
-                          animate: _shapeAnimationEnabled,
                         ),
                     ],
                   ),
@@ -1218,84 +1138,6 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
             },
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _SeaTurtleAnimationCard extends StatelessWidget {
-  const _SeaTurtleAnimationCard({
-    required this.animationSeconds,
-    required this.variant,
-    required this.selected,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-    required this.muted,
-  });
-
-  final double animationSeconds;
-  final int variant;
-  final bool selected;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-  final Color muted;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Material(
-      color: selected ? scheme.primaryContainer.withValues(alpha: 0.34) : const Color(0xFFF8FBFD),
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: selected ? scheme.primary : const Color(0xFFE5EDF2),
-              width: selected ? 1.8 : 1,
-            ),
-          ),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 176,
-                child: Center(
-                  child: _SeaTurtleAnimatedAsset(
-                    tone: ShapeTone.blue,
-                    size: 168,
-                    animationSeconds: animationSeconds,
-                    variant: variant,
-                    animate: true,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: muted,
-                  fontSize: 10.5,
-                  height: 1.35,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -1712,15 +1554,9 @@ class _SeaTurtleRuntimeObject extends StatelessWidget {
   const _SeaTurtleRuntimeObject({
     super.key,
     required this.object,
-    required this.animationSeconds,
-    required this.animationVariant,
-    required this.animate,
   });
 
   final FloatingObject object;
-  final double animationSeconds;
-  final int animationVariant;
-  final bool animate;
 
   @override
   Widget build(BuildContext context) {
@@ -1733,141 +1569,13 @@ class _SeaTurtleRuntimeObject extends StatelessWidget {
       child: IgnorePointer(
         child: Transform.rotate(
           angle: object.rotation,
-          child: _SeaTurtleAnimatedAsset(
+          child: _SeaTurtleStaticAsset(
             tone: object.token.tone,
             size: side,
-            animationSeconds: animationSeconds,
-            variant: animationVariant,
-            animate: animate,
-            compactError: true,
           ),
         ),
       ),
     );
-  }
-}
-
-class _SeaTurtleAnimatedAsset extends StatelessWidget {
-  const _SeaTurtleAnimatedAsset({
-    required this.tone,
-    required this.size,
-    required this.animationSeconds,
-    required this.variant,
-    required this.animate,
-    this.compactError = false,
-  });
-
-  final ShapeTone tone;
-  final double size;
-  final double animationSeconds;
-  final int variant;
-  final bool animate;
-  final bool compactError;
-
-  static const _nearPivot = Offset(204 / 512, 234 / 512);
-  static const _farPivot = Offset(124 / 512, 239 / 512);
-
-  @override
-  Widget build(BuildContext context) {
-    final asset = _assetForTone(tone);
-    final (nearDegrees, farDegrees) = _angles();
-
-    Widget image({bool showError = false}) => Image.asset(
-          asset,
-          width: size,
-          height: size,
-          fit: BoxFit.contain,
-          gaplessPlayback: true,
-          filterQuality: FilterQuality.high,
-          errorBuilder: (context, error, stackTrace) {
-            if (!showError) return const SizedBox.shrink();
-            if (compactError) {
-              return const Center(
-                child: Icon(
-                  Icons.broken_image_outlined,
-                  size: 18,
-                  color: Color(0xFFB64242),
-                ),
-              );
-            }
-            return Container(
-              width: size,
-              height: size,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFECEC),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                'Asset error',
-                style: TextStyle(color: Color(0xFF9F2F2F), fontSize: 10),
-              ),
-            );
-          },
-        );
-
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        clipBehavior: Clip.none,
-        fit: StackFit.expand,
-        children: [
-          Transform.rotate(
-            angle: _degrees(farDegrees),
-            alignment: _alignmentFor(_farPivot),
-            child: ClipPath(
-              clipper: const _SeaTurtlePartClipper(_TurtlePart.far),
-              child: image(),
-            ),
-          ),
-          ClipPath(
-            clipper: const _SeaTurtleBaseClipper(),
-            child: image(showError: true),
-          ),
-          Transform.rotate(
-            angle: _degrees(nearDegrees),
-            alignment: _alignmentFor(_nearPivot),
-            child: ClipPath(
-              clipper: const _SeaTurtlePartClipper(_TurtlePart.near),
-              child: image(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  (double, double) _angles() {
-    if (!animate) return (0, 0);
-
-    switch (variant) {
-      case 0:
-        final phase = animationSeconds * (2 * pi / 4.2);
-        return (
-          -0.4 + sin(phase) * 5.0,
-          0.2 - sin(phase + 0.18) * 3.4,
-        );
-      case 2:
-        final near =
-            sin(animationSeconds * (2 * pi / 4.9)) * 2.8 +
-            sin(animationSeconds * (2 * pi / 7.4)) * 0.9;
-        final far =
-            sin(animationSeconds * (2 * pi / 5.5) + 1.05) * 2.1;
-        return (near, far);
-      default:
-        final phase = animationSeconds * (2 * pi / 3.25);
-        return (
-          -0.8 + sin(phase) * 6.8,
-          0.4 - sin(phase + 0.82) * 4.4,
-        );
-    }
-  }
-
-  static double _degrees(double value) => value * pi / 180;
-
-  static Alignment _alignmentFor(Offset pivot) {
-    return Alignment(pivot.dx * 2 - 1, pivot.dy * 2 - 1);
   }
 }
 
@@ -1913,128 +1621,6 @@ String _assetForTone(ShapeTone tone) => switch (tone) {
       ShapeTone.pink => 'assets/sea_turtle_runtime_v2/sea_turtle_pink.png',
       ShapeTone.yellow => 'assets/sea_turtle_runtime_v2/sea_turtle_yellow.png',
     };
-
-enum _TurtlePart { near, far }
-
-class _SeaTurtlePartClipper extends CustomClipper<Path> {
-  const _SeaTurtlePartClipper(this.part);
-
-  final _TurtlePart part;
-
-  static const _near = <Offset>[
-    Offset(196 / 512, 224 / 512),
-    Offset(218 / 512, 222 / 512),
-    Offset(236 / 512, 238 / 512),
-    Offset(249 / 512, 263 / 512),
-    Offset(265 / 512, 292 / 512),
-    Offset(282 / 512, 318 / 512),
-    Offset(302 / 512, 340 / 512),
-    Offset(323 / 512, 357 / 512),
-    Offset(317 / 512, 371 / 512),
-    Offset(296 / 512, 373 / 512),
-    Offset(276 / 512, 365 / 512),
-    Offset(255 / 512, 350 / 512),
-    Offset(236 / 512, 329 / 512),
-    Offset(220 / 512, 305 / 512),
-    Offset(207 / 512, 280 / 512),
-    Offset(199 / 512, 255 / 512),
-  ];
-
-  static const _far = <Offset>[
-    Offset(108 / 512, 231 / 512),
-    Offset(132 / 512, 228 / 512),
-    Offset(151 / 512, 238 / 512),
-    Offset(160 / 512, 255 / 512),
-    Offset(155 / 512, 282 / 512),
-    Offset(147 / 512, 312 / 512),
-    Offset(139 / 512, 340 / 512),
-    Offset(128 / 512, 357 / 512),
-    Offset(115 / 512, 354 / 512),
-    Offset(103 / 512, 342 / 512),
-    Offset(96 / 512, 322 / 512),
-    Offset(92 / 512, 296 / 512),
-    Offset(93 / 512, 269 / 512),
-    Offset(101 / 512, 244 / 512),
-  ];
-
-  @override
-  Path getClip(Size size) {
-    final points = part == _TurtlePart.near ? _near : _far;
-    return Path()
-      ..addPolygon(
-        [
-          for (final point in points)
-            Offset(point.dx * size.width, point.dy * size.height),
-        ],
-        true,
-      );
-  }
-
-  @override
-  bool shouldReclip(covariant _SeaTurtlePartClipper oldClipper) =>
-      oldClipper.part != part;
-}
-
-class _SeaTurtleBaseClipper extends CustomClipper<Path> {
-  const _SeaTurtleBaseClipper();
-
-  static const _nearCut = <Offset>[
-    Offset(201 / 512, 230 / 512),
-    Offset(218 / 512, 229 / 512),
-    Offset(232 / 512, 241 / 512),
-    Offset(245 / 512, 266 / 512),
-    Offset(261 / 512, 295 / 512),
-    Offset(278 / 512, 319 / 512),
-    Offset(300 / 512, 341 / 512),
-    Offset(319 / 512, 358 / 512),
-    Offset(313 / 512, 367 / 512),
-    Offset(298 / 512, 368 / 512),
-    Offset(280 / 512, 360 / 512),
-    Offset(259 / 512, 346 / 512),
-    Offset(240 / 512, 325 / 512),
-    Offset(225 / 512, 303 / 512),
-    Offset(213 / 512, 278 / 512),
-    Offset(205 / 512, 255 / 512),
-  ];
-
-  static const _farCut = <Offset>[
-    Offset(112 / 512, 236 / 512),
-    Offset(132 / 512, 234 / 512),
-    Offset(147 / 512, 242 / 512),
-    Offset(155 / 512, 257 / 512),
-    Offset(151 / 512, 281 / 512),
-    Offset(143 / 512, 309 / 512),
-    Offset(136 / 512, 336 / 512),
-    Offset(127 / 512, 351 / 512),
-    Offset(118 / 512, 349 / 512),
-    Offset(108 / 512, 338 / 512),
-    Offset(101 / 512, 319 / 512),
-    Offset(98 / 512, 296 / 512),
-    Offset(99 / 512, 271 / 512),
-    Offset(105 / 512, 248 / 512),
-  ];
-
-  @override
-  Path getClip(Size size) {
-    final path = Path()
-      ..fillType = PathFillType.evenOdd
-      ..addRect(Offset.zero & size);
-
-    for (final points in [_nearCut, _farCut]) {
-      path.addPolygon(
-        [
-          for (final point in points)
-            Offset(point.dx * size.width, point.dy * size.height),
-        ],
-        true,
-      );
-    }
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant _SeaTurtleBaseClipper oldClipper) => false;
-}
 
 class _CrayonCandidate {
   const _CrayonCandidate({
