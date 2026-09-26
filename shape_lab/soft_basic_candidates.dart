@@ -337,6 +337,14 @@ enum SoftBasicSquareMaterialProfile {
   balancedGloss,
 }
 
+enum SoftBasicSquareGlossRefinement {
+  base,
+  highSoftPatch,
+  highCompactCore,
+  balancedBright,
+  balancedWide,
+}
+
 class SoftBasicSquareCandidate {
   const SoftBasicSquareCandidate({
     required this.id,
@@ -345,6 +353,7 @@ class SoftBasicSquareCandidate {
     required this.technique,
     this.highlightTechnique = SoftBasicSquareHighlightTechnique.round1Base,
     this.materialProfile = SoftBasicSquareMaterialProfile.legacy,
+    this.glossRefinement = SoftBasicSquareGlossRefinement.base,
     this.badge,
   });
 
@@ -354,6 +363,7 @@ class SoftBasicSquareCandidate {
   final SoftBasicSquareTechnique technique;
   final SoftBasicSquareHighlightTechnique highlightTechnique;
   final SoftBasicSquareMaterialProfile materialProfile;
+  final SoftBasicSquareGlossRefinement glossRefinement;
   final String? badge;
 }
 
@@ -503,5 +513,63 @@ const softBasicSquareRound4Candidates = <SoftBasicSquareCandidate>[
     technique: SoftBasicSquareTechnique.tighterCorner,
     materialProfile: SoftBasicSquareMaterialProfile.balancedGloss,
     badge: 'BALANCED',
+  ),
+];
+
+
+const softBasicSquareRound5Candidates = <SoftBasicSquareCandidate>[
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R5-01',
+    name: 'High Spec Base',
+    intent: 'Round 4-05 High Spec을 그대로 유지한 기준안. 선명한 Core Spec과 응축된 좌상단 면광을 비교 기준으로 사용.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    materialProfile: SoftBasicSquareMaterialProfile.highSpec,
+    glossRefinement: SoftBasicSquareGlossRefinement.base,
+    badge: 'HS BASE',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R5-02',
+    name: 'High Spec · Soft Patch',
+    intent: 'High Spec의 Core Spec은 유지하고 Soft Spec 면적을 넓히며 경계를 부드럽게 해 목업의 면광 비중을 강화한 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    materialProfile: SoftBasicSquareMaterialProfile.highSpec,
+    glossRefinement: SoftBasicSquareGlossRefinement.highSoftPatch,
+    badge: 'HS SOFT',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R5-03',
+    name: 'High Spec · Compact Core',
+    intent: 'Soft Spec은 유지하되 Core Spec을 더 작고 응축되게 만들어 광택은 선명하지만 장식처럼 튀지 않게 한 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    materialProfile: SoftBasicSquareMaterialProfile.highSpec,
+    glossRefinement: SoftBasicSquareGlossRefinement.highCompactCore,
+    badge: 'HS CORE',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R5-04',
+    name: 'Balanced Base',
+    intent: 'Round 4-06 Balanced Gloss를 그대로 유지한 기준안. 상단 면광, Core Spec, 하단 Bounce의 균형을 비교 기준으로 사용.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    materialProfile: SoftBasicSquareMaterialProfile.balancedGloss,
+    glossRefinement: SoftBasicSquareGlossRefinement.base,
+    badge: 'BG BASE',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R5-05',
+    name: 'Balanced · Brighter',
+    intent: 'Balanced의 비율은 유지하면서 좌상단 Soft/Core Spec을 한 단계 밝게 올려 58px에서도 광택이 확실히 읽히게 한 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    materialProfile: SoftBasicSquareMaterialProfile.balancedGloss,
+    glossRefinement: SoftBasicSquareGlossRefinement.balancedBright,
+    badge: 'BG BRIGHT',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R5-06',
+    name: 'Balanced · Wide Soft',
+    intent: '좌상단 면광과 하단 Bounce를 조금 넓히고 Core Spec은 살짝 낮춰 가장 부드럽고 목업 친화적인 균형을 노린 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    materialProfile: SoftBasicSquareMaterialProfile.balancedGloss,
+    glossRefinement: SoftBasicSquareGlossRefinement.balancedWide,
+    badge: 'BG WIDE',
   ),
 ];
