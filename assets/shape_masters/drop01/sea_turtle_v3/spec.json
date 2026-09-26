@@ -1,0 +1,84 @@
+{
+  "shapeId": "d1_s02_sea_turtle",
+  "nameKo": "바다거북",
+  "nameEn": "Sea Turtle",
+  "drop": "drop01",
+  "version": 3,
+  "masterVariant": "S02 Long Flipper",
+  "status": "canonical_2048_draft_f0_part_split",
+  "sourceUpgrade": {
+    "from": "sea_turtle_master_v2_512.png",
+    "to": "sea_turtle_master_v3_2048_draft.png",
+    "policy": "geometry_reference_preserved_quality_source_upgraded",
+    "reason": "512 source made semantic region and moving-part separation unnecessarily fragile",
+    "note": "v3 remains a QA draft until visual approval; simple upscale output alone is not treated as final source-of-truth."
+  },
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "transparent": true
+  },
+  "geometry": {
+    "policy": "Long Flipper silhouette preserved from v2; no redesign in this phase"
+  },
+  "staticParts": [
+    {
+      "id": "static_body",
+      "file": "parts/static_body_reference_2048.png"
+    },
+    {
+      "id": "front_flipper_far_f0",
+      "file": "parts/front_flipper_far_f0_reference_2048.png",
+      "movingPart": true
+    },
+    {
+      "id": "front_flipper_near_f0",
+      "file": "parts/front_flipper_near_f0_reference_2048.png",
+      "movingPart": true
+    }
+  ],
+  "semanticRegions": [
+    {
+      "id": "shell",
+      "file": "masks/shell_mask_2048.png",
+      "role": "color_material_effect_surface"
+    },
+    {
+      "id": "belly",
+      "file": "masks/belly_mask_2048.png",
+      "role": "collection_completion_reward_surface"
+    },
+    {
+      "id": "shell_detail",
+      "file": "masks/shell_detail_mask_2048.png",
+      "role": "detail_overlay"
+    }
+  ],
+  "movingPartIsolation": {
+    "policy": "moving_part_owns_visual_maps",
+    "maps": [
+      "alpha",
+      "outline",
+      "shadow",
+      "highlight"
+    ],
+    "reason": "prevent F0 outline/highlight residue when future F1..F3 poses replace the front flipper"
+  },
+  "animation": {
+    "implemented": false,
+    "nextSequence": [
+      "whole-turtle image mockup",
+      "approve 3-4 key poses",
+      "implement near flipper poses",
+      "implement far flipper poses",
+      "loop QA"
+    ],
+    "motionSetOwnership": "whole-object movement remains FloatingEngine/Motion Set"
+  },
+  "qa": {
+    "f0RebuildMaxChannelDiff": 0,
+    "f0RebuildChangedChannelCount": 0,
+    "pngCrcStatus": "PASS",
+    "target": "0 / 0 before Static Master Lock"
+  }
+}
