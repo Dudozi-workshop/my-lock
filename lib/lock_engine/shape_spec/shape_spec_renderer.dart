@@ -47,7 +47,7 @@ class ShapeSpecRenderer {
         style: bundle.style,
         token: token,
         opacity: opacity,
-        configOverride: crayonOverride,
+        configOverride: crayonOverride ?? bundle.shape.crayonOverride,
       );
       canvas.restore();
       return;
