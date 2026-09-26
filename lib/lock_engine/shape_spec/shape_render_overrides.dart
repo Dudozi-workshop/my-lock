@@ -20,6 +20,7 @@ class ShapeLayerTransform {
 
 class ShapeRenderOverrides {
   const ShapeRenderOverrides({
+    this.bodyGeometry,
     this.surfaceCenterX,
     this.surfaceCenterY,
     this.surfaceRadius,
@@ -29,6 +30,10 @@ class ShapeRenderOverrides {
     this.shadowOpacityScale = 1,
     this.shadowElevationScale = 1,
   });
+
+  /// Shape Lab only: swaps the body path while keeping the production
+  /// Style/Layer renderer intact. Production callers leave this null.
+  final ShapeGeometrySpec? bodyGeometry;
 
   final double? surfaceCenterX;
   final double? surfaceCenterY;
