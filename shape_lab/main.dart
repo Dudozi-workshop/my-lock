@@ -453,10 +453,10 @@ class _SeaTurtleV3StaticSplitPanel extends StatelessWidget {
             muted: muted,
           ),
           const SizedBox(height: 10),
-          Wrap(
+          const Wrap(
             spacing: 7,
             runSpacing: 7,
-            children: const [
+            children: [
               _ValueChip(label: 'Source', value: '2048 draft'),
               _ValueChip(label: 'F0 rebuild diff', value: '0'),
               _ValueChip(label: 'PNG CRC', value: 'PASS'),
