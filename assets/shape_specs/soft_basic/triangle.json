@@ -1,8 +1,9 @@
 {
   "styleId": "soft_basic",
   "shapeId": "triangle",
-  "version": 2,
+  "version": 3,
   "geometryMaster": "assets/shape_masters/core/basic_v1/triangle_master_v1.json",
+  "rotationMode": "fixed",
   "body": {
     "kind": "roundedPolygon",
     "cornerRadius": 10,
@@ -21,54 +22,259 @@
       ]
     ]
   },
+  "surface": {
+    "kind": "solid"
+  },
   "layers": [
     {
-      "id": "light",
-      "role": "light",
-      "opacity": 0.22,
-      "blur": 4.5,
-      "rotationDeg": -42,
-      "geometry": {
-        "kind": "ellipse",
-        "cx": 33,
-        "cy": 34,
-        "rx": 26,
-        "ry": 11
-      }
-    },
-    {
-      "id": "shade",
+      "id": "color_shell",
       "role": "shade",
-      "opacity": 0.13,
-      "blur": 6,
-      "rotationDeg": 22,
+      "blend": "normal",
+      "opacity": 0.28,
+      "blur": 1.7,
+      "toneLightnessDelta": -0.1,
+      "toneSaturationDelta": 0.02,
       "geometry": {
-        "kind": "ellipse",
-        "cx": 68,
-        "cy": 72,
-        "rx": 30,
-        "ry": 17
+        "kind": "roundedPolygon",
+        "cornerRadius": 10,
+        "points": [
+          [
+            50,
+            4
+          ],
+          [
+            96,
+            91
+          ],
+          [
+            4,
+            91
+          ]
+        ]
       }
     },
     {
-      "id": "spec",
-      "role": "spec",
-      "opacity": 0.56,
-      "blur": 0.65,
-      "rotationDeg": -58,
+      "id": "color_shell_inner",
+      "role": "light",
+      "blend": "normal",
+      "opacity": 1,
+      "blur": 0,
+      "toneLightnessDelta": 0,
+      "toneSaturationDelta": 0,
       "geometry": {
-        "kind": "roundRect",
-        "x": 21,
-        "y": 25,
-        "w": 19,
-        "h": 6.5,
-        "radius": 3
+        "kind": "roundedPolygon",
+        "cornerRadius": 8.5,
+        "points": [
+          [
+            50,
+            7
+          ],
+          [
+            92.5,
+            88.5
+          ],
+          [
+            7.5,
+            88.5
+          ]
+        ]
+      }
+    },
+    {
+      "id": "airbrush_light",
+      "role": "light",
+      "blend": "normal",
+      "opacity": 0.48,
+      "blur": 22,
+      "toneLightnessDelta": 0.16,
+      "toneSaturationDelta": -0.04,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 37,
+        "cy": 31,
+        "rx": 29,
+        "ry": 24
+      }
+    },
+    {
+      "id": "airbrush_shade",
+      "role": "shade",
+      "blend": "normal",
+      "opacity": 0.4,
+      "blur": 27,
+      "toneLightnessDelta": -0.16,
+      "toneSaturationDelta": 0.03,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 69,
+        "cy": 76,
+        "rx": 33,
+        "ry": 26
+      }
+    },
+    {
+      "id": "ambient_bounce",
+      "role": "light",
+      "blend": "normal",
+      "opacity": 0.16,
+      "blur": 9,
+      "toneLightnessDelta": 0.11,
+      "toneSaturationDelta": -0.025,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 50,
+        "cy": 77.5,
+        "rx": 31,
+        "ry": 10.5
+      }
+    },
+    {
+      "id": "ambient_core",
+      "role": "light",
+      "blend": "normal",
+      "opacity": 0.09,
+      "blur": 6,
+      "toneLightnessDelta": 0.16,
+      "toneSaturationDelta": -0.04,
+      "geometry": {
+        "kind": "circle",
+        "cx": 57,
+        "cy": 69,
+        "r": 9.5
+      }
+    },
+    {
+      "id": "ambient_depth",
+      "role": "shade",
+      "blend": "normal",
+      "opacity": 0.045,
+      "blur": 4.5,
+      "toneLightnessDelta": -0.16,
+      "toneSaturationDelta": 0.03,
+      "geometry": {
+        "kind": "ellipse",
+        "cx": 50,
+        "cy": 86.5,
+        "rx": 27,
+        "ry": 4.8
+      }
+    },
+    {
+      "id": "edge_leaf_halo",
+      "role": "spec",
+      "blend": "normal",
+      "opacity": 0.2,
+      "blur": 8.5,
+      "geometry": {
+        "kind": "path",
+        "commands": [
+          {
+            "op": "M",
+            "x": 25,
+            "y": 43
+          },
+          {
+            "op": "C",
+            "c1x": 27,
+            "c1y": 33,
+            "c2x": 31,
+            "c2y": 23.5,
+            "x": 38.5,
+            "y": 16.5
+          },
+          {
+            "op": "C",
+            "c1x": 42.5,
+            "c1y": 12.8,
+            "c2x": 46.5,
+            "c2y": 13.5,
+            "x": 47.5,
+            "y": 17
+          },
+          {
+            "op": "C",
+            "c1x": 48.5,
+            "c1y": 21,
+            "c2x": 44,
+            "c2y": 27.5,
+            "x": 39,
+            "y": 33.5
+          },
+          {
+            "op": "C",
+            "c1x": 34,
+            "c1y": 39.5,
+            "c2x": 28.5,
+            "c2y": 46.5,
+            "x": 25,
+            "y": 43
+          },
+          {
+            "op": "Z"
+          }
+        ]
+      }
+    },
+    {
+      "id": "edge_leaf",
+      "role": "spec",
+      "blend": "normal",
+      "opacity": 0.76,
+      "blur": 3.1,
+      "geometry": {
+        "kind": "path",
+        "commands": [
+          {
+            "op": "M",
+            "x": 25,
+            "y": 43
+          },
+          {
+            "op": "C",
+            "c1x": 27,
+            "c1y": 33,
+            "c2x": 31,
+            "c2y": 23.5,
+            "x": 38.5,
+            "y": 16.5
+          },
+          {
+            "op": "C",
+            "c1x": 42.5,
+            "c1y": 12.8,
+            "c2x": 46.5,
+            "c2y": 13.5,
+            "x": 47.5,
+            "y": 17
+          },
+          {
+            "op": "C",
+            "c1x": 48.5,
+            "c1y": 21,
+            "c2x": 44,
+            "c2y": 27.5,
+            "x": 39,
+            "y": 33.5
+          },
+          {
+            "op": "C",
+            "c1x": 34,
+            "c1y": 39.5,
+            "c2x": 28.5,
+            "c2y": 46.5,
+            "x": 25,
+            "y": 43
+          },
+          {
+            "op": "Z"
+          }
+        ]
       }
     }
   ],
   "shadow": {
-    "opacity": 0.04,
-    "elevation": 2,
+    "opacity": 0.018,
+    "elevation": 1.35,
     "offsetX": 0,
     "offsetY": 1
   }
