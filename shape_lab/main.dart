@@ -373,7 +373,7 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
             muted: widget.muted,
           ),
           const SizedBox(height: 16),
-          Wrap(
+          const Wrap(
             spacing: 18,
             runSpacing: 12,
             children: [
