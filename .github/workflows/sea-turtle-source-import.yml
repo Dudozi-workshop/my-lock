@@ -25,7 +25,7 @@ jobs:
           PAYLOAD=".github/source-payload/sea-turtle-v2"
           cat "$PAYLOAD"/part-*.b64 > /tmp/sea_turtle_source.tar.gz.b64
           base64 --decode /tmp/sea_turtle_source.tar.gz.b64 > /tmp/sea_turtle_source.tar.gz
-          echo "b88777a6f12ee6dc9c30d976030529234fd0b6154242f1e439bb9344e9db9b7c  /tmp/sea_turtle_source.tar.gz" | sha256sum -c -
+          echo "1fe0452fca9a2528a345dad1d16be3394be6912a9ce96f13632f0b732468ee47  /tmp/sea_turtle_source.tar.gz" | sha256sum -c -
           mkdir -p /tmp/sea_turtle_pack_v2
           tar -xzf /tmp/sea_turtle_source.tar.gz -C /tmp/sea_turtle_pack_v2
 
