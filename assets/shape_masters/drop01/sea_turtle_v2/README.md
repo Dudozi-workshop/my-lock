@@ -6,6 +6,7 @@ Drop 01 / S02 Sea Turtle / Long Flipper.
 - Geometry is source-locked. Do not redraw the silhouette after Geometry Lock.
 - Runtime appearance is generated from semantic Region Masks + Palette Tokens + neutral overlays.
 - The three files under `assets/sea_turtle_runtime_v2/` are baked runtime QA references, not the master source.
+- Runtime colors must come from the app `ShapeTone` palette only. Current allowed tones are Pink, Blue and Yellow; do not introduce Sea-Turtle-only custom colors.
 - Runtime size is dynamic from FloatingEngine. 58 px is not the design target; 64/72/80/96 px are downscale QA checkpoints.
 - Outline color is a palette token, not a fixed teal.
 - Underbelly is semantic and excludes the far flipper.
@@ -20,10 +21,19 @@ Drop 01 / S02 Sea Turtle / Long Flipper.
 6. highlight overlay
 7. outline → outline @ 0.72
 
-## Motion ownership
-Sea Turtle shape-local motion is disabled for the current production direction.
-Movement, collision, rotation, speed and movement area belong to the existing Motion Set / FloatingEngine system.
-Do not add shape-local idle, tap, flipper, frame, or custom swim motion unless the product decision is explicitly reopened.
+## Shape Animation vs Motion Set
+Sea Turtle is a high-grade Shape and may own **Shape Animation**.
+
+- **Shape Animation**: shape-local articulation only. For Sea Turtle, this is the Long Flipper front-flipper swim motion.
+- **Motion Set / FloatingEngine**: whole-shape position, collision, rotation, speed and movement area.
+- These two systems are independent and may be composed at runtime.
+- Do not call Sea Turtle's flipper articulation a Motion. The product term is **Shape Animation**.
+- Tap/selection interaction remains a separate interaction layer unless explicitly designed later.
+
+Current Shape Lab QA variants:
+1. Long Sweep
+2. Natural Swim
+3. Soft Flow
 
 ## Binary integrity
 Binary master/mask/overlay sources are archived separately and tracked by SHA-256 in `SHA256SUMS.txt`.
