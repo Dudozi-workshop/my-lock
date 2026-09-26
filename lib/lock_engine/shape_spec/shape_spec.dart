@@ -103,6 +103,18 @@ class CrayonTextureSpec {
     this.internalStrandCount = 1,
     this.internalStrandSpread = 0.0,
     this.internalGapOffsetJitter = 0.0,
+    this.directionPassCount = 1,
+    this.directionSpreadDeg = 0.0,
+    this.laneScatter = 0.0,
+    this.pressureVariation = 0.0,
+    this.paperToothCount = 0,
+    this.paperToothWidthMin = 0.25,
+    this.paperToothWidthMax = 0.85,
+    this.paperToothLengthMin = 0.8,
+    this.paperToothLengthMax = 3.2,
+    this.paperToothStrength = 0.85,
+    this.grainRadiusMin = 0.18,
+    this.grainRadiusMax = 0.58,
   });
 
   final int darkStrokeCount;
@@ -174,6 +186,29 @@ class CrayonTextureSpec {
   final int internalStrandCount;
   final double internalStrandSpread;
   final double internalGapOffsetJitter;
+
+  /// Reference-reset controls. Defaults are neutral so the current Production
+  /// style.json keeps PREVIEW 008 behavior until an approved Lab candidate is
+  /// explicitly promoted.
+  ///
+  /// directionPassCount/directionSpreadDeg create several hand-rub direction
+  /// families instead of mechanically parallel lanes. laneScatter blends even
+  /// lanes toward random placement. pressureVariation adds local heavy wax
+  /// deposits along a stroke. paperTooth* removes tiny irregular pigment marks
+  /// so the real background reads through like paper tooth. grainRadius*
+  /// controls pigment clump size rather than adding a blur/airbrush layer.
+  final int directionPassCount;
+  final double directionSpreadDeg;
+  final double laneScatter;
+  final double pressureVariation;
+  final int paperToothCount;
+  final double paperToothWidthMin;
+  final double paperToothWidthMax;
+  final double paperToothLengthMin;
+  final double paperToothLengthMax;
+  final double paperToothStrength;
+  final double grainRadiusMin;
+  final double grainRadiusMax;
 
   factory CrayonTextureSpec.fromJson(Map<String, dynamic> json) {
     return CrayonTextureSpec(
@@ -261,6 +296,30 @@ class CrayonTextureSpec {
           (json['internalStrandSpread'] as num?)?.toDouble() ?? 0.0,
       internalGapOffsetJitter:
           (json['internalGapOffsetJitter'] as num?)?.toDouble() ?? 0.0,
+      directionPassCount:
+          (json['directionPassCount'] as num?)?.toInt() ?? 1,
+      directionSpreadDeg:
+          (json['directionSpreadDeg'] as num?)?.toDouble() ?? 0.0,
+      laneScatter:
+          (json['laneScatter'] as num?)?.toDouble() ?? 0.0,
+      pressureVariation:
+          (json['pressureVariation'] as num?)?.toDouble() ?? 0.0,
+      paperToothCount:
+          (json['paperToothCount'] as num?)?.toInt() ?? 0,
+      paperToothWidthMin:
+          (json['paperToothWidthMin'] as num?)?.toDouble() ?? 0.25,
+      paperToothWidthMax:
+          (json['paperToothWidthMax'] as num?)?.toDouble() ?? 0.85,
+      paperToothLengthMin:
+          (json['paperToothLengthMin'] as num?)?.toDouble() ?? 0.8,
+      paperToothLengthMax:
+          (json['paperToothLengthMax'] as num?)?.toDouble() ?? 3.2,
+      paperToothStrength:
+          (json['paperToothStrength'] as num?)?.toDouble() ?? 0.85,
+      grainRadiusMin:
+          (json['grainRadiusMin'] as num?)?.toDouble() ?? 0.18,
+      grainRadiusMax:
+          (json['grainRadiusMax'] as num?)?.toDouble() ?? 0.58,
     );
   }
 }
