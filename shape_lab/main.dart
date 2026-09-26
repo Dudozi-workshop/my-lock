@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:my_lock/lock_engine/effects.dart';
@@ -86,7 +87,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 027 · Lily Bubble HQ · 58px Runtime',
+                                  'LAB 028 · Lily Bubble Illustrated Asset · 58px',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -297,7 +298,7 @@ class _HighResRuntimeDemo extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Lily Bubble · HQ Runtime',
+                  'Lily Bubble · Illustrated Runtime',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -306,7 +307,7 @@ class _HighResRuntimeDemo extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '레퍼런스의 짙은 숲색 유리구슬, 좌상단 백색 반사광, 우하단 금빛 글로우, 은방울꽃과 내부 반딧불 움직임을 8× Master에서 구성합니다.',
+                  '코드 드로잉 대신 일러스트 원본을 직접 런타임 베이스로 사용하고, 반딧불만 실시간 오버레이 애니메이션으로 움직입니다.',
                   style: TextStyle(
                     color: muted.withValues(alpha: 0.98),
                     fontSize: 11,
@@ -315,7 +316,7 @@ class _HighResRuntimeDemo extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'MASTER 464px  ·  DISPLAY 58px  ·  SCALE 12.5%  ·  FIREFLY LIVE',
+                  'ILLUSTRATED ASSET 128px  ·  DISPLAY 58px  ·  FIREFLY LIVE',
                   style: TextStyle(
                     color: Color(0xFFC4E98B),
                     fontSize: 9.2,
@@ -377,6 +378,9 @@ class _HighResRuntimeDemo extends StatelessWidget {
   }
 }
 
+
+const _lilyBubbleIllustrationBase64 = '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';
+
 class _LilyBubbleAsset extends StatefulWidget {
   const _LilyBubbleAsset({required this.displaySize});
 
@@ -390,8 +394,10 @@ class _LilyBubbleAssetState extends State<_LilyBubbleAsset>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 9200),
+    duration: const Duration(milliseconds: 9800),
   )..repeat();
+
+  late final imageBytes = base64Decode(_lilyBubbleIllustrationBase64);
 
   @override
   void dispose() {
@@ -403,479 +409,79 @@ class _LilyBubbleAssetState extends State<_LilyBubbleAsset>
   Widget build(BuildContext context) {
     return SizedBox.square(
       dimension: widget.displaySize,
-      child: FittedBox(
-        fit: BoxFit.contain,
-        child: RepaintBoundary(
-          child: SizedBox.square(
-            dimension: 464,
-            child: CustomPaint(
-              painter: _LilyBubblePainter(_controller),
+      child: ClipOval(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.memory(
+              imageBytes,
+              fit: BoxFit.cover,
+              filterQuality: FilterQuality.high,
+              gaplessPlayback: true,
             ),
-          ),
+            IgnorePointer(
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: _LilyFireflyOverlayPainter(_controller.value),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _LilyBubblePainter extends CustomPainter {
-  _LilyBubblePainter(this.animation) : super(repaint: animation);
+class _LilyFireflyOverlayPainter extends CustomPainter {
+  const _LilyFireflyOverlayPainter(this.progress);
 
-  final Animation<double> animation;
-
-  static const _master = 464.0;
-  static const _center = Offset(232, 229);
-  static const _radius = 194.0;
+  final double progress;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final scale = size.width / _master;
-    canvas.save();
-    canvas.scale(scale, scale);
-
-    final t = animation.value * math.pi * 2;
-    final orbRect = Rect.fromCircle(center: _center, radius: _radius);
-
-    _drawOuterShadow(canvas);
-    _drawGlassBase(canvas, orbRect);
-
-    canvas.save();
-    canvas.clipPath(Path()..addOval(orbRect));
-
-    _drawForestDepth(canvas, orbRect);
-    _drawMossFloor(canvas);
-    _drawGoldenBloom(canvas);
-    _drawStaticLightDust(canvas);
-    _drawFlower(canvas);
-    _drawAnimatedFireflies(canvas, t);
-    _drawInnerRefractions(canvas);
-
-    canvas.restore();
-
-    _drawGlassRim(canvas, orbRect);
-    _drawPrimaryReflection(canvas);
-    _drawLowerGoldReflection(canvas);
-    _drawMicroHighlights(canvas);
-
-    canvas.restore();
-  }
-
-  static void _drawOuterShadow(Canvas canvas) {
-    canvas.drawOval(
-      const Rect.fromLTWH(72, 404, 320, 38),
-      Paint()
-        ..color = const Color(0x62000000)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20),
-    );
-    canvas.drawCircle(
-      _center + const Offset(0, 8),
-      _radius + 5,
-      Paint()
-        ..color = const Color(0x42000000)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
-    );
-  }
-
-  static void _drawGlassBase(Canvas canvas, Rect orbRect) {
-    canvas.drawCircle(
-      _center,
-      _radius,
-      Paint()
-        ..shader = const RadialGradient(
-          center: Alignment(-0.32, -0.40),
-          radius: 1.10,
-          colors: [
-            Color(0xFF124A38),
-            Color(0xFF0A3022),
-            Color(0xFF071C15),
-            Color(0xFF030B08),
-          ],
-          stops: [0.0, 0.38, 0.72, 1.0],
-        ).createShader(orbRect),
-    );
-  }
-
-  static void _drawForestDepth(Canvas canvas, Rect orbRect) {
-    final vignette = Paint()
-      ..shader = const RadialGradient(
-        center: Alignment(-0.18, -0.10),
-        radius: 1.05,
-        colors: [
-          Color(0x00182C1F),
-          Color(0x22030906),
-          Color(0xA8000000),
-        ],
-        stops: [0.0, 0.64, 1.0],
-      ).createShader(orbRect);
-    canvas.drawCircle(_center, _radius, vignette);
-
-    _softBlob(canvas, const Offset(104, 96), 76, const Color(0x442D8168), 30);
-    _softBlob(canvas, const Offset(142, 62), 46, const Color(0x1E83B5A0), 22);
-    _softBlob(canvas, const Offset(330, 86), 72, const Color(0x24598437), 30);
-    _softBlob(canvas, const Offset(362, 150), 38, const Color(0x3C6B6E29), 24);
-    _softBlob(canvas, const Offset(80, 250), 54, const Color(0x1E244F33), 24);
-
-    for (final spot in const [
-      (Offset(74, 86), 16.0, Color(0x33579F81)),
-      (Offset(99, 142), 13.0, Color(0x24307454)),
-      (Offset(306, 62), 13.0, Color(0x244D7831)),
-      (Offset(344, 113), 18.0, Color(0x315A6B2F)),
-      (Offset(371, 220), 14.0, Color(0x28496E28)),
-      (Offset(127, 215), 11.0, Color(0x263F6B49)),
-    ]) {
-      _softBlob(canvas, spot.$1, spot.$2, spot.$3, 10);
-    }
-  }
-
-  static void _drawMossFloor(Canvas canvas) {
-    final moss = Path()
-      ..moveTo(62, 350)
-      ..cubicTo(106, 324, 143, 336, 175, 328)
-      ..cubicTo(217, 316, 251, 340, 287, 324)
-      ..cubicTo(322, 309, 356, 321, 404, 344)
-      ..lineTo(420, 430)
-      ..lineTo(44, 430)
-      ..close();
-
-    canvas.drawPath(
-      moss,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF426F28),
-            Color(0xFF173A19),
-            Color(0xFF07150C),
-          ],
-        ).createShader(const Rect.fromLTWH(45, 315, 380, 120)),
-    );
-
-    for (var i = 0; i < 24; i++) {
-      final x = 64.0 + ((i * 37) % 330);
-      final y = 347.0 + ((i * 17) % 50);
-      final r = 2.0 + (i % 4) * 1.2;
-      canvas.drawCircle(
-        Offset(x, y),
-        r,
-        Paint()..color = Color.lerp(
-          const Color(0xFF87A934),
-          const Color(0xFF22421B),
-          (i % 5) / 4,
-        )!,
-      );
-    }
-  }
-
-  static void _drawGoldenBloom(Canvas canvas) {
-    final bloomRect = Rect.fromCircle(
-      center: const Offset(341, 320),
-      radius: 154,
-    );
-    canvas.drawCircle(
-      const Offset(341, 320),
-      154,
-      Paint()
-        ..shader = const RadialGradient(
-          colors: [
-            Color(0xE8FFF65D),
-            Color(0xB8EAC72C),
-            Color(0x557F8B1D),
-            Color(0x001C2E10),
-          ],
-          stops: [0.0, 0.20, 0.48, 1.0],
-        ).createShader(bloomRect),
-    );
-
-    _softBlob(canvas, const Offset(368, 340), 50, const Color(0x9EFFF879), 18);
-    _softBlob(canvas, const Offset(329, 368), 38, const Color(0x6AF3E14B), 14);
-  }
-
-  static void _drawStaticLightDust(Canvas canvas) {
-    const lights = [
-      (Offset(73, 117), 9.0),
-      (Offset(121, 205), 5.5),
-      (Offset(160, 100), 5.0),
-      (Offset(184, 310), 5.4),
-      (Offset(263, 95), 4.4),
-      (Offset(316, 128), 6.0),
-      (Offset(372, 182), 7.0),
-      (Offset(339, 258), 5.2),
-      (Offset(286, 331), 5.5),
-      (Offset(117, 329), 4.5),
-    ];
-
-    for (var i = 0; i < lights.length; i++) {
-      final light = lights[i];
-      _drawGlow(
-        canvas,
-        light.$1,
-        light.$2,
-        i.isEven ? const Color(0xFFFFF36D) : const Color(0xFFCFFF90),
-        coreOpacity: 0.90,
-      );
-    }
-  }
-
-  static void _drawFlower(Canvas canvas) {
-    final stemGlow = Paint()
-      ..color = const Color(0x454EAF34)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 15
-      ..strokeCap = StrokeCap.round
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
-    final stem = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0xFFE8ED53), Color(0xFF8FB32F), Color(0xFF4F7B24)],
-      ).createShader(const Rect.fromLTWH(170, 106, 150, 260))
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 6.5
-      ..strokeCap = StrokeCap.round;
-
-    final mainStem = Path()
-      ..moveTo(231, 362)
-      ..cubicTo(230, 316, 229, 274, 233, 229)
-      ..cubicTo(238, 182, 249, 151, 269, 134)
-      ..cubicTo(280, 124, 289, 122, 299, 127);
-    canvas.drawPath(mainStem, stemGlow);
-    canvas.drawPath(mainStem, stem);
-
-    final branches = <Path>[
-      Path()
-        ..moveTo(237, 250)
-        ..cubicTo(216, 235, 197, 226, 177, 210),
-      Path()
-        ..moveTo(240, 218)
-        ..cubicTo(263, 207, 281, 193, 293, 176),
-      Path()
-        ..moveTo(245, 190)
-        ..cubicTo(266, 177, 277, 161, 282, 145),
-      Path()
-        ..moveTo(232, 285)
-        ..cubicTo(252, 271, 271, 260, 293, 250),
-    ];
-    for (final branch in branches) {
-      canvas.drawPath(branch, stemGlow..strokeWidth = 9);
-      canvas.drawPath(branch, stem..strokeWidth = 5.2);
-    }
-
-    _drawLeaf(
-      canvas,
-      Path()
-        ..moveTo(230, 319)
-        ..cubicTo(190, 282, 154, 281, 128, 302)
-        ..cubicTo(153, 340, 192, 347, 230, 331)
-        ..close(),
-      const Rect.fromLTWH(125, 278, 112, 72),
-    );
-    _drawLeaf(
-      canvas,
-      Path()
-        ..moveTo(236, 333)
-        ..cubicTo(272, 292, 312, 287, 341, 303)
-        ..cubicTo(320, 345, 278, 360, 236, 344)
-        ..close(),
-      const Rect.fromLTWH(232, 286, 112, 78),
-    );
-    _drawLeaf(
-      canvas,
-      Path()
-        ..moveTo(234, 274)
-        ..cubicTo(208, 252, 187, 252, 171, 266)
-        ..cubicTo(188, 288, 210, 294, 234, 284)
-        ..close(),
-      const Rect.fromLTWH(168, 248, 72, 50),
-      small: true,
-    );
-
-    _drawBell(canvas, const Offset(174, 205), 1.02, -0.16);
-    _drawBell(canvas, const Offset(292, 170), 1.12, 0.10);
-    _drawBell(canvas, const Offset(283, 141), 1.18, 0.09);
-    _drawBell(canvas, const Offset(301, 246), 0.96, 0.10);
-    _drawBell(canvas, const Offset(211, 234), 1.08, -0.08);
-  }
-
-  static void _drawAnimatedFireflies(Canvas canvas, double t) {
+    final t = progress * math.pi * 2;
     final particles = <(Offset, double, double, double)>[
-      (const Offset(122, 142), 12, 1.0, 0.0),
-      (const Offset(314, 112), 9, 0.8, 1.4),
-      (const Offset(348, 224), 10, 1.1, 2.2),
-      (const Offset(154, 292), 8, 0.9, 3.3),
-      (const Offset(288, 308), 7, 1.3, 4.1),
-      (const Offset(95, 258), 6, 1.2, 5.0),
+      (const Offset(0.24, 0.30), 1.0, 0.0, 0.85),
+      (const Offset(0.76, 0.25), 0.85, 1.3, 0.72),
+      (const Offset(0.82, 0.52), 1.1, 2.4, 0.92),
+      (const Offset(0.31, 0.69), 0.9, 3.3, 0.76),
+      (const Offset(0.66, 0.73), 1.2, 4.2, 0.82),
     ];
 
     for (var i = 0; i < particles.length; i++) {
-      final item = particles[i];
-      final base = item.$1;
-      final radius = item.$2;
-      final speed = item.$3;
-      final phase = item.$4;
-      final dx = math.sin(t * speed + phase) * (4.5 + (i % 3) * 2.0);
-      final dy = math.cos(t * (speed * 0.73) + phase * 1.2) *
-          (5.5 + (i % 2) * 2.5);
-      final pulse = 0.62 + 0.38 * (0.5 + 0.5 * math.sin(t * 2.1 + phase));
-      _drawGlow(
+      final p = particles[i];
+      final base = Offset(p.$1.dx * size.width, p.$1.dy * size.height);
+      final amp = size.width * (0.018 + (i % 3) * 0.005);
+      final dx = math.sin(t * p.$2 + p.$3) * amp;
+      final dy = math.cos(t * (p.$2 * 0.73) + p.$3) * amp;
+      final pulse = 0.58 + 0.42 * (0.5 + 0.5 * math.sin(t * 2.1 + p.$3));
+      final radius = size.width * (0.018 + 0.006 * (i % 2));
+
+      _paintGlow(
         canvas,
         base + Offset(dx, dy),
-        radius * (0.74 + pulse * 0.26),
-        i.isEven ? const Color(0xFFFFEE57) : const Color(0xFFD6FF79),
-        coreOpacity: pulse,
+        radius,
+        pulse * p.$4,
       );
     }
   }
 
-  static void _drawInnerRefractions(Canvas canvas) {
-    final leftRefraction = Path()
-      ..moveTo(78, 174)
-      ..cubicTo(99, 126, 135, 91, 187, 73);
-    canvas.drawPath(
-      leftRefraction,
-      Paint()
-        ..color = const Color(0x2E9BE8C0)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 22
-        ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
-    );
-
-    final goldRefraction = Path()
-      ..moveTo(334, 351)
-      ..cubicTo(367, 329, 386, 291, 399, 249);
-    canvas.drawPath(
-      goldRefraction,
-      Paint()
-        ..color = const Color(0x7AFFF672)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 18
-        ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
-    );
-  }
-
-  static void _drawGlassRim(Canvas canvas, Rect orbRect) {
-    canvas.drawCircle(
-      _center,
-      _radius,
-      Paint()
-        ..shader = const SweepGradient(
-          colors: [
-            Color(0xFFE7FFF1),
-            Color(0xFF80F0B3),
-            Color(0xFF245F47),
-            Color(0xFFECFFF0),
-            Color(0xFFF6F45A),
-            Color(0xFF3A815C),
-            Color(0xFFE7FFF1),
-          ],
-          stops: [0.0, 0.14, 0.34, 0.51, 0.67, 0.85, 1.0],
-        ).createShader(orbRect)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 7.0,
-    );
-    canvas.drawCircle(
-      _center,
-      _radius - 7,
-      Paint()
-        ..color = const Color(0x6AB8F5D0)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.1,
-    );
-  }
-
-  static void _drawPrimaryReflection(Canvas canvas) {
-    final reflection = Path()
-      ..moveTo(86, 184)
-      ..cubicTo(103, 125, 145, 83, 202, 64)
-      ..cubicTo(226, 56, 250, 55, 274, 59);
-
-    canvas.drawPath(
-      reflection,
-      Paint()
-        ..color = const Color(0x62C8FFE5)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 27
-        ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
-    );
-    canvas.drawPath(
-      reflection,
-      Paint()
-        ..shader = const LinearGradient(
-          colors: [
-            Color(0xFFFFFFFF),
-            Color(0xFFDFFFEF),
-            Color(0x66FFFFFF),
-          ],
-        ).createShader(const Rect.fromLTWH(80, 54, 200, 135))
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 12
-        ..strokeCap = StrokeCap.round,
-    );
-    canvas.drawPath(
-      reflection,
-      Paint()
-        ..color = const Color(0xFFFFFFFF)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.0
-        ..strokeCap = StrokeCap.round,
-    );
-  }
-
-  static void _drawLowerGoldReflection(Canvas canvas) {
-    final lower = Path()
-      ..moveTo(334, 366)
-      ..cubicTo(374, 343, 401, 307, 414, 260);
-    canvas.drawPath(
-      lower,
-      Paint()
-        ..color = const Color(0xB6FFF36A)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 22
-        ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
-    );
-    canvas.drawPath(
-      lower,
-      Paint()
-        ..color = const Color(0xEFFFF7AE)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 5
-        ..strokeCap = StrokeCap.round,
-    );
-  }
-
-  static void _drawMicroHighlights(Canvas canvas) {
-    for (final item in const [
-      (Offset(318, 77), 4.5),
-      (Offset(352, 101), 3.0),
-      (Offset(385, 164), 5.0),
-      (Offset(82, 240), 3.5),
-      (Offset(115, 322), 4.0),
-    ]) {
-      canvas.drawCircle(
-        item.$1,
-        item.$2,
-        Paint()..color = const Color(0xEFFFFFFF),
-      );
-    }
-  }
-
-  static void _drawGlow(
+  static void _paintGlow(
     Canvas canvas,
     Offset center,
     double radius,
-    Color color, {
-    double coreOpacity = 1.0,
-  }) {
+    double opacity,
+  ) {
     canvas.drawCircle(
       center,
-      radius * 2.4,
+      radius * 3.2,
       Paint()
-        ..color = color.withValues(alpha: 0.20 * coreOpacity)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, radius * 1.4),
+        ..color = const Color(0xFFFFF06A).withValues(alpha: 0.16 * opacity)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, radius * 2.0),
     );
     canvas.drawCircle(
       center,
@@ -883,145 +489,18 @@ class _LilyBubblePainter extends CustomPainter {
       Paint()
         ..shader = RadialGradient(
           colors: [
-            Colors.white.withValues(alpha: 0.98 * coreOpacity),
-            color.withValues(alpha: 0.95 * coreOpacity),
-            color.withValues(alpha: 0.0),
+            Colors.white.withValues(alpha: 0.98 * opacity),
+            const Color(0xFFFFEE58).withValues(alpha: 0.92 * opacity),
+            const Color(0x00FFEE58),
           ],
-          stops: const [0.0, 0.38, 1.0],
+          stops: const [0.0, 0.35, 1.0],
         ).createShader(Rect.fromCircle(center: center, radius: radius)),
     );
   }
 
-  static void _softBlob(
-    Canvas canvas,
-    Offset center,
-    double radius,
-    Color color,
-    double blur,
-  ) {
-    canvas.drawCircle(
-      center,
-      radius,
-      Paint()
-        ..color = color
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur),
-    );
-  }
-
-  static void _drawLeaf(
-    Canvas canvas,
-    Path path,
-    Rect bounds, {
-    bool small = false,
-  }) {
-    canvas.drawPath(
-      path,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFD6E74D),
-            Color(0xFF60912B),
-            Color(0xFF255421),
-            Color(0xFF102E18),
-          ],
-          stops: [0.0, 0.35, 0.72, 1.0],
-        ).createShader(bounds),
-    );
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = const Color(0xA9EAF466)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = small ? 3.0 : 4.2,
-    );
-
-    final vein = Path()
-      ..moveTo(bounds.left + bounds.width * 0.18, bounds.bottom - bounds.height * 0.20)
-      ..lineTo(bounds.right - bounds.width * 0.12, bounds.top + bounds.height * 0.26);
-    canvas.drawPath(
-      vein,
-      Paint()
-        ..color = const Color(0x7294C644)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = small ? 1.5 : 2.0,
-    );
-  }
-
-  static void _drawBell(
-    Canvas canvas,
-    Offset center,
-    double scale,
-    double rotation,
-  ) {
-    canvas.save();
-    canvas.translate(center.dx, center.dy);
-    canvas.rotate(rotation);
-    canvas.scale(scale, scale);
-
-    final bell = Path()
-      ..moveTo(0, -24)
-      ..cubicTo(-15, -22, -22, -7, -20, 9)
-      ..cubicTo(-18, 15, -12, 18, -7, 13)
-      ..cubicTo(-4, 21, 3, 21, 7, 13)
-      ..cubicTo(12, 18, 19, 15, 22, 9)
-      ..cubicTo(21, -8, 14, -22, 0, -24)
-      ..close();
-
-    final bounds = bell.getBounds();
-
-    canvas.drawPath(
-      bell,
-      Paint()
-        ..color = const Color(0x66FFF46A)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
-    );
-
-    canvas.drawPath(
-      bell,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFFFFFFF),
-            Color(0xFFF2FFF1),
-            Color(0xFFFFFFD1),
-            Color(0xFFF0D95D),
-          ],
-          stops: [0.0, 0.42, 0.76, 1.0],
-        ).createShader(bounds),
-    );
-
-    canvas.drawPath(
-      bell,
-      Paint()
-        ..color = const Color(0xFFCBDD63)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.0,
-    );
-
-    canvas.drawOval(
-      const Rect.fromLTWH(-11, -17, 7, 19),
-      Paint()..color = const Color(0xB8FFFFFF),
-    );
-    canvas.drawOval(
-      const Rect.fromLTWH(5, -12, 5, 13),
-      Paint()..color = const Color(0x72F7FFEE),
-    );
-
-    canvas.drawCircle(
-      const Offset(0, 10),
-      3.1,
-      Paint()..color = const Color(0xFFE8C347),
-    );
-
-    canvas.restore();
-  }
-
   @override
-  bool shouldRepaint(covariant _LilyBubblePainter oldDelegate) => false;
+  bool shouldRepaint(covariant _LilyFireflyOverlayPainter oldDelegate) =>
+      oldDelegate.progress != progress;
 }
 
 class _CrayonCandidate {
