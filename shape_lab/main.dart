@@ -40,7 +40,7 @@ class LabsPage extends StatefulWidget {
 }
 
 class _LabsPageState extends State<LabsPage> {
-  LabTab tab = LabTab.style;
+  LabTab tab = LabTab.shape;
   bool dark = false;
 
   @override
@@ -85,7 +85,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 025 · Crayon Soft Approved',
+                                  'LAB 026 · 4× Master → 58px Runtime',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -230,6 +230,8 @@ class ShapeLab extends StatelessWidget {
             muted: muted,
           ),
           const SizedBox(height: 16),
+          _HighResRuntimeDemo(fg: fg, muted: muted),
+          const SizedBox(height: 22),
           for (final shape in shapes) ...[
             Text(
               shape.label,
@@ -256,6 +258,449 @@ class ShapeLab extends StatelessWidget {
       ),
     );
   }
+}
+
+
+class _HighResRuntimeDemo extends StatelessWidget {
+  const _HighResRuntimeDemo({required this.fg, required this.muted});
+
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0B1914),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFF284535)),
+      ),
+      child: Wrap(
+        spacing: 18,
+        runSpacing: 12,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          SizedBox(
+            width: 230,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '4× Master → 58px Runtime',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '은방울꽃 Glass Bubble 예시. 내부 좌표는 232×232로 제작하고 실제 잠금 도형은 정확히 58×58로 축소 표시합니다.',
+                  style: TextStyle(
+                    color: muted.withValues(alpha: 0.95),
+                    fontSize: 11,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'MASTER 232px  ·  DISPLAY 58px  ·  SCALE 25%',
+                  style: TextStyle(
+                    color: Color(0xFF9FD9A9),
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Column(
+            children: [
+              Container(
+                width: 96,
+                height: 96,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF08100D),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const _LilyBubbleAsset(displaySize: 58),
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                'ACTUAL 58×58',
+                style: TextStyle(
+                  color: Color(0xFFDCF6E1),
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          Column(
+            children: [
+              Container(
+                width: 132,
+                height: 132,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF08100D),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const _LilyBubbleAsset(displaySize: 116),
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                '2× INSPECTION',
+                style: TextStyle(
+                  color: Color(0xFF8EAE98),
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LilyBubbleAsset extends StatelessWidget {
+  const _LilyBubbleAsset({required this.displaySize});
+
+  final double displaySize;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: displaySize,
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: RepaintBoundary(
+          child: SizedBox.square(
+            dimension: 232,
+            child: CustomPaint(painter: _LilyBubblePainter()),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LilyBubblePainter extends CustomPainter {
+  const _LilyBubblePainter();
+
+  static const _master = 232.0;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final scale = size.width / _master;
+    canvas.save();
+    canvas.scale(scale, scale);
+
+    const center = Offset(116, 116);
+    final orbRect = Rect.fromCircle(center: center, radius: 101);
+
+    canvas.drawCircle(
+      center + const Offset(0, 5),
+      104,
+      Paint()
+        ..color = const Color(0xA0000000)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
+    );
+
+    canvas.drawCircle(
+      center,
+      103,
+      Paint()
+        ..shader = const RadialGradient(
+          center: Alignment(-0.34, -0.30),
+          radius: 1.08,
+          colors: [
+            Color(0xCC174C35),
+            Color(0xE6102E20),
+            Color(0xF20B1712),
+          ],
+          stops: [0.0, 0.54, 1.0],
+        ).createShader(orbRect),
+    );
+
+    canvas.save();
+    canvas.clipPath(Path()..addOval(orbRect));
+
+    final glowRect = Rect.fromCircle(
+      center: const Offset(174, 171),
+      radius: 82,
+    );
+    canvas.drawCircle(
+      const Offset(174, 171),
+      82,
+      Paint()
+        ..shader = const RadialGradient(
+          colors: [
+            Color(0xB8FFF44E),
+            Color(0x806FD51C),
+            Color(0x001A3D17),
+          ],
+          stops: [0.0, 0.36, 1.0],
+        ).createShader(glowRect),
+    );
+
+    final coolRect = Rect.fromCircle(
+      center: const Offset(73, 68),
+      radius: 72,
+    );
+    canvas.drawCircle(
+      const Offset(73, 68),
+      72,
+      Paint()
+        ..shader = const RadialGradient(
+          colors: [
+            Color(0x5A77E6D4),
+            Color(0x2238A58B),
+            Color(0x000B1712),
+          ],
+          stops: [0.0, 0.48, 1.0],
+        ).createShader(coolRect),
+    );
+
+    _drawGlow(canvas, const Offset(55, 76), 10, const Color(0xFFFFE85A));
+    _drawGlow(canvas, const Offset(170, 63), 5, const Color(0xFFFFF29A));
+    _drawGlow(canvas, const Offset(183, 132), 7, const Color(0xFFFFF164));
+    _drawGlow(canvas, const Offset(62, 155), 6, const Color(0xFFFFEE59));
+    _drawGlow(canvas, const Offset(148, 180), 4, const Color(0xFFCEFF85));
+    _drawGlow(canvas, const Offset(87, 96), 3.5, const Color(0xFFB9F8D1));
+    _drawGlow(canvas, const Offset(150, 94), 2.7, const Color(0xFFFFF4A4));
+
+    final stemGlow = Paint()
+      ..color = const Color(0x667AD53A)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 9
+      ..strokeCap = StrokeCap.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    final stem = Paint()
+      ..color = const Color(0xFFD4E748)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4.2
+      ..strokeCap = StrokeCap.round;
+
+    final mainStem = Path()
+      ..moveTo(112, 184)
+      ..cubicTo(111, 153, 111, 118, 120, 80)
+      ..cubicTo(124, 65, 131, 57, 140, 56);
+    canvas.drawPath(mainStem, stemGlow);
+    canvas.drawPath(mainStem, stem);
+
+    final branch1 = Path()
+      ..moveTo(117, 121)
+      ..cubicTo(102, 113, 91, 108, 80, 97);
+    final branch2 = Path()
+      ..moveTo(119, 104)
+      ..cubicTo(134, 97, 145, 89, 151, 78);
+    final branch3 = Path()
+      ..moveTo(114, 139)
+      ..cubicTo(132, 132, 144, 124, 153, 114);
+    canvas.drawPath(branch1, stem);
+    canvas.drawPath(branch2, stem);
+    canvas.drawPath(branch3, stem);
+
+    _drawLeaf(
+      canvas,
+      Path()
+        ..moveTo(111, 159)
+        ..cubicTo(88, 144, 72, 146, 65, 157)
+        ..cubicTo(78, 174, 94, 174, 111, 165)
+        ..close(),
+    );
+    _drawLeaf(
+      canvas,
+      Path()
+        ..moveTo(114, 169)
+        ..cubicTo(131, 150, 149, 147, 161, 153)
+        ..cubicTo(153, 171, 136, 181, 114, 176)
+        ..close(),
+    );
+    _drawLeaf(
+      canvas,
+      Path()
+        ..moveTo(116, 132)
+        ..cubicTo(100, 122, 91, 123, 85, 130)
+        ..cubicTo(95, 140, 105, 141, 116, 137)
+        ..close(),
+      small: true,
+    );
+
+    _drawBell(canvas, const Offset(77, 91), 0.78, -0.14);
+    _drawBell(canvas, const Offset(144, 69), 0.92, 0.10);
+    _drawBell(canvas, const Offset(157, 84), 0.78, 0.12);
+    _drawBell(canvas, const Offset(149, 107), 0.72, 0.10);
+    _drawBell(canvas, const Offset(106, 116), 0.84, -0.10);
+
+    final reflection = Path()
+      ..moveTo(49, 74)
+      ..cubicTo(66, 45, 93, 31, 121, 28)
+      ..cubicTo(91, 32, 67, 49, 56, 78);
+    canvas.drawPath(
+      reflection,
+      Paint()
+        ..color = const Color(0xB9E5FFF0)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 8
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.drawPath(
+      reflection,
+      Paint()
+        ..color = const Color(0xBFFFFFFF)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.3
+        ..strokeCap = StrokeCap.round,
+    );
+
+    final lowerReflection = Path()
+      ..moveTo(171, 175)
+      ..cubicTo(188, 157, 199, 139, 204, 118);
+    canvas.drawPath(
+      lowerReflection,
+      Paint()
+        ..color = const Color(0xA6FFF65D)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 10
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
+
+    canvas.restore();
+
+    canvas.drawCircle(
+      center,
+      102,
+      Paint()
+        ..color = const Color(0xC6A9FFC1)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3.2,
+    );
+    canvas.drawCircle(
+      center,
+      99.2,
+      Paint()
+        ..color = const Color(0x6639CB7A)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.4,
+    );
+
+    canvas.restore();
+  }
+
+  static void _drawGlow(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    Color color,
+  ) {
+    canvas.drawCircle(
+      center,
+      radius * 2.2,
+      Paint()
+        ..color = color.withValues(alpha: 0.16)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, radius * 1.6),
+    );
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            Colors.white.withValues(alpha: 0.98),
+            color.withValues(alpha: 0.92),
+            color.withValues(alpha: 0.0),
+          ],
+          stops: const [0.0, 0.42, 1.0],
+        ).createShader(Rect.fromCircle(center: center, radius: radius)),
+    );
+  }
+
+  static void _drawLeaf(Canvas canvas, Path path, {bool small = false}) {
+    final bounds = path.getBounds();
+    canvas.drawPath(
+      path,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFE6EF4D), Color(0xFF327B2F), Color(0xFF123B24)],
+        ).createShader(bounds),
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = const Color(0xB6DDF25B)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = small ? 2.2 : 2.8,
+    );
+  }
+
+  static void _drawBell(
+    Canvas canvas,
+    Offset center,
+    double scale,
+    double rotation,
+  ) {
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    canvas.rotate(rotation);
+    canvas.scale(scale, scale);
+
+    final path = Path()
+      ..moveTo(0, -14)
+      ..cubicTo(-9, -13, -13, -2, -12, 7)
+      ..cubicTo(-10, 11, -7, 12, -4, 9)
+      ..cubicTo(-2, 14, 2, 14, 4, 9)
+      ..cubicTo(7, 12, 11, 11, 13, 7)
+      ..cubicTo(12, -3, 8, -13, 0, -14)
+      ..close();
+
+    final bounds = path.getBounds();
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = const Color(0x99FFF55C)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFFFFFFF),
+            Color(0xFFF7FFE9),
+            Color(0xFFFFF39A),
+          ],
+          stops: [0.0, 0.55, 1.0],
+        ).createShader(bounds),
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = const Color(0xFFD8E65E)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.1,
+    );
+    canvas.drawOval(
+      const Rect.fromLTWH(-5, -10, 4, 11),
+      Paint()..color = const Color(0x96FFFFFF),
+    );
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _LilyBubblePainter oldDelegate) => false;
 }
 
 class _CrayonCandidate {
