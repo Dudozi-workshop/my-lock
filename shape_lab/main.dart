@@ -725,8 +725,8 @@ class _SeaTurtleInternalAnimation extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Image.asset(_asset, fit: BoxFit.contain),
-          CustomPaint(
-            painter: const _SeaTurtleErasePainter(),
+          const CustomPaint(
+            painter: _SeaTurtleErasePainter(),
           ),
           _SeaTurtleFlipperLayer(
             asset: _asset,
@@ -766,9 +766,9 @@ class _SeaTurtleFlipperLayer extends StatelessWidget {
         final px = pivot.dx * constraints.maxWidth;
         final py = pivot.dy * constraints.maxHeight;
         final transform = Matrix4.identity()
-          ..translate(px, py)
+          ..translateByDouble(px, py, 0, 1)
           ..rotateZ(angle)
-          ..translate(-px, -py);
+          ..translateByDouble(-px, -py, 0, 1);
 
         return Transform(
           alignment: Alignment.topLeft,
