@@ -38,7 +38,7 @@ class ShapeSpecRenderer {
     canvas.translate(center.dx - radius, center.dy - radius);
     canvas.scale(scale, scale);
 
-    final bodyPath = _pathFor(bundle.shape.body);
+    final bodyPath = _pathFor(overrides?.bodyGeometry ?? bundle.shape.body);
 
     if (bundle.style.renderMode == ShapeRenderMode.crayon) {
       _paintCrayonToken(
