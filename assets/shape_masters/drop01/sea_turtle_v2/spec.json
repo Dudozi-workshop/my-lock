@@ -7,33 +7,127 @@
   "version": 2,
   "sourceOfTruth": "Sea Turtle Shape Master S02 / side basic view (locked raster from 74051.png)",
   "geometryPolicy": "source_locked_no_redraw",
-  "rasterCanvas": {"width": 512, "height": 512},
+  "rasterCanvas": {
+    "width": 512,
+    "height": 512
+  },
   "runtimeScale": {
     "policy": "dynamic_from_floating_engine",
-    "radiusRatioOfMinDimension": {"min": 0.072, "max": 0.09},
-    "diameterRatioOfMinDimension": {"min": 0.144, "max": 0.18},
+    "radiusRatioOfMinDimension": {
+      "min": 0.072,
+      "max": 0.09
+    },
+    "diameterRatioOfMinDimension": {
+      "min": 0.144,
+      "max": 0.18
+    },
     "note": "58px is not a master target; representative QA exports are 64/72/80/96px and runtime size remains dynamic."
   },
   "layers": [
-    {"id":"master_alpha","file":"masks/master_alpha.png","token":"main","order":1},
-    {"id":"underbelly","file":"masks/underbelly_mask.png","token":"underbelly","order":2,"semantic":"head-neck-body underside only; far flipper excluded"},
-    {"id":"shell","file":"masks/shell_mask.png","token":"deep","order":3},
-    {"id":"shell_detail","file":"masks/shell_detail_mask.png","token":"detail","order":4,"opacity":0.48},
-    {"id":"shadow","file":"overlays/shadow_overlay.png","type":"overlay","order":5},
-    {"id":"highlight","file":"overlays/highlight_overlay.png","type":"overlay","order":6},
-    {"id":"outline","file":"masks/outline_mask.png","token":"outline","order":7,"opacity":0.72}
+    {
+      "id": "master_alpha",
+      "file": "masks/master_alpha.png",
+      "token": "main",
+      "order": 1
+    },
+    {
+      "id": "underbelly",
+      "file": "masks/underbelly_mask.png",
+      "token": "underbelly",
+      "order": 2,
+      "semantic": "head-neck-body underside only; far flipper excluded"
+    },
+    {
+      "id": "shell",
+      "file": "masks/shell_mask.png",
+      "token": "deep",
+      "order": 3
+    },
+    {
+      "id": "shell_detail",
+      "file": "masks/shell_detail_mask.png",
+      "token": "detail",
+      "order": 4,
+      "opacity": 0.48
+    },
+    {
+      "id": "shadow",
+      "file": "overlays/shadow_overlay.png",
+      "type": "overlay",
+      "order": 5
+    },
+    {
+      "id": "highlight",
+      "file": "overlays/highlight_overlay.png",
+      "type": "overlay",
+      "order": 6
+    },
+    {
+      "id": "outline",
+      "file": "masks/outline_mask.png",
+      "token": "outline",
+      "order": 7,
+      "opacity": 0.72
+    }
   ],
   "palettePolicy": {
-    "outline":"palette_token_not_fixed_color",
-    "underbelly":"semantic_region_with_palette_specific_high_lightness",
-    "shapeIdentity":"selected palette must dominate the full shape"
+    "outline": "palette_token_not_fixed_color",
+    "underbelly": "semantic_region_with_palette_specific_high_lightness",
+    "shapeIdentity": "selected palette must dominate the full shape",
+    "runtimePaletteSource": "ShapeTone",
+    "allowedRuntimeTones": [
+      "pink",
+      "blue",
+      "yellow"
+    ],
+    "customPerShapeColors": false
   },
-  "motion": {"grade":2,"enabled":false,"policy":"idle_only_after_geometry_lock"},
   "runtimeDerivedAssets": {
-    "aquaMint":"assets/sea_turtle_runtime_v2/sea_turtle_blue.png",
-    "coralPink":"assets/sea_turtle_runtime_v2/sea_turtle_pink.png",
-    "sandBeige":"assets/sea_turtle_runtime_v2/sea_turtle_yellow.png",
-    "status":"baked_qa_reference_not_source_of_truth"
+    "blue": "assets/sea_turtle_runtime_v2/sea_turtle_blue.png",
+    "pink": "assets/sea_turtle_runtime_v2/sea_turtle_pink.png",
+    "yellow": "assets/sea_turtle_runtime_v2/sea_turtle_yellow.png",
+    "status": "baked_qa_reference_not_source_of_truth"
   },
-  "status":"static_region_refinement_v2_poc"
+  "status": "shape_animation_qa",
+  "motionSetOwnership": {
+    "owner": "FloatingEngine",
+    "responsibilities": [
+      "position",
+      "collision",
+      "rotation",
+      "speed",
+      "movement_area"
+    ],
+    "independentFromShapeAnimation": true
+  },
+  "shapeAnimation": {
+    "enabled": true,
+    "ownership": "shape_local",
+    "terminology": "Shape Animation",
+    "affects": [
+      "front_flippers"
+    ],
+    "excludes": [
+      "whole_shape_position",
+      "whole_shape_rotation",
+      "collision",
+      "movement_area"
+    ],
+    "qaVariants": [
+      {
+        "id": "long_sweep",
+        "label": "Long Sweep"
+      },
+      {
+        "id": "natural_swim",
+        "label": "Natural Swim",
+        "defaultQa": true
+      },
+      {
+        "id": "soft_flow",
+        "label": "Soft Flow"
+      }
+    ],
+    "status": "shape_lab_qa"
+  }
 }
