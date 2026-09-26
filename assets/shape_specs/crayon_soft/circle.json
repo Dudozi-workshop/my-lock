@@ -2,6 +2,7 @@
   "styleId": "crayon_soft",
   "shapeId": "circle",
   "version": 10,
+  "geometryMaster": "assets/shape_masters/core/basic_v1/circle_master_v1.json",
   "rotationMode": "fixed",
   "body": {
     "kind": "circle",
