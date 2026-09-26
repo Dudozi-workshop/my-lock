@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = ROOT / "assets/shape_masters/drop01/sea_turtle_v2/spec.json"
+V3_SPEC = ROOT / "assets/shape_masters/drop01/sea_turtle_v3/spec.json"
 RUNTIME = ROOT / "assets/sea_turtle_runtime_v2"
 SHAPE_LAB = ROOT / "shape_lab/main.dart"
 
@@ -92,7 +93,7 @@ def main() -> None:
     if spec.get("shapeId") != "d1_s02_sea_turtle":
         fail("unexpected shapeId")
     if spec.get("version") != 2:
-        fail("Sea Turtle master version must remain v2 until explicitly promoted")
+        fail("v2 reference spec must remain version 2")
     if spec.get("geometryPolicy") != "source_locked_no_redraw":
         fail("geometry policy changed")
     shape_animation = spec.get("shapeAnimation", {})
@@ -164,22 +165,46 @@ def main() -> None:
     if residues:
         fail("legacy Sea Turtle animation residue found: " + ", ".join(residues))
 
+    # v3 Canonical preparation intentionally keeps the runtime at neutral F0.
+    # Do not require the old Shape Animation comparison UI before Static Master Lock.
     required_runtime_text = (
-        "Shape Animation Comparison",
-        "Motion Set × Shape Animation QA",
+        "v3 Canonical Draft 준비",
+        "앞지느러미 Shape Animation 분리",
         "FloatingEngine",
-        "_SeaTurtleAnimatedAsset",
         "_SeaTurtleStaticAsset",
     )
     missing = [token for token in required_runtime_text if token not in lab]
     if missing:
-        fail("Shape Animation ownership marker missing: " + ", ".join(missing))
+        fail("current Sea Turtle ownership marker missing: " + ", ".join(missing))
+
+    if not V3_SPEC.is_file():
+        fail(f"missing v3 draft spec: {V3_SPEC.relative_to(ROOT)}")
+    v3 = json.loads(V3_SPEC.read_text(encoding="utf-8"))
+    if v3.get("version") != 3:
+        fail("Sea Turtle canonical draft spec must be version 3")
+    if v3.get("status") != "canonical_2048_draft_f0_part_split":
+        fail("unexpected v3 canonical draft status")
+    canvas = v3.get("canvas", {})
+    if canvas.get("width") != 2048 or canvas.get("height") != 2048 or canvas.get("transparent") is not True:
+        fail("v3 canonical canvas must be 2048x2048 transparent")
+    isolation = v3.get("movingPartIsolation", {})
+    if isolation.get("policy") != "moving_part_owns_visual_maps":
+        fail("v3 moving-part ownership policy changed")
+    if set(isolation.get("maps", [])) != {"alpha", "outline", "shadow", "highlight"}:
+        fail("v3 moving-part visual maps must be alpha/outline/shadow/highlight")
+    animation = v3.get("animation", {})
+    if animation.get("implemented") is not False:
+        fail("v3 animation must remain unimplemented until Static Master Lock")
+    qa = v3.get("qa", {})
+    if qa.get("f0RebuildMaxChannelDiff") != 0 or qa.get("f0RebuildChangedChannelCount") != 0:
+        fail("v3 F0 rebuild QA must remain exact")
 
     print("[sea-turtle-master] PASS")
     print("- Geometry: source_locked_no_redraw")
     print("- Region tokens: main / underbelly / deep / detail / outline")
-    print("- Shape Animation: enabled for front-flipper articulation")
+    print("- Shape Animation: front-flipper ownership defined; implementation deferred until Static Master Lock")
     print("- Motion Set: whole-shape movement remains owned by FloatingEngine")
+    print("- v3 Canonical Draft: 2048x2048 transparent / F0 exact rebuild QA locked")
     print("- Palette: ShapeTone Pink / Blue / Yellow only")
     if source_present:
         print("- Source pack: complete; byte size + SHA-256 verified")
