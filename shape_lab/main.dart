@@ -801,8 +801,15 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
   int _objectCount = 9;
   MovementStyle _movement = MovementStyle.underwater;
   bool _darkBackground = false;
-  bool _frameLoop = true;
-  double _frameElapsedSeconds = 0;
+  bool _motionPlaying = true;
+  double _motionElapsedSeconds = 0;
+  double _playbackRate = 1.0;
+  String _selectedMotionId = 'B';
+
+  _SeaTurtleMotionPreset get _selectedMotion =>
+      _seaTurtleMotionPresets.firstWhere(
+        (preset) => preset.id == _selectedMotionId,
+      );
 
   @override
   void initState() {
@@ -830,8 +837,10 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
 
     if (delta > 0) {
       final safeDelta = delta.clamp(0.0, 0.035).toDouble();
-      _frameElapsedSeconds += safeDelta;
-      _engine.step(safeDelta);
+      if (_motionPlaying) {
+        _motionElapsedSeconds += safeDelta * _playbackRate;
+      }
+      _engine.step(safeDelta * _playbackRate);
       setState(() {});
     }
   }
@@ -852,7 +861,7 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
           _SectionTitle(
             title: 'Drop 01 · Sea Turtle · Long Flipper',
             subtitle:
-                'Static Master 유지 · 3-Frame Swim PoC · 이동/충돌/회전은 Motion Set이 담당',
+                'Static Master 유지 · 6-Key Swim Motion Lab · A/B/C 비교 · 이동/충돌은 Motion Set이 담당',
             fg: widget.fg,
             muted: widget.muted,
           ),
@@ -910,54 +919,54 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
           ),
           const SizedBox(height: 18),
           Text(
-            '3-Frame Swim PoC',
+            '6-Key Swim Motion Lab',
             style: TextStyle(
               color: widget.fg,
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: FontWeight.w900,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            'Long Flipper Static Master에서 앞지느러미 Region만 3개 고정 포즈로 전환합니다. 재생 순서: F1 → F2 → F3 → F2.',
-            style: TextStyle(color: widget.muted, fontSize: 11.5),
+            'Long Flipper Static Master의 앞지느러미 Region만 사용해 A/B/C 세 가지 유영 리듬을 비교합니다. 각 카드의 F1~F6가 실제 보간 Keyframe입니다.',
+            style: TextStyle(color: widget.muted, fontSize: 11.5, height: 1.35),
           ),
           const SizedBox(height: 12),
           LayoutBuilder(
             builder: (context, constraints) {
-              final compact = constraints.maxWidth < 720;
-              final previewWidth = compact
-                  ? constraints.maxWidth
-                  : (constraints.maxWidth - 20) * 0.34;
-              final stripWidth = compact
-                  ? constraints.maxWidth
-                  : (constraints.maxWidth - 20) * 0.66;
-
+              final columns = constraints.maxWidth >= 1040
+                  ? 3
+                  : constraints.maxWidth >= 700
+                      ? 2
+                      : 1;
+              final gap = 12.0;
+              final cardWidth =
+                  (constraints.maxWidth - gap * (columns - 1)) / columns;
               return Wrap(
-                spacing: 20,
-                runSpacing: 14,
-                crossAxisAlignment: WrapCrossAlignment.start,
+                spacing: gap,
+                runSpacing: gap,
                 children: [
-                  SizedBox(
-                    width: previewWidth,
-                    child: _SeaTurtleLoopPreview(
-                      frameIndex: _frameLoop
-                          ? _seaTurtleFrameIndex(_frameElapsedSeconds)
-                          : 0,
-                      muted: widget.muted,
+                  for (final preset in _seaTurtleMotionPresets)
+                    SizedBox(
+                      width: cardWidth,
+                      child: _SeaTurtleMotionCard(
+                        preset: preset,
+                        elapsedSeconds: _motionElapsedSeconds,
+                        selected: preset.id == _selectedMotionId,
+                        muted: widget.muted,
+                        onPick: () => setState(() {
+                          _selectedMotionId = preset.id;
+                          _motionElapsedSeconds = 0;
+                        }),
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    width: stripWidth,
-                    child: _SeaTurtleFrameStrip(muted: widget.muted),
-                  ),
                 ],
               );
             },
           ),
           const SizedBox(height: 18),
           Text(
-            'Runtime Motion Set QA',
+            'Runtime Comparison',
             style: TextStyle(
               color: widget.fg,
               fontSize: 14,
@@ -966,7 +975,7 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
           ),
           const SizedBox(height: 4),
           Text(
-            '실제 FloatingEngine의 이동·충돌·크기 값을 사용합니다. Circle token은 이 Lab에서 물리 계산용으로만 사용됩니다.',
+            '선택한 6-Key preset을 실제 FloatingEngine 이동·충돌·회전과 결합합니다. Circle token은 물리 계산용으로만 사용됩니다.',
             style: TextStyle(color: widget.muted, fontSize: 11.5),
           ),
           const SizedBox(height: 12),
@@ -975,7 +984,16 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
             runSpacing: 8,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              for (final value in const [6, 9, 12])
+              for (final preset in _seaTurtleMotionPresets)
+                ChoiceChip(
+                  label: Text('${preset.id} · ${preset.shortName}'),
+                  selected: _selectedMotionId == preset.id,
+                  onSelected: (_) => setState(() {
+                    _selectedMotionId = preset.id;
+                    _motionElapsedSeconds = 0;
+                  }),
+                ),
+              for (final value in const [3, 6, 9])
                 ChoiceChip(
                   label: Text('$value개'),
                   selected: _objectCount == value,
@@ -998,10 +1016,16 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
                   });
                 },
               ),
+              for (final rate in const [0.5, 1.0, 1.25])
+                ChoiceChip(
+                  label: Text('${rate}x'),
+                  selected: (_playbackRate - rate).abs() < 0.001,
+                  onSelected: (_) => setState(() => _playbackRate = rate),
+                ),
               FilterChip(
-                label: const Text('3-Frame Swim'),
-                selected: _frameLoop,
-                onSelected: (value) => setState(() => _frameLoop = value),
+                label: Text(_motionPlaying ? 'Motion ON' : 'Motion OFF'),
+                selected: _motionPlaying,
+                onSelected: (value) => setState(() => _motionPlaying = value),
               ),
               FilterChip(
                 label: const Text('Dark BG'),
@@ -1056,11 +1080,10 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
                         _SeaTurtleRuntimeObject(
                           key: ValueKey(object.id),
                           object: object,
-                          frameIndex: _frameLoop
-                              ? _seaTurtleFrameIndex(
-                                  _frameElapsedSeconds + object.id * 0.11,
-                                )
-                              : 0,
+                          preset: _selectedMotion,
+                          elapsedSeconds: _motionElapsedSeconds +
+                              object.id * _selectedMotion.durationSeconds * 0.07,
+                          motionEnabled: _motionPlaying,
                         ),
                     ],
                   ),
@@ -1485,15 +1508,22 @@ class _SeaTurtleRuntimeObject extends StatelessWidget {
   const _SeaTurtleRuntimeObject({
     super.key,
     required this.object,
-    required this.frameIndex,
+    required this.preset,
+    required this.elapsedSeconds,
+    required this.motionEnabled,
   });
 
   final FloatingObject object;
-  final int frameIndex;
+  final _SeaTurtleMotionPreset preset;
+  final double elapsedSeconds;
+  final bool motionEnabled;
 
   @override
   Widget build(BuildContext context) {
     final side = object.radius * 2.34;
+    final pose = motionEnabled
+        ? _sampleSeaTurtleMotion(preset, elapsedSeconds)
+        : const _SeaTurtlePose(nearDeg: 0, farDeg: 0);
     return Positioned(
       left: object.position.dx - side / 2,
       top: object.position.dy - side / 2,
@@ -1502,10 +1532,11 @@ class _SeaTurtleRuntimeObject extends StatelessWidget {
       child: IgnorePointer(
         child: Transform.rotate(
           angle: object.rotation,
-          child: _SeaTurtleFrameAsset(
+          child: _SeaTurtlePoseAsset(
             tone: object.token.tone,
             size: side,
-            frameIndex: frameIndex,
+            nearDeg: pose.nearDeg,
+            farDeg: pose.farDeg,
             compactError: true,
           ),
         ),
@@ -1515,34 +1546,19 @@ class _SeaTurtleRuntimeObject extends StatelessWidget {
 }
 
 class _SeaTurtleStaticAsset extends StatelessWidget {
-  const _SeaTurtleStaticAsset({
-    required this.tone,
-    required this.size,
-  });
-
+  const _SeaTurtleStaticAsset({required this.tone, required this.size});
   final ShapeTone tone;
   final double size;
 
   @override
-  Widget build(BuildContext context) {
-    final asset = switch (tone) {
-      ShapeTone.blue =>
-        'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
-      ShapeTone.pink =>
-        'assets/sea_turtle_runtime_v2/sea_turtle_pink.png',
-      ShapeTone.yellow =>
-        'assets/sea_turtle_runtime_v2/sea_turtle_yellow.png',
-    };
-
-    return Image.asset(
-      asset,
-      width: size,
-      height: size,
-      fit: BoxFit.contain,
-      gaplessPlayback: true,
-      filterQuality: FilterQuality.high,
-      errorBuilder: (context, error, stackTrace) {
-        return Container(
+  Widget build(BuildContext context) => Image.asset(
+        _seaTurtleAssetForTone(tone),
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        gaplessPlayback: true,
+        filterQuality: FilterQuality.high,
+        errorBuilder: (context, error, stackTrace) => Container(
           width: size,
           height: size,
           alignment: Alignment.center,
@@ -1554,127 +1570,187 @@ class _SeaTurtleStaticAsset extends StatelessWidget {
             'Asset error',
             style: TextStyle(color: Color(0xFF9F2F2F), fontSize: 10),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
 }
 
-int _seaTurtleFrameIndex(double seconds) {
-  const sequence = <int>[0, 1, 2, 1];
-  const frameDurationSeconds = 0.36;
-  final step = (seconds / frameDurationSeconds).floor();
-  return sequence[step % sequence.length];
+String _seaTurtleAssetForTone(ShapeTone tone) => switch (tone) {
+      ShapeTone.blue => 'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
+      ShapeTone.pink => 'assets/sea_turtle_runtime_v2/sea_turtle_pink.png',
+      ShapeTone.yellow => 'assets/sea_turtle_runtime_v2/sea_turtle_yellow.png',
+    };
+
+class _SeaTurtleKeyframe {
+  const _SeaTurtleKeyframe({required this.t, required this.nearDeg, required this.farDeg});
+  final double t;
+  final double nearDeg;
+  final double farDeg;
 }
 
-class _SeaTurtleLoopPreview extends StatelessWidget {
-  const _SeaTurtleLoopPreview({
-    required this.frameIndex,
-    required this.muted,
+class _SeaTurtleMotionPreset {
+  const _SeaTurtleMotionPreset({
+    required this.id,
+    required this.shortName,
+    required this.title,
+    required this.subtitle,
+    required this.durationSeconds,
+    required this.keys,
   });
-
-  final int frameIndex;
-  final Color muted;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FBFD),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5EDF2)),
-      ),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 170,
-            child: Center(
-              child: _SeaTurtleFrameAsset(
-                tone: ShapeTone.blue,
-                size: 158,
-                frameIndex: frameIndex,
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'LIVE · F${frameIndex + 1}',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            'F1 → F2 → F3 → F2 · 360ms/step',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: muted, fontSize: 10.5),
-          ),
-        ],
-      ),
-    );
-  }
+  final String id;
+  final String shortName;
+  final String title;
+  final String subtitle;
+  final double durationSeconds;
+  final List<_SeaTurtleKeyframe> keys;
 }
 
-class _SeaTurtleFrameStrip extends StatelessWidget {
-  const _SeaTurtleFrameStrip({required this.muted});
+class _SeaTurtlePose {
+  const _SeaTurtlePose({required this.nearDeg, required this.farDeg});
+  final double nearDeg;
+  final double farDeg;
+}
 
+const _seaTurtleMotionPresets = <_SeaTurtleMotionPreset>[
+  _SeaTurtleMotionPreset(
+    id: 'A', shortName: 'Long Sweep', title: 'Long Sweep',
+    subtitle: '긴 스트로크와 우아한 전진감', durationSeconds: 4.0,
+    keys: [
+      _SeaTurtleKeyframe(t: 0.00, nearDeg: 8, farDeg: 5),
+      _SeaTurtleKeyframe(t: 0.18, nearDeg: 2, farDeg: 0),
+      _SeaTurtleKeyframe(t: 0.31, nearDeg: -12, farDeg: -9),
+      _SeaTurtleKeyframe(t: 0.53, nearDeg: -23, farDeg: -18),
+      _SeaTurtleKeyframe(t: 0.66, nearDeg: -10, farDeg: -7),
+      _SeaTurtleKeyframe(t: 1.00, nearDeg: 4, farDeg: 2),
+    ],
+  ),
+  _SeaTurtleMotionPreset(
+    id: 'B', shortName: 'Natural Offset', title: 'Natural Offset',
+    subtitle: '좌우 위상차가 있는 자연스러운 유영', durationSeconds: 3.4,
+    keys: [
+      _SeaTurtleKeyframe(t: 0.00, nearDeg: 6, farDeg: -1),
+      _SeaTurtleKeyframe(t: 0.18, nearDeg: -3, farDeg: 5),
+      _SeaTurtleKeyframe(t: 0.36, nearDeg: -18, farDeg: -5),
+      _SeaTurtleKeyframe(t: 0.58, nearDeg: -10, farDeg: -17),
+      _SeaTurtleKeyframe(t: 0.75, nearDeg: 1, farDeg: -8),
+      _SeaTurtleKeyframe(t: 1.00, nearDeg: 7, farDeg: 3),
+    ],
+  ),
+  _SeaTurtleMotionPreset(
+    id: 'C', shortName: 'Soft Float', title: 'Soft Float',
+    subtitle: '작은 스트로크와 잔잔한 부유감', durationSeconds: 5.2,
+    keys: [
+      _SeaTurtleKeyframe(t: 0.00, nearDeg: 4, farDeg: 1),
+      _SeaTurtleKeyframe(t: 0.20, nearDeg: 0, farDeg: -2),
+      _SeaTurtleKeyframe(t: 0.38, nearDeg: -7, farDeg: -5),
+      _SeaTurtleKeyframe(t: 0.55, nearDeg: -11, farDeg: -9),
+      _SeaTurtleKeyframe(t: 0.74, nearDeg: -4, farDeg: -3),
+      _SeaTurtleKeyframe(t: 1.00, nearDeg: 3, farDeg: 2),
+    ],
+  ),
+];
+
+_SeaTurtlePose _sampleSeaTurtleMotion(_SeaTurtleMotionPreset preset, double seconds) {
+  final wrapped = ((seconds % preset.durationSeconds) + preset.durationSeconds) %
+      preset.durationSeconds;
+  final progress = wrapped / preset.durationSeconds;
+  for (var i = 0; i < preset.keys.length - 1; i++) {
+    final a = preset.keys[i];
+    final b = preset.keys[i + 1];
+    if (progress >= a.t && progress <= b.t) {
+      final raw = ((progress - a.t) / max(0.0001, b.t - a.t))
+          .clamp(0.0, 1.0)
+          .toDouble();
+      final eased = Curves.easeInOut.transform(raw);
+      return _SeaTurtlePose(
+        nearDeg: ui.lerpDouble(a.nearDeg, b.nearDeg, eased) ?? a.nearDeg,
+        farDeg: ui.lerpDouble(a.farDeg, b.farDeg, eased) ?? a.farDeg,
+      );
+    }
+  }
+  final last = preset.keys.last;
+  return _SeaTurtlePose(nearDeg: last.nearDeg, farDeg: last.farDeg);
+}
+
+class _SeaTurtleMotionCard extends StatelessWidget {
+  const _SeaTurtleMotionCard({
+    required this.preset,
+    required this.elapsedSeconds,
+    required this.selected,
+    required this.muted,
+    required this.onPick,
+  });
+  final _SeaTurtleMotionPreset preset;
+  final double elapsedSeconds;
+  final bool selected;
   final Color muted;
+  final VoidCallback onPick;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
+    final pose = _sampleSeaTurtleMotion(preset, elapsedSeconds);
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FBFD),
+        color: selected ? const Color(0xFFF6F3FF) : const Color(0xFFF8FBFD),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5EDF2)),
+        border: Border.all(
+          color: selected ? const Color(0xFF7257F5) : const Color(0xFFE5EDF2),
+          width: selected ? 1.8 : 1,
+        ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Frame Structure',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900),
+          Row(children: [
+            Expanded(child: Text(
+              '${preset.id} · ${preset.title}',
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
+            )),
+            if (selected)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF7257F5),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: const Text('PICK',
+                  style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900)),
+              ),
+          ]),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 150,
+            child: Center(child: _SeaTurtlePoseAsset(
+              tone: ShapeTone.blue, size: 142,
+              nearDeg: pose.nearDeg, farDeg: pose.farDeg,
+            )),
           ),
+          Text(preset.subtitle,
+            style: TextStyle(color: muted, fontSize: 10.5, height: 1.35)),
           const SizedBox(height: 10),
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: 5, runSpacing: 6,
             children: [
-              for (var frame = 0; frame < 3; frame++)
+              for (var i = 0; i < preset.keys.length; i++)
                 SizedBox(
-                  width: 106,
-                  child: Column(
-                    children: [
-                      _SeaTurtleFrameAsset(
-                        tone: ShapeTone.blue,
-                        size: 96,
-                        frameIndex: frame,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        switch (frame) {
-                          0 => 'F1 · Neutral',
-                          1 => 'F2 · Down',
-                          _ => 'F3 · Up',
-                        },
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
+                  width: 62,
+                  child: Column(children: [
+                    _SeaTurtlePoseAsset(
+                      tone: ShapeTone.blue, size: 56,
+                      nearDeg: preset.keys[i].nearDeg,
+                      farDeg: preset.keys[i].farDeg,
+                    ),
+                    Text('F${i + 1}',
+                      style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800)),
+                  ]),
                 ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            '현재는 같은 3색 Runtime PNG에서 Region 좌표만 바꾸는 PoC입니다. 포즈 확정 후 실제 프레임 Asset으로 bake 가능.',
-            style: TextStyle(color: muted, fontSize: 10.5, height: 1.35),
+          OutlinedButton(
+            onPressed: onPick,
+            child: Text(selected ? 'Selected' : 'Pick ${preset.id}'),
           ),
         ],
       ),
@@ -1682,110 +1758,67 @@ class _SeaTurtleFrameStrip extends StatelessWidget {
   }
 }
 
-class _SeaTurtleFrameAsset extends StatelessWidget {
-  const _SeaTurtleFrameAsset({
+class _SeaTurtlePoseAsset extends StatelessWidget {
+  const _SeaTurtlePoseAsset({
     required this.tone,
     required this.size,
-    required this.frameIndex,
+    required this.nearDeg,
+    required this.farDeg,
     this.compactError = false,
   });
-
   final ShapeTone tone;
   final double size;
-  final int frameIndex;
+  final double nearDeg;
+  final double farDeg;
   final bool compactError;
-
   static const _nearPivot = Offset(204 / 512, 234 / 512);
   static const _farPivot = Offset(124 / 512, 239 / 512);
 
   @override
   Widget build(BuildContext context) {
-    final asset = switch (tone) {
-      ShapeTone.blue =>
-        'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
-      ShapeTone.pink =>
-        'assets/sea_turtle_runtime_v2/sea_turtle_pink.png',
-      ShapeTone.yellow =>
-        'assets/sea_turtle_runtime_v2/sea_turtle_yellow.png',
-    };
-
-    final pose = switch (frameIndex.clamp(0, 2)) {
-      1 => (near: 5.5, far: -3.2),
-      2 => (near: -3.0, far: 2.0),
-      _ => (near: 0.0, far: 0.0),
-    };
-
+    final asset = _seaTurtleAssetForTone(tone);
     Widget image({bool showError = false}) => Image.asset(
-          asset,
-          width: size,
-          height: size,
-          fit: BoxFit.contain,
-          gaplessPlayback: true,
-          filterQuality: FilterQuality.high,
-          errorBuilder: (context, error, stackTrace) {
-            if (!showError) return const SizedBox.shrink();
-            if (compactError) {
-              return const Center(
-                child: Icon(
-                  Icons.broken_image_outlined,
-                  size: 18,
-                  color: Color(0xFFB64242),
-                ),
-              );
-            }
-            return Container(
-              width: size,
-              height: size,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFECEC),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                'Asset error',
-                style: TextStyle(color: Color(0xFF9F2F2F), fontSize: 10),
-              ),
-            );
-          },
-        );
-
+      asset, width: size, height: size, fit: BoxFit.contain,
+      gaplessPlayback: true, filterQuality: FilterQuality.high,
+      errorBuilder: (context, error, stackTrace) {
+        if (!showError) return const SizedBox.shrink();
+        if (compactError) {
+          return const Center(child: Icon(
+            Icons.broken_image_outlined, size: 18, color: Color(0xFFB64242)));
+        }
+        return const SizedBox.shrink();
+      },
+    );
     return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        clipBehavior: Clip.none,
-        fit: StackFit.expand,
-        children: [
-          Transform.rotate(
-            angle: _degrees(pose.far),
-            alignment: _alignmentFor(_farPivot),
-            child: ClipPath(
-              clipper: const _SeaTurtleFramePartClipper(_TurtleFramePart.far),
-              child: image(),
-            ),
+      width: size, height: size,
+      child: Stack(fit: StackFit.expand, children: [
+        Transform.rotate(
+          angle: _degrees(farDeg),
+          alignment: _alignmentFor(_farPivot),
+          child: ClipPath(
+            clipper: const _SeaTurtleFramePartClipper(_TurtleFramePart.far),
+            child: image(),
           ),
-          ClipPath(
-            clipper: const _SeaTurtleFrameBaseClipper(),
-            child: image(showError: true),
+        ),
+        ClipPath(
+          clipper: const _SeaTurtleFrameBaseClipper(),
+          child: image(showError: true),
+        ),
+        Transform.rotate(
+          angle: _degrees(nearDeg),
+          alignment: _alignmentFor(_nearPivot),
+          child: ClipPath(
+            clipper: const _SeaTurtleFramePartClipper(_TurtleFramePart.near),
+            child: image(),
           ),
-          Transform.rotate(
-            angle: _degrees(pose.near),
-            alignment: _alignmentFor(_nearPivot),
-            child: ClipPath(
-              clipper: const _SeaTurtleFramePartClipper(_TurtleFramePart.near),
-              child: image(),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ]),
     );
   }
 
   static double _degrees(double value) => value * pi / 180;
-
-  static Alignment _alignmentFor(Offset pivot) {
-    return Alignment(pivot.dx * 2 - 1, pivot.dy * 2 - 1);
-  }
+  static Alignment _alignmentFor(Offset pivot) =>
+      Alignment(pivot.dx * 2 - 1, pivot.dy * 2 - 1);
 }
 
 enum _TurtleFramePart { near, far }
