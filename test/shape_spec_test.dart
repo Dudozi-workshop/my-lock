@@ -130,4 +130,36 @@ void main() {
     }
   });
 
+  test('Core styles resolve the same canonical body geometry', () async {
+    await ShapeSpecRegistry.instance.load();
+
+    for (final shape in ShapeKind.values) {
+      final soft = ShapeSpecRegistry.instance.resolve(
+        ShapeStyle.softBasic,
+        shape,
+      );
+      final crayon = ShapeSpecRegistry.instance.resolve(
+        ShapeStyle.crayonSoft,
+        shape,
+      );
+
+      expect(soft.shape.body.kind, crayon.shape.body.kind);
+      expect(soft.shape.body.values, crayon.shape.body.values);
+    }
+
+    final triangle = ShapeSpecRegistry.instance.resolve(
+      ShapeStyle.softBasic,
+      ShapeKind.triangle,
+    );
+    expect(triangle.shape.body.values['cornerRadius'], 10);
+    expect(
+      triangle.shape.body.values['points'],
+      equals([
+        [50, 4],
+        [96, 91],
+        [4, 91],
+      ]),
+    );
+  });
+
 }
