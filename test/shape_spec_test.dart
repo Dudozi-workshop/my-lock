@@ -112,7 +112,7 @@ void main() {
     expect(commands.last['op'], 'Z');
   });
 
-  test('Crayon Soft reuses shape masters with procedural texture', () async {
+  test('Crayon Soft uses frozen geometry masters with procedural texture', () async {
     await ShapeSpecRegistry.instance.load();
 
     for (final shape in ShapeKind.values) {
@@ -123,9 +123,9 @@ void main() {
 
       expect(bundle.style.id, 'crayon_soft');
       expect(bundle.style.renderMode, ShapeRenderMode.crayon);
-      expect(bundle.style.shapeSourceId, 'soft_basic');
+      expect(bundle.style.shapeSourceId, 'crayon_soft');
       expect(bundle.style.crayon, isNotNull);
-      expect(bundle.shape.styleId, 'soft_basic');
+      expect(bundle.shape.styleId, 'crayon_soft');
       expect(bundle.shape.shapeId, shape.name);
     }
   });
