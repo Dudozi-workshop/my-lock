@@ -1875,12 +1875,10 @@ class _SeaTurtleStaticAsset extends StatelessWidget {
   const _SeaTurtleStaticAsset({
     required this.tone,
     required this.size,
-    this.compactError = false,
   });
 
   final ShapeTone tone;
   final double size;
-  final bool compactError;
 
   @override
   Widget build(BuildContext context) {
@@ -1892,15 +1890,6 @@ class _SeaTurtleStaticAsset extends StatelessWidget {
       gaplessPlayback: true,
       filterQuality: FilterQuality.high,
       errorBuilder: (context, error, stackTrace) {
-        if (compactError) {
-          return const Center(
-            child: Icon(
-              Icons.broken_image_outlined,
-              size: 18,
-              color: Color(0xFFB64242),
-            ),
-          );
-        }
         return Container(
           width: size,
           height: size,
