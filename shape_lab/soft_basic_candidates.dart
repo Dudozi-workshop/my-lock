@@ -327,6 +327,16 @@ enum SoftBasicSquareHighlightTechnique {
   edgeFade,
 }
 
+enum SoftBasicSquareMaterialProfile {
+  legacy,
+  circleTransfer,
+  mockupGloss,
+  softGloss,
+  wideDiffuse,
+  highSpec,
+  balancedGloss,
+}
+
 class SoftBasicSquareCandidate {
   const SoftBasicSquareCandidate({
     required this.id,
@@ -334,6 +344,7 @@ class SoftBasicSquareCandidate {
     required this.intent,
     required this.technique,
     this.highlightTechnique = SoftBasicSquareHighlightTechnique.round1Base,
+    this.materialProfile = SoftBasicSquareMaterialProfile.legacy,
     this.badge,
   });
 
@@ -342,6 +353,7 @@ class SoftBasicSquareCandidate {
   final String intent;
   final SoftBasicSquareTechnique technique;
   final SoftBasicSquareHighlightTechnique highlightTechnique;
+  final SoftBasicSquareMaterialProfile materialProfile;
   final String? badge;
 }
 
@@ -439,5 +451,57 @@ const softBasicSquareRound3Candidates = <SoftBasicSquareCandidate>[
     technique: SoftBasicSquareTechnique.tighterCorner,
     highlightTechnique: SoftBasicSquareHighlightTechnique.edgeFade,
     badge: 'NATURAL',
+  ),
+];
+
+
+const softBasicSquareRound4Candidates = <SoftBasicSquareCandidate>[
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R4-01',
+    name: 'Circle Transfer',
+    intent: '확정 Circle R9N-03의 광원 구조와 재질감을 Square geometry에 가장 직접적으로 이식한 기준안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    materialProfile: SoftBasicSquareMaterialProfile.circleTransfer,
+    badge: 'CIRCLE',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R4-02',
+    name: 'Mockup Gloss',
+    intent: '목업의 Soft Spec, Core Spec, Diffuse Light, Form Shadow를 가장 선명하게 재현한 고광택 기준안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    materialProfile: SoftBasicSquareMaterialProfile.mockupGloss,
+    badge: 'MOCKUP',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R4-03',
+    name: 'Soft Gloss',
+    intent: 'Mockup Gloss의 광택 구조는 유지하되 광도와 대비를 약 15~20% 낮춘 부드러운 절충안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    materialProfile: SoftBasicSquareMaterialProfile.softGloss,
+    badge: 'SOFT',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R4-04',
+    name: 'Wide Diffuse',
+    intent: '하단 색상 반사광을 넓게 퍼뜨려 선 없이도 말랑한 볼륨이 읽히도록 만든 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    materialProfile: SoftBasicSquareMaterialProfile.wideDiffuse,
+    badge: 'DIFFUSE',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R4-05',
+    name: 'High Spec',
+    intent: '좌상단 Soft Spec과 작은 Core Spec을 선명하게 잡아 매끈한 표면 광택을 가장 쉽게 읽히게 한 안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    materialProfile: SoftBasicSquareMaterialProfile.highSpec,
+    badge: 'SPEC',
+  ),
+  SoftBasicSquareCandidate(
+    id: 'SB-S-R4-06',
+    name: 'Balanced Gloss',
+    intent: '상단광, 코어광, 하단 반사광, 우하단 음영을 균형 있게 조정해 실사용 58px까지 노린 종합안.',
+    technique: SoftBasicSquareTechnique.tighterCorner,
+    materialProfile: SoftBasicSquareMaterialProfile.balancedGloss,
+    badge: 'BALANCED',
   ),
 ];
