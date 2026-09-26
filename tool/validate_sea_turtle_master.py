@@ -62,7 +62,7 @@ EXPECTED_RUNTIME = {
     },
 }
 
-FORBIDDEN_SHAPE_LOCAL_MOTION = (
+FORBIDDEN_LEGACY_ANIMATION = (
     "6-Key Swim Motion Lab",
     "_SeaTurtleMotionPreset",
     "_SeaTurtleMotionCard",
@@ -72,7 +72,6 @@ FORBIDDEN_SHAPE_LOCAL_MOTION = (
     "_motionElapsedSeconds",
     "_motionPlaying",
     "3-Frame Swim PoC",
-    "Flipper animation",
 )
 
 
@@ -96,8 +95,27 @@ def main() -> None:
         fail("Sea Turtle master version must remain v2 until explicitly promoted")
     if spec.get("geometryPolicy") != "source_locked_no_redraw":
         fail("geometry policy changed")
-    if spec.get("motion", {}).get("enabled") is not False:
-        fail("shape-local motion must stay disabled")
+    shape_animation = spec.get("shapeAnimation", {})
+    if shape_animation.get("enabled") is not True:
+        fail("Shape Animation must stay enabled for the high-grade Sea Turtle")
+    if shape_animation.get("terminology") != "Shape Animation":
+        fail("shape-local articulation must be named Shape Animation")
+    if "front_flippers" not in shape_animation.get("affects", []):
+        fail("Sea Turtle Shape Animation must own front-flipper articulation")
+
+    motion_owner = spec.get("motionSetOwnership", {})
+    if motion_owner.get("owner") != "FloatingEngine":
+        fail("Motion Set ownership must remain with FloatingEngine")
+    if motion_owner.get("independentFromShapeAnimation") is not True:
+        fail("Motion Set and Shape Animation must remain independent")
+
+    palette_policy = spec.get("palettePolicy", {})
+    if palette_policy.get("runtimePaletteSource") != "ShapeTone":
+        fail("runtime palette source must remain ShapeTone")
+    if set(palette_policy.get("allowedRuntimeTones", [])) != {"pink", "blue", "yellow"}:
+        fail("Sea Turtle runtime tones must match the current app palette")
+    if palette_policy.get("customPerShapeColors") is not False:
+        fail("Sea Turtle-only custom colors are not allowed")
 
     layers = {layer["id"]: layer for layer in spec.get("layers", [])}
     expected_tokens = {
@@ -142,23 +160,27 @@ def main() -> None:
             fail(f"SHA-256 mismatch: {name}")
 
     lab = SHAPE_LAB.read_text(encoding="utf-8")
-    residues = [token for token in FORBIDDEN_SHAPE_LOCAL_MOTION if token in lab]
+    residues = [token for token in FORBIDDEN_LEGACY_ANIMATION if token in lab]
     if residues:
-        fail("shape-local motion residue found: " + ", ".join(residues))
+        fail("legacy Sea Turtle animation residue found: " + ", ".join(residues))
 
     required_runtime_text = (
-        "Shape 자체 Motion 없음",
+        "Shape Animation Comparison",
+        "Motion Set × Shape Animation QA",
         "FloatingEngine",
+        "_SeaTurtleAnimatedAsset",
         "_SeaTurtleStaticAsset",
     )
     missing = [token for token in required_runtime_text if token not in lab]
     if missing:
-        fail("static runtime ownership marker missing: " + ", ".join(missing))
+        fail("Shape Animation ownership marker missing: " + ", ".join(missing))
 
     print("[sea-turtle-master] PASS")
     print("- Geometry: source_locked_no_redraw")
     print("- Region tokens: main / underbelly / deep / detail / outline")
-    print("- Shape-local motion: disabled")
+    print("- Shape Animation: enabled for front-flipper articulation")
+    print("- Motion Set: whole-shape movement remains owned by FloatingEngine")
+    print("- Palette: ShapeTone Pink / Blue / Yellow only")
     if source_present:
         print("- Source pack: complete; byte size + SHA-256 verified")
     else:
