@@ -115,7 +115,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 032 · Core Basic 3-Shape Master Compare',
+                                  'LAB 033 · Soft Basic Triangle Final Material Round',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -2130,20 +2130,20 @@ class _SharedTriangleMasterLab extends StatefulWidget {
 }
 
 class _SharedTriangleMasterLabState extends State<_SharedTriangleMasterLab> {
-  int selectedIndex = 2;
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
-    final selected = softBasicTriangleGeometryRound1Candidates[selectedIndex];
+    final selected = softBasicTriangleFinalCandidates[selectedIndex];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Triangle · Geometry Round 1',
+          title: 'Soft Basic · Triangle · Final Material Round',
           subtitle:
-              '정삼각형 비율은 고정하고 꼭짓점 corner round만 2/3/4/5px로 비교합니다. Crayon Soft는 현재 외형을 Frozen Reference로 유지하며 이번 라운드에서 변경하지 않습니다.',
+              'Triangle Geometry는 Canonical Master(R10)로 고정. 모양은 건드리지 않고 Highlight · Shade · Ambient Bounce의 위치와 강도만 최종 비교합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -2152,22 +2152,28 @@ class _SharedTriangleMasterLabState extends State<_SharedTriangleMasterLab> {
           spacing: 6,
           runSpacing: 4,
           children: [
+            const _ValueChip(label: 'Geometry', value: 'MASTER LOCKED'),
+            const _ValueChip(label: 'Corner', value: 'R10'),
             TextButton.icon(
               onPressed: widget.onBackToSquare,
               icon: const Icon(Icons.crop_square_rounded, size: 16),
-              label: const Text('Square Master 보기'),
+              label: const Text('Square 확정본 보기'),
             ),
             TextButton.icon(
               onPressed: widget.onBackToCircle,
               icon: const Icon(Icons.check_circle_outline, size: 16),
-              label: const Text('Circle Master 보기'),
+              label: const Text('Circle 확정본 보기'),
             ),
           ],
         ),
         const SizedBox(height: 10),
         LayoutBuilder(
           builder: (context, constraints) {
-            final columns = constraints.maxWidth >= 980 ? 4 : 2;
+            final columns = constraints.maxWidth >= 980
+                ? 3
+                : constraints.maxWidth >= 650
+                    ? 2
+                    : 1;
             final gap = compact ? 8.0 : 12.0;
             final itemWidth =
                 (constraints.maxWidth - gap * (columns - 1)) / columns;
@@ -2176,14 +2182,11 @@ class _SharedTriangleMasterLabState extends State<_SharedTriangleMasterLab> {
               spacing: gap,
               runSpacing: gap,
               children: [
-                for (var i = 0;
-                    i < softBasicTriangleGeometryRound1Candidates.length;
-                    i++)
+                for (var i = 0; i < softBasicTriangleFinalCandidates.length; i++)
                   SizedBox(
                     width: itemWidth,
-                    child: _TriangleGeometryCandidateCard(
-                      candidate:
-                          softBasicTriangleGeometryRound1Candidates[i],
+                    child: _TriangleMaterialCandidateCard(
+                      candidate: softBasicTriangleFinalCandidates[i],
                       selected: selectedIndex == i,
                       card: widget.card,
                       fg: widget.fg,
@@ -2196,7 +2199,7 @@ class _SharedTriangleMasterLabState extends State<_SharedTriangleMasterLab> {
           },
         ),
         const SizedBox(height: 14),
-        _TriangleGeometryComparePanel(
+        _TriangleMaterialDetailPanel(
           candidate: selected,
           card: widget.card,
           fg: widget.fg,
@@ -2207,8 +2210,8 @@ class _SharedTriangleMasterLabState extends State<_SharedTriangleMasterLab> {
   }
 }
 
-class _TriangleGeometryCandidateCard extends StatelessWidget {
-  const _TriangleGeometryCandidateCard({
+class _TriangleMaterialCandidateCard extends StatelessWidget {
+  const _TriangleMaterialCandidateCard({
     required this.candidate,
     required this.selected,
     required this.card,
@@ -2217,7 +2220,7 @@ class _TriangleGeometryCandidateCard extends StatelessWidget {
     required this.onTap,
   });
 
-  final SoftBasicTriangleGeometryCandidate candidate;
+  final SoftBasicTriangleMaterialCandidate candidate;
   final bool selected;
   final Color card;
   final Color fg;
@@ -2232,8 +2235,8 @@ class _TriangleGeometryCandidateCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(18),
         child: Container(
-          height: 174,
-          padding: const EdgeInsets.all(10),
+          height: 196,
+          padding: const EdgeInsets.all(11),
           decoration: BoxDecoration(
             color: card,
             borderRadius: BorderRadius.circular(18),
@@ -2287,10 +2290,10 @@ class _TriangleGeometryCandidateCard extends StatelessWidget {
                     ShapeTone.blue,
                     ShapeTone.yellow,
                   ])
-                    _TriangleGeometryToken(
+                    _TriangleMaterialToken(
                       tone: tone,
                       candidate: candidate,
-                      size: 54,
+                      size: 58,
                     ),
                 ],
               ),
@@ -2313,15 +2316,15 @@ class _TriangleGeometryCandidateCard extends StatelessWidget {
   }
 }
 
-class _TriangleGeometryComparePanel extends StatelessWidget {
-  const _TriangleGeometryComparePanel({
+class _TriangleMaterialDetailPanel extends StatelessWidget {
+  const _TriangleMaterialDetailPanel({
     required this.candidate,
     required this.card,
     required this.fg,
     required this.muted,
   });
 
-  final SoftBasicTriangleGeometryCandidate candidate;
+  final SoftBasicTriangleMaterialCandidate candidate;
   final Color card;
   final Color fg;
   final Color muted;
@@ -2336,7 +2339,7 @@ class _TriangleGeometryComparePanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${candidate.id} · ${candidate.name} · R=${candidate.cornerRadius.toStringAsFixed(0)}px',
+            '${candidate.id} · ${candidate.name}',
             style: TextStyle(
               color: fg,
               fontSize: 17,
@@ -2350,7 +2353,7 @@ class _TriangleGeometryComparePanel extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            '96px ENLARGED · BASIC CANDIDATE ↔ CRAYON FROZEN',
+            '96px ENLARGED · CURRENT ↔ CANDIDATE',
             style: TextStyle(
               color: fg,
               fontSize: 11,
@@ -2359,7 +2362,7 @@ class _TriangleGeometryComparePanel extends StatelessWidget {
           ),
           const SizedBox(height: 9),
           for (final tone in tones) ...[
-            _TriangleGeometryToneRow(
+            _TriangleMaterialCompareRow(
               tone: tone,
               candidate: candidate,
               size: 96,
@@ -2372,7 +2375,7 @@ class _TriangleGeometryComparePanel extends StatelessWidget {
           const Divider(color: Color(0xFFE8E5EF), height: 1),
           const SizedBox(height: 14),
           Text(
-            '58px APP EXACT SCALE',
+            '58px APP SCALE · 3 SHAPE BALANCE',
             style: TextStyle(
               color: fg,
               fontSize: 11,
@@ -2381,14 +2384,13 @@ class _TriangleGeometryComparePanel extends StatelessWidget {
           ),
           const SizedBox(height: 9),
           for (final tone in tones) ...[
-            _TriangleGeometryToneRow(
+            _TriangleThreeShapeBalanceRow(
               tone: tone,
               candidate: candidate,
-              size: 58,
               fg: fg,
               muted: muted,
             ),
-            if (tone != tones.last) const SizedBox(height: 9),
+            if (tone != tones.last) const SizedBox(height: 12),
           ],
         ],
       ),
@@ -2396,8 +2398,8 @@ class _TriangleGeometryComparePanel extends StatelessWidget {
   }
 }
 
-class _TriangleGeometryToneRow extends StatelessWidget {
-  const _TriangleGeometryToneRow({
+class _TriangleMaterialCompareRow extends StatelessWidget {
+  const _TriangleMaterialCompareRow({
     required this.tone,
     required this.candidate,
     required this.size,
@@ -2406,7 +2408,7 @@ class _TriangleGeometryToneRow extends StatelessWidget {
   });
 
   final ShapeTone tone;
-  final SoftBasicTriangleGeometryCandidate candidate;
+  final SoftBasicTriangleMaterialCandidate candidate;
   final double size;
   final Color fg;
   final Color muted;
@@ -2428,10 +2430,10 @@ class _TriangleGeometryToneRow extends StatelessWidget {
         ),
         Expanded(
           child: _CompareTokenCell(
-            label: 'SOFT BASIC · R=${candidate.cornerRadius.toStringAsFixed(0)}',
-            token: _TriangleGeometryToken(
+            label: 'CURRENT',
+            token: _ProductionCoreToken(
+              shape: ShapeKind.triangle,
               tone: tone,
-              candidate: candidate,
               size: size,
             ),
             fg: fg,
@@ -2441,10 +2443,10 @@ class _TriangleGeometryToneRow extends StatelessWidget {
         const SizedBox(width: 14),
         Expanded(
           child: _CompareTokenCell(
-            label: 'CRAYON · FROZEN',
-            token: _ProductionTriangleToken(
+            label: candidate.id,
+            token: _TriangleMaterialToken(
               tone: tone,
-              style: ShapeStyle.crayonSoft,
+              candidate: candidate,
               size: size,
             ),
             fg: fg,
@@ -2456,15 +2458,86 @@ class _TriangleGeometryToneRow extends StatelessWidget {
   }
 }
 
-class _TriangleGeometryToken extends StatelessWidget {
-  const _TriangleGeometryToken({
+class _TriangleThreeShapeBalanceRow extends StatelessWidget {
+  const _TriangleThreeShapeBalanceRow({
+    required this.tone,
+    required this.candidate,
+    required this.fg,
+    required this.muted,
+  });
+
+  final ShapeTone tone;
+  final SoftBasicTriangleMaterialCandidate candidate;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 50,
+          child: Text(
+            tone.label,
+            style: TextStyle(
+              color: muted,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        Expanded(
+          child: _CompareTokenCell(
+            label: 'CIRCLE',
+            token: _ProductionCoreToken(
+              shape: ShapeKind.circle,
+              tone: tone,
+              size: 58,
+            ),
+            fg: fg,
+            muted: muted,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _CompareTokenCell(
+            label: 'TRIANGLE',
+            token: _TriangleMaterialToken(
+              tone: tone,
+              candidate: candidate,
+              size: 58,
+            ),
+            fg: fg,
+            muted: muted,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _CompareTokenCell(
+            label: 'SQUARE',
+            token: _ProductionCoreToken(
+              shape: ShapeKind.square,
+              tone: tone,
+              size: 58,
+            ),
+            fg: fg,
+            muted: muted,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TriangleMaterialToken extends StatelessWidget {
+  const _TriangleMaterialToken({
     required this.tone,
     required this.candidate,
     required this.size,
   });
 
   final ShapeTone tone;
-  final SoftBasicTriangleGeometryCandidate candidate;
+  final SoftBasicTriangleMaterialCandidate candidate;
   final double size;
 
   @override
@@ -2472,7 +2545,7 @@ class _TriangleGeometryToken extends StatelessWidget {
     return SizedBox.square(
       dimension: size,
       child: CustomPaint(
-        painter: _TriangleGeometryPainter(
+        painter: _TriangleMaterialPainter(
           tone: tone,
           candidate: candidate,
         ),
@@ -2481,17 +2554,24 @@ class _TriangleGeometryToken extends StatelessWidget {
   }
 }
 
-class _TriangleGeometryPainter extends CustomPainter {
-  const _TriangleGeometryPainter({
+class _TriangleMaterialPainter extends CustomPainter {
+  const _TriangleMaterialPainter({
     required this.tone,
     required this.candidate,
   });
 
   final ShapeTone tone;
-  final SoftBasicTriangleGeometryCandidate candidate;
+  final SoftBasicTriangleMaterialCandidate candidate;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final highlightTransform = ShapeLayerTransform(
+      scaleX: candidate.highlightScaleX,
+      scaleY: candidate.highlightScaleY,
+      offsetX: candidate.highlightOffsetX,
+      offsetY: candidate.highlightOffsetY,
+    );
+
     ShapeSpecRenderer.paintToken(
       canvas,
       center: size.center(Offset.zero),
@@ -2500,37 +2580,58 @@ class _TriangleGeometryPainter extends CustomPainter {
       style: ShapeStyle.softBasic,
       opacity: 1,
       overrides: ShapeRenderOverrides(
-        bodyGeometry: ShapeGeometrySpec(
-          'roundedPolygon',
-          <String, dynamic>{
-            'kind': 'roundedPolygon',
-            'cornerRadius': candidate.cornerRadius,
-            'points': const <dynamic>[
-              <dynamic>[50.0, 11.9],
-              <dynamic>[94.0, 88.1],
-              <dynamic>[6.0, 88.1],
-            ],
-          },
-        ),
+        layerOpacityScaleById: <String, double>{
+          'edge_leaf': candidate.highlightOpacityScale,
+          'edge_leaf_halo': candidate.haloOpacityScale,
+          'airbrush_light': candidate.lightOpacityScale,
+          'airbrush_shade': candidate.shadeOpacityScale,
+          'ambient_bounce': candidate.bounceOpacityScale,
+          'ambient_core': candidate.coreOpacityScale,
+          'ambient_depth': candidate.depthOpacityScale,
+        },
+        layerTransformById: <String, ShapeLayerTransform>{
+          'edge_leaf': highlightTransform,
+          'edge_leaf_halo': highlightTransform,
+          'airbrush_light': ShapeLayerTransform(
+            scaleX: candidate.lightScaleX,
+            scaleY: candidate.lightScaleY,
+            offsetX: candidate.lightOffsetX,
+            offsetY: candidate.lightOffsetY,
+          ),
+          'airbrush_shade': ShapeLayerTransform(
+            scaleX: candidate.shadeScaleX,
+            scaleY: candidate.shadeScaleY,
+            offsetX: candidate.shadeOffsetX,
+            offsetY: candidate.shadeOffsetY,
+          ),
+          'ambient_bounce': ShapeLayerTransform(
+            scaleX: candidate.bounceScaleX,
+            scaleY: candidate.bounceScaleY,
+            offsetX: candidate.bounceOffsetX,
+            offsetY: candidate.bounceOffsetY,
+          ),
+        },
+        shadowOpacityScale: candidate.shadowOpacityScale,
+        shadowElevationScale: candidate.shadowElevationScale,
       ),
     );
   }
 
   @override
-  bool shouldRepaint(covariant _TriangleGeometryPainter oldDelegate) =>
+  bool shouldRepaint(covariant _TriangleMaterialPainter oldDelegate) =>
       oldDelegate.tone != tone ||
       oldDelegate.candidate.id != candidate.id;
 }
 
-class _ProductionTriangleToken extends StatelessWidget {
-  const _ProductionTriangleToken({
+class _ProductionCoreToken extends StatelessWidget {
+  const _ProductionCoreToken({
+    required this.shape,
     required this.tone,
-    required this.style,
     required this.size,
   });
 
+  final ShapeKind shape;
   final ShapeTone tone;
-  final ShapeStyle style;
   final double size;
 
   @override
@@ -2539,8 +2640,8 @@ class _ProductionTriangleToken extends StatelessWidget {
       dimension: size,
       child: CustomPaint(
         painter: LockTokenPainter(
-          LockToken(shape: ShapeKind.triangle, tone: tone),
-          style: style,
+          LockToken(shape: shape, tone: tone),
+          style: ShapeStyle.softBasic,
         ),
       ),
     );
