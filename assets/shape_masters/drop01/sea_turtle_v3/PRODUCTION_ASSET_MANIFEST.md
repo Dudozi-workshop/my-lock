@@ -31,11 +31,16 @@ Updated: 2026-09-26
 - SHA-256: `b9af6b1fd8d9454bc1837b64ffafd4fad66925a5064a5f7a122c7902289ce38f`
 - Status: DRAFT QA COMPLETE / semantic refinement may continue
 
+### Belly Mask
+- File: `belly_mask_2048.png`
+- Drive ID: `12FysUfX-i4qdGU9E4KftGbDcWMjteTek`
+- SHA-256: `fb3fa0c869c194edeffa1992edc360dba3895f04186b7e05810e11f4c832e118`
+- Status: DRAFT QA COMPLETE / semantic refinement may continue
+
 ## Next
-1. Belly mask
-2. Shell detail mask
-3. Static / Near / Far F0 split
-4. Per-part alpha / outline / shadow / highlight
-5. F0 rebuild QA
-6. Asset Split QA
-7. Static Master Lock
+1. Shell detail mask
+2. Static / Near / Far F0 split
+3. Per-part alpha / outline / shadow / highlight
+4. F0 rebuild QA
+5. Asset Split QA
+6. Static Master Lock
