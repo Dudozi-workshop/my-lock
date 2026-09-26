@@ -1901,8 +1901,8 @@ class _SoftBasicSquareRound2State extends State<_SoftBasicSquareRound2> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Square · Round 5 · High Spec × Balanced',
-          subtitle: 'Round 4의 05 High Spec과 06 Balanced Gloss만 남겨 각각 3안씩 디벨롭합니다. 사각 형태는 고정하고 Soft Spec 면광 · Core Spec · 하단 Diffuse Bounce만 미세 조정합니다.',
+          title: 'Soft Basic · Square · Round 5 · High Spec × Balanced · SELECTED 03',
+          subtitle: 'Round 5는 03 High Spec · Compact Core로 확정합니다. 이 형태를 Master로 고정하고 다음 라운드부터 03 기반 파생안을 디벨롭합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -2685,46 +2685,38 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
         ),
     );
 
-    // R5-03 keeps the broad Soft Spec but removes point-like white accents.
-    // This avoids the core/sparkle reading as decorative dots at 58px.
-    final suppressPointSpec =
-        refinement == SoftBasicSquareGlossRefinement.highCompactCore;
-
-    if (!suppressPointSpec) {
-      // Core Spec: a compact interior glint, never an edge stroke.
-      final coreRect = Rect.fromCenter(
-        center: Offset(
-          rect.left + rect.width * 0.235,
-          rect.top + rect.height * 0.205,
+    // Core Spec: a compact interior glint, never an edge stroke.
+    final coreRect = Rect.fromCenter(
+      center: Offset(
+        rect.left + rect.width * 0.235,
+        rect.top + rect.height * 0.205,
+      ),
+      width: rect.width * 0.105 * coreScale,
+      height: rect.height * 0.165 * coreScale,
+    );
+    final core = RRect.fromRectAndRadius(
+      coreRect,
+      Radius.circular(coreRect.width * 0.50),
+    );
+    canvas.save();
+    canvas.translate(coreRect.center.dx, coreRect.center.dy);
+    canvas.rotate(0.34);
+    canvas.translate(-coreRect.center.dx, -coreRect.center.dy);
+    canvas.drawRRect(
+      core,
+      Paint()
+        ..color = Colors.white.withValues(alpha: coreAlpha)
+        ..maskFilter = MaskFilter.blur(
+          BlurStyle.normal,
+          size.shortestSide * 0.007,
         ),
-        width: rect.width * 0.105 * coreScale,
-        height: rect.height * 0.165 * coreScale,
-      );
-      final core = RRect.fromRectAndRadius(
-        coreRect,
-        Radius.circular(coreRect.width * 0.50),
-      );
-      canvas.save();
-      canvas.translate(coreRect.center.dx, coreRect.center.dy);
-      canvas.rotate(0.34);
-      canvas.translate(-coreRect.center.dx, -coreRect.center.dy);
-      canvas.drawRRect(
-        core,
-        Paint()
-          ..color = Colors.white.withValues(alpha: coreAlpha)
-          ..maskFilter = MaskFilter.blur(
-            BlurStyle.normal,
-            size.shortestSide * 0.007,
-          ),
-      );
-      canvas.restore();
-    }
+    );
+    canvas.restore();
 
     // Small secondary sparkle only for the glossier profiles.
-    if (!suppressPointSpec &&
-        (profile == SoftBasicSquareMaterialProfile.mockupGloss ||
-            profile == SoftBasicSquareMaterialProfile.highSpec ||
-            profile == SoftBasicSquareMaterialProfile.balancedGloss)) {
+    if (profile == SoftBasicSquareMaterialProfile.mockupGloss ||
+        profile == SoftBasicSquareMaterialProfile.highSpec ||
+        profile == SoftBasicSquareMaterialProfile.balancedGloss) {
       canvas.drawOval(
         Rect.fromCenter(
           center: Offset(
@@ -2742,7 +2734,6 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
           ),
       );
     }
-
     canvas.restore();
   }
 
