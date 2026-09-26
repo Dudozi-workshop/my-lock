@@ -929,7 +929,7 @@ class _SoftBasicCandidateLab extends StatefulWidget {
 
 class _SoftBasicCandidateLabState extends State<_SoftBasicCandidateLab> {
   int selectedIndex = 0;
-  bool squareMode = false;
+  bool squareMode = true;
 
   @override
   Widget build(BuildContext context) {
@@ -1025,14 +1025,14 @@ class _SoftBasicSquareRound2State extends State<_SoftBasicSquareRound2> {
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
-    final selected = softBasicSquareRound2Candidates[selectedIndex];
+    final selected = softBasicSquareRound3Candidates[selectedIndex];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Square · Round 2 · Highlight Refinement',
-          subtitle: 'R1-03 Tighter Corner를 고정하고 상단 하이라이트만 미세 조정합니다. A/B/C 3안을 96px 확대와 58px 실사용 크기로 비교합니다.',
+          title: 'Soft Basic · Square · Round 3 · Natural Highlight',
+          subtitle: 'R1-03 Tighter Corner를 고정하고, pill/sweep을 버린 뒤 비대칭·소면적·색상 기반 자연광 3안을 96px와 58px로 비교합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -1042,7 +1042,7 @@ class _SoftBasicSquareRound2State extends State<_SoftBasicSquareRound2> {
           child: TextButton.icon(
             onPressed: widget.onBackToCircle,
             icon: const Icon(Icons.check_circle_outline, size: 16),
-            label: const Text('Circle Master R11-01 보기'),
+            label: const Text('Circle Master R9N-03 보기'),
           ),
         ),
         const SizedBox(height: 8),
@@ -1056,11 +1056,11 @@ class _SoftBasicSquareRound2State extends State<_SoftBasicSquareRound2> {
               spacing: gap,
               runSpacing: gap,
               children: [
-                for (var i = 0; i < softBasicSquareRound2Candidates.length; i++)
+                for (var i = 0; i < softBasicSquareRound3Candidates.length; i++)
                   SizedBox(
                     width: itemWidth,
                     child: _SoftBasicSquareCandidateCard(
-                      candidate: softBasicSquareRound2Candidates[i],
+                      candidate: softBasicSquareRound3Candidates[i],
                       selected: i == selectedIndex,
                       card: widget.card,
                       fg: widget.fg,
@@ -1100,7 +1100,7 @@ class _SoftBasicCircleSquareComparePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 700;
-    final circleMaster = softBasicCircleRound11Candidates.first;
+    final circleMaster = softBasicCircleRound9NaturalCandidates[2];
     const tones = [
       ShapeTone.pink,
       ShapeTone.blue,
@@ -1113,7 +1113,7 @@ class _SoftBasicCircleSquareComparePanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Circle Master R11-01  ↔  ' +
+            'Circle Master R9N-03  ↔  ' +
                 squareCandidate.id +
                 ' · ' +
                 squareCandidate.name,
@@ -1219,7 +1219,7 @@ class _CircleSquareToneRow extends StatelessWidget {
         ),
         Expanded(
           child: _CompareTokenCell(
-            label: 'CIRCLE · R11-01',
+            label: 'CIRCLE · R9N-03',
             token: _SoftBasicExactToken(
               shape: ShapeKind.circle,
               tone: tone,
@@ -1656,6 +1656,147 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
               size.shortestSide * 0.009,
             ),
         );
+      case SoftBasicSquareHighlightTechnique.cornerKiss:
+        final cornerGlow = adjustTone(
+          baseColorForTone(tone),
+          lightnessDelta: tone == ShapeTone.yellow ? 0.08 : 0.12,
+          saturationDelta: -0.02,
+        );
+        final kissRect = Rect.fromCenter(
+          center: Offset(
+            rect.left + rect.width * 0.205,
+            rect.top + rect.height * 0.205,
+          ),
+          width: rect.width * 0.23,
+          height: rect.height * 0.12,
+        );
+        canvas.save();
+        canvas.clipRRect(
+          RRect.fromRectAndRadius(
+            rect,
+            Radius.circular(rect.width * 0.20),
+          ),
+        );
+        canvas.drawArc(
+          kissRect,
+          3.55,
+          1.45,
+          false,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = rect.width * 0.030
+            ..strokeCap = StrokeCap.round
+            ..color = cornerGlow.withValues(alpha: 0.34)
+            ..maskFilter = MaskFilter.blur(
+              BlurStyle.normal,
+              size.shortestSide * 0.018,
+            ),
+        );
+        canvas.restore();
+
+      case SoftBasicSquareHighlightTechnique.softFacet:
+        final facetGlow = adjustTone(
+          baseColorForTone(tone),
+          lightnessDelta: tone == ShapeTone.yellow ? 0.07 : 0.105,
+          saturationDelta: -0.018,
+        );
+        final facet = Path()
+          ..moveTo(
+            rect.left + rect.width * 0.08,
+            rect.top + rect.height * 0.31,
+          )
+          ..quadraticBezierTo(
+            rect.left + rect.width * 0.10,
+            rect.top + rect.height * 0.11,
+            rect.left + rect.width * 0.30,
+            rect.top + rect.height * 0.08,
+          )
+          ..quadraticBezierTo(
+            rect.left + rect.width * 0.40,
+            rect.top + rect.height * 0.09,
+            rect.left + rect.width * 0.34,
+            rect.top + rect.height * 0.20,
+          )
+          ..quadraticBezierTo(
+            rect.left + rect.width * 0.23,
+            rect.top + rect.height * 0.29,
+            rect.left + rect.width * 0.08,
+            rect.top + rect.height * 0.31,
+          )
+          ..close();
+        canvas.save();
+        canvas.clipRRect(
+          RRect.fromRectAndRadius(
+            rect,
+            Radius.circular(rect.width * 0.20),
+          ),
+        );
+        canvas.drawPath(
+          facet,
+          Paint()
+            ..color = facetGlow.withValues(alpha: 0.18)
+            ..maskFilter = MaskFilter.blur(
+              BlurStyle.normal,
+              size.shortestSide * 0.050,
+            ),
+        );
+        canvas.drawPath(
+          facet,
+          Paint()
+            ..color = facetGlow.withValues(alpha: 0.10)
+            ..maskFilter = MaskFilter.blur(
+              BlurStyle.normal,
+              size.shortestSide * 0.018,
+            ),
+        );
+        canvas.restore();
+
+      case SoftBasicSquareHighlightTechnique.edgeFade:
+        final edgeGlow = adjustTone(
+          baseColorForTone(tone),
+          lightnessDelta: tone == ShapeTone.yellow ? 0.075 : 0.115,
+          saturationDelta: -0.02,
+        );
+        final rounded = RRect.fromRectAndRadius(
+          rect.deflate(rect.width * 0.022),
+          Radius.circular(rect.width * 0.20 * 0.97),
+        );
+        final edgeBounds = Rect.fromLTWH(
+          rect.left,
+          rect.top,
+          rect.width * 0.52,
+          rect.height * 0.48,
+        );
+        canvas.save();
+        canvas.clipRRect(
+          RRect.fromRectAndRadius(
+            rect,
+            Radius.circular(rect.width * 0.20),
+          ),
+        );
+        canvas.drawRRect(
+          rounded,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = rect.width * 0.025
+            ..shader = LinearGradient(
+              begin: Alignment.bottomRight,
+              end: Alignment.topLeft,
+              colors: [
+                edgeGlow.withValues(alpha: 0.00),
+                edgeGlow.withValues(alpha: 0.28),
+                edgeGlow.withValues(alpha: 0.08),
+                edgeGlow.withValues(alpha: 0.00),
+              ],
+              stops: const [0.0, 0.42, 0.70, 1.0],
+            ).createShader(edgeBounds)
+            ..maskFilter = MaskFilter.blur(
+              BlurStyle.normal,
+              size.shortestSide * 0.016,
+            ),
+        );
+        canvas.restore();
+
       case SoftBasicSquareHighlightTechnique.round1Base:
         _paintGlossPill(
           canvas,
