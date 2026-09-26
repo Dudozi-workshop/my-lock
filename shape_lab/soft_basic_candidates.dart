@@ -538,12 +538,12 @@ const softBasicSquareRound5Candidates = <SoftBasicSquareCandidate>[
   ),
   SoftBasicSquareCandidate(
     id: 'SB-S-R5-03',
-    name: 'High Spec · Compact Core',
-    intent: 'Soft Spec은 유지하되 Core Spec을 더 작고 응축되게 만들어 광택은 선명하지만 장식처럼 튀지 않게 한 안.',
+    name: 'High Spec · Clean Patch',
+    intent: 'High Spec의 넓은 Soft Spec 면광은 유지하고, 내부 Core Spec과 secondary sparkle을 제거해 하얀 점 없이 깔끔하게 정리한 안.',
     technique: SoftBasicSquareTechnique.tighterCorner,
     materialProfile: SoftBasicSquareMaterialProfile.highSpec,
     glossRefinement: SoftBasicSquareGlossRefinement.highCompactCore,
-    badge: 'HS CORE',
+    badge: 'NO DOT',
   ),
   SoftBasicSquareCandidate(
     id: 'SB-S-R5-04',
