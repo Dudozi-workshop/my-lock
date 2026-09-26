@@ -147,7 +147,6 @@ class ShapeSpec {
     required this.rotationMode,
     required this.layers,
     required this.shadow,
-    this.crayonOverride,
   });
 
   final String styleId;
@@ -158,7 +157,6 @@ class ShapeSpec {
   final ShapeRotationMode rotationMode;
   final List<ShapeLayerSpec> layers;
   final ShapeShadowSpec shadow;
-  final CrayonTextureSpec? crayonOverride;
 
   factory ShapeSpec.fromJson(Map<String, dynamic> json) {
     return ShapeSpec(
@@ -179,11 +177,6 @@ class ShapeSpec {
       ],
       shadow:
           ShapeShadowSpec.fromJson(json['shadow'] as Map<String, dynamic>),
-      crayonOverride: json['crayonOverride'] == null
-          ? null
-          : CrayonTextureSpec.fromJson(
-              json['crayonOverride'] as Map<String, dynamic>,
-            ),
     );
   }
 }
