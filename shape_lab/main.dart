@@ -1902,7 +1902,7 @@ class _SoftBasicSquareRound2State extends State<_SoftBasicSquareRound2> {
       children: [
         _SectionTitle(
           title: 'Soft Basic · Square · Round 5 · High Spec × Balanced',
-          subtitle: 'Round 4의 05 High Spec과 06 Balanced Gloss만 남겨 각각 3안씩 디벨롭합니다. 사각 형태는 고정하고 Soft Spec 면광 · Core Spec · 하단 Diffuse Bounce만 미세 조정합니다.'
+          subtitle: 'Round 4의 05 High Spec과 06 Balanced Gloss만 남겨 각각 3안씩 디벨롭합니다. 사각 형태는 고정하고 Soft Spec 면광 · Core Spec · 하단 Diffuse Bounce만 미세 조정합니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
@@ -2586,6 +2586,13 @@ class _SoftBasicSquareCandidatePainter extends CustomPainter {
       SoftBasicSquareMaterialProfile.softGloss => 1.04,
       SoftBasicSquareMaterialProfile.wideDiffuse => 1.08,
       SoftBasicSquareMaterialProfile.legacy => 0.88,
+    };
+    final coreScale = baseCoreScale * switch (refinement) {
+      SoftBasicSquareGlossRefinement.base => 1.0,
+      SoftBasicSquareGlossRefinement.highSoftPatch => 0.96,
+      SoftBasicSquareGlossRefinement.highCompactCore => 0.74,
+      SoftBasicSquareGlossRefinement.balancedBright => 0.94,
+      SoftBasicSquareGlossRefinement.balancedWide => 0.88,
     };
 
     final clip = RRect.fromRectAndRadius(
