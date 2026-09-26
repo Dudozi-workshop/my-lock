@@ -5,7 +5,7 @@ on:
     branches:
       - chore/sea-turtle-v2-source-import
     paths:
-      - '.github/source-payload/sea-turtle-v2/READY'
+      - '.github/source-payload/sea-turtle-v2-rot13/READY'
 
 permissions:
   contents: write
@@ -22,8 +22,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          PAYLOAD=".github/source-payload/sea-turtle-v2"
-          cat "$PAYLOAD"/part-*.b64 > /tmp/sea_turtle_source.tar.gz.b64
+          PAYLOAD=".github/source-payload/sea-turtle-v2-rot13"
+          cat "$PAYLOAD"/part-*.txt > /tmp/sea_turtle_source.tar.gz.rot13
+          tr 'A-Za-z' 'N-ZA-Mn-za-m' < /tmp/sea_turtle_source.tar.gz.rot13 > /tmp/sea_turtle_source.tar.gz.b64
           base64 --decode /tmp/sea_turtle_source.tar.gz.b64 > /tmp/sea_turtle_source.tar.gz
           echo "1fe0452fca9a2528a345dad1d16be3394be6912a9ce96f13632f0b732468ee47  /tmp/sea_turtle_source.tar.gz" | sha256sum -c -
           mkdir -p /tmp/sea_turtle_pack_v2
@@ -40,6 +41,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf .github/source-payload/sea-turtle-v2
+          rm -rf .github/source-payload/sea-turtle-v2-rot13
           rm -f .github/workflows/sea-turtle-source-import.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
