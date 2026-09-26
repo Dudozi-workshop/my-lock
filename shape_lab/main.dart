@@ -2392,9 +2392,9 @@ class _SharedTriangleMasterLabState extends State<_SharedTriangleMasterLab> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _SectionTitle(
-          title: 'Soft Basic · Triangle · Direction Round 1',
+          title: 'Soft Basic · Triangle · Direction Round 1 · 6 Approaches',
           subtitle:
-              'Triangle Geometry는 Canonical Master(R10)로 고정. 1차에서는 미세 수치 조정이 아니라 Gloss Cap · Dual Spec · Edge Sweep · Bevel · Dome · Bounce처럼 서로 다른 입체 표현 방식 자체를 비교합니다.',
+              'Triangle Geometry는 Canonical Master(R10)로 고정. 기준안 1개와 Gloss Cap · Dual Spec · Bevel · Dome · Bottom Bounce · Hybrid 6개 방향을 비교합니다. 1차에서는 수치 미세조정보다 표현 방식 차이를 크게 봅니다.',
           fg: widget.fg,
           muted: widget.muted,
         ),
