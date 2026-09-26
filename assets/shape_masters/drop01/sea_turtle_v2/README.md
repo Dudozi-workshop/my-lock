@@ -28,3 +28,15 @@ Do not add shape-local idle, tap, flipper, frame, or custom swim motion unless t
 ## Binary integrity
 Binary master/mask/overlay sources are archived separately and tracked by SHA-256 in `SHA256SUMS.txt`.
 Before promotion, verify PNG signature/chunk CRC and compare SHA-256 against the archive.
+
+
+## Verified import
+Use `tool/import_sea_turtle_master.py` with the extracted `sea_turtle_pack_v2` directory.
+The importer verifies every source PNG against the locked SHA-256 manifest before copying anything.
+
+The CI validator follows an all-or-nothing rule:
+- no source PNGs committed yet: metadata/runtime QA validation continues;
+- all source PNGs present: every size and SHA-256 must match;
+- partial source pack: CI fails.
+
+This prevents a mixed or partially replaced Sea Turtle master from becoming the source of truth.
