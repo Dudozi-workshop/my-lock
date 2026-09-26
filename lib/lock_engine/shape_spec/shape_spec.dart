@@ -115,6 +115,13 @@ class CrayonTextureSpec {
     this.paperToothStrength = 0.85,
     this.grainRadiusMin = 0.18,
     this.grainRadiusMax = 0.58,
+    this.contourBaseWidth = 0.0,
+    this.contourBaseOpacity = 0.0,
+    this.contourGapCount = 0,
+    this.contourGapLengthMin = 1.4,
+    this.contourGapLengthMax = 3.8,
+    this.contourGapWidthScale = 0.82,
+    this.contourGapStrength = 1.0,
   });
 
   final int darkStrokeCount;
@@ -209,6 +216,20 @@ class CrayonTextureSpec {
   final double paperToothStrength;
   final double grainRadiusMin;
   final double grainRadiusMax;
+
+  /// Round 2 contour controls. The base contour restores the deliberately
+  /// thick hand-outlined stroke as an independent layer. Sparse contour gaps
+  /// are erased from that stroke, so the outline can still show dry crayon
+  /// paper breaks without disappearing as a structural cue.
+  ///
+  /// Defaults are disabled to preserve the current Production style.json.
+  final double contourBaseWidth;
+  final double contourBaseOpacity;
+  final int contourGapCount;
+  final double contourGapLengthMin;
+  final double contourGapLengthMax;
+  final double contourGapWidthScale;
+  final double contourGapStrength;
 
   factory CrayonTextureSpec.fromJson(Map<String, dynamic> json) {
     return CrayonTextureSpec(
@@ -320,6 +341,20 @@ class CrayonTextureSpec {
           (json['grainRadiusMin'] as num?)?.toDouble() ?? 0.18,
       grainRadiusMax:
           (json['grainRadiusMax'] as num?)?.toDouble() ?? 0.58,
+      contourBaseWidth:
+          (json['contourBaseWidth'] as num?)?.toDouble() ?? 0.0,
+      contourBaseOpacity:
+          (json['contourBaseOpacity'] as num?)?.toDouble() ?? 0.0,
+      contourGapCount:
+          (json['contourGapCount'] as num?)?.toInt() ?? 0,
+      contourGapLengthMin:
+          (json['contourGapLengthMin'] as num?)?.toDouble() ?? 1.4,
+      contourGapLengthMax:
+          (json['contourGapLengthMax'] as num?)?.toDouble() ?? 3.8,
+      contourGapWidthScale:
+          (json['contourGapWidthScale'] as num?)?.toDouble() ?? 0.82,
+      contourGapStrength:
+          (json['contourGapStrength'] as num?)?.toDouble() ?? 1.0,
     );
   }
 }
