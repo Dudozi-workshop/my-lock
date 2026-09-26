@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -112,7 +113,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 016 · Soft Basic Square R2 · Reference Highlight',
+                                  'LAB 026 · Sea Turtle × Crayon Soft',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -393,6 +394,39 @@ class _SeaTurtleShapePanelState extends State<_SeaTurtleShapePanel>
           ),
           const SizedBox(height: 18),
           Text(
+            'Crayon Soft Apply Test',
+            style: TextStyle(
+              color: widget.fg,
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Approved R3-04 · R2-02 Broken Thick Outline · Sea Turtle Long Flipper raster adapter',
+            style: TextStyle(color: widget.muted, fontSize: 11.5),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 18,
+            runSpacing: 12,
+            children: const [
+              _SeaTurtleCrayonPreview(
+                tone: ShapeTone.blue,
+                label: 'Blue',
+              ),
+              _SeaTurtleCrayonPreview(
+                tone: ShapeTone.pink,
+                label: 'Pink',
+              ),
+              _SeaTurtleCrayonPreview(
+                tone: ShapeTone.yellow,
+                label: 'Yellow',
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Text(
             '3-Frame Swim PoC',
             style: TextStyle(
               color: widget.fg,
@@ -591,6 +625,378 @@ class _SeaTurtlePreview extends StatelessWidget {
   }
 }
 
+
+
+class _SeaTurtleCrayonPreview extends StatelessWidget {
+  const _SeaTurtleCrayonPreview({
+    required this.tone,
+    required this.label,
+  });
+
+  final ShapeTone tone;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 180,
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9F7F2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE8E1D8)),
+      ),
+      child: Column(
+        children: [
+          _SeaTurtleCrayonAsset(tone: tone, size: 132),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _SeaTurtleCrayonAsset(tone: tone, size: 58),
+              const SizedBox(width: 10),
+              Text(
+                '58px QA',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 7),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SeaTurtleCrayonAsset extends StatefulWidget {
+  const _SeaTurtleCrayonAsset({
+    required this.tone,
+    required this.size,
+  });
+
+  final ShapeTone tone;
+  final double size;
+
+  @override
+  State<_SeaTurtleCrayonAsset> createState() => _SeaTurtleCrayonAssetState();
+}
+
+class _SeaTurtleCrayonAssetState extends State<_SeaTurtleCrayonAsset> {
+  ImageStream? _stream;
+  ImageStreamListener? _listener;
+  ui.Image? _image;
+
+  String get _asset => switch (widget.tone) {
+        ShapeTone.blue =>
+          'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
+        ShapeTone.pink =>
+          'assets/sea_turtle_runtime_v2/sea_turtle_pink.png',
+        ShapeTone.yellow =>
+          'assets/sea_turtle_runtime_v2/sea_turtle_yellow.png',
+      };
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _resolveImage();
+  }
+
+  @override
+  void didUpdateWidget(covariant _SeaTurtleCrayonAsset oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.tone != widget.tone) {
+      _resolveImage();
+    }
+  }
+
+  void _resolveImage() {
+    if (_stream != null && _listener != null) {
+      _stream!.removeListener(_listener!);
+    }
+
+    final stream = AssetImage(_asset).resolve(
+      createLocalImageConfiguration(context),
+    );
+    final listener = ImageStreamListener(
+      (info, _) {
+        if (!mounted) return;
+        setState(() => _image = info.image);
+      },
+      onError: (_, __) {
+        if (!mounted) return;
+        setState(() => _image = null);
+      },
+    );
+
+    _stream = stream;
+    _listener = listener;
+    stream.addListener(listener);
+  }
+
+  @override
+  void dispose() {
+    if (_stream != null && _listener != null) {
+      _stream!.removeListener(_listener!);
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: widget.size,
+      height: widget.size,
+      child: _image == null
+          ? const Center(
+              child: SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          : CustomPaint(
+              painter: _SeaTurtleCrayonPainter(
+                image: _image!,
+                tone: widget.tone,
+              ),
+            ),
+    );
+  }
+}
+
+class _SeaTurtleCrayonPainter extends CustomPainter {
+  const _SeaTurtleCrayonPainter({
+    required this.image,
+    required this.tone,
+  });
+
+  final ui.Image image;
+  final ShapeTone tone;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final side = size.shortestSide;
+    final src = Rect.fromLTWH(
+      0,
+      0,
+      image.width.toDouble(),
+      image.height.toDouble(),
+    );
+    final dest = Rect.fromLTWH(0, 0, size.width, size.height);
+
+    final base = baseColorForTone(tone);
+    final dark = adjustTone(
+      base,
+      lightnessDelta: -0.105,
+      saturationDelta: 0.0,
+    );
+    final slightlyDark = adjustTone(
+      base,
+      lightnessDelta: -0.055,
+      saturationDelta: 0.0,
+    );
+
+    final seed = 91261 + tone.index * 104729;
+    final random = Random(seed);
+
+    // R2-02 outline: thick dark wax rim with sparse dry breaks.
+    final contourWidth = side * 0.0365;
+    canvas.saveLayer(dest.inflate(contourWidth * 1.8), Paint());
+    final contourPaint = Paint()
+      ..filterQuality = FilterQuality.high
+      ..colorFilter = ColorFilter.mode(
+        dark.withValues(alpha: 0.68),
+        BlendMode.srcIn,
+      );
+
+    const contourPasses = 16;
+    for (var i = 0; i < contourPasses; i++) {
+      final angle = pi * 2 * i / contourPasses;
+      final offset = Offset(cos(angle), sin(angle)) * contourWidth;
+      canvas.drawImageRect(
+        image,
+        src,
+        dest.shift(offset),
+        contourPaint,
+      );
+    }
+
+    final contourGapPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = max(0.75, contourWidth * 0.86)
+      ..blendMode = BlendMode.dstOut
+      ..color = Colors.white.withValues(alpha: 0.94);
+
+    for (var i = 0; i < 14; i++) {
+      final center = Offset(
+        random.nextDouble() * side,
+        random.nextDouble() * side,
+      );
+      final angle = random.nextDouble() * pi * 2;
+      final length = side * (0.018 + random.nextDouble() * 0.034);
+      final delta = Offset(cos(angle), sin(angle)) * length;
+      canvas.drawLine(center - delta, center + delta, contourGapPaint);
+    }
+    canvas.restore();
+
+    // R3-04 fill: high color retention + thick same-family wax strokes.
+    canvas.saveLayer(dest, Paint());
+    canvas.drawRect(
+      dest,
+      Paint()..color = base.withValues(alpha: 0.95),
+    );
+
+    void drawWaxPass({
+      required int count,
+      required double width,
+      required double opacity,
+      required Color color,
+      required double baseAngleDeg,
+      required double angleSpreadDeg,
+      required double minLength,
+      required double maxLength,
+    }) {
+      for (var i = 0; i < count; i++) {
+        final angle =
+            (baseAngleDeg +
+                    (random.nextDouble() - 0.5) * 2 * angleSpreadDeg) *
+                pi /
+                180;
+        final direction = Offset(cos(angle), sin(angle));
+        final normal = Offset(-direction.dy, direction.dx);
+        final center = Offset(
+          random.nextDouble() * side,
+          random.nextDouble() * side,
+        );
+        final length =
+            side * (minLength + random.nextDouble() * (maxLength - minLength));
+        final half = direction * (length / 2);
+        final wobble =
+            normal * ((random.nextDouble() - 0.5) * side * 0.018);
+        final start = center - half;
+        final end = center + half;
+        final control = center + wobble;
+        final path = Path()
+          ..moveTo(start.dx, start.dy)
+          ..quadraticBezierTo(control.dx, control.dy, end.dx, end.dy);
+
+        final pressure = 0.72 + random.nextDouble() * 0.56;
+        canvas.drawPath(
+          path,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeCap = StrokeCap.round
+            ..strokeJoin = StrokeJoin.round
+            ..strokeWidth =
+                max(0.75, width * (0.82 + random.nextDouble() * 0.36))
+            ..color = color.withValues(
+              alpha: (opacity * pressure).clamp(0.0, 1.0),
+            ),
+        );
+
+        if (random.nextDouble() < 0.105) {
+          final gapCenter = Offset.lerp(start, end, 0.28 + random.nextDouble() * 0.44)!;
+          final gapHalf =
+              direction * side * (0.0085 + random.nextDouble() * 0.012);
+          canvas.drawLine(
+            gapCenter - gapHalf,
+            gapCenter + gapHalf,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeCap = StrokeCap.round
+              ..strokeWidth = max(0.62, width * 0.35)
+              ..blendMode = BlendMode.dstOut
+              ..color = Colors.white.withValues(alpha: 0.88),
+          );
+        }
+      }
+    }
+
+    drawWaxPass(
+      count: 19,
+      width: side * 0.0482,
+      opacity: 0.235,
+      color: slightlyDark,
+      baseAngleDeg: -17,
+      angleSpreadDeg: 6,
+      minLength: 0.58,
+      maxLength: 0.92,
+    );
+    drawWaxPass(
+      count: 29,
+      width: side * 0.035,
+      opacity: 0.31,
+      color: dark,
+      baseAngleDeg: -17,
+      angleSpreadDeg: 7.5,
+      minLength: 0.58,
+      maxLength: 0.92,
+    );
+
+    final grainPaint = Paint()
+      ..color = dark.withValues(alpha: 0.16);
+    for (var i = 0; i < 44; i++) {
+      final radius = side * (0.0013 + random.nextDouble() * 0.0083);
+      canvas.drawCircle(
+        Offset(
+          random.nextDouble() * side,
+          random.nextDouble() * side,
+        ),
+        max(0.35, radius),
+        grainPaint,
+      );
+    }
+
+    final toothPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..blendMode = BlendMode.dstOut
+      ..color = Colors.white.withValues(alpha: 0.54);
+
+    for (var i = 0; i < 26; i++) {
+      final angle =
+          (-17 + (random.nextDouble() - 0.5) * 42) * pi / 180;
+      final direction = Offset(cos(angle), sin(angle));
+      final center = Offset(
+        random.nextDouble() * side,
+        random.nextDouble() * side,
+      );
+      final length = side * (0.0036 + random.nextDouble() * 0.0144);
+      final half = direction * (length / 2);
+      toothPaint.strokeWidth = max(
+        0.45,
+        side * (0.0010 + random.nextDouble() * 0.0038),
+      );
+      canvas.drawLine(center - half, center + half, toothPaint);
+    }
+
+    // Clip the procedural wax layer by the actual transparent turtle Runtime
+    // Asset so the test uses the approved Long Flipper silhouette.
+    canvas.drawImageRect(
+      image,
+      src,
+      dest,
+      Paint()
+        ..filterQuality = FilterQuality.high
+        ..blendMode = BlendMode.dstIn,
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _SeaTurtleCrayonPainter oldDelegate) =>
+      oldDelegate.image != image || oldDelegate.tone != tone;
+}
 
 class _SeaTurtleRuntimeObject extends StatelessWidget {
   const _SeaTurtleRuntimeObject({
