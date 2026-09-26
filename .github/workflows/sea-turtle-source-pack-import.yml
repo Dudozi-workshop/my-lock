@@ -1,0 +1,46 @@
+name: Sea Turtle Source Pack Import
+
+on:
+  push:
+    branches:
+      - chore/sea-turtle-v2-source-import
+    paths:
+      - '.github/source-payload/sea-turtle-v2/READY'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore archive
+        run: |
+          set -euo pipefail
+          cat .github/source-payload/sea-turtle-v2/part-*.b64 > /tmp/source.b64
+          base64 -d /tmp/source.b64 > /tmp/source.tar.gz
+          echo "1fe0452fca9a2528a345dad1d16be3394be6912a9ce96f13632f0b732468ee47  /tmp/source.tar.gz" | sha256sum -c -
+          mkdir -p /tmp/sea_turtle_pack_v2
+          tar -xzf /tmp/source.tar.gz -C /tmp/sea_turtle_pack_v2
+
+      - name: Import verified pack
+        run: |
+          set -euo pipefail
+          python3 tool/import_sea_turtle_master.py /tmp/sea_turtle_pack_v2
+          python3 tool/validate_sea_turtle_master.py
+
+      - name: Commit source
+        run: |
+          set -euo pipefail
+          rm -rf .github/source-payload/sea-turtle-v2
+          rm -f .github/workflows/sea-turtle-source-import.yml
+          rm -f .github/workflows/sea-turtle-source-pack-import.yml
+          git config user.name github-actions
+          git config user.email actions@github.com
+          git add -A
+          git commit -m "chore(shape-master): commit Sea Turtle v2 raw source pack"
+          git push origin HEAD:chore/sea-turtle-v2-source-import
