@@ -14,6 +14,7 @@ class ShapeSpecRegistry {
   final Map<ShapeStyle, ShapeStyleSpec> _styles = {};
   final Map<(ShapeStyle, ShapeKind), ShapeSpec> _shapes = {};
   final Map<String, ui.Image> _maskImages = {};
+  final Map<String, Map<String, dynamic>> _geometryMasterCache = {};
   bool _loaded = false;
 
   bool get loaded => _loaded;
@@ -33,7 +34,8 @@ class ShapeSpecRegistry {
         final shapeJson = await _loadJson(
           'assets/shape_specs/$shapeSourceId/${shape.name}.json',
         );
-        final spec = ShapeSpec.fromJson(shapeJson);
+        final resolvedShapeJson = await _resolveGeometryMaster(shapeJson);
+        final spec = ShapeSpec.fromJson(resolvedShapeJson);
         if (spec.styleId != shapeSourceId || spec.shapeId != shape.name) {
           throw StateError(
             'ShapeSpec id mismatch: $shapeSourceId/${shape.name}',
@@ -84,6 +86,27 @@ class ShapeSpecRegistry {
   Future<Map<String, dynamic>> _loadJson(String path) async {
     final raw = await rootBundle.loadString(path);
     return jsonDecode(raw) as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> _resolveGeometryMaster(
+    Map<String, dynamic> shapeJson,
+  ) async {
+    final masterPath = shapeJson['geometryMaster'] as String?;
+    if (masterPath == null || masterPath.isEmpty) {
+      return shapeJson;
+    }
+
+    final master =
+        _geometryMasterCache[masterPath] ??= await _loadJson(masterPath);
+    final geometry = master['geometry'];
+    if (geometry is! Map<String, dynamic>) {
+      throw StateError('Invalid geometry master: $masterPath');
+    }
+
+    return <String, dynamic>{
+      ...shapeJson,
+      'body': Map<String, dynamic>.from(geometry),
+    };
   }
 
   Future<ui.Image> _loadMaskImage(String asset) async {
