@@ -5,7 +5,7 @@
   "drop": "drop01",
   "version": 3,
   "masterVariant": "S02 Long Flipper",
-  "status": "master_shape_reference_locked_canonical_pending",
+  "status": "canonical_ready_semantic_rework",
   "masterShapeReference": {
     "id": "sea_turtle_master_shape_reference_v1",
     "file": "reference/sea_turtle_master_shape_reference_v1.png",
@@ -20,7 +20,7 @@
     "width": 2048,
     "height": 2048,
     "transparent": true,
-    "status": "pending_rebuild_from_locked_reference",
+    "status": "complete",
     "requirements": [
       "remove background and external glow",
       "preserve approved silhouette and proportions",
@@ -47,18 +47,48 @@
     "eyes": "none"
   },
   "staticParts": [
-    {"id": "static_body", "file": "parts/static_body_reference_2048.png"},
-    {"id": "front_flipper_far_f0", "file": "parts/front_flipper_far_f0_reference_2048.png", "movingPart": true},
-    {"id": "front_flipper_near_f0", "file": "parts/front_flipper_near_f0_reference_2048.png", "movingPart": true}
+    {
+      "id": "static_body",
+      "file": "parts/static_body_reference_2048.png"
+    },
+    {
+      "id": "front_flipper_far_f0",
+      "file": "parts/front_flipper_far_f0_reference_2048.png",
+      "movingPart": true
+    },
+    {
+      "id": "front_flipper_near_f0",
+      "file": "parts/front_flipper_near_f0_reference_2048.png",
+      "movingPart": true
+    }
   ],
   "semanticRegions": [
-    {"id": "shell", "file": "masks/shell_mask_2048.png", "role": "color_material_effect_surface"},
-    {"id": "belly", "file": "masks/belly_mask_2048.png", "role": "collection_completion_reward_surface"},
-    {"id": "shell_detail", "file": "masks/shell_detail_mask_2048.png", "role": "detail_overlay"}
+    {
+      "id": "shell",
+      "file": "masks/shell_mask_2048.png",
+      "role": "color_material_effect_surface"
+    },
+    {
+      "id": "belly",
+      "file": "masks/belly_mask_2048.png",
+      "role": "continuous_underbelly_material_surface",
+      "hiddenUnderlap": true,
+      "status": "rework_pending_reveal_qa"
+    },
+    {
+      "id": "shell_detail",
+      "file": "masks/shell_detail_mask_2048.png",
+      "role": "detail_overlay"
+    }
   ],
   "movingPartIsolation": {
     "policy": "moving_part_owns_visual_maps",
-    "maps": ["alpha", "outline", "shadow", "highlight"],
+    "maps": [
+      "alpha",
+      "outline",
+      "shadow",
+      "highlight"
+    ],
     "reason": "prevent F0 outline/highlight residue when future F1..F3 poses replace the front flipper"
   },
   "animation": {
@@ -69,6 +99,36 @@
   "qa": {
     "previousF0DraftRebuildMaxChannelDiff": 0,
     "previousF0DraftRebuildChangedChannelCount": 0,
-    "newCanonicalQaStatus": "pending_after_reference_rebuild"
+    "newCanonicalQaStatus": "pending_after_reference_rebuild",
+    "layerPolicy": "generate_qc_qa_register",
+    "gates": [
+      "master_alpha_containment",
+      "ownership_overlap_gap",
+      "hidden_underlap_reveal",
+      "moving_part_reveal",
+      "rebuild_diff",
+      "png_integrity",
+      "runtime_size_visual"
+    ]
+  },
+  "materialCompositor": {
+    "policy": "hybrid_baked_structure_runtime_material",
+    "document": "MATERIAL_COMPOSITOR.md",
+    "coordinateSpace": "shape_local_region_local",
+    "compositionOrder": [
+      "albedo_or_dynamic_material",
+      "region_mask",
+      "shadow",
+      "highlight",
+      "detail",
+      "outline",
+      "final_composite"
+    ],
+    "auroraSea": {
+      "role": "dynamic_shell_albedo_reference_poc",
+      "animated": true,
+      "screenSpace": false
+    },
+    "lockGate": "material_recomposition_and_aurora_poc_before_static_master_lock"
   }
 }
