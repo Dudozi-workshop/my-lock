@@ -162,4 +162,36 @@ void main() {
     );
   });
 
+  test('Soft Basic Core shapes share the finalized material layer grammar', () async {
+    await ShapeSpecRegistry.instance.load();
+
+    const expectedLayerIds = [
+      'color_shell',
+      'color_shell_inner',
+      'airbrush_light',
+      'airbrush_shade',
+      'ambient_bounce',
+      'ambient_core',
+      'ambient_depth',
+      'edge_leaf_halo',
+      'edge_leaf',
+    ];
+
+    for (final shape in ShapeKind.values) {
+      final bundle = ShapeSpecRegistry.instance.resolve(
+        ShapeStyle.softBasic,
+        shape,
+      );
+
+      expect(
+        bundle.shape.layers.map((layer) => layer.id).toList(),
+        expectedLayerIds,
+      );
+      expect(bundle.shape.rotationMode, ShapeRotationMode.fixed);
+      expect(bundle.shape.surface.kind, 'solid');
+      expect(bundle.shape.shadow.opacity, closeTo(0.018, 0.0001));
+      expect(bundle.shape.shadow.elevation, closeTo(1.35, 0.0001));
+    }
+  });
+
 }
