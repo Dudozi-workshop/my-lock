@@ -1,0 +1,49 @@
+{
+  "asset": "Sea Turtle v3 Front Flipper Outer",
+  "status": "adopted",
+  "canonical_canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "source_master": "sea_turtle_master_v3_2048.png",
+  "adopted_asset": {
+    "file": "front_flipper_outer_asset_v2_2048.png",
+    "sha256": "9ed10634626211aa7e2c63d36d5a5464ac3ce794dac5cabcd835e8ea55ce5b2f",
+    "bbox_xyxy_exclusive": [811, 911, 1290, 1446],
+    "drive_url": "https://drive.google.com/file/d/18xvNog6BPlCskVE5aZDJ0ihEVNMJR0eM/view?usp=drivesdk"
+  },
+  "mask_alpha_gate": {
+    "status": "qa-pass",
+    "alpha_file": {
+      "file": "front_flipper_outer_alpha_exact_v1_2048.png",
+      "sha256": "be2d9674fc3d923545ca56fc163a0f2b0fb550cddfbf3fb5be0fae19a0ec6a77",
+      "drive_url": "https://drive.google.com/file/d/1l3LZdD7WaWs8XgoFdTmZFohGAZ9xAjbY/view?usp=drivesdk"
+    },
+    "ownership_mask_file": {
+      "file": "front_flipper_outer_ownership_mask_v1_2048.png",
+      "sha256": "724bedcc791fc364e70e5998913899c2dbe5285f88ad4b8c4c59948bddf2b3a9",
+      "drive_url": "https://drive.google.com/file/d/1qbl-TLv2VniTWtHquBfKC4RRG73gD_1G/view?usp=drivesdk"
+    },
+    "boundary_qa_file": {
+      "file": "front_flipper_outer_mask_boundary_qa_v1_2048.png",
+      "sha256": "09e54ff8105254b4a90ed9964d4ed9080fad0c378dad2a58526d8e0ffae9e64a",
+      "drive_url": "https://drive.google.com/file/d/1OUmqVb18f7DOZZ3xRsK1tql_SWOpAp2Y/view?usp=drivesdk"
+    },
+    "validation_file": {
+      "file": "front_flipper_outer_mask_alpha_validation_v1.json",
+      "sha256": "b74d5ef127b7ffb26ca0c1425649419dd5528a6bdb7b1551d126e885de308c27",
+      "drive_url": "https://drive.google.com/file/d/1DPQNBR-XONnlmtM-4AVNsvdz7xlOzkIn/view?usp=drivesdk"
+    },
+    "alpha_exact_roundtrip": true,
+    "ownership_mask_exact_from_alpha": true,
+    "transparent_rgb_nonzero_pixels": 0,
+    "qa_pass": true
+  },
+  "policy": {
+    "image_generation_used": false,
+    "geometry_changed": false,
+    "source_of_truth": "adopted v2 asset",
+    "next_stage": "outline split from the same adopted v2 asset"
+  }
+}
