@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
@@ -107,7 +108,7 @@ class _RuntimeSample extends StatelessWidget {
     required this.dark,
   });
 
-  final List<int> bytes;
+  final Uint8List bytes;
   final double size;
   final bool dark;
 
