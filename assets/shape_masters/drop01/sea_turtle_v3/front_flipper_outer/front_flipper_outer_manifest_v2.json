@@ -10,7 +10,12 @@
   "adopted_asset": {
     "file": "front_flipper_outer_asset_v2_2048.png",
     "sha256": "9ed10634626211aa7e2c63d36d5a5464ac3ce794dac5cabcd835e8ea55ce5b2f",
-    "bbox_xyxy_exclusive": [811, 911, 1290, 1446],
+    "bbox_xyxy_exclusive": [
+      811,
+      911,
+      1290,
+      1446
+    ],
     "drive_url": "https://drive.google.com/file/d/18xvNog6BPlCskVE5aZDJ0ihEVNMJR0eM/view?usp=drivesdk"
   },
   "mask_alpha_gate": {
@@ -109,6 +114,71 @@
     "image_generation_used": false,
     "geometry_changed": false,
     "source_of_truth": "adopted v2 asset",
-    "next_stage": "highlight ownership overlay from the same adopted v2 asset"
+    "next_stage": "full material recomposition QA approval, then final Part closeout"
+  },
+  "highlight_gate": {
+    "status": "locked",
+    "production_method": "approved ownership overlay -> exact binary mask -> adopted v2 source-pixel extraction; no ImageGen",
+    "highlight_pixels": 4367,
+    "outside_flipper_pixels": 0,
+    "outline_overlap_pixels": 0,
+    "pattern_overlap_pixels": 0,
+    "shadow_overlap_pixels": 0,
+    "recomposite_changed_pixels": 0,
+    "max_channel_diff": 0,
+    "asset": {
+      "file": "front_flipper_outer_highlight_asset_v1_2048.png",
+      "sha256": "9869112231846f926d70ad5ccd427c71def426339ecadd2afc7344daf8bf34b6",
+      "drive_url": "https://drive.google.com/file/d/1U0mBvmUQbxRvcndEXkAzboh80pVmw82e/view?usp=drivesdk"
+    },
+    "mask": {
+      "file": "front_flipper_outer_highlight_mask_v1_2048.png",
+      "sha256": "f4f57d3edcf44cdeb6f8df79c5823c74c9973d27faf34b1ef2aabc88aad17bef",
+      "drive_url": "https://drive.google.com/file/d/1n745zcKpL7xjcY5GRRjGYdmqFrRUiNbg/view?usp=drivesdk"
+    },
+    "removed_remainder": {
+      "file": "front_flipper_outer_highlight_removed_remainder_v1_2048.png",
+      "sha256": "5c257ec32efb499ec1363565b13129638800672de12625adbc93e6d9bb463627",
+      "drive_url": "https://drive.google.com/file/d/1yK8apBZOd0aNIavG9-hmfv2Vg_e57_bZ/view?usp=drivesdk"
+    },
+    "ownership_qa": {
+      "file": "front_flipper_outer_highlight_ownership_qa_v1_2048.png",
+      "sha256": "77bedbb57cd9f7add0d9f5e3114a5e39249a9991eb9a70908eea3fd8fa65e19a",
+      "drive_url": "https://drive.google.com/file/d/1k6bLspbyRL5Vq8T2rErlwRuLwTZ2ezGY/view?usp=drivesdk"
+    },
+    "recomposite_diff": {
+      "file": "front_flipper_outer_highlight_recomposite_diff_v1_2048.png",
+      "sha256": "4366893496c99f69cef48e1359ec843e15879ba94879171d8596e5514ea615aa",
+      "drive_url": "https://drive.google.com/file/d/1dX0OnjpT9N8uztFzL0-RioMmt_wrxSvP/view?usp=drivesdk"
+    },
+    "package_url": "https://drive.google.com/file/d/1CciEuyK1WWBu_-CZGKYnximVKctfsP1q/view?usp=drivesdk"
+  },
+  "material_recomposition_gate": {
+    "status": "qa-candidate",
+    "source_visible_pixels": 108600,
+    "ownership_pixels": {
+      "albedo": 14053,
+      "outline": 4613,
+      "pattern": 71757,
+      "shadow": 13810,
+      "highlight": 4367
+    },
+    "gap_pixels": 0,
+    "overlap_pixels": 0,
+    "outside_source_pixels": 0,
+    "recomposite_changed_pixels": 0,
+    "max_channel_diff": 0,
+    "image_generation_used": false,
+    "drive": {
+      "albedo_asset": "https://drive.google.com/file/d/1jPNnZllprd4MxPst1g9oP0fABrLWDqhI/view?usp=drivesdk",
+      "ownership_qa": "https://drive.google.com/file/d/1TcG8lzp9KbtgdgMm-W6sSbmZZ_CCqNz1/view?usp=drivesdk",
+      "recomposite": "https://drive.google.com/file/d/1KO2WCCXvx5yJQRmUgFc-uoKnot6Lh7n0/view?usp=drivesdk",
+      "recomposite_diff": "https://drive.google.com/file/d/18vdJgKJFogGO5Ut5Y4RkeicNvJCW5ZUL/view?usp=drivesdk",
+      "overlap_map": "https://drive.google.com/file/d/1n8yLa6SxwHqlxfQqRHzB5pbyc_cHnAfy/view?usp=drivesdk",
+      "gap_map": "https://drive.google.com/file/d/1iB80chRLnreHBeH-ky8YMu9D1LWxZeDF/view?usp=drivesdk",
+      "manifest": "https://drive.google.com/file/d/1VysF2elw4uciL7IEfUqnjg7ea2S2fdRN/view?usp=drivesdk",
+      "package": "https://drive.google.com/file/d/1JuSSNV9sFRjFkC70UNDNrLtP18K50Uov/view?usp=drivesdk"
+    },
+    "next_gate": "user visual approval of full material ownership/recomposition QA before final Part closeout"
   }
 }
