@@ -1,0 +1,27 @@
+{
+  "asset": "Sea Turtle v3 Shell",
+  "version": "v1",
+  "status": "approved",
+  "date": "2026-09-27",
+  "role": "fixed_shell_layer",
+  "dimensions": {
+    "shell_png": [1254, 1254],
+    "qa_png": [1122, 1402]
+  },
+  "format": {
+    "shell_png": "RGBA PNG",
+    "qa_png": "RGB PNG"
+  },
+  "ownership": {
+    "shell": "fixed",
+    "belly": "separate_fixed",
+    "body_rear": "separate_fixed",
+    "front_flipper_near": "moving",
+    "front_flipper_far": "moving"
+  },
+  "drive": {
+    "shell": "https://drive.google.com/file/d/1uaMYm8SOxAO9B3eITm_ZfAqXHdT_0vat/view?usp=drivesdk",
+    "qa": "https://drive.google.com/file/d/1-V3lkiiU_wJdxBzWNn3_19pN5gGxlnym/view?usp=drivesdk",
+    "pack_zip": "https://drive.google.com/file/d/1g6YtVrYPOjA2L-id3_ECri177ds9FrzT/view?usp=drivesdk"
+  }
+}
