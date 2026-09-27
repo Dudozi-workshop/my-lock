@@ -186,3 +186,18 @@ For Sea Turtle v3:
   approved front-flippers-removed base → ownership overlay → approval → mask → asset → remainder → recomposite/residual QA → LOCK
 - body_with_rear workflow must follow the same gate sequence.
 - Shell/Belly/Front Flippers remain locked while body_with_rear is being processed unless separately requested.
+
+
+## 11. Production-system reference
+
+The reusable end-to-end method for complex illustrated raster Parts is documented in:
+- `docs/illustrated-raster-part-production-system.md`
+
+Key additions now treated as standard:
+- semantic ownership is approved before technical mask extraction;
+- extraction and missing-pixel reconstruction are separate workflows;
+- material source-pixel ownership uses Base/Albedo + Pattern/Detail + Shadow + Highlight + Outline;
+- QA is split into Ownership QA, Technical QA, and Production QA;
+- Base/Albedo is derived last as the remainder of approved material ownership;
+- an approved gate is saved immediately before proceeding to the next gate;
+- final Part closeout requires gap/overlap/recomposition/PNG/runtime-size checks and a registered manifest.
