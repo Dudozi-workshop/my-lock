@@ -17,6 +17,9 @@ If any source/version conflicts, stop and resolve the source-of-truth conflict b
 
 ## 1. Work modes
 
+### Default
+- Unless the user explicitly says `이미지만 ㄱㄱ`, all Shape/Image/Asset work is handled in **산출물 보고형** by default.
+
 ### 이미지만 ㄱㄱ
 - Return image/result only.
 - No report, no analysis, no next-step commentary.
@@ -78,16 +81,29 @@ For complex illustrated raster Shapes:
 - Cropped assets are review/derived artifacts only.
 - Production part extraction must come from the approved canonical source/base; do not generate a visually similar replacement.
 
-## 5. Image generation rule
+## 5. Image generation rule — HARD GATE
 
-Normal layer separation / mask extraction:
-- **Image generation is prohibited.**
-- Use existing approved pixels + explicit mask only.
+- **ImageGen is prohibited by default for all Shape / Part / Mask / Asset work.**
+- Do not use ImageGen for:
+  - Ownership extraction
+  - layer separation
+  - Mask creation
+  - Asset extraction
+  - Removed Remainder
+  - Recomposite
+  - QA
+- Use only approved existing pixels + explicit masks + deterministic pixel/compositing operations.
 
-Exception:
-- Hidden Underlap or truly missing source pixels may require reconstruction.
-- Ask the user **before** using image generation.
-- Once the reconstruction is approved, subsequent ownership/mask/asset extraction must be pixel/mask based and must not regenerate the part.
+### Exception: genuinely missing pixels only
+- Hidden Underlap or other truly missing source pixels may be candidates for reconstruction.
+- ImageGen may be used **only when the user explicitly approves its use in that specific turn**.
+- Prior approval, general project approval, or an earlier exception does not carry forward.
+- If explicit approval is absent, **do not call ImageGen**.
+- Once a reconstruction is approved, all subsequent ownership/mask/asset/remainder/QA derivations must be pixel/mask based and must not regenerate the part.
+
+### Accidental ImageGen use
+- Any asset generated in violation of this rule is **not a Production Candidate**.
+- Treat it as discarded and restart from the last approved Source using non-generative operations.
 
 ## 6. Scope-lock rule
 
@@ -168,4 +184,5 @@ For Sea Turtle v3:
 - Belly: fixed base surface with hidden underlap beneath front flippers
 - Belly workflow must be:
   approved front-flippers-removed base → ownership overlay → approval → mask → asset → remainder → recomposite/residual QA → LOCK
-- Head upper / rear flippers / shell remain locked while Belly is being refined unless separately requested.
+- body_with_rear workflow must follow the same gate sequence.
+- Shell/Belly/Front Flippers remain locked while body_with_rear is being processed unless separately requested.
