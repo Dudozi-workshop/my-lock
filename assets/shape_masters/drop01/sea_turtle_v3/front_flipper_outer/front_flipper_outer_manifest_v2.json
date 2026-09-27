@@ -47,27 +47,47 @@
       "sha256": "39694220fdf7481b80f8dc8c51c511c900a35f2b28616e92bce0dd730b45c839",
       "drive_url": "https://drive.google.com/file/d/1xnRA4oOwwgfNGQXodMjv567SWjF9rwkG/view?usp=drivesdk"
     },
+    "package_url": "https://drive.google.com/file/d/1BNQ-HmjAII1SJ66Y_gWOZ0tpNHKQ45nu/view?usp=drivesdk"
+  },
+  "pattern_gate": {
+    "status": "locked",
+    "production_method": "approved ownership mask from adopted v2 source pixels only",
+    "final_pattern_pixels": 71757,
+    "outside_flipper_pixels": 0,
+    "outline_overlap_pixels": 0,
+    "recomposite_changed_pixels": 0,
+    "max_channel_diff": 0,
+    "asset": {
+      "file": "front_flipper_outer_pattern_asset_v1_2048.png",
+      "sha256": "fb85c8a20f5108f08e13ff7835c5bc388cef6795878c296f5d3eee676dbca915",
+      "drive_url": "https://drive.google.com/file/d/1P_AVF5oViTaBUAuRAxCOmAsknehREDs0/view?usp=drivesdk"
+    },
+    "mask": {
+      "file": "front_flipper_outer_pattern_mask_v1_2048.png",
+      "sha256": "b96a7f1c62c2c79ffce52f4193f7391a2d2667b4c80ef78dcd0ca5118e268a3e",
+      "drive_url": "https://drive.google.com/file/d/184dRtYP7KnkAuKNdeMtt2xwKCsUYGmV_/view?usp=drivesdk"
+    },
     "removed_remainder": {
-      "file": "front_flipper_outer_outline_removed_remainder_v1_2048.png",
-      "sha256": "59e68b729d512ee5fbd33739618c580f227a127710049bb3e0799a1f28efaab2",
-      "drive_url": "https://drive.google.com/file/d/1If5OUhq2aOhl17iLjZZVlfewxbBaSG9u/view?usp=drivesdk"
+      "file": "front_flipper_outer_pattern_removed_remainder_v1_2048.png",
+      "sha256": "bdcb1821a3e7b8aa542d76aa8a9631d4d44570eff556b90202897c7d716a8fb6",
+      "drive_url": "https://drive.google.com/file/d/16dc_gmnyCMz_72DJusjO7ySOmXzl-SP0/view?usp=drivesdk"
     },
     "ownership_qa": {
-      "file": "front_flipper_outer_outline_ownership_qa_v1_2048.png",
-      "sha256": "7a1ad0d6a31c70fcb0659c9bdddbcd61459b7ca3ac878efee15db6e0b8789ce4",
-      "drive_url": "https://drive.google.com/file/d/1bSGKWzZjS7Bjc5F3oArHCLU3jC-FUOMQ/view?usp=drivesdk"
+      "file": "front_flipper_outer_pattern_ownership_qa_v1_2048.png",
+      "sha256": "319fbb1b48aae54ab62222938442a4109bb624ef4195acb9b5e0f2e3c2d1d8a3",
+      "drive_url": "https://drive.google.com/file/d/1UM8863vVa5EZc57m-IeGGU8DoDRuWsC7/view?usp=drivesdk"
     },
     "recomposite_diff": {
-      "file": "front_flipper_outer_outline_recomposite_diff_v1_2048.png",
-      "sha256": "4366893496c99f69cef48e1359ec843e15879ba94879171d8596e5514ea615aa",
-      "drive_url": "https://drive.google.com/file/d/1U3tLrVCP7OED1kTVu37tQ3zEe4_Lgv83/view?usp=drivesdk"
+      "file": "front_flipper_outer_pattern_recomposite_diff_v1_2048.png",
+      "sha256": "03937270bf28203b87786e0a667bc030f6af2e5b286e28a89196205232946476",
+      "drive_url": "https://drive.google.com/file/d/1wS4Bncnu_gt5gVX4KwtgeA64mNVoTTLI/view?usp=drivesdk"
     },
-    "package_url": "https://drive.google.com/file/d/1BNQ-HmjAII1SJ66Y_gWOZ0tpNHKQ45nu/view?usp=drivesdk"
+    "package_url": "https://drive.google.com/file/d/1Df4vJ1frMheR8uNZGsFUGhfGqM17LMn9/view?usp=drivesdk"
   },
   "policy": {
     "image_generation_used": false,
     "geometry_changed": false,
     "source_of_truth": "adopted v2 asset",
-    "next_stage": "pattern ownership overlay from the same adopted v2 asset"
+    "next_stage": "shadow ownership overlay from the same adopted v2 asset"
   }
 }
