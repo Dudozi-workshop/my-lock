@@ -25,25 +25,49 @@
       "sha256": "724bedcc791fc364e70e5998913899c2dbe5285f88ad4b8c4c59948bddf2b3a9",
       "drive_url": "https://drive.google.com/file/d/1qbl-TLv2VniTWtHquBfKC4RRG73gD_1G/view?usp=drivesdk"
     },
-    "boundary_qa_file": {
-      "file": "front_flipper_outer_mask_boundary_qa_v1_2048.png",
-      "sha256": "09e54ff8105254b4a90ed9964d4ed9080fad0c378dad2a58526d8e0ffae9e64a",
-      "drive_url": "https://drive.google.com/file/d/1OUmqVb18f7DOZZ3xRsK1tql_SWOpAp2Y/view?usp=drivesdk"
-    },
-    "validation_file": {
-      "file": "front_flipper_outer_mask_alpha_validation_v1.json",
-      "sha256": "b74d5ef127b7ffb26ca0c1425649419dd5528a6bdb7b1551d126e885de308c27",
-      "drive_url": "https://drive.google.com/file/d/1DPQNBR-XONnlmtM-4AVNsvdz7xlOzkIn/view?usp=drivesdk"
-    },
     "alpha_exact_roundtrip": true,
     "ownership_mask_exact_from_alpha": true,
     "transparent_rgb_nonzero_pixels": 0,
     "qa_pass": true
   },
+  "outline_gate": {
+    "status": "locked",
+    "method": "approved 3px inner ownership band from the adopted v2 alpha",
+    "outline_pixels": 4613,
+    "outside_flipper_pixels": 0,
+    "recomposite_changed_pixels": 0,
+    "max_channel_diff": 0,
+    "asset": {
+      "file": "front_flipper_outer_outline_asset_v1_2048.png",
+      "sha256": "21a46392c97b1a0b85cc3fef210fd85571ddfeceb6489abc7b90145b25878b07",
+      "drive_url": "https://drive.google.com/file/d/127GIAs5pd_x-XEOSNI-8jWqiXwg6Pi4B/view?usp=drivesdk"
+    },
+    "mask": {
+      "file": "front_flipper_outer_outline_mask_v1_2048.png",
+      "sha256": "39694220fdf7481b80f8dc8c51c511c900a35f2b28616e92bce0dd730b45c839",
+      "drive_url": "https://drive.google.com/file/d/1xnRA4oOwwgfNGQXodMjv567SWjF9rwkG/view?usp=drivesdk"
+    },
+    "removed_remainder": {
+      "file": "front_flipper_outer_outline_removed_remainder_v1_2048.png",
+      "sha256": "59e68b729d512ee5fbd33739618c580f227a127710049bb3e0799a1f28efaab2",
+      "drive_url": "https://drive.google.com/file/d/1If5OUhq2aOhl17iLjZZVlfewxbBaSG9u/view?usp=drivesdk"
+    },
+    "ownership_qa": {
+      "file": "front_flipper_outer_outline_ownership_qa_v1_2048.png",
+      "sha256": "7a1ad0d6a31c70fcb0659c9bdddbcd61459b7ca3ac878efee15db6e0b8789ce4",
+      "drive_url": "https://drive.google.com/file/d/1bSGKWzZjS7Bjc5F3oArHCLU3jC-FUOMQ/view?usp=drivesdk"
+    },
+    "recomposite_diff": {
+      "file": "front_flipper_outer_outline_recomposite_diff_v1_2048.png",
+      "sha256": "4366893496c99f69cef48e1359ec843e15879ba94879171d8596e5514ea615aa",
+      "drive_url": "https://drive.google.com/file/d/1U3tLrVCP7OED1kTVu37tQ3zEe4_Lgv83/view?usp=drivesdk"
+    },
+    "package_url": "https://drive.google.com/file/d/1BNQ-HmjAII1SJ66Y_gWOZ0tpNHKQ45nu/view?usp=drivesdk"
+  },
   "policy": {
     "image_generation_used": false,
     "geometry_changed": false,
     "source_of_truth": "adopted v2 asset",
-    "next_stage": "outline split from the same adopted v2 asset"
+    "next_stage": "pattern ownership overlay from the same adopted v2 asset"
   }
 }
