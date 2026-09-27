@@ -114,7 +114,7 @@
     "image_generation_used": false,
     "geometry_changed": false,
     "source_of_truth": "adopted v2 asset",
-    "next_stage": "full material recomposition QA approval, then final Part closeout"
+    "next_stage": "actual app runtime QA using the same locked outer-front-flipper structure and app palette"
   },
   "highlight_gate": {
     "status": "locked",
@@ -180,5 +180,33 @@
       "package": "https://drive.google.com/file/d/1JuSSNV9sFRjFkC70UNDNrLtP18K50Uov/view?usp=drivesdk"
     },
     "next_gate": "user visual approval of full material ownership/recomposition QA before final Part closeout"
+  },
+  "palette_qa_gate": {
+    "status": "adopted",
+    "source": "front_flipper_outer_asset_v2_2048.png",
+    "image_generation_used": false,
+    "palette_source": "app main runtime ShapeTone/baseColorForTone",
+    "palettes": {
+      "pink": {
+        "hex": "#FF8FD1",
+        "asset_sha256": "a98eef03c8cd317ba6cfe6a71d550863ea147556083064442d3c06746e173170"
+      },
+      "blue": {
+        "hex": "#79BFFF",
+        "asset_sha256": "03997beafe71940ba0458e94399c4f434a1ca7fd4f3afecd5e72002041a15f09"
+      },
+      "yellow": {
+        "hex": "#FFDA72",
+        "asset_sha256": "3813a0e85f86033187dc72ed6821399f04fad4c21d84e3de8f66837c8b5641d3"
+      }
+    },
+    "geometry_changed_pixels": 0,
+    "alpha_changed_pixels": 0,
+    "material_gap_pixels": 0,
+    "material_overlap_pixels": 0,
+    "runtime_preview_px": 58,
+    "drive_folder": "https://drive.google.com/drive/folders/1l0MAqYcPxwSBJQb0UpT8Tj4_-WKVp9Ed",
+    "package_url": "https://drive.google.com/file/d/1k6Si8_gAvSqU0UBPVjW3upp5-dFgQHUa/view?usp=drivesdk",
+    "note": "Purple/Mint not included because they are not currently registered in app runtime ShapeTone."
   }
 }
