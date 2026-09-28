@@ -4,21 +4,21 @@ MY LOCK keeps the GitHub repository private.
 
 The web preview uses this flow:
 
-1. GitHub Actions builds Flutter Web for free.
+1. GitHub Actions builds Flutter Web.
 2. The generated `build/web` folder is uploaded as the `my-lock-web` artifact.
-3. Cloudflare Pages can host that static folder on the free plan.
+3. Wrangler deploys the static Flutter Web bundle through Cloudflare Workers.
 
-## Cloudflare Pages target
+## Current public preview
 
-Recommended project name:
+Current deployed Worker:
 
-`my-lock-preview`
+`https://my-lock-preview.rlatkd5959.workers.dev`
 
-Expected public URL after the one-time Cloudflare setup:
+Sea Turtle outer-front-flipper runtime QA:
 
-`https://my-lock-preview.pages.dev`
+`https://my-lock-preview.rlatkd5959.workers.dev/?qa=front-flipper-outer`
 
-The repository intentionally does not require a paid GitHub Pages plan.
+Do not use the old GitHub Pages URL (`dudozi-workshop.github.io/my-lock`) for this preview. GitHub Pages is not the active deployment target.
 
 ## Build locally
 
