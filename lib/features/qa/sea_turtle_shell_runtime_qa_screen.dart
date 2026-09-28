@@ -301,7 +301,7 @@ class _AuroraShellSampleState extends State<_AuroraShellSample>
                   ).createShader(bounds);
                 },
                 child: Opacity(
-                  opacity: 0.92,
+                  opacity: 0.62,
                   child: Image.memory(
                     widget.bytes,
                     width: widget.size,
