@@ -167,3 +167,32 @@ Before declaring a Part complete:
 9. final package + manifest are saved and registered.
 
 Then the Part may become the reusable source for later runtime/variant work.
+
+
+## 13. Palette and runtime gate
+
+A complex illustrated Part is not Final merely because source-pixel recomposition passes.
+
+Before final closeout, verify the actual app palette and runtime presentation:
+
+1. Keep geometry, alpha, pattern, shadow, highlight and outline locked.
+2. Apply only the app's registered palette values with deterministic recolor/compositing.
+3. Do not use ImageGen for palette application.
+4. Verify representative runtime size(s), including the smallest intended display size.
+5. Check at minimum:
+   - silhouette readability
+   - outline continuity/contrast
+   - pattern separation
+   - highlight retention on bright colors
+   - shadow retention on dark colors
+   - alpha edge cleanliness
+   - light/dark background legibility when relevant
+6. Use only palette entries actually registered in the current app runtime unless a separate palette expansion is explicitly approved.
+7. Record the exact palette hex values, runtime size, build result and user visual approval in the Part manifest.
+
+Final closeout requires:
+- material recomposition QA PASS;
+- palette QA approved;
+- runtime QA approved;
+- build/deployment verification PASS;
+- final package saved and registered.
