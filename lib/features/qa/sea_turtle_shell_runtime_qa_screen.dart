@@ -41,23 +41,17 @@ class SeaTurtleShellRuntimeQaScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Aurora Sea · animated gradient trial',
+              'Aurora Sea · independent animated color',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 6),
             Text(
-              'Shell alpha and detail stay fixed; only a low-intensity '
-              'gradient layer moves inside the shell.',
+              'A standalone Signature Color material — not a Pink / Blue / Yellow variation. '
+              'The color itself flows across the shell at runtime.',
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                for (final item in _items) _AuroraShellCard(item: item),
-              ],
-            ),
+            _AuroraSeaCard(baseBytes: base64Decode(_blueWebp)),
             const SizedBox(height: 20),
             Text(
               'Review: 58 px legibility, 96 px detail retention, 160 px '
@@ -149,42 +143,21 @@ class _RuntimeSample extends StatelessWidget {
   }
 }
 
-List<Color> _auroraColorsFor(String label) {
-  switch (label) {
-    case 'Pink':
-      return const [
-        Color(0xFFD52F9D),
-        Color(0xFFFF4FA3),
-        Color(0xFFFFB6E1),
-        Color(0xFFE45BFF),
-      ];
-    case 'Blue':
-      return const [
-        Color(0xFF075A9E),
-        Color(0xFF00A8E8),
-        Color(0xFF66E6FF),
-        Color(0xFF4D7CFF),
-      ];
-    case 'Yellow':
-      return const [
-        Color(0xFFB96A00),
-        Color(0xFFF2B400),
-        Color(0xFFFFE36B),
-        Color(0xFFFF9F2D),
-      ];
-    default:
-      return const [Color(0xFF79BFFF), Color(0xFF66E6FF)];
-  }
-}
+const _auroraSeaColors = <Color>[
+  Color(0xFF00D9C6),
+  Color(0xFF36A9FF),
+  Color(0xFF8B5CF6),
+  Color(0xFFFF4FB3),
+  Color(0xFF00E5B0),
+];
 
-class _AuroraShellCard extends StatelessWidget {
-  const _AuroraShellCard({required this.item});
+class _AuroraSeaCard extends StatelessWidget {
+  const _AuroraSeaCard({required this.baseBytes});
 
-  final _ShellRuntimeItem item;
+  final Uint8List baseBytes;
 
   @override
   Widget build(BuildContext context) {
-    final bytes = base64Decode(item.assetBase64);
     return SizedBox(
       width: 260,
       child: Card(
@@ -194,29 +167,27 @@ class _AuroraShellCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                item.label + ' · Aurora Sea',
+                'Aurora Sea · Signature Color',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 10),
               Center(
-                child: _AuroraShellSample(
-                  bytes: bytes,
+                child: _AuroraSeaSample(
+                  bytes: baseBytes,
                   size: 160,
                   dark: true,
-                  colors: _auroraColorsFor(item.label),
                 ),
               ),
-              const Center(child: Text('160 px animated preview')),
+              const Center(child: Text('160 px · moving color reference')),
               const SizedBox(height: 10),
               Center(
-                child: _AuroraShellSample(
-                  bytes: bytes,
+                child: _AuroraSeaSample(
+                  bytes: baseBytes,
                   size: 96,
                   dark: false,
-                  colors: _auroraColorsFor(item.label),
                 ),
               ),
-              const Center(child: Text('96 px detail check')),
+              const Center(child: Text('96 px · detail / motion check')),
             ],
           ),
         ),
@@ -225,24 +196,22 @@ class _AuroraShellCard extends StatelessWidget {
   }
 }
 
-class _AuroraShellSample extends StatefulWidget {
-  const _AuroraShellSample({
+class _AuroraSeaSample extends StatefulWidget {
+  const _AuroraSeaSample({
     required this.bytes,
     required this.size,
     required this.dark,
-    required this.colors,
   });
 
   final Uint8List bytes;
   final double size;
   final bool dark;
-  final List<Color> colors;
 
   @override
-  State<_AuroraShellSample> createState() => _AuroraShellSampleState();
+  State<_AuroraSeaSample> createState() => _AuroraSeaSampleState();
 }
 
-class _AuroraShellSampleState extends State<_AuroraShellSample>
+class _AuroraSeaSampleState extends State<_AuroraSeaSample>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
@@ -251,7 +220,7 @@ class _AuroraShellSampleState extends State<_AuroraShellSample>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 8),
+      duration: const Duration(seconds: 4),
     )..repeat();
   }
 
@@ -267,6 +236,8 @@ class _AuroraShellSampleState extends State<_AuroraShellSample>
       animation: _controller,
       builder: (context, child) {
         final phase = _controller.value * math.pi * 2;
+        final driftX = math.sin(phase) * 1.6;
+        final driftY = math.cos(phase * 0.8) * 0.9;
         return Container(
           width: widget.size + 20,
           height: widget.size + 20,
@@ -280,28 +251,29 @@ class _AuroraShellSampleState extends State<_AuroraShellSample>
           child: Stack(
             alignment: Alignment.center,
             children: [
-              Image.memory(
-                widget.bytes,
-                width: widget.size,
-                height: widget.size,
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
-                gaplessPlayback: true,
+              Opacity(
+                opacity: 0.52,
+                child: Image.memory(
+                  widget.bytes,
+                  width: widget.size,
+                  height: widget.size,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                  gaplessPlayback: true,
+                ),
               ),
               ShaderMask(
-                blendMode: BlendMode.modulate,
+                blendMode: BlendMode.srcIn,
                 shaderCallback: (bounds) {
-                  final driftX = math.sin(phase) * 0.35;
-                  final driftY = math.cos(phase * 0.7) * 0.25;
                   return LinearGradient(
-                    begin: Alignment(-1.0 + driftX, -1.0 + driftY),
-                    end: Alignment(1.0 + driftX, 1.0 + driftY),
-                    colors: widget.colors,
-                    stops: const [0.0, 0.32, 0.62, 1.0],
+                    begin: Alignment(-2.0 + driftX, -1.1 + driftY),
+                    end: Alignment(2.0 + driftX, 1.1 + driftY),
+                    colors: _auroraSeaColors,
+                    stops: const [0.0, 0.24, 0.5, 0.76, 1.0],
                   ).createShader(bounds);
                 },
                 child: Opacity(
-                  opacity: 0.82,
+                  opacity: 0.72,
                   child: Image.memory(
                     widget.bytes,
                     width: widget.size,
