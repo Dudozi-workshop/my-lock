@@ -1,6 +1,6 @@
 {
   "asset": "Sea Turtle v3 Front Flipper Outer",
-  "status": "adopted",
+  "status": "final_locked",
   "canonical_canvas": {
     "width": 2048,
     "height": 2048,
@@ -114,7 +114,7 @@
     "image_generation_used": false,
     "geometry_changed": false,
     "source_of_truth": "adopted v2 asset",
-    "next_stage": "actual app runtime QA using the same locked outer-front-flipper structure and app palette"
+    "next_stage": "front_flipper_inner_f0 using the same locked production system"
   },
   "highlight_gate": {
     "status": "locked",
@@ -154,7 +154,7 @@
     "package_url": "https://drive.google.com/file/d/1CciEuyK1WWBu_-CZGKYnximVKctfsP1q/view?usp=drivesdk"
   },
   "material_recomposition_gate": {
-    "status": "qa-candidate",
+    "status": "locked",
     "source_visible_pixels": 108600,
     "ownership_pixels": {
       "albedo": 14053,
@@ -179,7 +179,7 @@
       "manifest": "https://drive.google.com/file/d/1VysF2elw4uciL7IEfUqnjg7ea2S2fdRN/view?usp=drivesdk",
       "package": "https://drive.google.com/file/d/1JuSSNV9sFRjFkC70UNDNrLtP18K50Uov/view?usp=drivesdk"
     },
-    "next_gate": "user visual approval of full material ownership/recomposition QA before final Part closeout"
+    "next_gate": "completed"
   },
   "palette_qa_gate": {
     "status": "adopted",
@@ -208,5 +208,40 @@
     "drive_folder": "https://drive.google.com/drive/folders/1l0MAqYcPxwSBJQb0UpT8Tj4_-WKVp9Ed",
     "package_url": "https://drive.google.com/file/d/1k6Si8_gAvSqU0UBPVjW3upp5-dFgQHUa/view?usp=drivesdk",
     "note": "Purple/Mint not included because they are not currently registered in app runtime ShapeTone."
+  },
+  "locked_at": "2026-09-29",
+  "runtime_qa_gate": {
+    "status": "locked",
+    "route": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=front-flipper-outer",
+    "implementation_commit": "b8f468da8debe3cf61e608394a402111978248c0",
+    "preview_build": "009",
+    "render_checks": [
+      "58px_light",
+      "58px_dark",
+      "96px_inspection"
+    ],
+    "palette_hex": {
+      "pink": "#FF8FD1",
+      "blue": "#79BFFF",
+      "yellow": "#FFDA72"
+    },
+    "image_generation_used": false,
+    "web_build": "pass",
+    "android_ci": "pass",
+    "user_visual_approval": true
+  },
+  "final_closeout": {
+    "status": "final_locked",
+    "approved_at": "2026-09-29",
+    "canonical_asset": "front_flipper_outer_asset_v2_2048.png",
+    "canonical_recomposition_changed_pixels": 0,
+    "canonical_recomposition_max_channel_diff": 0,
+    "material_gap_pixels": 0,
+    "material_overlap_pixels": 0,
+    "material_outside_source_pixels": 0,
+    "final_package_sha256": "09d6727f25fb91d6a0dec5d0761e7dcd6c51fa8ce5f28f51ac531522d05b71c2",
+    "final_package_url": "https://drive.google.com/file/d/1EtnfWMeOD4NgIvza025Um-LufEiURGQk/view?usp=drivesdk",
+    "drive_folder": "v3 Canonical Production/front_flipper_outer_v2/final_v1",
+    "next_stage": "front_flipper_inner_f0"
   }
 }
