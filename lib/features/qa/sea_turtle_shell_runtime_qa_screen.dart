@@ -121,13 +121,11 @@ class _RuntimeSample extends StatelessWidget {
     required this.bytes,
     required this.size,
     required this.dark,
-    required this.colors,
   });
 
   final Uint8List bytes;
   final double size;
   final bool dark;
-  final List<Color> colors;
 
   @override
   Widget build(BuildContext context) {
@@ -232,11 +230,13 @@ class _AuroraShellSample extends StatefulWidget {
     required this.bytes,
     required this.size,
     required this.dark,
+    required this.colors,
   });
 
   final Uint8List bytes;
   final double size;
   final bool dark;
+  final List<Color> colors;
 
   @override
   State<_AuroraShellSample> createState() => _AuroraShellSampleState();
