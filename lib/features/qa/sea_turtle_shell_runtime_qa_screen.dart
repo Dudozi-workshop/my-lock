@@ -257,7 +257,7 @@ class _AuroraShellSampleState extends State<_AuroraShellSample>
                 gaplessPlayback: true,
               ),
               ShaderMask(
-                blendMode: BlendMode.srcOver,
+                blendMode: BlendMode.srcIn,
                 shaderCallback: (bounds) {
                   final driftX = math.sin(phase) * 0.35;
                   final driftY = math.cos(phase * 0.7) * 0.25;
