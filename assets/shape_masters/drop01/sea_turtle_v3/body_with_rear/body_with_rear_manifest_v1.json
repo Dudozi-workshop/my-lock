@@ -1,0 +1,25 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "part_id": "body_with_rear",
+  "version": "v1",
+  "status": "Final / Locked",
+  "authoritative_master": "Q3 canonical master",
+  "source_file": "sea_turtle_master_v3_authoritative_2048.png",
+  "canvas": {"width": 2048, "height": 2048, "mode": "RGBA"},
+  "role": "Fixed Layer: upper head/neck-body + Rear Near/Far; underbelly excluded",
+  "imagegen_used": false,
+  "source_method": "deterministic source-pixel ownership extraction and outline-residual cleanup",
+  "locked_areas_not_modified": ["shell_main","underbelly","front_flipper_near","front_flipper_far"],
+  "qa": {
+    "recomposite_changed_pixels": 0,
+    "recomposite_max_channel_diff": 0,
+    "asset_outside_master_alpha_pixels": 0,
+    "asset_alpha_vs_mask_changed_pixels": 0,
+    "asset_transparent_rgb_residue_pixels": 0,
+    "remainder_transparent_rgb_residue_pixels": 0,
+    "asset_bbox": [420,688,1640,1315],
+    "runtime_review": "58x58 full-object recomposite review generated"
+  },
+  "drive_package_url": "https://drive.google.com/file/d/1x0rZJUKY_QchP7PALFHTP47c5z6sG25v/view?usp=drivesdk",
+  "approval_note": "User approved v7 outline cleanup on 2026-09-29: 좋아. 이렇게 가자"
+}
