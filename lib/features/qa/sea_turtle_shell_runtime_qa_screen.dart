@@ -121,11 +121,13 @@ class _RuntimeSample extends StatelessWidget {
     required this.bytes,
     required this.size,
     required this.dark,
+    required this.colors,
   });
 
   final Uint8List bytes;
   final double size;
   final bool dark;
+  final List<Color> colors;
 
   @override
   Widget build(BuildContext context) {
@@ -146,6 +148,34 @@ class _RuntimeSample extends StatelessWidget {
         gaplessPlayback: true,
       ),
     );
+  }
+}
+
+List<Color> _auroraColorsFor(String label) {
+  switch (label) {
+    case 'Pink':
+      return const [
+        Color(0xFFD52F9D),
+        Color(0xFFFF4FA3),
+        Color(0xFFFFB6E1),
+        Color(0xFFE45BFF),
+      ];
+    case 'Blue':
+      return const [
+        Color(0xFF075A9E),
+        Color(0xFF00A8E8),
+        Color(0xFF66E6FF),
+        Color(0xFF4D7CFF),
+      ];
+    case 'Yellow':
+      return const [
+        Color(0xFFB96A00),
+        Color(0xFFF2B400),
+        Color(0xFFFFE36B),
+        Color(0xFFFF9F2D),
+      ];
+    default:
+      return const [Color(0xFF79BFFF), Color(0xFF66E6FF)];
   }
 }
 
@@ -175,6 +205,7 @@ class _AuroraShellCard extends StatelessWidget {
                   bytes: bytes,
                   size: 160,
                   dark: true,
+                  colors: _auroraColorsFor(item.label),
                 ),
               ),
               const Center(child: Text('160 px animated preview')),
@@ -184,6 +215,7 @@ class _AuroraShellCard extends StatelessWidget {
                   bytes: bytes,
                   size: 96,
                   dark: false,
+                  colors: _auroraColorsFor(item.label),
                 ),
               ),
               const Center(child: Text('96 px detail check')),
@@ -257,25 +289,19 @@ class _AuroraShellSampleState extends State<_AuroraShellSample>
                 gaplessPlayback: true,
               ),
               ShaderMask(
-                blendMode: BlendMode.srcIn,
+                blendMode: BlendMode.color,
                 shaderCallback: (bounds) {
                   final driftX = math.sin(phase) * 0.35;
                   final driftY = math.cos(phase * 0.7) * 0.25;
                   return LinearGradient(
                     begin: Alignment(-1.0 + driftX, -1.0 + driftY),
                     end: Alignment(1.0 + driftX, 1.0 + driftY),
-                    colors: const [
-                      Color(0x0058E0D8),
-                      Color(0x8A58E0D8),
-                      Color(0x806EA8FF),
-                      Color(0x80CE83FF),
-                      Color(0x0058E0D8),
-                    ],
-                    stops: const [0.0, 0.28, 0.52, 0.76, 1.0],
+                    colors: widget.colors,
+                    stops: const [0.0, 0.32, 0.62, 1.0],
                   ).createShader(bounds);
                 },
                 child: Opacity(
-                  opacity: 0.34,
+                  opacity: 0.92,
                   child: Image.memory(
                     widget.bytes,
                     width: widget.size,
