@@ -1,6 +1,6 @@
 {
   "asset": "Sea Turtle v3 Front Flipper Outer",
-  "status": "final_locked",
+  "status": "correction_required",
   "canonical_canvas": {
     "width": 2048,
     "height": 2048,
@@ -114,7 +114,7 @@
     "image_generation_used": false,
     "geometry_changed": false,
     "source_of_truth": "adopted v2 asset",
-    "next_stage": "front_flipper_inner_f0 using the same locked production system"
+    "next_stage": "user approval of front_flipper_outer cleanup correction v3 ownership overlay, then regenerate material outline/palette/runtime QA and final package"
   },
   "highlight_gate": {
     "status": "locked",
@@ -231,7 +231,7 @@
     "user_visual_approval": true
   },
   "final_closeout": {
-    "status": "final_locked",
+    "status": "withdrawn_due_outline_residual",
     "approved_at": "2026-09-29",
     "canonical_asset": "front_flipper_outer_asset_v2_2048.png",
     "canonical_recomposition_changed_pixels": 0,
@@ -242,6 +242,19 @@
     "final_package_sha256": "09d6727f25fb91d6a0dec5d0761e7dcd6c51fa8ce5f28f51ac531522d05b71c2",
     "final_package_url": "https://drive.google.com/file/d/1EtnfWMeOD4NgIvza025Um-LufEiURGQk/view?usp=drivesdk",
     "drive_folder": "v3 Canonical Production/front_flipper_outer_v2/final_v1",
-    "next_stage": "front_flipper_inner_f0"
+    "next_stage": "front_flipper_inner_f0",
+    "issue": "Final v1 package reused a stale ownership boundary; removed remainder retained a visible lower/outer front-flipper outline/tip residual."
+  },
+  "correction_candidate_v3": {
+    "status": "qa_candidate",
+    "source": "sea_turtle_master_v3_2048.png",
+    "image_generation_used": false,
+    "old_owned_pixels": 108600,
+    "new_owned_pixels": 114017,
+    "added_owned_pixels": 5417,
+    "local_disconnected_residual_components_after_cleanup": 0,
+    "recomposite_changed_pixels": 0,
+    "max_channel_diff": 0,
+    "note": "Do not promote until user approves the corrected Ownership Overlay / Removed Remainder."
   }
 }
