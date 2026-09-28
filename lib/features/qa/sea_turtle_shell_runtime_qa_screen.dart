@@ -37,21 +37,9 @@ class SeaTurtleShellRuntimeQaScreen extends StatelessWidget {
               runSpacing: 12,
               children: [
                 for (final item in _items) _ShellRuntimeCard(item: item),
+                _AuroraSeaCard(sourceBytes: base64Decode(_blueWebp)),
               ],
             ),
-            const SizedBox(height: 24),
-            Text(
-              'Aurora Sea · independent animated color',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'A standalone Signature Color material — not a Pink / Blue / Yellow variation. '
-              'The color itself flows across the shell at runtime.',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            const SizedBox(height: 12),
-            _AuroraSeaCard(baseBytes: base64Decode(_blueWebp)),
             const SizedBox(height: 20),
             Text(
               'Review: 58 px legibility, 96 px detail retention, 160 px '
@@ -152,9 +140,9 @@ const _auroraSeaColors = <Color>[
 ];
 
 class _AuroraSeaCard extends StatelessWidget {
-  const _AuroraSeaCard({required this.baseBytes});
+  const _AuroraSeaCard({required this.sourceBytes});
 
-  final Uint8List baseBytes;
+  final Uint8List sourceBytes;
 
   @override
   Widget build(BuildContext context) {
@@ -167,27 +155,45 @@ class _AuroraSeaCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Aurora Sea · Signature Color',
+                'Aurora Sea  ·  Dynamic',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: 10),
-              Center(
-                child: _AuroraSeaSample(
-                  bytes: baseBytes,
-                  size: 160,
-                  dark: true,
-                ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _AuroraSeaSample(
+                    bytes: sourceBytes,
+                    size: 58,
+                    dark: false,
+                  ),
+                  const SizedBox(width: 10),
+                  _AuroraSeaSample(
+                    bytes: sourceBytes,
+                    size: 58,
+                    dark: true,
+                  ),
+                ],
               ),
-              const Center(child: Text('160 px · moving color reference')),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
+              const Text('58 px · light / dark'),
+              const SizedBox(height: 12),
               Center(
                 child: _AuroraSeaSample(
-                  bytes: baseBytes,
+                  bytes: sourceBytes,
                   size: 96,
                   dark: false,
                 ),
               ),
-              const Center(child: Text('96 px · detail / motion check')),
+              const Center(child: Text('96 px inspection')),
+              const SizedBox(height: 12),
+              Center(
+                child: _AuroraSeaSample(
+                  bytes: sourceBytes,
+                  size: 160,
+                  dark: true,
+                ),
+              ),
+              const Center(child: Text('160 px reference scale')),
             ],
           ),
         ),
@@ -213,6 +219,13 @@ class _AuroraSeaSample extends StatefulWidget {
 
 class _AuroraSeaSampleState extends State<_AuroraSeaSample>
     with SingleTickerProviderStateMixin {
+  static const _grayscaleDetail = ColorFilter.matrix(<double>[
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0, 0, 0, 1, 0,
+  ]);
+
   late final AnimationController _controller;
 
   @override
@@ -236,8 +249,8 @@ class _AuroraSeaSampleState extends State<_AuroraSeaSample>
       animation: _controller,
       builder: (context, child) {
         final phase = _controller.value * math.pi * 2;
-        final driftX = math.sin(phase) * 1.6;
-        final driftY = math.cos(phase * 0.8) * 0.9;
+        final driftX = math.sin(phase) * 0.9;
+        final driftY = math.cos(phase * 0.8) * 0.45;
         return Container(
           width: widget.size + 20,
           height: widget.size + 20,
@@ -251,8 +264,16 @@ class _AuroraSeaSampleState extends State<_AuroraSeaSample>
           child: Stack(
             alignment: Alignment.center,
             children: [
-              Opacity(
-                opacity: 0.52,
+              ShaderMask(
+                blendMode: BlendMode.srcIn,
+                shaderCallback: (bounds) {
+                  return LinearGradient(
+                    begin: Alignment(-1.15 + driftX, -0.75 + driftY),
+                    end: Alignment(1.15 + driftX, 0.75 + driftY),
+                    colors: _auroraSeaColors,
+                    stops: const [0.0, 0.24, 0.5, 0.76, 1.0],
+                  ).createShader(bounds);
+                },
                 child: Image.memory(
                   widget.bytes,
                   width: widget.size,
@@ -262,18 +283,10 @@ class _AuroraSeaSampleState extends State<_AuroraSeaSample>
                   gaplessPlayback: true,
                 ),
               ),
-              ShaderMask(
-                blendMode: BlendMode.srcIn,
-                shaderCallback: (bounds) {
-                  return LinearGradient(
-                    begin: Alignment(-2.0 + driftX, -1.1 + driftY),
-                    end: Alignment(2.0 + driftX, 1.1 + driftY),
-                    colors: _auroraSeaColors,
-                    stops: const [0.0, 0.24, 0.5, 0.76, 1.0],
-                  ).createShader(bounds);
-                },
-                child: Opacity(
-                  opacity: 0.72,
+              Opacity(
+                opacity: 0.24,
+                child: ColorFiltered(
+                  colorFilter: _grayscaleDetail,
                   child: Image.memory(
                     widget.bytes,
                     width: widget.size,
