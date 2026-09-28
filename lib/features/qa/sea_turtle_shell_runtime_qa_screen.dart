@@ -289,7 +289,7 @@ class _AuroraShellSampleState extends State<_AuroraShellSample>
                 gaplessPlayback: true,
               ),
               ShaderMask(
-                blendMode: BlendMode.srcIn,
+                blendMode: BlendMode.modulate,
                 shaderCallback: (bounds) {
                   final driftX = math.sin(phase) * 0.35;
                   final driftY = math.cos(phase * 0.7) * 0.25;
@@ -301,7 +301,7 @@ class _AuroraShellSampleState extends State<_AuroraShellSample>
                   ).createShader(bounds);
                 },
                 child: Opacity(
-                  opacity: 0.62,
+                  opacity: 0.82,
                   child: Image.memory(
                     widget.bytes,
                     width: widget.size,
