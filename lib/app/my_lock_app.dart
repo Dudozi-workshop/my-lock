@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../features/qa/sea_turtle_front_flipper_runtime_qa_screen.dart';
+import '../features/qa/sea_turtle_shell_runtime_qa_screen.dart';
 import '../features/shell/root_shell.dart';
 import 'build_info.dart';
 import 'theme.dart';
@@ -11,8 +12,9 @@ class MyLockApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showFrontFlipperQa = kIsWeb &&
-        Uri.base.queryParameters['qa'] == 'front-flipper-outer';
+    final qa = Uri.base.queryParameters['qa'];
+    final showShellRuntimeQa = kIsWeb && qa == 'sea-turtle-shell-runtime';
+    final showFrontFlipperQa = kIsWeb && qa == 'front-flipper-outer';
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -24,9 +26,11 @@ class MyLockApp extends StatelessWidget {
           const Positioned.fill(child: BuildStamp()),
         ],
       ),
-      home: showFrontFlipperQa
-          ? const SeaTurtleFrontFlipperRuntimeQaScreen()
-          : const RootShell(),
+      home: showShellRuntimeQa
+          ? const SeaTurtleShellRuntimeQaScreen()
+          : showFrontFlipperQa
+              ? const SeaTurtleFrontFlipperRuntimeQaScreen()
+              : const RootShell(),
     );
   }
 }

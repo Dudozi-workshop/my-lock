@@ -1,0 +1,58 @@
+{
+  "asset": "sea_turtle_v3_shell_palette",
+  "version": 1,
+  "status": "approved",
+  "canonical_canvas": [2048, 2048],
+  "authoritative_shell": "sea_turtle_v3_shell_asset_v1_2048.png",
+  "palette_source": "Soft Basic final implementation standard",
+  "palettes": {
+    "pink": {
+      "hex": "#FF8FD1",
+      "full_detail": "sea_turtle_v3_shell_palette_pink_v1_2048.png",
+      "runtime_lod": "sea_turtle_v3_shell_palette_pink_runtime_lod_v1_2048.png"
+    },
+    "blue": {
+      "hex": "#79BFFF",
+      "full_detail": "sea_turtle_v3_shell_palette_blue_v1_2048.png",
+      "runtime_lod": "sea_turtle_v3_shell_palette_blue_runtime_lod_v1_2048.png"
+    },
+    "yellow": {
+      "hex": "#FFDA72",
+      "full_detail": "sea_turtle_v3_shell_palette_yellow_v1_2048.png",
+      "runtime_lod": "sea_turtle_v3_shell_palette_yellow_runtime_lod_v1_2048.png",
+      "tuning": "reduced highlight lift; stronger shade contrast"
+    }
+  },
+  "qa": {
+    "board": "sea_turtle_v3_shell_palette_runtime_qa_v1.png",
+    "runtime_512_board": "sea_turtle_v3_shell_runtime_512_qa_v1.png",
+    "runtime_reference_shell_width_px": 160,
+    "alpha_matches_authoritative_shell": true,
+    "transparent_region_rgb_zero": true,
+    "generated_image_model_used": false
+  },
+  "runtime_export": {
+    "status": "approved",
+    "canvas": [512, 512],
+    "format": "lossless WebP",
+    "resampling": "Lanczos",
+    "source": "runtime_lod 2048",
+    "minimum_safe_resolution": 512,
+    "pink": "sea_turtle_v3_shell_palette_pink_runtime_v1_512.webp",
+    "blue": "sea_turtle_v3_shell_palette_blue_runtime_v1_512.webp",
+    "yellow": "sea_turtle_v3_shell_palette_yellow_runtime_v1_512.webp"
+  },
+  "sha256": {
+    "sea_turtle_v3_shell_palette_pink_v1_2048.png": "0e658b1e60b8823d8fee7fbb047b0478ade3ae8399d94c9d4140aaca8988549e",
+    "sea_turtle_v3_shell_palette_blue_v1_2048.png": "81900b8e8574c9cce394aa7a1b0eebd8613244118fa88fd772db42762f48d087",
+    "sea_turtle_v3_shell_palette_yellow_v1_2048.png": "3c144cb023b624d32c5e22e159e1eea0909b3700d67c084058a876438585d074",
+    "sea_turtle_v3_shell_palette_pink_runtime_lod_v1_2048.png": "9452665991c17261e2a80bf10108bb555721a52169b9b7d8cabec683b87095f2",
+    "sea_turtle_v3_shell_palette_blue_runtime_lod_v1_2048.png": "5598d80bf327f696b6bddecedac404543ee7df2c954222dd3a8f2db7c253cc6b",
+    "sea_turtle_v3_shell_palette_yellow_runtime_lod_v1_2048.png": "c05917ed44bcc0c06212f428faedb04fe910a803e384daae71aefc65557f7c9d",
+    "sea_turtle_v3_shell_palette_runtime_qa_v1.png": "c8ad3dbcca81e0fa5fedb7120edc01ae385448aeeb51fe4db4383f367c044f28",
+    "sea_turtle_v3_shell_palette_pink_runtime_v1_512.webp": "0c86a0c5e27e2b3e7c19284758457f67a2eb33a78f63391ff4d8b81def9481e2",
+    "sea_turtle_v3_shell_palette_blue_runtime_v1_512.webp": "947ee0e92551a13dba43184603ad5364a0ab5159db72101ad85414e66cd87c81",
+    "sea_turtle_v3_shell_palette_yellow_runtime_v1_512.webp": "61ed57c6642b969f1ba507fbbf468234ffcae8057229f5ace596cd4d01bf5bf5",
+    "sea_turtle_v3_shell_runtime_512_qa_v1.png": "818e8a82a1c7dfce3fbb429c30c3af9d0d9216c2fe5b377ddf43d9e73a5a4012"
+  }
+}
