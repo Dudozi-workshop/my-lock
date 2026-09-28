@@ -196,3 +196,19 @@ Final closeout requires:
 - runtime QA approved;
 - build/deployment verification PASS;
 - final package saved and registered.
+
+
+## 14. Final naming and legacy separation
+
+Final naming is reserved for exactly one currently approved artifact set.
+
+Rules:
+- Candidate outputs use `candidate_v#`.
+- Approved intermediate/locked outputs use versioned names such as `v2`, `v3`.
+- Only the latest explicitly approved production set may use `final`.
+- If a Final artifact requires correction, immediately withdraw Final status.
+- Rename/archive the withdrawn set as `legacy_final_v#_<reason>_<date>` or equivalent.
+- The corrected set remains `candidate_v#` until user approval.
+- After approval, promote only the newest approved set to `final`.
+- Never leave two active Final sets for the same Part.
+- Manifests must record withdrawn-final reason and replacement candidate/final version.
