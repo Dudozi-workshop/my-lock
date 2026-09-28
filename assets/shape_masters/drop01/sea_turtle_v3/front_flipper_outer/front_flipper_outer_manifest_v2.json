@@ -114,7 +114,7 @@
     "image_generation_used": false,
     "geometry_changed": false,
     "source_of_truth": "adopted v2 asset",
-    "next_stage": "user approval of front_flipper_outer cleanup correction v3 ownership overlay, then regenerate material outline/palette/runtime QA and final package"
+    "next_stage": "user review of cleanup v3 ownership overlay and removed remainder; do not regenerate material/palette/runtime derivatives before approval"
   },
   "highlight_gate": {
     "status": "locked",
@@ -231,7 +231,7 @@
     "user_visual_approval": true
   },
   "final_closeout": {
-    "status": "withdrawn_due_outline_residual",
+    "status": "legacy_withdrawn_outline_residual",
     "approved_at": "2026-09-29",
     "canonical_asset": "front_flipper_outer_asset_v2_2048.png",
     "canonical_recomposition_changed_pixels": 0,
@@ -243,7 +243,9 @@
     "final_package_url": "https://drive.google.com/file/d/1EtnfWMeOD4NgIvza025Um-LufEiURGQk/view?usp=drivesdk",
     "drive_folder": "v3 Canonical Production/front_flipper_outer_v2/final_v1",
     "next_stage": "front_flipper_inner_f0",
-    "issue": "Final v1 package reused a stale ownership boundary; removed remainder retained a visible lower/outer front-flipper outline/tip residual."
+    "issue": "Final v1 package reused a stale ownership boundary; removed remainder retained a visible lower/outer front-flipper outline/tip residual.",
+    "legacy_drive_folder": "https://drive.google.com/drive/folders/1FyX_G-0r2rgGVK3zT13m5hKiEy62Ms-G",
+    "legacy_package_url": "https://drive.google.com/file/d/1EtnfWMeOD4NgIvza025Um-LufEiURGQk/view?usp=drivesdk"
   },
   "correction_candidate_v3": {
     "status": "qa_candidate",
@@ -255,6 +257,21 @@
     "local_disconnected_residual_components_after_cleanup": 0,
     "recomposite_changed_pixels": 0,
     "max_channel_diff": 0,
-    "note": "Do not promote until user approves the corrected Ownership Overlay / Removed Remainder."
+    "note": "Do not promote until user approves the corrected Ownership Overlay / Removed Remainder.",
+    "candidate_name": "front_flipper_outer_cleanup_v3_candidate",
+    "package_sha256": "65b7ab08f48725874ffa1dbf7aa40cf3497c09b7595358f24e5b109ad74812be",
+    "drive_folder": "https://drive.google.com/drive/folders/1nA42T-UTKJrwMbCgYTuyqTygxChJdMVS",
+    "package_url": "https://drive.google.com/file/d/140-hbZs30AryYJ17pFZlhk8Y9Ylj046C/view?usp=drivesdk",
+    "ownership_overlay_url": "https://drive.google.com/file/d/1NnAOxtYip81HqJxOJHvC55hNWgJdoqao/view?usp=drivesdk",
+    "removed_remainder_url": "https://drive.google.com/file/d/1lzLw_JL_FtmtTpcvbZiihk4ZJTia90CB/view?usp=drivesdk",
+    "promotion_rule": "explicit user approval required; only then may the newest set regain final status"
+  },
+  "naming_policy": {
+    "active_final_count_allowed": 1,
+    "candidate_pattern": "candidate_v#",
+    "withdrawn_final_pattern": "legacy_final_v#_<reason>_<date>",
+    "current_final": null,
+    "legacy_final": "legacy_final_v1_outline_residual_20260929",
+    "current_candidate": "front_flipper_outer_cleanup_v3_candidate"
   }
 }
