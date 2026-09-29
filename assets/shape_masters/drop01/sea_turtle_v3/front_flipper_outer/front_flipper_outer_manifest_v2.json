@@ -1,6 +1,6 @@
 {
   "asset": "Sea Turtle v3 Front Flipper Outer",
-  "status": "correction_required",
+  "status": "geometry_v3_locked_material_revalidation",
   "canonical_canvas": {
     "width": 2048,
     "height": 2048,
@@ -114,7 +114,7 @@
     "image_generation_used": false,
     "geometry_changed": false,
     "source_of_truth": "adopted v2 asset",
-    "next_stage": "user review of cleanup v3 ownership overlay and removed remainder; do not regenerate material/palette/runtime derivatives before approval"
+    "next_stage": "user visual approval of material ownership v2 on geometry v3; then deterministic palette/runtime revalidation"
   },
   "highlight_gate": {
     "status": "locked",
@@ -248,7 +248,7 @@
     "legacy_package_url": "https://drive.google.com/file/d/1EtnfWMeOD4NgIvza025Um-LufEiURGQk/view?usp=drivesdk"
   },
   "correction_candidate_v3": {
-    "status": "qa_candidate",
+    "status": "geometry_locked",
     "source": "sea_turtle_master_v3_2048.png",
     "image_generation_used": false,
     "old_owned_pixels": 108600,
@@ -264,7 +264,15 @@
     "package_url": "https://drive.google.com/file/d/140-hbZs30AryYJ17pFZlhk8Y9Ylj046C/view?usp=drivesdk",
     "ownership_overlay_url": "https://drive.google.com/file/d/1NnAOxtYip81HqJxOJHvC55hNWgJdoqao/view?usp=drivesdk",
     "removed_remainder_url": "https://drive.google.com/file/d/1lzLw_JL_FtmtTpcvbZiihk4ZJTia90CB/view?usp=drivesdk",
-    "promotion_rule": "explicit user approval required; only then may the newest set regain final status"
+    "promotion_rule": "explicit user approval required; only then may the newest set regain final status",
+    "approved_by_user": true,
+    "approved_date": "2026-09-29",
+    "geometry_locked_package_sha256": "1fc8655639aab7e53cafffd98a2fb8fcd86d068be7d6c8ba2681a17253974512",
+    "geometry_drive_folder": "https://drive.google.com/drive/folders/1asS9YMVYoP6f6_YnQv5bRKZDkUKTmIk3",
+    "geometry_asset_url": "https://drive.google.com/file/d/15OuHEujhlw3ngpuclfOgz0cEjmmhrlbM/view?usp=drivesdk",
+    "geometry_mask_url": "https://drive.google.com/file/d/1mK7VW1shAFLSPAJjpCI7HzK-Y1RcFH1c/view?usp=drivesdk",
+    "geometry_remainder_url": "https://drive.google.com/file/d/12IRid-rUdjyH2CkF2YnqMPXXcgS-Zqba/view?usp=drivesdk",
+    "geometry_package_url": "https://drive.google.com/file/d/117DuoBpMwk0nDV5DzXVYr6YoNi6-1gAA/view?usp=drivesdk"
   },
   "naming_policy": {
     "active_final_count_allowed": 1,
@@ -272,6 +280,34 @@
     "withdrawn_final_pattern": "legacy_final_v#_<reason>_<date>",
     "current_final": null,
     "legacy_final": "legacy_final_v1_outline_residual_20260929",
-    "current_candidate": "front_flipper_outer_cleanup_v3_candidate"
+    "current_candidate": "front_flipper_outer_v3_material_qa_candidate"
+  },
+  "material_revalidation_v2": {
+    "status": "qa_candidate",
+    "source": "front_flipper_outer_asset_v3_2048.png",
+    "image_generation_used": false,
+    "ownership_pixels": 114017,
+    "material_pixels": {
+      "albedo": 14053,
+      "outline": 10030,
+      "pattern": 71757,
+      "shadow": 13810,
+      "highlight": 4367
+    },
+    "change_from_v1": {
+      "outline_added_pixels": 5417,
+      "pattern_changed_pixels": 0,
+      "shadow_changed_pixels": 0,
+      "highlight_changed_pixels": 0,
+      "albedo_changed_pixels": 0
+    },
+    "gap_pixels": 0,
+    "overlap_pixels": 0,
+    "outside_source_pixels": 0,
+    "material_recompose_changed_pixels": 0,
+    "max_channel_diff": 0,
+    "package_sha256": "9e72893c0ac56d0d30975c2412c528d3826ad1f97f76bba95419d068abb49044",
+    "note": "Approved cleanup v3 adds exterior silhouette/antialias ownership. These pixels are assigned to Outline. Existing Pattern/Shadow/Highlight/Albedo ownership is unchanged.",
+    "next_gate": "user visual approval of material ownership v2; then palette/runtime revalidation"
   }
 }
