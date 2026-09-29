@@ -1,0 +1,38 @@
+# Sea Turtle v3 · Underbelly Final v4
+
+- Status: **Final / Locked**
+- Approval date: **2026-09-30**
+- Authoritative Master: **Q3 Canonical Master**
+- Source base: approved front-flippers-removed Hidden Underlap Rebuild Base v3
+- Canvas: **2048×2048 RGBA**
+- Role: lower jaw + lower neck + chest/abdomen + front-flipper hidden underlap
+- ImageGen: **not used**
+- Method: deterministic source-pixel ownership cleanup only
+
+## Final cleanup
+Repeat QA found one isolated ownership pixel at `x=1363, y=1207` in the previous FINAL.
+Candidate v4 removed only this pixel from Underbelly ownership and returned the original RGBA `[121,128,117,99]` pixel to Removed Remainder.
+All other Underbelly pixels and every other Sea Turtle Part remained locked.
+
+## Final QA
+- Asset visible pixels: **136,758**
+- Mask visible pixels: **136,758**
+- Asset↔Mask support mismatch: **0**
+- Connected components: **1**
+- Isolated noise: **0**
+- Enclosed holes: **0**
+- Asset↔Remainder overlap: **0**
+- Transparent RGB residue: **0**
+- Recomposite changed pixels: **0**
+- Recomposite max channel diff: **0**
+- PNG integrity: **PASS**
+
+## Version discipline
+The prior FINAL is withdrawn from active use because repeat QA found the isolated 1 px residual.
+The user approved candidate v4 on 2026-09-30; v4 is therefore the sole active **Underbelly Final / Locked** geometry source.
+
+## Next production gate
+Use this locked Underbelly source for Material Decomposition:
+`Outline → Pattern / Detail → Shadow → Highlight → Base / Albedo → Material Recomposition QA → Palette QA → Surface/Material Compatibility QA`.
+
+During Underbelly material work, `body_with_rear`, `shell_main`, `front_flipper_near`, and `front_flipper_far` remain locked.
