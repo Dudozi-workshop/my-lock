@@ -1,6 +1,6 @@
 {
   "asset": "Sea Turtle v3 Front Flipper Outer",
-  "status": "geometry_v3_locked_material_revalidation",
+  "status": "geometry_v3_locked_material_v2_locked_palette_v2_qa",
   "canonical_canvas": {
     "width": 2048,
     "height": 2048,
@@ -114,7 +114,7 @@
     "image_generation_used": false,
     "geometry_changed": false,
     "source_of_truth": "adopted v2 asset",
-    "next_stage": "user visual approval of material ownership v2 on geometry v3; then deterministic palette/runtime revalidation"
+    "next_stage": "user visual approval of Palette QA v2; then Flutter runtime revalidation v2"
   },
   "highlight_gate": {
     "status": "locked",
@@ -280,10 +280,10 @@
     "withdrawn_final_pattern": "legacy_final_v#_<reason>_<date>",
     "current_final": null,
     "legacy_final": "legacy_final_v1_outline_residual_20260929",
-    "current_candidate": "front_flipper_outer_v3_material_qa_candidate"
+    "current_candidate": "front_flipper_outer_palette_qa_v2_candidate"
   },
   "material_revalidation_v2": {
-    "status": "qa_candidate",
+    "status": "locked",
     "source": "front_flipper_outer_asset_v3_2048.png",
     "image_generation_used": false,
     "ownership_pixels": 114017,
@@ -308,6 +308,41 @@
     "max_channel_diff": 0,
     "package_sha256": "9e72893c0ac56d0d30975c2412c528d3826ad1f97f76bba95419d068abb49044",
     "note": "Approved cleanup v3 adds exterior silhouette/antialias ownership. These pixels are assigned to Outline. Existing Pattern/Shadow/Highlight/Albedo ownership is unchanged.",
-    "next_gate": "user visual approval of material ownership v2; then palette/runtime revalidation"
+    "next_gate": "palette QA v2",
+    "user_visual_approval": true,
+    "approved_date": "2026-09-29"
+  },
+  "palette_revalidation_v2": {
+    "status": "qa_candidate",
+    "source": "front_flipper_outer_asset_v3_2048.png",
+    "image_generation_used": false,
+    "palette_source": "current app runtime ShapeTone/baseColorForTone",
+    "palettes": {
+      "pink": {
+        "hex": "#FF8FD1",
+        "asset_sha256": "a0296f69b046cc28ca5a751ddeb0bbfbb7dc8f58f2810c63edf7004c4b04e80f"
+      },
+      "blue": {
+        "hex": "#79BFFF",
+        "asset_sha256": "cc18dd81dc17f837984d14cea542c076d67d4dc2193e9bf2653ce82d43e6f468"
+      },
+      "yellow": {
+        "hex": "#FFDA72",
+        "asset_sha256": "3059d2f29b53a92841375bc6b54b08916df2dec392782095dd3f027430249f73"
+      }
+    },
+    "method": "Preserve approved v1 palette pixels on prior ownership exactly; map only the 5,417 recovered v3 ownership pixels deterministically from the approved v2 source->palette lookup; preserve v3 alpha.",
+    "geometry": {
+      "visible_pixels": 114017,
+      "old_owned_pixels": 108600,
+      "added_owned_pixels": 5417,
+      "old_area_changed_pixels": 0,
+      "alpha_mismatch_pixels": 0,
+      "outside_alpha_pixels": 0
+    },
+    "runtime_preview_px": 58,
+    "package_sha256": "86d45f6804bf8d9fa6acb6432fb763cdbf0a95456e71ad64ca474b1d56784ca8",
+    "drive_status": "pending_user_approval",
+    "next_gate": "user visual approval of palette QA v2; then actual Flutter runtime revalidation"
   }
 }
