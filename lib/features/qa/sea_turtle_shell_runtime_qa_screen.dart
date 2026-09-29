@@ -132,11 +132,11 @@ class _RuntimeSample extends StatelessWidget {
 }
 
 const _auroraSeaColors = <Color>[
-  Color(0xFF00D9C6),
-  Color(0xFF36A9FF),
-  Color(0xFF8B5CF6),
-  Color(0xFFFF4FB3),
-  Color(0xFF00E5B0),
+  Color(0xFF65D8CF),
+  Color(0xFF72BDED),
+  Color(0xFFA894E2),
+  Color(0xFFE58FBE),
+  Color(0xFF66D5B9),
 ];
 
 class _AuroraSeaCard extends StatelessWidget {
@@ -284,7 +284,7 @@ class _AuroraSeaSampleState extends State<_AuroraSeaSample>
                 ),
               ),
               Opacity(
-                opacity: 0.24,
+                opacity: 0.52,
                 child: ColorFiltered(
                   colorFilter: _grayscaleDetail,
                   child: Image.memory(
