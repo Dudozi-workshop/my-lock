@@ -1,26 +1,41 @@
 {
   "asset": "sea_turtle_v3_shell_palette",
   "version": 1,
-  "status": "approved",
+  "status": "FINAL_LOCKED",
+  "approval_date": "2026-09-29",
   "canonical_canvas": [2048, 2048],
   "authoritative_shell": "sea_turtle_v3_shell_asset_v1_2048.png",
   "palette_source": "Soft Basic final implementation standard",
+  "material_model": "Hybrid Material Compositor",
   "palettes": {
     "pink": {
+      "type": "fixed",
       "hex": "#FF8FD1",
       "full_detail": "sea_turtle_v3_shell_palette_pink_v1_2048.png",
       "runtime_lod": "sea_turtle_v3_shell_palette_pink_runtime_lod_v1_2048.png"
     },
     "blue": {
+      "type": "fixed",
       "hex": "#79BFFF",
       "full_detail": "sea_turtle_v3_shell_palette_blue_v1_2048.png",
       "runtime_lod": "sea_turtle_v3_shell_palette_blue_runtime_lod_v1_2048.png"
     },
     "yellow": {
+      "type": "fixed",
       "hex": "#FFDA72",
       "full_detail": "sea_turtle_v3_shell_palette_yellow_v1_2048.png",
       "runtime_lod": "sea_turtle_v3_shell_palette_yellow_runtime_lod_v1_2048.png",
       "tuning": "reduced highlight lift; stronger shade contrast"
+    },
+    "aurora_sea": {
+      "type": "dynamic_color",
+      "status": "FINAL_LOCKED",
+      "colors": ["#65D8CF", "#72BDED", "#A894E2", "#E58FBE", "#66D5B9"],
+      "duration_seconds": 4,
+      "moving_layer": "base color/albedo only",
+      "fixed_layers": ["shadow", "pattern", "division lines", "highlight", "outline"],
+      "detail_overlay_opacity": 0.52,
+      "rule": "Aurora Sea is the color itself; it replaces albedo while all material detail remains fixed."
     }
   },
   "qa": {
@@ -29,7 +44,8 @@
     "runtime_reference_shell_width_px": 160,
     "alpha_matches_authoritative_shell": true,
     "transparent_region_rgb_zero": true,
-    "generated_image_model_used": false
+    "generated_image_model_used": false,
+    "user_visual_approval": true
   },
   "runtime_export": {
     "status": "approved",
@@ -40,7 +56,8 @@
     "minimum_safe_resolution": 512,
     "pink": "sea_turtle_v3_shell_palette_pink_runtime_v1_512.webp",
     "blue": "sea_turtle_v3_shell_palette_blue_runtime_v1_512.webp",
-    "yellow": "sea_turtle_v3_shell_palette_yellow_runtime_v1_512.webp"
+    "yellow": "sea_turtle_v3_shell_palette_yellow_runtime_v1_512.webp",
+    "aurora_sea": "runtime compositor; no baked color asset"
   },
   "sha256": {
     "sea_turtle_v3_shell_palette_pink_v1_2048.png": "0e658b1e60b8823d8fee7fbb047b0478ade3ae8399d94c9d4140aaca8988549e",
