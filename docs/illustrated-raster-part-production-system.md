@@ -212,3 +212,22 @@ Rules:
 - After approval, promote only the newest approved set to `final`.
 - Never leave two active Final sets for the same Part.
 - Manifests must record withdrawn-final reason and replacement candidate/final version.
+
+
+## 15. Dynamic palette and material preservation
+
+Dynamic Palette is a color source, not an overlay effect.
+
+Rules:
+- Only Base Color / Albedo may vary over time.
+- Shadow, Pattern / Detail, division lines, Highlight, Outline and Alpha Geometry remain fixed.
+- If a dynamic color suppresses detail, reduce its albedo contribution and strengthen the fixed detail composite instead of altering geometry or ownership.
+- When one dynamic palette spans multiple Parts, use a shared timebase and coordinate phase to prevent color seams at Part boundaries.
+- Record the color stops, duration, fixed material layers and detail-composite strength in the runtime manifest.
+- Palette animation never changes the canonical ownership mask.
+
+Sea Turtle v3 Shell reference:
+- Aurora Sea: `#65D8CF → #72BDED → #A894E2 → #E58FBE → #66D5B9`
+- duration: 4 seconds
+- detail overlay opacity: 0.52
+- moving layer: Base Color / Albedo only
