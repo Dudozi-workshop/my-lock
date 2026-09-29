@@ -1,27 +1,119 @@
 {
   "asset": "Sea Turtle v3 Shell",
   "version": "v1",
-  "status": "approved",
-  "date": "2026-09-27",
-  "role": "fixed_shell_layer",
-  "dimensions": {
-    "shell_png": [1254, 1254],
-    "qa_png": [1122, 1402]
+  "status": "FINAL_LOCKED",
+  "approved_date": "2026-09-29",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
   },
-  "format": {
-    "shell_png": "RGBA PNG",
-    "qa_png": "RGB PNG"
+  "source": {
+    "canonical_master": "sea_turtle_master_v3_2048.png",
+    "approved_review_crop": "sea_turtle_v3_shell_master_v1.png",
+    "review_crop_dimensions": [
+      1254,
+      1254
+    ],
+    "rule": "review crop defines ownership boundary only; RGB comes exclusively from canonical master",
+    "review_component_bbox_xyxy": [
+      33,
+      242,
+      1243,
+      1030
+    ],
+    "canonical_reference_mask_bbox_xyxy": [
+      778,
+      694,
+      1549,
+      1136
+    ],
+    "canonical_shell_bbox_xyxy": [
+      778,
+      694,
+      1561,
+      1171
+    ],
+    "placement": "boundary traced on canonical master coordinates; no review-crop RGB used"
   },
   "ownership": {
-    "shell": "fixed",
-    "belly": "separate_fixed",
-    "body_rear": "separate_fixed",
-    "front_flipper_near": "moving",
-    "front_flipper_far": "moving"
+    "included": [
+      "shell alpha",
+      "outline",
+      "shading",
+      "highlight",
+      "detail"
+    ],
+    "excluded": [
+      "belly",
+      "body_with_rear",
+      "front_flipper_near",
+      "front_flipper_far"
+    ],
+    "mask_type": "single binary ownership mask"
+  },
+  "qa": {
+    "recomposite_changed_pixels": 0,
+    "recomposite_max_channel_diff": 0,
+    "non_shell_pixels_in_asset": 0
+  },
+  "runtime": {
+    "material_model": "Hybrid Material Compositor",
+    "aurora_sea": {
+      "status": "FINAL_LOCKED",
+      "duration_seconds": 4,
+      "colors": [
+        "#65D8CF",
+        "#72BDED",
+        "#A894E2",
+        "#E58FBE",
+        "#66D5B9"
+      ],
+      "moving_layer": "base color/albedo only",
+      "fixed_layers": [
+        "shadow",
+        "pattern",
+        "division lines",
+        "highlight",
+        "outline"
+      ],
+      "detail_overlay_opacity": 0.52
+    }
   },
   "drive": {
-    "shell": "https://drive.google.com/file/d/1uaMYm8SOxAO9B3eITm_ZfAqXHdT_0vat/view?usp=drivesdk",
-    "qa": "https://drive.google.com/file/d/1-V3lkiiU_wJdxBzWNn3_19pN5gGxlnym/view?usp=drivesdk",
-    "pack_zip": "https://drive.google.com/file/d/1g6YtVrYPOjA2L-id3_ECri177ds9FrzT/view?usp=drivesdk"
+    "asset": "https://drive.google.com/file/d/1nCUJQ35ST_fuwTq48WxQz5YjveN_KlB7/view?usp=drivesdk",
+    "mask": "https://drive.google.com/file/d/1h23rjWhefJb0Hp6x1dMeErSrUJkXha2T/view?usp=drivesdk",
+    "removed_remainder": "https://drive.google.com/file/d/1F35oGhotELwwXiM03Tw7nVCFIgL2DeRI/view?usp=drivesdk",
+    "recomposite_qa": "https://drive.google.com/file/d/1dpJHEvgXQocwD0jh4jRGKA4GwyrVi5o_/view?usp=drivesdk",
+    "recomposite_diff": "https://drive.google.com/file/d/1NH2T3RVattIj7lhEchD6pLDQm0V91mwr/view?usp=drivesdk",
+    "ownership_qa": "https://drive.google.com/file/d/11l8kAbcH7xGMhuKVdwbyTZYkr9AyAjPu/view?usp=drivesdk",
+    "manifest": "https://drive.google.com/file/d/1KPOiKOudPaxDCva73cDV8FQkQxkC9oFw/view?usp=drivesdk",
+    "pack_zip": "https://drive.google.com/file/d/1C4SBlAedd1_1staOFtSlZLU2X71KZsvX/view?usp=drivesdk"
+  },
+  "files": {
+    "sea_turtle_v3_shell_asset_v1_2048.png": {
+      "sha256": "ed7a6b6bd3da47e920b8478086d36eba28bfe86e64483db7ce7dabe3f237620a",
+      "bytes": 435778
+    },
+    "sea_turtle_v3_shell_mask_v1_2048.png": {
+      "sha256": "3155cd45202de6a6caf201acdf97981b65b55ce14549fb02955982fe6ee63b0e",
+      "bytes": 6340
+    },
+    "sea_turtle_v3_shell_removed_remainder_v1_2048.png": {
+      "sha256": "eea724ffba2c180b3606f35a73502cda5750f77827601239450189575d0542e1",
+      "bytes": 655446
+    },
+    "sea_turtle_v3_shell_recomposite_qa_v1_2048.png": {
+      "sha256": "7b8013dadc9068df09bc10e6515ab50779b1e190538bc27752a4284bcf602251",
+      "bytes": 1042685
+    },
+    "sea_turtle_v3_shell_recomposite_diff_v1_2048.png": {
+      "sha256": "4366893496c99f69cef48e1359ec843e15879ba94879171d8596e5514ea615aa",
+      "bytes": 16350
+    },
+    "sea_turtle_v3_shell_ownership_qa_v1_2048.png": {
+      "sha256": "b99afe701349fcfaa0fb066ce8c3d3cd96fb48e1fdbfab888548927f3f2e32e2",
+      "bytes": 950733
+    }
   }
 }
