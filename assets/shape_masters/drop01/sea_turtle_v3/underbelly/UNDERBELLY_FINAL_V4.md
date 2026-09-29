@@ -8,6 +8,7 @@
 - Role: lower jaw + lower neck + chest/abdomen + front-flipper hidden underlap
 - ImageGen: **not used**
 - Method: deterministic source-pixel ownership cleanup only
+- Google Drive Final Pack: https://drive.google.com/file/d/1l0wKDBUL5v9xQ3rNWJzUDP9_n9VJXkZT/view?usp=drivesdk
 
 ## Final cleanup
 Repeat QA found one isolated ownership pixel at `x=1363, y=1207` in the previous FINAL.
@@ -30,6 +31,7 @@ All other Underbelly pixels and every other Sea Turtle Part remained locked.
 ## Version discipline
 The prior FINAL is withdrawn from active use because repeat QA found the isolated 1 px residual.
 The user approved candidate v4 on 2026-09-30; v4 is therefore the sole active **Underbelly Final / Locked** geometry source.
+Drive contains older same-part packages that predate repeat QA; they are not active production sources. The active binary package is explicitly named `sea_turtle_v3_underbelly_FINAL_v4.zip`.
 
 ## Next production gate
 Use this locked Underbelly source for Material Decomposition:
