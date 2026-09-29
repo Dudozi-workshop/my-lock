@@ -1,0 +1,43 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "part_id": "underbelly",
+  "display_name": "Sea Turtle v3 Underbelly / Belly",
+  "version": "FINAL_v4_cleanup",
+  "status": "Final / Locked",
+  "final_status_note": "Repeat QA found one isolated ownership pixel in the previous FINAL. Candidate v4 removed only that pixel, returned it to Removed Remainder, passed all QA gates, and was user-approved for FINAL / LOCKED promotion on 2026-09-30.",
+  "withdrawn_previous_final_reason": "isolated 1 px ownership noise at x=1363, y=1207",
+  "authoritative_master": "Q3 Canonical Master",
+  "source_base": "approved front-flippers-removed Hidden Underlap Rebuild Base v3",
+  "canvas": {"width": 2048, "height": 2048, "mode": "RGBA"},
+  "role": "Fixed Layer: lower jaw + lower neck + chest/abdomen + front-flipper hidden underlap",
+  "scope_lock": "Only x=1363,y=1207 was transferred from Underbelly ownership back to Removed Remainder. All other pixels remain unchanged.",
+  "current_derivation_imagegen_used": false,
+  "qa": {
+    "removed_isolated_pixel_xy": [1363, 1207],
+    "removed_pixel_original_rgba": [121, 128, 117, 99],
+    "returned_to_remainder_rgba": [121, 128, 117, 99],
+    "asset_bbox": [442, 823, 1431, 1217],
+    "asset_nonzero_alpha_pixels": 136758,
+    "mask_nonzero_pixels": 136758,
+    "asset_mask_support_mismatch_pixels": 0,
+    "asset_pixels_outside_reference_alpha": 0,
+    "mask_alpha_values": [0, 255],
+    "connected_component_count": 1,
+    "isolated_noise_pixels": 0,
+    "enclosed_hole_count": 0,
+    "transparent_rgb_residue_asset": 0,
+    "transparent_rgb_residue_remainder": 0,
+    "asset_remainder_overlap_pixels": 0,
+    "recomposite_changed_pixels_vs_reference": 0,
+    "recomposite_max_channel_diff": 0,
+    "png_integrity": "PASS"
+  },
+  "sha256": {
+    "underbelly_asset_FINAL_2048.png": "93811e85535dea80059ae57b0b8e848514210aaafc6dc7f277c0af38aedd6005",
+    "underbelly_mask_FINAL_2048.png": "270a5167464ec7f71bdadebf2402792f7dd3030085b8280068309b246274c457",
+    "underbelly_ownership_qa_FINAL_2048.png": "1520e5775952c616b7fe543181b87ff43b45edb25a74e114d34bd9264665f4e0",
+    "underbelly_recomposite_diff_FINAL_2048.png": "4366893496c99f69cef48e1359ec843e15879ba94879171d8596e5514ea615aa",
+    "underbelly_recomposite_qa_FINAL_2048.png": "d4bbb428781bb1ea764a462a4b90ea5158de0e0c758072af2048b3443148cc2d",
+    "underbelly_removed_remainder_FINAL_2048.png": "ea069616df78499046cf2d6b60d26a1e842c52728d1101032e0be67f825569d6"
+  }
+}
