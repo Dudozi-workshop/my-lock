@@ -1,0 +1,49 @@
+{
+  "part": "front_flipper_far",
+  "variant": "F0",
+  "layer": "outline",
+  "version": "candidate_v1",
+  "status": "qa_candidate_user_approval_pending",
+  "source_geometry": "front_flipper_far FINAL_v4",
+  "source_mask": "front_flipper_far_outline_mask_v1_2048.png",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "imagegen_used": false,
+  "method": "deterministic source-pixel extraction using approved locked Outline Mask v1",
+  "qa": {
+    "mask_pixels": 8838,
+    "bbox_xyxy_inclusive": [
+      470,
+      945,
+      712,
+      1362
+    ],
+    "connected_components_8_neighbor": 2,
+    "component_areas": [
+      8824,
+      14
+    ],
+    "source_alpha_outside_pixels": 0,
+    "asset_visible_pixels": 8838,
+    "asset_mask_mismatch_pixels": 0,
+    "source_rgba_mismatch_pixels": 0,
+    "asset_outside_mask_pixels": 0,
+    "asset_remainder_overlap_pixels": 0,
+    "remainder_inside_mask_pixels": 0,
+    "transparent_rgb_residue_asset_pixels": 0,
+    "recomposite_changed_pixels": 0,
+    "recomposite_max_channel_diff": 0,
+    "png_integrity": "PASS"
+  },
+  "locked_parts": [
+    "body_with_rear",
+    "shell_main",
+    "underbelly",
+    "front_flipper_near",
+    "front_flipper_far_geometry"
+  ],
+  "next_gate": "User visual approval -> Outline Final Lock -> Pattern / Detail Ownership Overlay"
+}
