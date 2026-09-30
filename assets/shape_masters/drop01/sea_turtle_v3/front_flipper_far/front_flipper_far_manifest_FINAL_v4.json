@@ -53,5 +53,17 @@
     "review_strip": "https://drive.google.com/file/d/1wCxX5DVeb1bsc3dMFUC8mtI-tPHjMvw7/view",
     "package": "https://drive.google.com/file/d/1alvbbMRfJdtQL3jK8d7zhNcjGUPOZnOX/view"
   },
-  "next_gate": "front_flipper_near F0 ownership overlay"
+  "next_gate": "front_flipper_far F0 material decomposition: outline ownership overlay",
+  "next_sequence": [
+    "outline",
+    "pattern_detail",
+    "shadow",
+    "highlight",
+    "base_albedo",
+    "material_recomposition_qa",
+    "palette_qa",
+    "surface_material_compatibility_qa",
+    "runtime_qa"
+  ],
+  "front_flipper_near_action": "locked_do_not_rederive"
 }
