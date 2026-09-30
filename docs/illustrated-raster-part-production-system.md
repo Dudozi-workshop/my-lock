@@ -231,3 +231,23 @@ Sea Turtle v3 Shell reference:
 - duration: 4 seconds
 - detail overlay opacity: 0.52
 - moving layer: Base Color / Albedo only
+
+
+## 16. Residual cleanup and neighbor-seam rule
+
+Lessons confirmed during Sea Turtle v3 Front Flipper Far production:
+
+- A zero-diff recomposite does not end residual QA. Always inspect the Removed Remainder and the local Part zone for leftover outline/tip/fringe pixels.
+- Classify leftovers before changing ownership:
+  1. **Detached/local residual**: isolated source-visible pixels clearly belonging to the active Part. These may be added to the active Part ownership after user review.
+  2. **Neighbor-connected seam**: pixels connected to a locked neighboring Part or static body. Do not auto-reassign these merely to make the remainder look cleaner.
+- For neighbor-connected seams, keep the locked owner unless the user explicitly approves an ownership change.
+- When a semantic ownership issue is found after a technically passing gate, roll back to the earliest affected ownership gate. Do not patch only the Remainder.
+- Superseded ownership/mask/asset lineages must be marked legacy and excluded from active Production Sources.
+- After residual cleanup, rerun the full chain: Mask → Asset → Removed Remainder → Recomposite → local residual audit.
+- Record the final ownership exception in the manifest, including whether the seam was intentionally left with the neighboring Part.
+
+Sea Turtle v3 Front Flipper Far reference:
+- v2 passed numeric extraction checks but left a lower-left outline residual.
+- v3 corrected that residual and exposed additional detached fringe pixels in downstream QA.
+- FINAL_v4 absorbed only the detached residual pixels and intentionally left the body-connected root seam outside Far ownership by user decision.
