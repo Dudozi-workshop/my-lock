@@ -1,25 +1,22 @@
 # Sea Turtle v3 · Front Flipper Far F0 · Mask v1
 
-- Status: **Mask Gate / Locked**
-- Approved: 2026-09-30
+- Status: **Withdrawn / Legacy**
+- Original approval: 2026-09-30
+- Withdrawn: 2026-09-30
+- Reason: parent Ownership v1 was withdrawn after upper attachment review found underbelly intrusion.
 - Authoritative Master: **Q3 Canonical Master**
 - Canvas: **2048 × 2048**
 - Part: `front_flipper_far` / F0
-- Source ownership: `front_flipper_far_f0_ownership_overlay_v1_2048.png`
+- Source ownership: withdrawn `front_flipper_far_f0_ownership_overlay_v1_2048.png`
 - ImageGen: **not used**
-- Method: exact mask derived from approved Ownership v1; deterministic source-pixel workflow only
+- Method: exact mask derived from the now-withdrawn Ownership v1.
 - Locked and unchanged: `body_with_rear` / `shell_main` / `underbelly` / `front_flipper_near`
 
-## QA
+## Legacy QA
 - Mask pixels: **62,012 px**
 - bbox: **[470, 943, 712, 1353]**
 - Source alpha outside pixels: **0**
 - Connected components: **1**
 
-## Google Drive
-- Mask: https://drive.google.com/file/d/1doBBg3t0OVTPWodqcDIUCDC5lJCLY_Qr/view?usp=drivesdk
-- Mask Alignment QA: https://drive.google.com/file/d/13MTpMdNLWXj8ucirDMNJJ9bc-SNhLky4/view?usp=drivesdk
-- Mask Manifest: https://drive.google.com/file/d/1Pt69LB3WncbMDag4kJ1VDlZV_xeEYOnr/view?usp=drivesdk
-
 ## Gate state
-Mask v1 is locked. The next gate is source-pixel Asset extraction from Q3 Canonical using this exact mask.
+Mask v1 is withdrawn and must not be used as an active Production Source. A corrected mask will only be derived after the revised Ownership Overlay is visually approved.
