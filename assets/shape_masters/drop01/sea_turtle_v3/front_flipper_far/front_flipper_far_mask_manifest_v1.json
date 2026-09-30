@@ -3,10 +3,12 @@
   "variant": "F0",
   "gate": "exact_mask",
   "version": "v1",
-  "status": "locked",
-  "approved_date": "2026-09-30",
+  "status": "withdrawn_legacy",
+  "original_approved_date": "2026-09-30",
+  "withdrawn_date": "2026-09-30",
+  "withdrawn_reason": "parent Ownership v1 withdrawn due to upper attachment underbelly intrusion",
   "authoritative_master": "Q3 Canonical Master",
-  "source_ownership": "front_flipper_far_f0_ownership_overlay_v1_2048.png",
+  "source_ownership": "withdrawn front_flipper_far_f0_ownership_overlay_v1_2048.png",
   "canvas": {
     "width": 2048,
     "height": 2048
@@ -18,7 +20,7 @@
     "underbelly",
     "front_flipper_near"
   ],
-  "qa": {
+  "legacy_qa": {
     "mask_pixels": 62012,
     "bbox": [
       470,
@@ -29,14 +31,5 @@
     "outside_source_alpha_pixels": 0,
     "connected_components": 1
   },
-  "drive": {
-    "mask": "https://drive.google.com/file/d/1doBBg3t0OVTPWodqcDIUCDC5lJCLY_Qr/view?usp=drivesdk",
-    "alignment_qa": "https://drive.google.com/file/d/13MTpMdNLWXj8ucirDMNJJ9bc-SNhLky4/view?usp=drivesdk",
-    "manifest": "https://drive.google.com/file/d/1Pt69LB3WncbMDag4kJ1VDlZV_xeEYOnr/view?usp=drivesdk"
-  },
-  "sha256": {
-    "mask": "02fc0bd0f15bd1daa14e7a0f0034618bc6a9362e599ca5d488a67741b1c3922b",
-    "alignment_qa": "b83c355eff87caab77832b5684c4592020157fc6b39b33211ea14fec1f4aa85f"
-  },
-  "next_gate": "asset extraction"
+  "replacement_state": "awaiting approval of corrected ownership overlay before new mask derivation"
 }
