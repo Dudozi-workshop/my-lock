@@ -1,0 +1,32 @@
+{
+  "shape_id":"sea_turtle_v3",
+  "part_id":"underbelly",
+  "layer_id":"pattern_detail",
+  "stage":"exact_mask",
+  "version":"v1",
+  "status":"Final / Locked / Active",
+  "source_overlay":"Underbelly Pattern / Detail Ownership v1",
+  "canvas":{"width":2048,"height":2048,"mask_mode":"L","mask_values":[0,255]},
+  "imagegen_used":false,
+  "geometry_changed":false,
+  "qa":{
+    "mask_pixels":11442,
+    "bbox_xyxy_inclusive":[634,921,1267,1194],
+    "overlay_mask_support_mismatch_pixels":0,
+    "outside_underbelly_source_alpha_pixels":0,
+    "overlap_with_locked_outline_v1_pixels":0,
+    "connected_component_count":3,
+    "component_sizes_desc":[10615,496,331],
+    "isolated_1px_noise_pixels":0,
+    "png_integrity":"PASS"
+  },
+  "sha256":{
+    "underbelly_pattern_detail_mask_v1_2048.png":"97de7664161eb84f42ecc09efa30293ef100638feaaf42e9a97979a37ca65da2"
+  },
+  "drive":{
+    "mask":"https://drive.google.com/file/d/1x9SCxQr6gTMb3Y7P7AJ-Ho0yIfQF2Qw3/view?usp=drivesdk",
+    "alignment_qa":"https://drive.google.com/file/d/1CInnwP4hXZWKVGPUyUn-bvp4vzZQC8c8/view?usp=drivesdk",
+    "gate_package":"https://drive.google.com/file/d/1GWE6JBO3-AFfysobA_bzA_3KqBgf1I5Y/view?usp=drivesdk"
+  },
+  "next_gate":"Asset extraction / Removed Remainder / Recomposite QA"
+}
