@@ -1,0 +1,42 @@
+{
+  "shape_id":"sea_turtle_v3",
+  "part_id":"underbelly",
+  "layer_id":"pattern_detail",
+  "version":"candidate_v1",
+  "status":"QA Candidate / Awaiting user approval",
+  "source_geometry":"underbelly FINAL_v4_cleanup",
+  "source_ownership":"Pattern / Detail Ownership v1 / Locked",
+  "source_mask":"Pattern / Detail Mask v1 / Locked",
+  "excluded_locked_layer":"Underbelly Outline Final v1",
+  "imagegen_used":false,
+  "geometry_changed":false,
+  "qa":{
+    "pattern_detail_pixels":11442,
+    "bbox_xyxy_inclusive":[634,921,1267,1194],
+    "connected_component_count":3,
+    "component_sizes_desc":[10615,496,331],
+    "isolated_1px_noise_pixels":0,
+    "outside_underbelly_source_alpha_pixels":0,
+    "overlap_with_locked_outline_v1_pixels":0,
+    "asset_support_mismatch_vs_mask_pixels":0,
+    "source_rgba_mismatch_inside_mask_pixels":0,
+    "asset_remainder_overlap_pixels":0,
+    "mask_pixels_remaining_in_remainder":0,
+    "transparent_rgb_residue_asset":0,
+    "transparent_rgb_residue_remainder":0,
+    "recomposite_changed_pixels":0,
+    "recomposite_max_channel_diff":0,
+    "png_integrity":"PASS"
+  },
+  "drive":{
+    "asset":"https://drive.google.com/file/d/11Ody5WifGlE2rvMitNgTjUmsuydtlWiW/view?usp=drivesdk",
+    "removed_remainder":"https://drive.google.com/file/d/1PXHQrLftOnBwjyHSdl1Fd4BhGgIsTsyb/view?usp=drivesdk",
+    "ownership_qa":"https://drive.google.com/file/d/1Vw64tpqXVqT5GlMqSFOepz-Pjqd2ZeYp/view?usp=drivesdk",
+    "recomposite_qa":"https://drive.google.com/file/d/14C5_pUmGkiw_QxonRbiT6Qcbt_mfXWQu/view?usp=drivesdk",
+    "recomposite_diff":"https://drive.google.com/file/d/1dfvzQWYW3SNKgbl6kwetAXUNw3iw6nV8/view?usp=drivesdk",
+    "manifest":"https://drive.google.com/file/d/1rBS4vmVttDsK2hYFyE5Lsjq9jqOx720M/view?usp=drivesdk",
+    "package":"https://drive.google.com/file/d/146rrVU4EXOvUCoruOW_yTt5i2kzGlP44/view?usp=drivesdk"
+  },
+  "promotion_rule":"explicit user approval required",
+  "next_gate":"User approval -> Pattern / Detail Final Lock -> Shadow Ownership Overlay"
+}
