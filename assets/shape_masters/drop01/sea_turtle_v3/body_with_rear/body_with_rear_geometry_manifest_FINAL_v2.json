@@ -1,0 +1,26 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "part_id": "body_with_rear",
+  "geometry_version": "FINAL_v2",
+  "status": "Final / Locked / Active",
+  "authoritative_master": "Q3 Canonical Master",
+  "previous_geometry": "body_with_rear Final v1",
+  "canvas": {"width": 2048, "height": 2048, "mode": "RGBA"},
+  "imagegen_used": false,
+  "change_scope": "head-back protruding residual only",
+  "change_method": "deterministic deletion of user-identified residual pixels; all other body/rear and neighboring Parts locked",
+  "qa": {
+    "changed_pixels_vs_final_v1": 319,
+    "changed_bbox_xyxy_exclusive": [776, 764, 806, 830],
+    "removed_to_transparent_pixels": 319,
+    "added_visible_pixels": 0,
+    "changes_outside_requested_delta": 0,
+    "new_transparent_rgb_residue_pixels": 0
+  },
+  "locked_parts": ["shell_main","underbelly","front_flipper_near","front_flipper_far"],
+  "output": "body_with_rear_geometry_FINAL_v2_2048.png",
+  "sha256": "4c1cca814c1149b4b29a36b8ccc471ba539bcea0b640a6eed67c253e3699814c",
+  "drive_package_url": "https://drive.google.com/file/d/1KbMATG6KfVyhgM4mOxzA9SpP3u_CM4YD/view?usp=drivesdk",
+  "approval_note": "User approved head-back protrusion cleanup on 2026-10-01: ㄱㄱ",
+  "next_material_gate": "Outline FINAL_v3"
+}
