@@ -1,0 +1,43 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "part_id": "body_with_rear",
+  "material_layer": "outline",
+  "version": "FINAL_v3",
+  "status": "Final / Locked / Active",
+  "authoritative_master": "Q3 Canonical Master",
+  "geometry_source": "body_with_rear Geometry FINAL_v2",
+  "source_file": "body_with_rear_geometry_FINAL_v2_2048.png",
+  "approved_overlay": "body_with_rear_outline_residual_overlay_candidate_v3_2048.png",
+  "canvas": {"width": 2048, "height": 2048, "mode": "RGBA"},
+  "imagegen_used": false,
+  "method": "deterministic source-pixel extraction from user-approved ownership overlay; source alpha retained",
+  "locked_parts": ["shell_main","underbelly","front_flipper_near","front_flipper_far"],
+  "qa": {
+    "selected_pixels": 13492,
+    "bbox": [420,688,1640,1315],
+    "connected_components": 19,
+    "isolated_1px_components": 6,
+    "source_alpha_outside_pixels": 0,
+    "asset_alpha_vs_mask_presence_diff_pixels": 0,
+    "asset_transparent_rgb_residue_pixels": 0,
+    "remainder_transparent_rgb_residue_pixels": 0,
+    "mask_transparent_rgb_residue_pixels": 0,
+    "recomposite_changed_pixels": 0,
+    "recomposite_max_channel_diff": 0,
+    "residual_audit_numeric_dark_exterior_candidates": 28,
+    "residual_audit_candidate_components": 16,
+    "residual_audit_max_component_pixels": 5,
+    "visual_residual_audit": "PASS: no coherent leftover Outline segment; tiny numeric candidates retained with non-Outline surface"
+  },
+  "drive_package_url": "https://drive.google.com/file/d/1w5iU5uNXJD2OS_mSfXP9P1VrVl_Qy3_j/view?usp=drivesdk",
+  "sha256": {
+    "body_with_rear_outline_mask_FINAL_v3_2048.png": "8593a06bf0be006c0278d4d1e6793bbb6c3983e3ddcc7448939b9fde5fe7ef8d",
+    "body_with_rear_outline_asset_FINAL_v3_2048.png": "4b204464b45621f80cb8633729b8203c83d83ee1ef3f193659341abfb3fef521",
+    "body_with_rear_outline_removed_remainder_FINAL_v3_2048.png": "abbb16961eb2016fa05284790b760d16e657bdb0e8d2b1cb290c02dfa9e90cb2",
+    "body_with_rear_outline_ownership_qa_FINAL_v3_2048.png": "971120ad21f992c279275b14a960f200db79427da9c1265b7758c06202b40596",
+    "body_with_rear_outline_recomposite_FINAL_v3_2048.png": "d651546980337a268433669e4d39c92e83cf58dfa2fdf74a40b735903309a5df",
+    "body_with_rear_outline_recomposite_diff_FINAL_v3_2048.png": "4366893496c99f69cef48e1359ec843e15879ba94879171d8596e5514ea615aa"
+  },
+  "approval_note": "User approved residual-corrected Outline Ownership Overlay v3 on 2026-10-01: 좋다.ㄱㄱ",
+  "next_gate": "Pattern / Detail Ownership Overlay"
+}
