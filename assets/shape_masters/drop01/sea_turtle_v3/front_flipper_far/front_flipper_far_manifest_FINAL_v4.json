@@ -51,7 +51,8 @@
     "recomposite_qa": "https://drive.google.com/file/d/1-ZVxZnJcupB6Vo_alM6t2kfTTq5_Gbpv/view",
     "recomposite_diff": "https://drive.google.com/file/d/1WxNL8cGIoHOJn2GHu5t81RoC1y1uDfQr/view",
     "review_strip": "https://drive.google.com/file/d/1wCxX5DVeb1bsc3dMFUC8mtI-tPHjMvw7/view",
-    "package": "https://drive.google.com/file/d/1alvbbMRfJdtQL3jK8d7zhNcjGUPOZnOX/view"
+    "package": "https://drive.google.com/file/d/1alvbbMRfJdtQL3jK8d7zhNcjGUPOZnOX/view",
+    "closeout_summary": "https://drive.google.com/file/d/1336K_NKuVpUgHiRNIyjrXRejFjZed_t6/view?usp=drivesdk"
   },
   "next_gate": "front_flipper_far F0 material decomposition: outline ownership overlay",
   "next_sequence": [
@@ -65,5 +66,6 @@
     "surface_material_compatibility_qa",
     "runtime_qa"
   ],
-  "front_flipper_near_action": "locked_do_not_rederive"
+  "front_flipper_near_action": "locked_do_not_rederive",
+  "closeout_verified_date": "2026-10-01"
 }
