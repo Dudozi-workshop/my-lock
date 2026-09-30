@@ -1,0 +1,44 @@
+{
+  "part": "front_flipper_far",
+  "variant": "F0",
+  "gate": "ownership_overlay",
+  "version": "v3",
+  "status": "selected_qa_hold",
+  "selected_date": "2026-09-30",
+  "authoritative_master": "Q3 Canonical Master",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "imagegen_used": false,
+  "locked_parts": [
+    "body_with_rear",
+    "shell_main",
+    "underbelly",
+    "front_flipper_near"
+  ],
+  "supersedes": "v2 lineage",
+  "qa_at_selection": {
+    "ownership_pixels": 62712,
+    "added_pixels_from_v2": 1289,
+    "added_bbox": [
+      474,
+      1209,
+      582,
+      1360
+    ],
+    "source_alpha_outside_pixels": 0
+  },
+  "downstream_qa_hold": {
+    "detached_local_far_residual_pixels": 317,
+    "connected_root_edge_seam_requires_user_review": true
+  },
+  "drive": {
+    "ownership_overlay": "https://drive.google.com/file/d/14_o9tNCd8jnaIqET3vGppcUXCv7ja4NG/view?usp=drivesdk",
+    "review_crop": "https://drive.google.com/file/d/1jHA01P9jnIKF8xNPPx4ITzInrhdBqIXO/view?usp=drivesdk",
+    "lower_left_review": "https://drive.google.com/file/d/1SsPHpLePzQa8cbwax1AhMqRkvtKkm9Nb/view?usp=drivesdk",
+    "lower_left_remainder_proof": "https://drive.google.com/file/d/1vrNaetCsvTTFYqUhH7vzyX9vx64ol8Wu/view?usp=drivesdk"
+  },
+  "next_gate": "residual cleanup ownership candidate"
+}
