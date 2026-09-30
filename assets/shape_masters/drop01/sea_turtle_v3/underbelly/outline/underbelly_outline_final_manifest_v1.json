@@ -1,0 +1,35 @@
+{
+  "shape_id":"sea_turtle_v3",
+  "part_id":"underbelly",
+  "layer_id":"outline",
+  "version":"v1",
+  "status":"Final / Locked / Active",
+  "approval_date":"2026-09-30",
+  "source_geometry":"underbelly FINAL_v4_cleanup",
+  "source_mask":"underbelly_outline_mask_v1_2048.png",
+  "imagegen_used":false,
+  "geometry_changed":false,
+  "qa":{
+    "outline_pixels":8647,
+    "bbox_xyxy_inclusive":[442,823,1431,1217],
+    "source_rgba_mismatch_inside_mask":0,
+    "asset_pixels_outside_mask":0,
+    "asset_remainder_overlap_pixels":0,
+    "transparent_rgb_residue_asset":0,
+    "transparent_rgb_residue_remainder":0,
+    "recomposite_changed_pixels":0,
+    "recomposite_max_channel_diff":0,
+    "png_integrity":"PASS"
+  },
+  "drive":{
+    "asset":"https://drive.google.com/file/d/19iS3kX5pCs0X-Pk0lDYFlGiGrdP2V3gI/view?usp=drivesdk",
+    "removed_remainder":"https://drive.google.com/file/d/1ojACQdse_PX4IuxIJ9_qhPzfZb-MzcOZ/view?usp=drivesdk",
+    "ownership_qa":"https://drive.google.com/file/d/1vAzugGKsabXvkStX84sKNckToLhVyJhA/view?usp=drivesdk",
+    "recomposite_qa":"https://drive.google.com/file/d/1YBlqtlUtkrGHenAz1lIiqOkrcpJVEscj/view?usp=drivesdk",
+    "recomposite_diff":"https://drive.google.com/file/d/1SEI-FV9dubUT0TOPxS6RXLEUb8kUTusv/view?usp=drivesdk",
+    "manifest":"https://drive.google.com/file/d/1Rb-49a4TjyNqpqAo3BckWu_V5MoYCOqX/view?usp=drivesdk",
+    "package":"https://drive.google.com/file/d/121VdYKjHkbe7U3ph9M9S6gR6N9ImdyAG/view?usp=drivesdk"
+  },
+  "locked_parts":["body_with_rear","shell_main","front_flipper_near","front_flipper_far"],
+  "next_gate":"Pattern / Detail Ownership Overlay"
+}
