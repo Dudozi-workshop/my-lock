@@ -1,0 +1,42 @@
+{
+  "part": "front_flipper_far",
+  "variant": "F0",
+  "layer": "outline_ownership_overlay",
+  "version": "v1",
+  "status": "final_locked_active",
+  "approved_date": "2026-10-01",
+  "source_geometry": "front_flipper_far FINAL_v4",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "method": "approved visual ownership overlay over locked FINAL_v4; geometry/alpha unchanged; ImageGen not used",
+  "imagegen_used": false,
+  "qa": {
+    "selected_support_pixels": 8838,
+    "bbox_xyxy_inclusive": [
+      470,
+      945,
+      712,
+      1362
+    ],
+    "source_alpha_outside_pixels": 0,
+    "alpha_changed_pixels": 0,
+    "binary_support_connected_components": 79,
+    "note": "component count includes small antialiased/discrete source-valid outline pixels; no cleanup after user approval"
+  },
+  "drive": {
+    "overlay": "https://drive.google.com/file/d/1p3oS4vUrnejozKpJ9Ne3BU2EtaTUEfI4/view?usp=drivesdk",
+    "review_crop": "https://drive.google.com/file/d/1_1t1wpnjhNthmTHBk1bMm1_Wc68VcR8Q/view?usp=drivesdk",
+    "manifest": "https://drive.google.com/file/d/1TzCz3C6OQfyhJf7GXI5qab6zWHnuaywo/view?usp=drivesdk"
+  },
+  "locked_parts": [
+    "body_with_rear",
+    "shell_main",
+    "underbelly",
+    "front_flipper_near",
+    "front_flipper_far_geometry"
+  ],
+  "next_gate": "Outline Exact Mask v1"
+}
