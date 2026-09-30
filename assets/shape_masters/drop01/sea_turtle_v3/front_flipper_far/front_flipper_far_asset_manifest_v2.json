@@ -1,0 +1,39 @@
+{
+  "part": "front_flipper_far",
+  "variant": "F0",
+  "gate": "asset_extraction",
+  "version": "v2",
+  "status": "locked_active",
+  "approved_date": "2026-09-30",
+  "authoritative_master": "Q3 Canonical Master",
+  "source_mask": "front_flipper_far_f0_mask_v2_2048.png",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "imagegen_used": false,
+  "locked_parts": [
+    "body_with_rear",
+    "shell_main",
+    "underbelly",
+    "front_flipper_near"
+  ],
+  "qa": {
+    "asset_visible_pixels": 61423,
+    "mask_pixels": 61423,
+    "asset_mask_mismatch_pixels": 0,
+    "source_rgba_diff_inside_mask_pixels": 0,
+    "rgba_nonzero_outside_mask_pixels": 0,
+    "transparent_rgb_residue_pixels": 0
+  },
+  "drive": {
+    "asset": "https://drive.google.com/file/d/1886oSUP6IXQN_MOHQO9IzXrPyXSojZLr/view?usp=drivesdk",
+    "review_crop": "https://drive.google.com/file/d/1BU5sXtnK-r6W20Gxh7rDbOw3ppDHkusV/view?usp=drivesdk",
+    "manifest": "https://drive.google.com/file/d/1bRemq0xfdEdbaC5pxNDZyH2UKAsPHEne/view?usp=drivesdk"
+  },
+  "sha256": {
+    "asset": "83ee0a5006c73699b914b1b6173a369f045c168cb1bd5a866720963d350d2b25"
+  },
+  "next_gate": "removed remainder"
+}
