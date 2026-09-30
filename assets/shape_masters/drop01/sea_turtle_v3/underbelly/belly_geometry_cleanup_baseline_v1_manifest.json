@@ -1,0 +1,43 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "part_id": "underbelly",
+  "baseline": "geometry_cleanup_v1",
+  "status": "GEOMETRY_OWNERSHIP_CLEANUP_APPROVED_MATERIAL_PENDING",
+  "authoritative_master": "Q3 Canonical Master",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "imagegen_used_for_this_baseline": false,
+  "locked_parts": [
+    "body_with_rear",
+    "shell_main",
+    "front_flipper_near",
+    "front_flipper_far"
+  ],
+  "next_gate": "Belly Outline Ownership Overlay",
+  "material_order": [
+    "Outline",
+    "Pattern/Detail",
+    "Shadow",
+    "Highlight",
+    "Base/Albedo",
+    "Material Recomposition QA",
+    "Palette QA",
+    "Surface/Material compatibility QA"
+  ],
+  "drive_folder": "https://drive.google.com/drive/folders/1FVrmOKxq1A2-3vzJCva9Qj-QcjTFFVVb",
+  "drive_files": {
+    "asset": "https://drive.google.com/file/d/18kf2FLZlNpdgWNF6V4QmWUl6t18ePPbJ/view?usp=drivesdk",
+    "mask": "https://drive.google.com/file/d/1lymHnanKUrDPWf_ON4dHi2zgsOojJtlt/view?usp=drivesdk",
+    "removed_remainder": "https://drive.google.com/file/d/1cUctZTdmlnpRwrMmL-yw3GUkP8KEqqOj/view?usp=drivesdk",
+    "recomposite": "https://drive.google.com/file/d/1acrQEFOFmBqC8kXNNachYcaX6eYOvCNu/view?usp=drivesdk",
+    "package_zip": "https://drive.google.com/file/d/1-Ml7sLttIvG4i4PYQNwOYOQfJaAx30zD/view?usp=drivesdk"
+  },
+  "discarded_tests": [
+    "belly_material_A_soft_matte",
+    "belly_material_B_soft_satin",
+    "belly_material_C_soft_pearl"
+  ]
+}
