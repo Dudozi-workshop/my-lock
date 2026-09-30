@@ -201,3 +201,21 @@ Key additions now treated as standard:
 - Base/Albedo is derived last as the remainder of approved material ownership;
 - an approved gate is saved immediately before proceeding to the next gate;
 - final Part closeout requires gap/overlap/recomposition/PNG/runtime-size checks and a registered manifest.
+
+
+## 12. Residual audit and conservative ownership rollback
+
+After Removed Remainder is generated, perform a local residual audit even if recomposite diff is 0.
+
+If a leftover is found:
+- detached/local leftover clearly owned by the active Part → return to Ownership Overlay and correct ownership;
+- leftover connected to a locked neighboring Part → do not auto-reassign; keep the locked owner unless the user explicitly approves a change;
+- never clean only the Remainder while leaving the ownership/mask lineage unchanged.
+
+When ownership changes after downstream artifacts already exist:
+1. mark the affected Ownership/Mask/Asset lineage as superseded or legacy;
+2. regenerate downstream derivatives from the corrected ownership;
+3. rerun overlap/gap/residual/recomposite QA;
+4. update Drive + GitHub + Notion before advancing.
+
+This rollback rule takes precedence over a prior numeric PASS because semantic ownership is the governing source of truth.
