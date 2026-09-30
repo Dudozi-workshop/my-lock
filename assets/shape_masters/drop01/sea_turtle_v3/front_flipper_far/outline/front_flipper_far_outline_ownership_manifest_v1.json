@@ -23,8 +23,13 @@
     ],
     "source_alpha_outside_pixels": 0,
     "alpha_changed_pixels": 0,
-    "binary_support_connected_components": 79,
-    "note": "component count includes small antialiased/discrete source-valid outline pixels; no cleanup after user approval"
+    "note": "8-neighbor connectivity is the production continuity metric; 4-neighbor diagnostic yields 79 because diagonal antialiased outline pixels split under 4-connectivity. No pixel cleanup after user approval.",
+    "connected_components_8_neighbor": 2,
+    "component_areas_8_neighbor": [
+      8824,
+      14
+    ],
+    "connected_components_4_neighbor_diagnostic": 79
   },
   "drive": {
     "overlay": "https://drive.google.com/file/d/1p3oS4vUrnejozKpJ9Ne3BU2EtaTUEfI4/view?usp=drivesdk",
