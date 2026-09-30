@@ -36,4 +36,8 @@
 - Final Package: https://drive.google.com/file/d/1alvbbMRfJdtQL3jK8d7zhNcjGUPOZnOX/view
 
 ## Next Gate
-`front_flipper_near` F0 → Source confirmation → Ownership Overlay.
+`front_flipper_far` F0 Shape Beauty / Material Decomposition → **Outline Ownership Overlay**.
+
+Sequence: `Outline → Pattern / Detail → Shadow → Highlight → Base / Albedo → Material Recomposition QA → Palette QA → Surface/Material Compatibility QA → Runtime QA`.
+
+`front_flipper_near` is already locked and must not be re-derived in this continuation.
