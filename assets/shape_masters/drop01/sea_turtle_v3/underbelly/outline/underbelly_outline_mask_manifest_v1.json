@@ -1,0 +1,33 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "part_id": "underbelly",
+  "layer_id": "outline",
+  "stage": "exact_mask",
+  "version": "v1",
+  "status": "Final / Locked / Active",
+  "source_geometry": "underbelly FINAL_v4_cleanup",
+  "source_overlay": "underbelly_outline_ownership_overlay_candidate_v1_2048.png",
+  "source_overlay_approved_by_user": true,
+  "canvas": {"width": 2048, "height": 2048, "mask_mode": "L", "mask_values": [0,255]},
+  "method": "exact binary mask derived 1:1 from approved Outline Ownership Overlay support; no reinterpretation",
+  "imagegen_used": false,
+  "geometry_changed": false,
+  "qa": {
+    "mask_pixels": 8647,
+    "bbox_xyxy_inclusive": [442,823,1431,1217],
+    "outside_underbelly_source_alpha_pixels": 0,
+    "overlay_support_mismatch_pixels": 0,
+    "connected_component_count": 1,
+    "isolated_1px_noise_pixels": 0,
+    "mask_values": [0,255],
+    "png_integrity": "PASS"
+  },
+  "drive": {
+    "mask": "https://drive.google.com/file/d/1N2MtEjweXXC1QYaEbkslUzQWbKszHq66/view?usp=drivesdk",
+    "alignment_qa": "https://drive.google.com/file/d/1SmEHFr2xGGslfCpNxU1kCEb1N5AlmABL/view?usp=drivesdk",
+    "manifest": "https://drive.google.com/file/d/107OSZSsC7j7PZiAeQ9K9rs8fvF6cAnnm/view?usp=drivesdk",
+    "package": "https://drive.google.com/file/d/1tHJ1zB5CMo9UrgkM67O1-4chXh0AFIeW/view?usp=drivesdk"
+  },
+  "locked_parts": ["body_with_rear","shell_main","front_flipper_near","front_flipper_far"],
+  "next_gate": "Outline Asset extraction from locked Underbelly source pixels"
+}
