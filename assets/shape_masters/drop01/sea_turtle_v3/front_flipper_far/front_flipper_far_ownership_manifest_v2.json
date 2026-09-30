@@ -1,0 +1,47 @@
+{
+  "part": "front_flipper_far",
+  "variant": "F0",
+  "gate": "ownership_overlay",
+  "version": "v2",
+  "status": "locked",
+  "approved_date": "2026-09-30",
+  "authoritative_master": "Q3 Canonical Master",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "imagegen_used": false,
+  "locked_parts": [
+    "body_with_rear",
+    "shell_main",
+    "underbelly",
+    "front_flipper_near"
+  ],
+  "supersedes": "withdrawn Ownership v1 (upper attachment underbelly intrusion)",
+  "approved_candidate": "front_flipper_far_f0_ownership_overlay_candidate_v2_2048.png",
+  "qa": {
+    "ownership_pixels": 61423,
+    "bbox": [
+      470,
+      945,
+      712,
+      1353
+    ],
+    "outside_source_alpha_pixels": 0,
+    "connected_components": 1,
+    "source_exact_outside_ownership_pixels": 0
+  },
+  "drive": {
+    "ownership_overlay": "https://drive.google.com/file/d/1x3EleCbnd9n72fveKSXHGHT0qmQA2baw/view?usp=drivesdk",
+    "review_crop": "https://drive.google.com/file/d/1Mzy9VAz5KSvpcrrPQVZylZdv_5cZlzAb/view?usp=drivesdk",
+    "top_attachment_review": "https://drive.google.com/file/d/16Q8Fr7l5mQIg663kRfEJW6ipJP4uF0kw/view?usp=drivesdk",
+    "manifest": "https://drive.google.com/file/d/1pjgHDJWkj48-kiOPykOMNk_1FTLaf95c/view?usp=drivesdk"
+  },
+  "sha256": {
+    "ownership_overlay": "4df376ad1fa37e6d0dca0d7d910c14d620efca0e95b3731dfa260a60cee2a987",
+    "review_crop": "7a91537507256701f6138749e455fb4631124288a05aa4765fc6909a863a1b36",
+    "top_attachment_review": "365db727f3645a668c52c397df8d0e5e710c70488851875dbfbd1bfeac09d262"
+  },
+  "next_gate": "exact mask v2 derivation"
+}
