@@ -1,0 +1,57 @@
+{
+  "part": "front_flipper_far",
+  "variant": "F0",
+  "version": "FINAL_v4",
+  "status": "final_locked_active",
+  "approved_date": "2026-09-30",
+  "authoritative_master": "Q3 Canonical Master",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "imagegen_used": false,
+  "source_lineage": "Ownership v3 user-approved -> v4 detached residual cleanup (+317 px) -> user-approved root seam exclusion",
+  "locked_parts": [
+    "body_with_rear",
+    "shell_main",
+    "underbelly",
+    "front_flipper_near"
+  ],
+  "qa": {
+    "mask_pixels": 63029,
+    "bbox": [
+      470,
+      945,
+      712,
+      1362
+    ],
+    "connected_components": 2,
+    "component_areas": [
+      63015,
+      14
+    ],
+    "asset_visible_pixels": 63029,
+    "asset_mask_mismatch_pixels": 0,
+    "asset_remainder_overlap_pixels": 0,
+    "remainder_inside_mask_pixels": 0,
+    "transparent_rgb_residue_asset_pixels": 0,
+    "local_far_zone_detached_residual_pixels": 0,
+    "recomposite_changed_pixels": 0,
+    "recomposite_max_channel_diff": 0,
+    "root_seam_decision": "excluded_from_far_ownership_by_user",
+    "root_seam_auto_reassignment": false
+  },
+  "drive": {
+    "asset": "https://drive.google.com/file/d/1-pEpuUWCs_VeOICKQe9iWS67Weh5hZfo/view",
+    "mask": "https://drive.google.com/file/d/1b0ctUahdwyhYrqFk_OXCG_GvtzCSsUI6/view",
+    "removed_remainder": "https://drive.google.com/file/d/1SkHNsHYJFbWO_c774tmT1U92iBFwRQMe/view",
+    "ownership_overlay": "https://drive.google.com/file/d/1HxsxCpxGwFlVpRa8cO0WoQb-3jmCEi3h/view",
+    "ownership_qa": "https://drive.google.com/file/d/1yhJK7wMmQwMNrIf5L2tJW_JkMDkFPSOZ/view",
+    "recomposite_qa": "https://drive.google.com/file/d/1-ZVxZnJcupB6Vo_alM6t2kfTTq5_Gbpv/view",
+    "recomposite_diff": "https://drive.google.com/file/d/1WxNL8cGIoHOJn2GHu5t81RoC1y1uDfQr/view",
+    "review_strip": "https://drive.google.com/file/d/1wCxX5DVeb1bsc3dMFUC8mtI-tPHjMvw7/view",
+    "package": "https://drive.google.com/file/d/1alvbbMRfJdtQL3jK8d7zhNcjGUPOZnOX/view"
+  },
+  "next_gate": "front_flipper_near F0 ownership overlay"
+}
