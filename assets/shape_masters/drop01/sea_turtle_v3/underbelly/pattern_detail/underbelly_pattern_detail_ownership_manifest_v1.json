@@ -1,0 +1,31 @@
+{
+  "shape_id":"sea_turtle_v3",
+  "part_id":"underbelly",
+  "layer_id":"pattern_detail",
+  "stage":"ownership_overlay",
+  "version":"v1",
+  "status":"Final / Locked / Active",
+  "approval_date":"2026-10-01",
+  "source_geometry":"underbelly FINAL_v4_cleanup",
+  "excluded_locked_layer":"underbelly Outline Final v1",
+  "imagegen_used":false,
+  "geometry_changed":false,
+  "qa":{
+    "ownership_pixels":11442,
+    "bbox_xyxy_inclusive":[634,921,1267,1194],
+    "connected_component_count":3,
+    "component_sizes_desc":[10615,496,331],
+    "outside_underbelly_source_alpha_pixels":0,
+    "overlap_with_locked_outline_v1_pixels":0,
+    "isolated_1px_noise_pixels":0
+  },
+  "sha256":{
+    "underbelly_pattern_detail_ownership_overlay_v1_2048.png":"a65429ec3ba68661b8962f8a561fd9553ac65ecc64edc9b6a2916eaa79aca173"
+  },
+  "drive":{
+    "ownership_overlay":"https://drive.google.com/file/d/1z9OyQxwbKSti3d7VBKn8U06IHeeGXPQV/view?usp=drivesdk",
+    "review":"https://drive.google.com/file/d/1ddPFpT8bU_DVm71Y10iPJVd6xVgOYfDN/view?usp=drivesdk",
+    "gate_package":"https://drive.google.com/file/d/1GWE6JBO3-AFfysobA_bzA_3KqBgf1I5Y/view?usp=drivesdk"
+  },
+  "next_gate":"Exact Mask v1 -> Asset extraction"
+}
