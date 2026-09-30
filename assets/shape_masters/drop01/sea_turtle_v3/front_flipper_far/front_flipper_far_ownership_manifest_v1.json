@@ -1,0 +1,32 @@
+{
+  "part": "front_flipper_far",
+  "variant": "F0",
+  "gate": "ownership_overlay",
+  "version": "v1",
+  "status": "locked",
+  "approved_date": "2026-09-30",
+  "authoritative_master": "Q3 Canonical Master",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "imagegen_used": false,
+  "locked_parts": [
+    "body_with_rear",
+    "shell_main",
+    "underbelly",
+    "front_flipper_near"
+  ],
+  "approved_candidate": "front_flipper_far_f0_ownership_overlay_candidate_v5_cleanup_2048.png",
+  "drive": {
+    "ownership_overlay": "https://drive.google.com/file/d/1m3lmEfTiQj2duxG1R6-zwjyhEVnilbW_/view?usp=drivesdk",
+    "review_crop": "https://drive.google.com/file/d/1ukMHUVH8mTu6CzqhRquEgU4S1QHDy_Rf/view?usp=drivesdk",
+    "manifest": "https://drive.google.com/file/d/1SRKPd1FW2SsEbYudiV4-sfkzsdMC1-2Q/view?usp=drivesdk"
+  },
+  "sha256": {
+    "ownership_overlay": "486a8e7d868edb9fadfd3fd98ee50fff4dca479f6e9231b904cc700163b686cb",
+    "review_crop": "c2e3577644e38647f28fd3135e3de2132183039c3592d1a306aafb6f836c4a1f"
+  },
+  "next_gate": "exact mask derivation"
+}
