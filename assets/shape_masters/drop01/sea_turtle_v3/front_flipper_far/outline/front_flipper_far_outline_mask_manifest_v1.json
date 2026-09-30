@@ -1,0 +1,49 @@
+{
+  "part": "front_flipper_far",
+  "variant": "F0",
+  "layer": "outline",
+  "version": "v1",
+  "status": "qa_candidate",
+  "source_geometry": "front_flipper_far FINAL_v4",
+  "source_overlay": "front_flipper_far_outline_ownership_overlay_v1_2048.png",
+  "source_overlay_approved_by_user": true,
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mask_mode": "L",
+    "mask_values": [
+      0,
+      255
+    ]
+  },
+  "method": "exact binary mask derived 1:1 from approved Outline Ownership Overlay support; no reinterpretation",
+  "imagegen_used": false,
+  "qa": {
+    "mask_pixels": 8838,
+    "bbox_xyxy_inclusive": [
+      470,
+      945,
+      712,
+      1362
+    ],
+    "source_alpha_outside_pixels": 0,
+    "overlay_mask_mismatch_pixels": 0,
+    "connected_components": 79,
+    "png_integrity": "PASS"
+  },
+  "drive": {
+    "mask": "https://drive.google.com/file/d/1zibS_bG47_u9G3b_8xNDyPYHSSvDixHq/view?usp=drivesdk",
+    "alignment_qa": "https://drive.google.com/file/d/1Doae0rNr-0eB4IlAxBVWl8bG-3TLaCZv/view?usp=drivesdk",
+    "review_crop": "https://drive.google.com/file/d/1H2zHwgopPz5nIWx4O_Abafd41B-5PU00/view?usp=drivesdk",
+    "manifest": "https://drive.google.com/file/d/18ojo4oBWqc4hy-AwiSE3bCWM9pNScnzy/view?usp=drivesdk",
+    "package": "https://drive.google.com/file/d/1zv2r0_fl3Ln9lZrCBPmGoNFq6V48NcPK/view?usp=drivesdk"
+  },
+  "locked_parts": [
+    "body_with_rear",
+    "shell_main",
+    "underbelly",
+    "front_flipper_near",
+    "front_flipper_far_geometry"
+  ],
+  "next_gate": "Outline Asset extraction after user approval"
+}
