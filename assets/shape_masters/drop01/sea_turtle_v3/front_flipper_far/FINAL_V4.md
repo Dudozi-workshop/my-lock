@@ -2,6 +2,7 @@
 
 - Status: **Final / Locked / Active**
 - Approved: 2026-09-30
+- Closeout verified: **2026-10-01**
 - User decision: keep current root seam ownership unchanged; do not auto-reassign the connected static-body seam.
 - Authoritative Master: **Q3 Canonical Master**
 - Canvas: **2048 × 2048 RGBA**
@@ -34,6 +35,7 @@
 - Recomposite Diff: https://drive.google.com/file/d/1WxNL8cGIoHOJn2GHu5t81RoC1y1uDfQr/view
 - Review Strip: https://drive.google.com/file/d/1wCxX5DVeb1bsc3dMFUC8mtI-tPHjMvw7/view
 - Final Package: https://drive.google.com/file/d/1alvbbMRfJdtQL3jK8d7zhNcjGUPOZnOX/view
+- Closeout Summary: https://drive.google.com/file/d/1336K_NKuVpUgHiRNIyjrXRejFjZed_t6/view?usp=drivesdk
 
 ## Next Gate
 `front_flipper_far` F0 Shape Beauty / Material Decomposition → **Outline Ownership Overlay**.
