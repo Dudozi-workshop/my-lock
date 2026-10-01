@@ -251,3 +251,31 @@ Sea Turtle v3 Front Flipper Far reference:
 - v2 passed numeric extraction checks but left a lower-left outline residual.
 - v3 corrected that residual and exposed additional detached fringe pixels in downstream QA.
 - FINAL_v4 absorbed only the detached residual pixels and intentionally left the body-connected root seam outside Far ownership by user decision.
+
+
+## 17. Outline attachment and runtime seam rule
+
+Source-pixel material ownership and final runtime visibility are separate concerns.
+
+- A Part may own source pixels classified as **Outline** so the material decomposition exactly reproduces its approved source.
+- This source ownership does **not** mean every owned Outline pixel must render as a strong line in the final composed Shape.
+- Treat outline pixels in two roles:
+  1. **Exterior Outline** — outer silhouette of the complete Shape. This may remain a strong continuous visible outline.
+  2. **Attachment / Internal Seam** — boundaries where two Parts join or overlap, such as Body↔Belly, Belly↔Shell, and Flipper Root↔Body/Belly.
+- Two neighboring Parts must not each render a strong outline on the same attachment boundary. Avoid double-line, excessive seam thickness, and assembled-piece appearance.
+- Resolve attachment seams at compositor/runtime level using one of:
+  - **single-owner visible boundary**;
+  - **suppressed outline** on one or both sides;
+  - **soft structural shadow/seam** when depth separation is needed.
+- Do not redraw or alter locked Geometry/Ownership merely to hide a runtime seam. Geometry changes require their own approved ownership gate.
+- Whole-shape recomposition/runtime QA must explicitly inspect:
+  - double outline;
+  - seam thickness;
+  - disconnected-piece appearance;
+  - outline continuity at transitions;
+  - Palette/Material consistency across the attachment.
+- Material manifests should record both `source_material_outline` ownership and `runtime_outline_visibility`/seam policy when a Part has attachment boundaries.
+
+Sea Turtle v3 Underbelly reference:
+- Underbelly Outline v1 is locked as source-pixel ownership.
+- Runtime visibility of its Body/Shell/Flipper attachment segments remains pending whole-shape seam QA.
