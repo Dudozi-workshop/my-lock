@@ -18,6 +18,12 @@ Sea Turtle outer-front-flipper runtime QA:
 
 `https://my-lock-preview.rlatkd5959.workers.dev/?qa=front-flipper-outer`
 
+Sea Turtle production Asset Book:
+
+`https://my-lock-preview.rlatkd5959.workers.dev/asset-book/`
+
+The Asset Book is a read-only viewer generated from Final / Locked Production manifests during the web build. It is not a Source of Truth. Public preview images are version-guarded low-resolution mirrors; when a Production version changes, a stale preview is hidden until its viewer mirror is refreshed.
+
 Do not use the old GitHub Pages URL (`dudozi-workshop.github.io/my-lock`) for this preview. GitHub Pages is not the active deployment target.
 
 ## Build locally
