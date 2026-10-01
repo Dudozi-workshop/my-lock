@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../features/qa/sea_turtle_body_with_rear_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_front_flipper_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_shell_runtime_qa_screen.dart';
+import '../features/qa/sea_turtle_underbelly_runtime_qa_screen.dart';
 import '../features/shell/root_shell.dart';
 import 'build_info.dart';
 import 'theme.dart';
@@ -17,6 +18,7 @@ class MyLockApp extends StatelessWidget {
     final showShellRuntimeQa = kIsWeb && qa == 'sea-turtle-shell-runtime';
     final showFrontFlipperQa = kIsWeb && qa == 'front-flipper-outer';
     final showBodyWithRearQa = kIsWeb && qa == 'sea-turtle-body-with-rear';
+    final showUnderbellyQa = kIsWeb && qa == 'sea-turtle-underbelly';
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -34,7 +36,9 @@ class MyLockApp extends StatelessWidget {
               ? const SeaTurtleFrontFlipperRuntimeQaScreen()
               : showBodyWithRearQa
                   ? const SeaTurtleBodyWithRearRuntimeQaScreen()
-                  : const RootShell(),
+                  : showUnderbellyQa
+                      ? const SeaTurtleUnderbellyRuntimeQaScreen()
+                      : const RootShell(),
     );
   }
 }
