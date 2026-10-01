@@ -29,7 +29,11 @@
   "runtime": {
     "route": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=front-flipper-far",
     "strategy": "single neutral 512 lossless WebP + app ShapeTone dynamic recolor",
-    "review_sizes_px": [58, 96, 160],
+    "review_sizes_px": [
+      58,
+      96,
+      160
+    ],
     "screen_commit": "f0434675aa326e39bb75ef1ae93991243ea646b9",
     "route_commit": "461facdc7802f52fe25b547ba4d239b64ad25b96",
     "web_run_id": 36934333447,
@@ -39,8 +43,9 @@
     "android_ci": "pass"
   },
   "drive": {
-    "final_candidate_package_url": "https://drive.google.com/file/d/18O4C5XosCxd9RiwjfHhhe0rsMSM7_gmH/view?usp=drivesdk",
-    "package_sha256": "dfeb838f9d1af90c027ff1395068f9b86cb7357d5b29136ca4127a1265ddb363"
+    "package_sha256": "dfeb838f9d1af90c027ff1395068f9b86cb7357d5b29136ca4127a1265ddb363",
+    "final_package_url": "https://drive.google.com/file/d/1l3WBB3_L1jVG3eVaB8xsnl3q79BvJI3A/view?usp=drivesdk"
   },
-  "next_gate": "Whole-turtle seam/material compatibility QA"
+  "next_gate": "Whole-turtle seam/material compatibility QA",
+  "layer": "runtime"
 }
