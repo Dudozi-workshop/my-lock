@@ -1,6 +1,6 @@
 # Sea Turtle v3 · Underbelly Palette QA Candidate v2
 
-- Status: **QA Candidate / user visual approval pending**
+- Status: **Final / Locked / Active — Underbelly standalone Part**
 - Material source: **Underbelly Material Profile v2**
 - Geometry source: **Underbelly FINAL_v4_cleanup**
 - Palette source: app **ShapeTone/baseColorForTone**
@@ -49,11 +49,19 @@ Pairwise palette alpha mismatch: **0 px**.
 - Palette remap changes RGB only.
 - Geometry, alpha, ownership masks and layer partition remain fixed.
 - Compatible in principle with the existing Hybrid Material Compositor contract.
-- Actual Flutter shader/runtime integration and whole-turtle seam/material compatibility remain **PENDING** until the Underbelly runtime asset is registered and built with the other locked Parts.
+- Flutter Runtime QA integration: **PASS** (`?qa=sea-turtle-underbelly`).
+- MY LOCK Web Build: **PASS** on main containing the Underbelly runtime route/source.
+- User visual runtime confirmation: **approved 2026-10-02**.
+- Underbelly standalone Part is complete. Whole-turtle seam/material compatibility remains the next assembly-level Gate; it does not reopen Underbelly Geometry/Ownership unless an explicit ownership rollback is approved.
 
 ## Drive
 - Material v2 package: https://drive.google.com/file/d/1asZ_-PD9FLf0_CgSEwjwy1u8uoyotoHU/view?usp=drivesdk
 - Palette QA v2 package: https://drive.google.com/file/d/1QMqQJK1iFGVrp6b9lJg1JJ8XcPhY29Fw/view?usp=drivesdk
 
-## Promotion rule
-Do not promote Palette QA / Runtime to Final until user visual approval plus whole-turtle runtime integration/build QA pass.
+## Finalization — 2026-10-02
+- Underbelly standalone production work: **COMPLETE / LOCKED**.
+- Runtime QA source: `lib/features/qa/sea_turtle_underbelly_runtime_qa_screen.dart`.
+- Runtime QA route: `?qa=sea-turtle-underbelly`.
+- Deployed QA endpoint: `https://my-lock-preview.rlatkd5959.workers.dev/?qa=sea-turtle-underbelly`.
+- No duplicate production binary upload was created during finalization; existing Drive Material v2 / Palette QA v2 packages remain authoritative.
+- Next Gate: **Whole-turtle Seam / Material QA**.
