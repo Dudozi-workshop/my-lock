@@ -9,6 +9,7 @@ on:
       - 'pubspec.yaml'
       - 'analysis_options.yaml'
       - 'tool/**'
+      - 'web/**'
       - 'wrangler.jsonc'
       - '.github/workflows/web-build.yml'
   workflow_dispatch:
