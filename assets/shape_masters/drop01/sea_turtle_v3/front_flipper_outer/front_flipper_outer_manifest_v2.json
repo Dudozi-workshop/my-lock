@@ -1,6 +1,6 @@
 {
   "asset": "Sea Turtle v3 Front Flipper Outer",
-  "status": "geometry_v3_locked_material_v2_locked_palette_v2_qa",
+  "status": "geometry_v3_locked_material_v2_locked_palette_v2_locked_runtime_v2_pending",
   "canonical_canvas": {
     "width": 2048,
     "height": 2048,
@@ -113,8 +113,8 @@
   "policy": {
     "image_generation_used": false,
     "geometry_changed": false,
-    "source_of_truth": "adopted v2 asset",
-    "next_stage": "user visual approval of Palette QA v2; then Flutter runtime revalidation v2"
+    "source_of_truth": "front_flipper_outer_asset_v3_2048.png",
+    "next_stage": "Flutter runtime revalidation v2; then Final Closeout"
   },
   "highlight_gate": {
     "status": "locked",
@@ -211,7 +211,7 @@
   },
   "locked_at": "2026-09-29",
   "runtime_qa_gate": {
-    "status": "locked",
+    "status": "legacy_locked_before_geometry_v3_cleanup",
     "route": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=front-flipper-outer",
     "implementation_commit": "b8f468da8debe3cf61e608394a402111978248c0",
     "preview_build": "009",
@@ -228,7 +228,8 @@
     "image_generation_used": false,
     "web_build": "pass",
     "android_ci": "pass",
-    "user_visual_approval": true
+    "user_visual_approval": true,
+    "note": "Historical Runtime QA for the pre-cleanup outer-flipper lineage. Geometry v3 added 5,417 ownership pixels; do not use this gate as current Final Closeout evidence."
   },
   "final_closeout": {
     "status": "legacy_withdrawn_outline_residual",
@@ -280,7 +281,7 @@
     "withdrawn_final_pattern": "legacy_final_v#_<reason>_<date>",
     "current_final": null,
     "legacy_final": "legacy_final_v1_outline_residual_20260929",
-    "current_candidate": "front_flipper_outer_palette_qa_v2_candidate"
+    "current_candidate": null
   },
   "material_revalidation_v2": {
     "status": "locked",
@@ -313,7 +314,7 @@
     "approved_date": "2026-09-29"
   },
   "palette_revalidation_v2": {
-    "status": "qa_candidate",
+    "status": "locked",
     "source": "front_flipper_outer_asset_v3_2048.png",
     "image_generation_used": false,
     "palette_source": "current app runtime ShapeTone/baseColorForTone",
@@ -342,7 +343,35 @@
     },
     "runtime_preview_px": 58,
     "package_sha256": "86d45f6804bf8d9fa6acb6432fb763cdbf0a95456e71ad64ca474b1d56784ca8",
-    "drive_status": "pending_user_approval",
-    "next_gate": "user visual approval of palette QA v2; then actual Flutter runtime revalidation"
+    "drive_status": "locked",
+    "next_gate": "Flutter runtime revalidation v2; then Final Closeout",
+    "user_visual_approval": true,
+    "approved_date": "2026-10-01",
+    "drive_folder": "https://drive.google.com/drive/folders/1Vy9wxMnzMETsXuoFTmgLBpmkafKipRLY",
+    "lock_readme_url": "https://drive.google.com/file/d/14bJG9hauHHKXkxfwRPpnLKNce2KcTebX/view?usp=drivesdk"
+  },
+  "active_geometry_source": {
+    "status": "locked",
+    "file": "front_flipper_outer_asset_v3_2048.png",
+    "visible_pixels": 114017,
+    "added_from_v2_pixels": 5417,
+    "drive_url": "https://drive.google.com/file/d/15OuHEujhlw3ngpuclfOgz0cEjmmhrlbM/view?usp=drivesdk"
+  },
+  "runtime_revalidation_v2": {
+    "status": "pending",
+    "source_geometry": "front_flipper_outer_asset_v3_2048.png",
+    "source_material": "material_revalidation_v2 locked",
+    "source_palette": "palette_revalidation_v2 locked",
+    "required_checks": [
+      "58px_light",
+      "58px_dark",
+      "96px_inspection",
+      "web_build",
+      "android_ci",
+      "user_visual_approval"
+    ],
+    "route": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=front-flipper-outer",
+    "image_generation_used": false,
+    "next_gate": "Final Closeout after PASS"
   }
 }
