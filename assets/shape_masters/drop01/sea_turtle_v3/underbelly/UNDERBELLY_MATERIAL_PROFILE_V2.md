@@ -25,5 +25,17 @@ Rationale:
 ## Locked scope
 No changes to Geometry, silhouette, alpha, Outline, body_with_rear, shell_main, front_flipper_near, or front_flipper_far.
 
-## Current Gate
-**Highlight Ownership Overlay Candidate v2** — simplified broad structural highlight only.
+## Current state — Material Decomposition v2 complete
+- Highlight Ownership v2: approved by user continuation instruction and deterministically materialized.
+- Highlight Mask / Asset / Removed Remainder: complete.
+- Base / Albedo v2: derived as exact remainder after locked Outline + locked Shadow + Highlight v2.
+- Material Recomposition QA: PASS.
+- Source visible support: 136,758 px.
+- Coverage gap: 0 px.
+- Pairwise ownership overlap: 0 px.
+- Recomposite changed pixels: 0.
+- Recomposite max channel diff: 0.
+- Package: https://drive.google.com/file/d/1asZ_-PD9FLf0_CgSEwjwy1u8uoyotoHU/view?usp=drivesdk
+
+## Next Gate
+**Palette QA**. Geometry and all material ownership remain locked during palette evaluation.
