@@ -39,11 +39,11 @@
 - QA route: `?qa=sea-turtle-body-with-rear`
 - Screen commit: `eff95a44f64e497e297f066dd4fbf546805677a0`
 - Route commit: `2b5a219aad0970f7472fd1084ae935b48c974176`
-- CI status for route commit: **no check/status surfaced yet**. Do not record build PASS until a real build/deploy check succeeds.
+- Flutter Web build/deploy: **PASS** via GitHub Actions run `36868740853` (Build web / artifact upload / Cloudflare Worker deploy all success).
 
 ## Remaining gates
-- Actual Flutter build/deployment verification: **PENDING**
-- Runtime visual approval using the deployed QA route: **PENDING**
+- Actual Flutter build/deployment verification: **PASS**
+- Runtime visual approval using the deployed QA route: **PENDING USER REVIEW**
 - Whole-turtle seam/material compatibility: **PENDING until all Parts are materially ready**
 - User visual approval: **REQUIRED** before promotion.
 
