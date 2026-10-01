@@ -19,6 +19,7 @@ BOOK_DIR = ROOT / "web/asset-book"
 OUTPUT = BOOK_DIR / "data.js"
 MASTER_POINTER = SHAPE_ROOT / "asset_book/MASTER_POINTER.json"
 PREVIEW_POINTERS = SHAPE_ROOT / "asset_book/PREVIEW_POINTERS.json"
+THEME_OVERVIEW = SHAPE_ROOT / "asset_book/THEME_OVERVIEW.json"
 
 BLOCKED_STATUS = {
     "candidate",
@@ -275,6 +276,7 @@ def build() -> dict[str, Any]:
 
     pointer = read_json(MASTER_POINTER) or {}
     preview_pointers = read_json(PREVIEW_POINTERS) or {}
+    theme_overview = read_json(THEME_OVERVIEW) or {}
     active_master_names = {
         normalize(record.get("authoritative_master"))
         for record in manifests
@@ -348,6 +350,7 @@ def build() -> dict[str, Any]:
             "privacy_rule": "Private Drive URLs and file IDs are excluded from the public payload.",
             "preview_rule": "Viewer previews are shown only when their guarded version matches the active Production version.",
         },
+        "theme": theme_overview,
         "shape": {
             "id": "sea_turtle_v3",
             "name": "Sea Turtle v3",
