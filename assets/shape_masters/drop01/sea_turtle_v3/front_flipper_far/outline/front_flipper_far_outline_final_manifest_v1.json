@@ -1,0 +1,55 @@
+{
+  "part": "front_flipper_far",
+  "variant": "F0",
+  "layer": "outline",
+  "version": "v1",
+  "status": "final_locked_active",
+  "approved_date": "2026-10-01",
+  "source_geometry": "front_flipper_far FINAL_v4",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "imagegen_used": false,
+  "qa": {
+    "outline_pixels": 8838,
+    "bbox_xyxy_inclusive": [
+      470,
+      945,
+      712,
+      1362
+    ],
+    "connected_components_8_neighbor": 2,
+    "component_areas_8_neighbor": [
+      8824,
+      14
+    ],
+    "asset_mask_mismatch_pixels": 0,
+    "source_rgba_mismatch_pixels": 0,
+    "asset_outside_mask_pixels": 0,
+    "asset_remainder_overlap_pixels": 0,
+    "remainder_inside_mask_pixels": 0,
+    "transparent_rgb_residue_asset_pixels": 0,
+    "recomposite_changed_pixels": 0,
+    "recomposite_max_channel_diff": 0,
+    "png_integrity": "PASS"
+  },
+  "drive": {
+    "asset": "https://drive.google.com/file/d/1SsytWOpHHbiWukWbx7hvRcx-swvoo4aT/view?usp=drivesdk",
+    "remainder": "https://drive.google.com/file/d/1zHcfcQGuu81RoQ8e73L0jp0T2clkcPrz/view?usp=drivesdk",
+    "ownership_qa": "https://drive.google.com/file/d/1yiLllVWoqsCHbx4a82LuctrDdGpliQo7/view?usp=drivesdk",
+    "recomposite_qa": "https://drive.google.com/file/d/1vAvO_73y7em5Ka3Qp2ECSDJ06aJqnqHf/view?usp=drivesdk",
+    "diff": "https://drive.google.com/file/d/1zGP47qik3EjuUv2JOiEAPaADvHRI353Y/view?usp=drivesdk",
+    "manifest": "https://drive.google.com/file/d/1qSICf0aC2f7VBDt4Oc9oHJrhd3Gan37b/view?usp=drivesdk",
+    "package": "https://drive.google.com/file/d/16kTmRIo7apaPqBO-OHRn3Us0_sQJXM80/view?usp=drivesdk"
+  },
+  "locked_parts": [
+    "body_with_rear",
+    "shell_main",
+    "underbelly",
+    "front_flipper_near",
+    "front_flipper_far_geometry"
+  ],
+  "next_gate": "Pattern / Detail Ownership Overlay"
+}
