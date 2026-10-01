@@ -1,0 +1,42 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "part_id": "body_with_rear",
+  "candidate": "FULL_REMAP_v2",
+  "status": "QA Candidate / not Production locked",
+  "geometry_source": "body_with_rear Geometry FINAL_v2",
+  "outline_source": "Outline FINAL_v3",
+  "imagegen_used": false,
+  "palette_source": "app ShapeTone/baseColorForTone",
+  "registered_palettes": {
+    "pink": "#FF8FD1",
+    "blue": "#79BFFF",
+    "yellow": "#FFDA72"
+  },
+  "qc": {
+    "canvas": [2048, 2048],
+    "mode": "RGBA",
+    "source_visible_pixels": 91756,
+    "outline_mask_pixels": 13492,
+    "alpha_mismatch_pixels_all_palettes": 0,
+    "outside_source_alpha_pixels_all_palettes": 0,
+    "transparent_rgb_residue_pixels_all_palettes": 0,
+    "pairwise_palette_alpha_mismatch_pixels": 0
+  },
+  "palette_qa": {
+    "green_residual_pixels": {"pink": 0, "blue": 0, "yellow": 0},
+    "target_hue_within_10deg_pct": {"pink": 100.0, "blue": 100.0, "yellow": 100.0},
+    "source_output_luminance_correlation": {
+      "pink": 0.968521,
+      "blue": 0.967151,
+      "yellow": 0.959622
+    }
+  },
+  "offline_runtime_qa": {
+    "58px_light_dark": "PASS",
+    "96px_light_dark": "PASS"
+  },
+  "whole_turtle_compatibility": "PENDING",
+  "flutter_runtime_integration_build": "PENDING",
+  "user_visual_approval": false,
+  "drive_package_url": "https://drive.google.com/file/d/173fvc7ad42YK46O6vWO7x_GWR1-tttNk/view?usp=drivesdk"
+}
