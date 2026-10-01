@@ -18,6 +18,7 @@ SHAPE_ROOT = ROOT / "assets/shape_masters/drop01/sea_turtle_v3"
 BOOK_DIR = ROOT / "web/asset-book"
 OUTPUT = BOOK_DIR / "data.js"
 MASTER_POINTER = SHAPE_ROOT / "asset_book/MASTER_POINTER.json"
+PREVIEW_POINTERS = SHAPE_ROOT / "asset_book/PREVIEW_POINTERS.json"
 
 BLOCKED_STATUS = {
     "candidate",
@@ -273,6 +274,7 @@ def build() -> dict[str, Any]:
         manifests.append(public_record(path, doc, part))
 
     pointer = read_json(MASTER_POINTER) or {}
+    preview_pointers = read_json(PREVIEW_POINTERS) or {}
     active_master_names = {
         normalize(record.get("authoritative_master"))
         for record in manifests
@@ -301,6 +303,19 @@ def build() -> dict[str, Any]:
             state = "Not registered"
             version = "—"
 
+        preview_spec = (
+            preview_pointers.get("parts", {}).get(part_id, {})
+            if isinstance(preview_pointers.get("parts"), dict)
+            else {}
+        )
+        preview_expected = str(preview_spec.get("expected_version", ""))
+        preview_current = bool(
+            primary
+            and preview_expected
+            and preview_expected == str(primary.get("version", ""))
+        )
+        preview_path = preview_spec.get("public_path") if preview_current else None
+
         parts.append(
             {
                 "id": part_id,
@@ -311,16 +326,27 @@ def build() -> dict[str, Any]:
                 "primary": primary,
                 "layers": layers,
                 "active_manifests": records,
+                "preview": preview_path,
+                "preview_current": preview_current,
+                "preview_expected_version": preview_expected or None,
             }
         )
 
+    master_preview_spec = preview_pointers.get("master", {})
+    master_preview_current = bool(
+        master_current
+        and isinstance(master_preview_spec, dict)
+        and normalize(master_preview_spec.get("expected_master")) == pointer_master
+    )
+
     return {
-        "schema": 1,
+        "schema": 2,
         "viewer": {
             "name": "MY LOCK Asset Book",
             "source_of_truth": False,
             "sync_rule": "Generated at web build from repository Production manifests.",
             "privacy_rule": "Private Drive URLs and file IDs are excluded from the public payload.",
+            "preview_rule": "Viewer previews are shown only when their guarded version matches the active Production version.",
         },
         "shape": {
             "id": "sea_turtle_v3",
@@ -331,6 +357,12 @@ def build() -> dict[str, Any]:
             "canonical_filename": pointer.get("canonical_filename"),
             "canvas": "2048 × 2048 · RGBA",
             "master_pointer_current": master_current,
+            "master_preview": (
+                master_preview_spec.get("public_path")
+                if master_preview_current
+                else None
+            ),
+            "master_preview_current": master_preview_current,
         },
         "parts": parts,
         "stats": {
