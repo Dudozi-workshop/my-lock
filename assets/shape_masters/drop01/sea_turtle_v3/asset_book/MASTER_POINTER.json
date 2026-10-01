@@ -1,0 +1,14 @@
+{
+  "role": "asset_book_display_pointer",
+  "source_of_truth": false,
+  "authoritative_master": "Q3 Canonical Master",
+  "canonical_filename": "sea_turtle_master_v3_2048.png",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "drive_url": "https://drive.google.com/file/d/1x4-U3ihSzfjdRKbBhFzkqPt-7sZsrI3y/view?usp=drivesdk",
+  "drive_folder": "https://drive.google.com/drive/folders/1S49_Sq_Bek4LS2GcZ3QxdJrZLTHAG60u",
+  "stale_guard": "The Asset Book generator may use this preview only while authoritative_master or canonical_filename still matches the active Production manifests."
+}
