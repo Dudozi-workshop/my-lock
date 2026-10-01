@@ -2,7 +2,7 @@
   "shape_id": "sea_turtle_v3",
   "part_id": "body_with_rear",
   "candidate": "FULL_REMAP_v2",
-  "status": "QA Candidate / not Production locked",
+  "status": "Runtime QA Candidate / not Production locked",
   "geometry_source": "body_with_rear Geometry FINAL_v2",
   "outline_source": "Outline FINAL_v3",
   "imagegen_used": false,
@@ -35,8 +35,16 @@
     "58px_light_dark": "PASS",
     "96px_light_dark": "PASS"
   },
-  "whole_turtle_compatibility": "PENDING",
-  "flutter_runtime_integration_build": "PENDING",
+  "flutter_runtime_candidate": {
+    "source": "single neutral 512x512 lossless WebP",
+    "color_source": "ShapeTone/baseColorForTone",
+    "recolor": "ColorFilter.mode(selectedTone, BlendMode.color)",
+    "qa_route": "?qa=sea-turtle-body-with-rear",
+    "screen_commit": "eff95a44f64e497e297f066dd4fbf546805677a0",
+    "route_commit": "2b5a219aad0970f7472fd1084ae935b48c974176",
+    "build_status": "PENDING_NO_STATUS_SURFACED"
+  },
+  "whole_turtle_compatibility": "PENDING_UNTIL_ALL_PARTS_READY",
   "user_visual_approval": false,
   "drive_package_url": "https://drive.google.com/file/d/173fvc7ad42YK46O6vWO7x_GWR1-tttNk/view?usp=drivesdk"
 }
