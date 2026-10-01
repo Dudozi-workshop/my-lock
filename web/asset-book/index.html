@@ -143,6 +143,89 @@
     h2 { margin:8px 0 0; font-size:clamp(30px,4vw,52px); letter-spacing:-.055em; }
     .section-note { max-width:530px; color:var(--muted); font-size:13px; line-height:1.7; text-align:right; }
 
+
+    .theme-hero {
+      position:relative; overflow:hidden; min-height:560px;
+      display:grid; grid-template-columns:1.15fr .85fr; gap:24px;
+      padding:54px; border:1px solid var(--line); border-radius:38px;
+      background:
+        radial-gradient(circle at 75% 20%,rgba(124,207,196,.18),transparent 26rem),
+        radial-gradient(circle at 88% 82%,rgba(185,167,232,.13),transparent 26rem),
+        linear-gradient(145deg,rgba(12,32,29,.97),rgba(7,18,17,.94));
+      box-shadow:var(--shadow);
+    }
+    .theme-hero::before {
+      content:""; position:absolute; inset:0; opacity:.28; pointer-events:none;
+      background:
+        radial-gradient(circle at 20% 70%,rgba(255,255,255,.08) 0 1px,transparent 2px),
+        radial-gradient(circle at 42% 18%,rgba(255,255,255,.06) 0 1px,transparent 2px);
+      background-size:72px 72px,96px 96px;
+    }
+    .theme-copy { position:relative; z-index:2; align-self:center; }
+    .theme-copy h1 { font-size:clamp(52px,7vw,108px); line-height:.9; }
+    .theme-copy p { max-width:680px; margin:22px 0 0; color:var(--soft); font-size:16px; line-height:1.8; }
+    .theme-principles { display:flex; flex-wrap:wrap; gap:8px; margin-top:24px; }
+    .theme-board {
+      position:relative; z-index:2; align-self:stretch; display:grid; align-content:center; gap:12px;
+      padding:24px; border:1px solid var(--line); border-radius:28px;
+      background:rgba(5,16,14,.56);
+    }
+    .theme-board h3 { margin:0 0 4px; font-size:14px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+    .palette-strip { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; }
+    .palette-swatch {
+      min-height:110px; border-radius:16px; overflow:hidden; position:relative;
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .palette-swatch span {
+      position:absolute; inset:auto 0 0; padding:32px 8px 9px;
+      background:linear-gradient(transparent,rgba(0,0,0,.48));
+      font-size:9px; font-weight:800; text-align:center;
+    }
+    .signature-swatch {
+      min-height:74px; border-radius:16px; border:1px solid rgba(255,255,255,.1);
+      display:flex; align-items:end; padding:12px; font-size:12px; font-weight:800;
+    }
+    .theme-grid { display:grid; grid-template-columns:repeat(12,1fr); gap:14px; }
+    .theme-card {
+      grid-column:span 4; padding:22px; min-height:230px; border:1px solid var(--line); border-radius:24px;
+      background:linear-gradient(155deg,rgba(18,33,30,.82),rgba(10,20,18,.78));
+    }
+    .theme-card h3 { margin:18px 0 6px; font-size:24px; letter-spacing:-.04em; }
+    .theme-card p { margin:0; color:var(--muted); font-size:12px; line-height:1.65; }
+    .tier {
+      display:inline-flex; padding:6px 8px; border-radius:999px; border:1px solid var(--line);
+      color:var(--soft); font-size:9px; text-transform:uppercase; letter-spacing:.1em;
+    }
+    .roster { display:grid; gap:8px; }
+    .roster-row {
+      display:grid; grid-template-columns:1.2fr .8fr 1.4fr; gap:12px; align-items:center;
+      padding:14px 16px; border:1px solid var(--line); border-radius:15px; background:rgba(255,255,255,.018);
+    }
+    .roster-row b { font-size:12px; }
+    .roster-row span { color:var(--muted); font-size:11px; }
+    .roster-row em { font-style:normal; color:var(--mint); font-size:10px; text-align:right; }
+    .scene-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .scene-card {
+      min-height:260px; padding:22px; border:1px solid var(--line); border-radius:24px;
+      background:
+        radial-gradient(circle at 80% 10%,rgba(120,207,224,.09),transparent 13rem),
+        rgba(12,25,23,.76);
+    }
+    .scene-card small { color:var(--mint); font-size:10px; letter-spacing:.12em; text-transform:uppercase; }
+    .scene-card h3 { margin:18px 0 8px; font-size:25px; letter-spacing:-.04em; }
+    .scene-card p { color:var(--muted); font-size:12px; line-height:1.7; }
+    .signature-moment { margin-top:18px; padding-top:14px; border-top:1px solid var(--line); color:var(--soft); font-size:11px; line-height:1.6; }
+    .feature-pair { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .feature-card {
+      padding:26px; border:1px solid var(--line); border-radius:26px; background:rgba(12,25,22,.74);
+    }
+    .feature-card h3 { margin:10px 0 10px; font-size:30px; letter-spacing:-.045em; }
+    .feature-card p { color:var(--muted); font-size:13px; line-height:1.75; margin:0; }
+    .feature-list { display:grid; gap:7px; margin-top:18px; }
+    .feature-list div { padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.025); font-size:11px; color:var(--soft); }
+    .shape-divider { margin-top:82px; padding-top:28px; border-top:1px solid var(--line); }
+    .shape-divider .kicker { color:var(--aqua); }
+
     .part-grid { display:grid; grid-template-columns:repeat(12,1fr); gap:14px; }
     .part-card {
       grid-column:span 4; min-height:330px; position:relative; overflow:hidden;
@@ -263,6 +346,9 @@
     }
 
     @media (max-width:1040px) {
+      .theme-hero { grid-template-columns:1fr; min-height:auto; padding:34px; }
+      .scene-grid { grid-template-columns:1fr 1fr; }
+      .theme-card { grid-column:span 6; }
       .hero { grid-template-columns:1fr; min-height:auto; padding:34px; }
       .master-stage { min-height:360px; }
       .part-card,.part-card:nth-child(1),.part-card:nth-child(2) { grid-column:span 6; }
@@ -276,6 +362,14 @@
       .shell { width:min(100% - 20px,1500px); padding-top:10px; }
       .topbar { top:7px; padding:10px 12px; border-radius:16px; }
       .nav a:nth-child(n+3) { display:none; }
+      .theme-hero { padding:24px; border-radius:26px; }
+      .theme-copy h1 { font-size:52px; }
+      .palette-strip { grid-template-columns:repeat(3,1fr); }
+      .palette-swatch { min-height:82px; }
+      .theme-card { grid-column:1 / -1; }
+      .scene-grid,.feature-pair { grid-template-columns:1fr; }
+      .roster-row { grid-template-columns:1fr; }
+      .roster-row em { text-align:left; }
       .hero { padding:24px; border-radius:26px; }
       h1 { font-size:56px; }
       .master-stage { min-height:340px; padding:18px; }
@@ -325,16 +419,124 @@
       <header class="topbar">
         <div class="brand"><span class="brand-mark"></span><span>MY LOCK · ASSET BOOK</span></div>
         <nav class="nav">
-          <a href="#overview">Overview</a>
+          <a href="#theme">Theme</a>
+          <a href="#collection">Collection</a>
+          <a href="#shape-overview">Sea Turtle</a>
           <a href="#parts">Parts</a>
-          <a href="#production">Production</a>
           <a href="#manifests">Manifests</a>
         </nav>
       </header>
 
-      <section class="hero" id="overview">
+      <section class="theme-hero" id="theme">
+        <div class="theme-copy">
+          <div class="eyebrow">${esc(data.theme?.drop || 'Drop 01')} · Theme master</div>
+          <h1>${esc(data.theme?.display_name || '작은 바닷속')}</h1>
+          <p>${esc(data.theme?.concept || '')}</p>
+          <div class="theme-principles">
+            ${(data.theme?.production_direction || []).map(x => `<span class="pill">${esc(x)}</span>`).join('')}
+          </div>
+        </div>
+        <div class="theme-board">
+          <h3>2D Soft Palette</h3>
+          <div class="palette-strip">
+            ${(data.theme?.palette?.colors || []).map(x => `
+              <div class="palette-swatch" style="background:${esc(x.hex)}">
+                <span>${esc(x.ko)}</span>
+              </div>`).join('')}
+          </div>
+          ${data.theme?.palette?.signature ? `
+            <div class="signature-swatch" style="background:linear-gradient(90deg,${data.theme.palette.signature.gradient.map(esc).join(',')})">
+              ${esc(data.theme.palette.signature.ko)} · Signature
+            </div>` : ''}
+          <div class="mini"><b>${esc(data.theme?.palette?.status || '')}</b><span>Theme-level palette direction</span></div>
+        </div>
+      </section>
+
+      <section class="section" id="collection">
+        <div class="section-head">
+          <div>
+            <div class="kicker">01 · Theme plan</div>
+            <h2>Shape Pack · first plan</h2>
+          </div>
+          <div class="section-note">초기 6종 Theme Pack 기획은 보존하고, 현재 실제 Production 진행상황은 별도 roster로 표시합니다.</div>
+        </div>
+        <div class="theme-grid">
+          ${(data.theme?.initial_shape_pack?.shapes || []).map((s,i) => `
+            <article class="theme-card">
+              <span class="tier">${esc(s.tier)}</span>
+              <div class="part-index" style="margin-top:18px">${String(i+1).padStart(2,'0')} · ${esc(s.en)}</div>
+              <h3>${esc(s.name)}</h3>
+              <p>${esc(s.role)}</p>
+              ${s.selection ? `<div class="part-version">${esc(s.selection)}</div>` : ''}
+            </article>`).join('')}
+        </div>
+      </section>
+
+      <section class="section" id="roster">
+        <div class="section-head">
+          <div>
+            <div class="kicker">02 · Production roster</div>
+            <h2>Plan and production</h2>
+          </div>
+          <div class="section-note">Theme Plan을 폐기하지 않고, 실제 제작이 어디까지 왔는지만 분리해 보여줍니다.</div>
+        </div>
+        <div class="roster">
+          ${(data.theme?.production_roster || []).map(r => `
+            <div class="roster-row">
+              <b>${esc(r.name)} <span>· ${esc(r.en)}</span></b>
+              <span>${esc(r.selection || '—')}</span>
+              <em>${esc(r.status)}</em>
+            </div>`).join('')}
+        </div>
+      </section>
+
+      <section class="section" id="backgrounds">
+        <div class="section-head">
+          <div>
+            <div class="kicker">03 · Background</div>
+            <h2>Three ocean scenes</h2>
+          </div>
+          <div class="section-note">단순 색상 변형이 아니라 서로 다른 공간 경험으로 확정된 3종 Background 기획입니다.</div>
+        </div>
+        <div class="scene-grid">
+          ${(data.theme?.backgrounds || []).map(bg => `
+            <article class="scene-card">
+              <small>0${esc(bg.order)} · ${esc(bg.en)}</small>
+              <h3>${esc(bg.name)}</h3>
+              <p>${esc(bg.concept)}</p>
+              <div class="signature-moment"><b>Signature Moment</b><br>${esc(bg.signature_moment)}</div>
+            </article>`).join('')}
+        </div>
+      </section>
+
+      <section class="section" id="theme-system">
+        <div class="feature-pair">
+          <article class="feature-card">
+            <div class="kicker">04 · Motion</div>
+            <h3>${esc(data.theme?.motion?.name || '유영')}</h3>
+            <p>${esc(data.theme?.motion?.signature_moment || '')}</p>
+            <div class="feature-list">
+              ${(data.theme?.motion?.rules || []).map(x => `<div>${esc(x)}</div>`).join('')}
+            </div>
+          </article>
+          <article class="feature-card">
+            <div class="kicker">05 · Collection complete</div>
+            <h3>Theme Reward</h3>
+            <p>${esc(data.theme?.collection_reward?.unlock || '')} · ${esc(data.theme?.collection_reward?.sale || '')}</p>
+            <div class="feature-list">
+              ${(data.theme?.collection_reward?.items || []).map(x => `<div><b>${esc(x.name)}</b> · ${esc(x.type)}<br><span style="color:var(--muted)">${esc(x.rule)}</span></div>`).join('')}
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <div class="shape-divider">
+        <div class="kicker">06 · Active Production Shape</div>
+      </div>
+
+      <section class="hero" id="shape-overview">
         <div class="hero-copy">
-          <div class="eyebrow">${esc(data.shape.drop)} · Production archive</div>
+          <div class="eyebrow">Sea Turtle v3 · Production archive</div>
           <h1>SEA<br>TURTLE <span style="color:var(--mint)">v3</span></h1>
           <div class="hero-sub">
             <span class="pill"><i class="dot"></i>${esc(data.shape.selection)}</span>
@@ -363,7 +565,7 @@
       <section class="section" id="parts">
         <div class="section-head">
           <div>
-            <div class="kicker">01 · Parts</div>
+            <div class="kicker">07 · Parts</div>
             <h2>Production parts</h2>
           </div>
           <div class="section-note">현재 Final / Locked 계보만 카드에 승격됩니다. Candidate·Superseded·Legacy는 자동 제외됩니다.</div>
@@ -396,7 +598,7 @@
       <section class="section" id="production">
         <div class="section-head">
           <div>
-            <div class="kicker">02 · Production system</div>
+            <div class="kicker">08 · Production system</div>
             <h2>How it is built</h2>
           </div>
           <div class="section-note">MY LOCK의 Canonical Production Asset Rule을 그대로 시각화합니다. Viewer가 Gate를 새로 만들거나 건너뛰지 않습니다.</div>
@@ -422,7 +624,7 @@
       <section class="section" id="manifests">
         <div class="section-head">
           <div>
-            <div class="kicker">03 · Active manifests</div>
+            <div class="kicker">09 · Active manifests</div>
             <h2>Current build state</h2>
           </div>
           <div class="section-note">${data.stats.active_manifest_count}개의 Final / Locked manifest를 현재 빌드에서 감지했습니다. QA 값은 manifest에 존재하는 항목만 표시합니다.</div>
@@ -444,7 +646,7 @@
       <section class="section" id="sync">
         <div class="sync-card">
           <div class="sync-copy">
-            <div class="kicker">04 · Auto sync</div>
+            <div class="kicker">10 · Auto sync</div>
             <h3>Final이 바뀌면, 다음 빌드가 따라갑니다.</h3>
             <p>Asset Book은 별도의 원본 DB가 아닙니다. GitHub Production manifest를 빌드 시 다시 스캔하고 Final / Locked 상태만 Registry로 생성합니다. Candidate가 생겨도 화면은 바뀌지 않습니다. Final 버전이 바뀌면 상태·버전·QA는 다음 빌드에서 자동 갱신되고, 기존 Preview는 버전 가드가 불일치하는 즉시 숨겨져 오래된 픽셀이 현재본처럼 보이지 않습니다.</p>
           </div>
@@ -458,7 +660,7 @@
       </section>
 
       <footer class="footer">
-        <span>MY LOCK · Asset Book / Sea Turtle v3</span>
+        <span>MY LOCK · Asset Book / Drop 01 · 작은 바닷속</span>
         <span>Viewer only · Source of Truth: Production Master + Manifest · Private Drive identifiers are not published</span>
       </footer>
     `;
