@@ -2,7 +2,7 @@
   "shape_id": "sea_turtle_v3",
   "part_id": "body_with_rear",
   "candidate": "FULL_REMAP_v2",
-  "status": "Runtime QA Candidate / not Production locked",
+  "status": "Runtime QA v2 Visual Approved / Whole-turtle QA Pending",
   "geometry_source": "body_with_rear Geometry FINAL_v2",
   "outline_source": "Outline FINAL_v3",
   "imagegen_used": false,
@@ -57,9 +57,12 @@
     "workflow_run_id": 36868740853,
     "workflow_conclusion": "success",
     "deploy_step": "success",
-    "public_qa_url": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=sea-turtle-body-with-rear"
+    "public_qa_url": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=sea-turtle-body-with-rear",
+    "visual_qa": "PASS_USER_APPROVED"
   },
   "whole_turtle_compatibility": "PENDING_UNTIL_ALL_PARTS_READY",
-  "user_visual_approval": false,
-  "drive_package_url": "https://drive.google.com/file/d/173fvc7ad42YK46O6vWO7x_GWR1-tttNk/view?usp=drivesdk"
+  "user_visual_approval": true,
+  "drive_package_url": "https://drive.google.com/file/d/173fvc7ad42YK46O6vWO7x_GWR1-tttNk/view?usp=drivesdk",
+  "user_visual_approval_date": "2026-10-01",
+  "next_gate": "Whole-turtle seam/material compatibility QA after all parts are materially ready"
 }
