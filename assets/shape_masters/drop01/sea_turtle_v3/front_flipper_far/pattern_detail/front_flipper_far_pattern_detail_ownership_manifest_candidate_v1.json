@@ -1,0 +1,56 @@
+{
+  "part": "front_flipper_far",
+  "variant": "F0",
+  "layer": "pattern_detail_ownership_overlay",
+  "version": "candidate_v1",
+  "status": "qa_candidate_user_approval_pending",
+  "source_geometry": "front_flipper_far FINAL_v4",
+  "locked_outline": "Outline Final v1",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "imagegen_used": false,
+  "method": "Interrupted Candidate v1 support recovered and rebuilt on canonical FINAL_v4 source; review crop used only to recover semantic support, not production RGBA pixels.",
+  "qa": {
+    "selected_support_pixels": 22765,
+    "bbox_xyxy_inclusive": [
+      480,
+      953,
+      705,
+      1346
+    ],
+    "connected_components_8_neighbor": 17,
+    "component_areas_8_neighbor": [
+      11368,
+      2871,
+      2065,
+      958,
+      889,
+      728,
+      705,
+      618,
+      493,
+      412,
+      381,
+      323,
+      264,
+      220,
+      173,
+      156,
+      141
+    ],
+    "locked_outline_overlap_pixels": 0,
+    "source_alpha_outside_pixels": 0,
+    "overlay_alpha_changed_pixels": 0,
+    "rgba_changed_outside_support_pixels": 0,
+    "lock_enforcement_removed_pixels": 0
+  },
+  "drive": {
+    "overlay": "https://drive.google.com/file/d/1EGQ5syu8XDJF355UPksTvPbvqRYYfA2j/view?usp=drivesdk",
+    "review_crop": "https://drive.google.com/file/d/1f9aKj1juNmDVMEwMYlDXz6QEiRtvHYjK/view?usp=drivesdk",
+    "manifest": "https://drive.google.com/file/d/1lGUKc_mm81zDXOzdX91EFvH8aBETG6JI/view?usp=drivesdk"
+  },
+  "next_gate": "User approval -> Exact Pattern / Detail Mask v1"
+}
