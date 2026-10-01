@@ -43,7 +43,7 @@
 - Android CI run: `36934333437` — **PASS**
 
 ## Drive
-- Final Candidate Package: https://drive.google.com/file/d/18O4C5XosCxd9RiwjfHhhe0rsMSM7_gmH/view?usp=drivesdk
+- Final Package: https://drive.google.com/file/d/1l3WBB3_L1jVG3eVaB8xsnl3q79BvJI3A/view?usp=drivesdk
 - Package SHA256: `dfeb838f9d1af90c027ff1395068f9b86cb7357d5b29136ca4127a1265ddb363`
 
 ## Next gate
