@@ -114,7 +114,7 @@
     "image_generation_used": false,
     "geometry_changed": false,
     "source_of_truth": "front_flipper_outer_asset_v3_2048.png",
-    "next_stage": "Runtime QA v2 current-build verification and user visual approval"
+    "next_stage": "User visual approval of Runtime QA v2 -> Final Closeout"
   },
   "highlight_gate": {
     "status": "locked",
@@ -358,7 +358,7 @@
     "drive_url": "https://drive.google.com/file/d/15OuHEujhlw3ngpuclfOgz0cEjmmhrlbM/view?usp=drivesdk"
   },
   "runtime_revalidation_v2": {
-    "status": "candidate_ci_deploy_pending",
+    "status": "candidate_user_visual_approval_pending",
     "source_geometry": "front_flipper_outer_asset_v3_2048.png",
     "source_material": "material_revalidation_v2 locked",
     "source_palette": "palette_revalidation_v2 locked",
@@ -370,12 +370,15 @@
       "58px_dark",
       "96px_runtime_bitmap_inspection"
     ],
-    "web_build": "pending",
-    "android_ci": "pending",
-    "deploy": "pending",
+    "web_build": "pass",
+    "android_ci": "pass",
+    "deploy": "pass",
     "user_visual_approval": false,
     "image_generation_used": false,
     "note": "Legacy embedded pre-cleanup WebP assets were replaced with Palette QA v2 runtime58 PNG assets from Geometry v3 lineage. Do not Final Closeout until current commit build/deploy and user visual approval pass.",
-    "next_gate": "Build/Deploy PASS -> user visual approval -> Final Closeout"
+    "next_gate": "User visual approval -> Final Closeout",
+    "web_run_id": 36928881951,
+    "android_run_id": 36928881871,
+    "drive_folder": "https://drive.google.com/drive/folders/1Ov9XobDf3WTtCIkee0mXIQYlWZNwaJV9"
   }
 }
