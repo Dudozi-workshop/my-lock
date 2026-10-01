@@ -1,6 +1,6 @@
 {
   "asset": "Sea Turtle v3 Front Flipper Outer",
-  "status": "geometry_v3_locked_material_v2_locked_palette_v2_locked_runtime_v2_candidate",
+  "status": "final_v2_locked_active",
   "canonical_canvas": {
     "width": 2048,
     "height": 2048,
@@ -114,7 +114,7 @@
     "image_generation_used": false,
     "geometry_changed": false,
     "source_of_truth": "front_flipper_outer_asset_v3_2048.png",
-    "next_stage": "User visual approval of Runtime QA v2 -> Final Closeout"
+    "next_stage": "Whole-turtle seam/material compatibility QA when all parts are ready"
   },
   "highlight_gate": {
     "status": "locked",
@@ -279,7 +279,7 @@
     "active_final_count_allowed": 1,
     "candidate_pattern": "candidate_v#",
     "withdrawn_final_pattern": "legacy_final_v#_<reason>_<date>",
-    "current_final": null,
+    "current_final": "final_v2",
     "legacy_final": "legacy_final_v1_outline_residual_20260929",
     "current_candidate": null
   },
@@ -358,7 +358,7 @@
     "drive_url": "https://drive.google.com/file/d/15OuHEujhlw3ngpuclfOgz0cEjmmhrlbM/view?usp=drivesdk"
   },
   "runtime_revalidation_v2": {
-    "status": "candidate_user_visual_approval_pending",
+    "status": "locked",
     "source_geometry": "front_flipper_outer_asset_v3_2048.png",
     "source_material": "material_revalidation_v2 locked",
     "source_palette": "palette_revalidation_v2 locked",
@@ -373,12 +373,36 @@
     "web_build": "pass",
     "android_ci": "pass",
     "deploy": "pass",
-    "user_visual_approval": false,
+    "user_visual_approval": true,
     "image_generation_used": false,
     "note": "Legacy embedded pre-cleanup WebP assets were replaced with Palette QA v2 runtime58 PNG assets from Geometry v3 lineage. Do not Final Closeout until current commit build/deploy and user visual approval pass.",
-    "next_gate": "User visual approval -> Final Closeout",
+    "next_gate": "completed",
     "web_run_id": 36928881951,
     "android_run_id": 36928881871,
-    "drive_folder": "https://drive.google.com/drive/folders/1Ov9XobDf3WTtCIkee0mXIQYlWZNwaJV9"
+    "drive_folder": "https://drive.google.com/drive/folders/1Ov9XobDf3WTtCIkee0mXIQYlWZNwaJV9",
+    "approved_date": "2026-10-02"
+  },
+  "final_closeout_v2": {
+    "status": "Final / Locked / Active",
+    "approved_date": "2026-10-02",
+    "canonical_asset": "front_flipper_outer_asset_v3_2048.png",
+    "geometry_visible_pixels": 114017,
+    "material_gap_pixels": 0,
+    "material_overlap_pixels": 0,
+    "material_outside_source_pixels": 0,
+    "material_recompose_changed_pixels": 0,
+    "material_recompose_max_channel_diff": 0,
+    "palette_status": "locked",
+    "runtime_qa_status": "locked",
+    "web_build": "pass",
+    "cloudflare_deploy": "pass",
+    "android_ci": "pass",
+    "user_visual_approval": true,
+    "final_package_sha256": "2510f6a3e41effe71f179064ab828d0818210e93920e9b9546167fbc23edc7dc",
+    "final_drive_folder": "https://drive.google.com/drive/folders/1ZlflomqhJu85MuQtuNS9inpuUkP0uhco",
+    "final_package_url": "https://drive.google.com/file/d/1-GW8l255X8LQfMfbClY8lc4Hse6J_ahA/view?usp=drivesdk",
+    "manifest_url": "https://drive.google.com/file/d/1VV2pL95DRWOEfEEBKDa2394pdFz59e5r/view?usp=drivesdk",
+    "runtime_manifest_url": "https://drive.google.com/file/d/1-3SopjbLr0Q2_17RkiWCZG2jxL_rNGZ2/view?usp=drivesdk",
+    "previous_final": "legacy_final_v1_outline_residual_20260929"
   }
 }
