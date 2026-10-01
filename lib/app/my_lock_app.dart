@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../features/qa/sea_turtle_body_with_rear_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_front_flipper_runtime_qa_screen.dart';
+import '../features/qa/sea_turtle_front_flipper_far_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_shell_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_underbelly_runtime_qa_screen.dart';
 import '../features/shell/root_shell.dart';
@@ -17,6 +18,7 @@ class MyLockApp extends StatelessWidget {
     final qa = Uri.base.queryParameters['qa'];
     final showShellRuntimeQa = kIsWeb && qa == 'sea-turtle-shell-runtime';
     final showFrontFlipperQa = kIsWeb && qa == 'front-flipper-outer';
+    final showFrontFlipperFarQa = kIsWeb && qa == 'front-flipper-far';
     final showBodyWithRearQa = kIsWeb && qa == 'sea-turtle-body-with-rear';
     final showUnderbellyQa = kIsWeb && qa == 'sea-turtle-underbelly';
 
@@ -34,7 +36,9 @@ class MyLockApp extends StatelessWidget {
           ? const SeaTurtleShellRuntimeQaScreen()
           : showFrontFlipperQa
               ? const SeaTurtleFrontFlipperRuntimeQaScreen()
-              : showBodyWithRearQa
+              : showFrontFlipperFarQa
+                  ? const SeaTurtleFrontFlipperFarRuntimeQaScreen()
+                  : showBodyWithRearQa
                   ? const SeaTurtleBodyWithRearRuntimeQaScreen()
                   : showUnderbellyQa
                       ? const SeaTurtleUnderbellyRuntimeQaScreen()
