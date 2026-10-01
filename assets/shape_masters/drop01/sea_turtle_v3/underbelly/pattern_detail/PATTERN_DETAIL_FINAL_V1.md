@@ -1,6 +1,6 @@
 # Sea Turtle v3 · Underbelly Pattern / Detail Final v1
 
-- Status: **Final / Locked / Active**
+- Status: **Superseded / Inactive material lineage**
 - Approval date: **2026-10-01**
 - Source Geometry: **Underbelly FINAL_v4_cleanup**
 - Source Ownership: **Pattern / Detail Ownership v1 / Locked**
@@ -34,5 +34,10 @@
 ## Scope lock
 `body_with_rear`, `shell_main`, `front_flipper_near`, `front_flipper_far`, Underbelly Geometry, and Underbelly Outline v1 remain unchanged.
 
-## Next gate
-**Shadow Ownership Overlay**. No Shadow Mask/Asset may be created before explicit Overlay approval.
+## Simplification decision — 2026-10-01
+User approved the same simplified material profile used by body_with_rear.
+Pattern / Detail v1 remains preserved as historical extraction lineage but is no longer an Active Production layer.
+Its source pixels return to Base / Albedo unless intentionally owned by an approved Shadow or Highlight region.
+
+## Active material sequence
+**Outline → Shadow → Highlight → Base / Albedo → Material Recomposition QA → Palette QA → Surface / Material Compatibility QA → Runtime QA**.
