@@ -1,0 +1,46 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "part_id": "front_flipper_far",
+  "variant": "F0",
+  "version": "FINAL_v1",
+  "status": "Final / Locked / Active",
+  "approved_date": "2026-10-02",
+  "geometry_source": "front_flipper_far FINAL_v4",
+  "outline_source": "Outline Final v1",
+  "imagegen_used": false,
+  "material": {
+    "source_visible_pixels": 63029,
+    "outline_pixels": 8838,
+    "pattern_detail_pixels": 22765,
+    "shadow_pixels": 6286,
+    "highlight_pixels": 2519,
+    "albedo_pixels": 22621,
+    "gap_pixels": 0,
+    "overlap_pixels": 0,
+    "outside_source_pixels": 0,
+    "recomposite_changed_pixels": 0,
+    "recomposite_max_channel_diff": 0
+  },
+  "palette": {
+    "pink": "#FF8FD1",
+    "blue": "#79BFFF",
+    "yellow": "#FFDA72"
+  },
+  "runtime": {
+    "route": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=front-flipper-far",
+    "strategy": "single neutral 512 lossless WebP + app ShapeTone dynamic recolor",
+    "review_sizes_px": [58, 96, 160],
+    "screen_commit": "f0434675aa326e39bb75ef1ae93991243ea646b9",
+    "route_commit": "461facdc7802f52fe25b547ba4d239b64ad25b96",
+    "web_run_id": 36934333447,
+    "web_build": "pass",
+    "cloudflare_deploy": "pass",
+    "android_run_id": 36934333437,
+    "android_ci": "pass"
+  },
+  "drive": {
+    "final_candidate_package_url": "https://drive.google.com/file/d/18O4C5XosCxd9RiwjfHhhe0rsMSM7_gmH/view?usp=drivesdk",
+    "package_sha256": "dfeb838f9d1af90c027ff1395068f9b86cb7357d5b29136ca4127a1265ddb363"
+  },
+  "next_gate": "Whole-turtle seam/material compatibility QA"
+}
