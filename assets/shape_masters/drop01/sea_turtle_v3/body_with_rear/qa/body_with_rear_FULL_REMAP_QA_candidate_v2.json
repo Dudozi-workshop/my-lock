@@ -13,7 +13,10 @@
     "yellow": "#FFDA72"
   },
   "qc": {
-    "canvas": [2048, 2048],
+    "canvas": [
+      2048,
+      2048
+    ],
     "mode": "RGBA",
     "source_visible_pixels": 91756,
     "outline_mask_pixels": 13492,
@@ -23,8 +26,16 @@
     "pairwise_palette_alpha_mismatch_pixels": 0
   },
   "palette_qa": {
-    "green_residual_pixels": {"pink": 0, "blue": 0, "yellow": 0},
-    "target_hue_within_10deg_pct": {"pink": 100.0, "blue": 100.0, "yellow": 100.0},
+    "green_residual_pixels": {
+      "pink": 0,
+      "blue": 0,
+      "yellow": 0
+    },
+    "target_hue_within_10deg_pct": {
+      "pink": 100,
+      "blue": 100,
+      "yellow": 100
+    },
     "source_output_luminance_correlation": {
       "pink": 0.968521,
       "blue": 0.967151,
@@ -42,7 +53,11 @@
     "qa_route": "?qa=sea-turtle-body-with-rear",
     "screen_commit": "eff95a44f64e497e297f066dd4fbf546805677a0",
     "route_commit": "2b5a219aad0970f7472fd1084ae935b48c974176",
-    "build_status": "PENDING_NO_STATUS_SURFACED"
+    "build_status": "PASS",
+    "workflow_run_id": 36868740853,
+    "workflow_conclusion": "success",
+    "deploy_step": "success",
+    "public_qa_url": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=sea-turtle-body-with-rear"
   },
   "whole_turtle_compatibility": "PENDING_UNTIL_ALL_PARTS_READY",
   "user_visual_approval": false,
