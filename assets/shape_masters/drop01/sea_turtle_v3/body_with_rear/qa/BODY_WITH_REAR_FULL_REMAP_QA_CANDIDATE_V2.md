@@ -1,6 +1,6 @@
 # Sea Turtle v3 · body_with_rear FULL REMAP QA Candidate v2
 
-- Status: **Runtime QA Candidate / not Production locked**
+- Status: **Runtime QA v2 Visual Approved / Whole-turtle QA Pending**
 - Geometry Source: **body_with_rear Geometry FINAL_v2**
 - Outline Ownership: **Outline FINAL_v3**
 - ImageGen: **not used**
@@ -43,9 +43,9 @@
 
 ## Remaining gates
 - Actual Flutter build/deployment verification: **PASS**
-- Runtime visual approval using the deployed QA route: **PENDING USER REVIEW**
+- Runtime visual approval using the deployed QA route: **PASS / user approved 2026-10-01**
 - Whole-turtle seam/material compatibility: **PENDING until all Parts are materially ready**
-- User visual approval: **REQUIRED** before promotion.
+- User visual approval: **PASS / 2026-10-01**.
 
 ## Promotion rule
-Do not promote this draft to Final/Locked until runtime build/deploy verification, user visual approval, and whole-turtle compatibility pass.
+Runtime build/deploy and part-level visual approval are complete. Do not promote to final whole-shape closeout until whole-turtle compatibility passes after all Parts are materially ready.
