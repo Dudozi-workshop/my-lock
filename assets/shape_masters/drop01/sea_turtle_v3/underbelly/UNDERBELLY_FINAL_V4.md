@@ -38,3 +38,22 @@ Use this locked Underbelly source for Material Decomposition:
 `Outline → Pattern / Detail → Shadow → Highlight → Base / Albedo → Material Recomposition QA → Palette QA → Surface/Material Compatibility QA`.
 
 During Underbelly material work, `body_with_rear`, `shell_main`, `front_flipper_near`, and `front_flipper_far` remain locked.
+
+
+## Material decomposition progress — 2026-10-01
+- **Outline v1: Locked**
+- Approved lineage: raw edge overlay v1 → clean-contour overlay v2 → deterministic mask/asset/remainder/recomposite.
+- Outline ownership pixels: **17,245**
+- Outside Underbelly: **0 px**
+- Asset↔Mask mismatch: **0 px**
+- Asset↔Remainder overlap: **0 px**
+- Source gap: **0 px**
+- Transparent RGB residue: **0 px**
+- Recomposite changed pixels: **0**
+- Max channel diff: **0**
+- ImageGen: **not used**
+- Runtime seam policy: Source Material Outline is locked, but attachment/internal-seam visibility remains pending whole-shape seam QA under the shared Outline Attachment / Runtime Seam Rule.
+- Drive package: https://drive.google.com/file/d/1_3pHbLU5oBp_-2tBfaw6nP5xRdxo8ECZ/view?usp=drivesdk
+- Outline spec: `UNDERBELLY_OUTLINE_V1.md`
+- Outline manifest: `underbelly_outline_manifest_v1.json`
+- **Next gate:** Underbelly Pattern / Detail Ownership Overlay.
