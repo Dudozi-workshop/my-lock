@@ -1,0 +1,48 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "part_id": "underbelly",
+  "layer": "outline",
+  "version": "v1",
+  "status": "LOCKED_SOURCE_PIXEL_OWNERSHIP_RUNTIME_SEAM_ROLE_PENDING",
+  "approval_date": "2026-10-01",
+  "authoritative_master": "Q3 Canonical Master",
+  "source_geometry": "Underbelly FINAL_v4",
+  "canonical_canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "image_generation_used": false,
+  "ownership_pixels": 17245,
+  "outside_underbelly_pixels": 0,
+  "asset_mask_mismatch_pixels": 0,
+  "asset_remainder_overlap_pixels": 0,
+  "source_gap_pixels": 0,
+  "transparent_rgb_residue_pixels": 0,
+  "recomposite_changed_pixels": 0,
+  "recomposite_max_channel_diff": 0,
+  "outline_role_policy": {
+    "source_material_outline": "locked",
+    "runtime_outline_visibility": "pending whole-shape seam QA",
+    "exterior_outline": "may remain visible",
+    "attachment_internal_seam": "must not become double outline; use single-owner boundary or suppressed/soft seam",
+    "rule": "Source Material Outline is not automatically the Runtime Visible Outline. Neighbor connections are resolved at whole-shape compositor QA without changing locked geometry."
+  },
+  "locked_parts_during_work": [
+    "body_with_rear",
+    "shell_main",
+    "front_flipper_near",
+    "front_flipper_far"
+  ],
+  "next_gate": "Underbelly Pattern/Detail Ownership Overlay",
+  "drive": {
+    "folder": "https://drive.google.com/drive/folders/1x7CKdzsM-aktmPwVul0iz9LHZYhENfqc",
+    "package": "https://drive.google.com/file/d/1_3pHbLU5oBp_-2tBfaw6nP5xRdxo8ECZ/view?usp=drivesdk",
+    "overlay": "https://drive.google.com/file/d/1NUxDzwH_ULA6sZdZshcj6MW8lvbr6Izr/view?usp=drivesdk",
+    "asset": "https://drive.google.com/file/d/1e_TjjKEdjbPzecUUFLqTlHlxgzHbXIFV/view?usp=drivesdk",
+    "mask": "https://drive.google.com/file/d/1CB1B1DbAqIleTGupZlABD0Cq_c2ZJ0hG/view?usp=drivesdk",
+    "removed_remainder": "https://drive.google.com/file/d/1MPbUl9W2nzXQF2-qxS2XOFDLnNHSitVv/view?usp=drivesdk",
+    "recomposite": "https://drive.google.com/file/d/1tQ7J7OwR9RBPvOccCjYsOthdesWn8Ilr/view?usp=drivesdk",
+    "diff": "https://drive.google.com/file/d/1i3Ot9bi79ABthCJpIBcE9N5APirS-5el/view?usp=drivesdk"
+  }
+}
