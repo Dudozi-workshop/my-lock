@@ -1,0 +1,27 @@
+{
+  "source_of_truth": false,
+  "purpose": "Public-safe viewer previews only. Production originals remain authoritative.",
+  "master": {
+    "public_path": "./previews/master.webp",
+    "expected_master": "Q3 Canonical Master"
+  },
+  "parts": {
+    "shell_main": {
+      "public_path": "./previews/shell_main.webp",
+      "expected_version": "v1"
+    },
+    "body_with_rear": {
+      "public_path": "./previews/body_with_rear.webp",
+      "expected_version": "FINAL_v2"
+    },
+    "underbelly": {
+      "public_path": "./previews/underbelly.webp",
+      "expected_version": "FINAL_v4_cleanup"
+    },
+    "front_flipper_far": {
+      "public_path": "./previews/front_flipper_far.webp",
+      "expected_version": "FINAL_v4"
+    }
+  },
+  "stale_policy": "If the active Production version no longer matches expected_version, the viewer must hide that preview instead of showing stale pixels."
+}
