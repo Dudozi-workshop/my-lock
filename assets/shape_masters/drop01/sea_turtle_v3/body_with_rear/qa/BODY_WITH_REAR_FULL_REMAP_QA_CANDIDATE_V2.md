@@ -1,6 +1,6 @@
 # Sea Turtle v3 · body_with_rear FULL REMAP QA Candidate v2
 
-- Status: **QA Candidate / not Production locked**
+- Status: **Runtime QA Candidate / not Production locked**
 - Geometry Source: **body_with_rear Geometry FINAL_v2**
 - Outline Ownership: **Outline FINAL_v3**
 - ImageGen: **not used**
@@ -31,10 +31,21 @@
 - 96 px inspection: PASS for form readability and retained tonal detail.
 - QA artifact: `body_with_rear_runtime_QA_candidate_v2.png`
 
+## Flutter Runtime QA Candidate
+- Runtime source: **single neutral 512×512 lossless WebP**
+- Runtime color source: **ShapeTone/baseColorForTone**
+- Runtime recolor: `ColorFilter.mode(selectedTone, BlendMode.color)`
+- Purpose: one Shape runtime source + selected app color; do not ship separate Pink/Blue/Yellow body assets.
+- QA route: `?qa=sea-turtle-body-with-rear`
+- Screen commit: `eff95a44f64e497e297f066dd4fbf546805677a0`
+- Route commit: `2b5a219aad0970f7472fd1084ae935b48c974176`
+- CI status for route commit: **no check/status surfaced yet**. Do not record build PASS until a real build/deploy check succeeds.
+
 ## Remaining gates
-- Whole-turtle seam/material compatibility: **PENDING**. Underbelly runtime seam role is explicitly pending whole-shape QA and other Parts are being developed in parallel.
-- Actual Flutter runtime integration/build/deployment: **PENDING**. Current renderer has ShapeTone base colors and generic layered-mask support, but no active `sea_turtle_v3 body_with_rear` raster-remap runtime registration was found.
+- Actual Flutter build/deployment verification: **PENDING**
+- Runtime visual approval using the deployed QA route: **PENDING**
+- Whole-turtle seam/material compatibility: **PENDING until all Parts are materially ready**
 - User visual approval: **REQUIRED** before promotion.
 
 ## Promotion rule
-Do not promote this draft to Final/Locked until whole-turtle compatibility, actual runtime implementation/build verification, and user visual approval pass.
+Do not promote this draft to Final/Locked until runtime build/deploy verification, user visual approval, and whole-turtle compatibility pass.
