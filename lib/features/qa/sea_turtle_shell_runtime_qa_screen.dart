@@ -4,6 +4,19 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+Uint8List seaTurtleShellRuntimeBytes(String tone) {
+  switch (tone) {
+    case 'pink':
+      return base64Decode(_pinkWebp);
+    case 'blue':
+      return base64Decode(_blueWebp);
+    case 'yellow':
+      return base64Decode(_yellowWebp);
+    default:
+      throw ArgumentError.value(tone, 'tone', 'Unsupported Sea Turtle shell tone');
+  }
+}
+
 class SeaTurtleShellRuntimeQaScreen extends StatelessWidget {
   const SeaTurtleShellRuntimeQaScreen({super.key});
 
