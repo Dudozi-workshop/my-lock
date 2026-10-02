@@ -24,7 +24,7 @@ import json, os
 from pathlib import Path
 Path('build/shape_lab/version.json').write_text(json.dumps({
     'commit': os.environ.get('GITHUB_SHA', 'local'),
-    'lab_version': 'LAB036',
+    'lab_version': 'LAB037',
 }))
 Path('build/shape_lab/_headers').write_text('/*\n  Cache-Control: no-store, max-age=0\n')
 PYCODE

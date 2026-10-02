@@ -160,33 +160,20 @@ class _LabsPageState extends State<LabsPage> {
                         child: Row(
                           children: [
                             _TabChip(label: '작업 목록', selected: tab == LabTab.home, onTap: () => _setTab(LabTab.home)),
-                            _TabChip(
-                              label: 'Shape Lab',
-                              selected: tab == LabTab.shape,
-                              onTap: () => _setTab(LabTab.shape),
-                            ),
-                            _TabChip(
-                              label: 'Style Lab',
-                              selected: tab == LabTab.style,
-                              onTap: () => _setTab(LabTab.style),
-                            ),
-                            _TabChip(
-                              label: 'Palette Lab',
-                              selected: tab == LabTab.palette,
-                              onTap: () => _setTab(LabTab.palette),
-                            ),
-                            _TabChip(
-                              label: 'Effect Lab',
-                              selected: tab == LabTab.effect,
-                              onTap: () => _setTab(LabTab.effect),
-                            ),
-                            _TabChip(label: '공통 검수',
-                              selected: tab == LabTab.review,
+                            _TabChip(label: '공통 검수', selected: tab == LabTab.review,
                               onTap: () => _setTab(LabTab.review)),
-                            _TabChip(
-                              label: 'Runtime QA',
-                              selected: tab == LabTab.qa,
-                              onTap: () => _setTab(LabTab.qa),
+                            PopupMenuButton<LabTab>(
+                              tooltip: '기존 제작 도구',
+                              onSelected: _setTab,
+                              itemBuilder: (_) => const [
+                                PopupMenuItem(value: LabTab.shape, child: Text('Shape Lab')),
+                                PopupMenuItem(value: LabTab.style, child: Text('Style Lab')),
+                                PopupMenuItem(value: LabTab.palette, child: Text('Palette Lab')),
+                                PopupMenuItem(value: LabTab.effect, child: Text('Effect Lab')),
+                                PopupMenuItem(value: LabTab.qa, child: Text('Runtime QA')),
+                              ],
+                              child: Padding(padding: const EdgeInsets.all(12),
+                                child: Text('기존 제작 도구 ▾', style: TextStyle(color: fg))),
                             ),
                           ],
                         ),
