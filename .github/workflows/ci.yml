@@ -115,7 +115,7 @@ jobs:
         run: python3 tool/validate_shape_masks.py
 
       - name: Validate MY LOCK asset lifecycle
-        run: python3 tool/mylock_asset_system.py validate assets/shape_masters/drop01/sea_turtle_v3
+        run: python3 tool/mylock_asset_system.py validate-all assets/shape_masters
 
       - name: Analyze
         run: flutter analyze
