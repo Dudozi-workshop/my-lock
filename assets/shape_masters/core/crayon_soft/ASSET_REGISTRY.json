@@ -1,8 +1,30 @@
 {
   "schema_version": "mylock_asset_registry_v1",
   "asset_id": "crayon_soft",
-  "lifecycle_vocabulary": ["archived", "candidate", "final_locked", "lock_candidate", "qa_candidate", "superseded", "withdrawn", "working"],
+  "lifecycle_vocabulary": [
+    "archived",
+    "candidate",
+    "final_locked",
+    "lock_candidate",
+    "qa_candidate",
+    "superseded",
+    "withdrawn",
+    "working"
+  ],
   "required_directories": [],
-  "lineages": [],
+  "lineages": [
+    {
+      "scope": "style",
+      "version": "v2",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true,
+      "artifact_path": "assets/shape_specs/crayon_soft/style.json",
+      "registered": true,
+      "completed": true,
+      "qa_evidence": "shape_spec_test and style_catalog_test",
+      "approval_evidence": "active production style on main"
+    }
+  ],
   "policy": {}
 }
