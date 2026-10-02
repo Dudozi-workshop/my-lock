@@ -14,6 +14,7 @@ import 'package:my_lock/lock_engine/shape_spec/shape_render_overrides.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec_renderer.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
+import 'package:my_lock/lock_engine/raster_shape_bootstrap.dart';
 
 import 'soft_basic_candidates.dart';
 import 'runtime_workbench.dart';
@@ -45,7 +46,7 @@ class MyLockLabsApp extends StatelessWidget {
       initialRoute: '${Uri.base.path}${Uri.base.hasQuery ? '?${Uri.base.query}' : ''}',
       onGenerateRoute: (settings) => MaterialPageRoute<void>(
         settings: settings,
-        builder: (_) => const LabsPage(),
+        builder: (_) => const RasterShapeBootstrap(child: LabsPage()),
       ),
       onGenerateInitialRoutes: (name) => [
         MaterialPageRoute<void>(

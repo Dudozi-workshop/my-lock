@@ -6,6 +6,40 @@
   },
   "experiments": [
     {
+      "id": "sea-turtle-swim-v1",
+      "title": "Sea Turtle v3 · Swim Motion Master v1",
+      "category": "shape",
+      "status": "Final / Locked",
+      "profile": "production",
+      "source_commit": "f60f9c516ae8bfbc80bcf6a120bdf8f3bb91c5a9",
+      "sizes": [
+        58,
+        72,
+        96,
+        160
+      ],
+      "object_counts": [
+        6,
+        9,
+        12
+      ],
+      "variants": [
+        {
+          "shape": "seaTurtle",
+          "tone": "pink"
+        },
+        {
+          "shape": "seaTurtle",
+          "tone": "blue"
+        },
+        {
+          "shape": "seaTurtle",
+          "tone": "auroraSea"
+        }
+      ],
+      "pending": "Web motion QA용. Android LockActivity 실기기 확인은 별도."
+    },
+    {
       "id": "candy-soft",
       "title": "Candy Soft · 기본 도형",
       "category": "shape",

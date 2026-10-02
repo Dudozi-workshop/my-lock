@@ -8,6 +8,11 @@ on:
     paths:
       - 'lib/lock_engine/shape_spec/**'
       - 'lib/lock_engine/shape_painter.dart'
+      - 'lib/lock_engine/models.dart'
+      - 'lib/lock_engine/floating_preview.dart'
+      - 'lib/lock_engine/raster_palette_clock.dart'
+      - 'lib/lock_engine/raster_shape_bootstrap.dart'
+      - 'lib/lock_engine/swim_pose_runtime.dart'
       - 'assets/shape_specs/**'
       - 'assets/lab/**'
       - 'assets/raster_shapes/**'
@@ -53,7 +58,7 @@ jobs:
         run: python3 tool/validate_shape_masks.py
 
       - name: Test ShapeSpec
-        run: flutter test --dart-define=CANDY_SOFT_CANDIDATE=true test/shape_spec_test.dart test/lab_workbench_test.dart
+        run: flutter test --dart-define=CANDY_SOFT_CANDIDATE=true test/shape_spec_test.dart test/lab_workbench_test.dart test/raster_runtime_v3_test.dart test/swim_pose_runtime_test.dart
 
       - name: Build Shape Lab
         run: bash tool/build_shape_lab.sh

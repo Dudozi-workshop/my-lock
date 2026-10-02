@@ -3,7 +3,8 @@ import 'dart:ui';
 enum ShapeKind {
   circle('원', false),
   triangle('세모', false),
-  square('네모', false);
+  square('네모', false),
+  seaTurtle('바다거북', true);
 
   const ShapeKind(this.label, this.premium);
 
@@ -20,7 +21,8 @@ enum ShapeKind {
 enum ShapeTone {
   pink('핑크', false),
   blue('블루', false),
-  yellow('옐로우', false);
+  yellow('옐로우', false),
+  auroraSea('오로라씨', true);
 
   const ShapeTone(this.label, this.premium);
 

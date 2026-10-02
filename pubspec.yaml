@@ -13,6 +13,7 @@ dependencies:
   flutter_secure_storage: ^11.2.0
   shared_preferences: ^2.5.5
   sensors_plus: ^6.1.2
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
@@ -24,6 +25,8 @@ flutter:
   assets:
     - assets/lab/
     - assets/raster_shapes/candy_soft/
+    - assets/raster_shapes/
+    - assets/raster_shapes/swim_v1/
     - assets/shape_specs/soft_basic/
     - assets/shape_specs/crayon_soft/
     - assets/shape_masters/core/basic_v1/

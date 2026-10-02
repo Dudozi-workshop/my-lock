@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../models.dart';
+import '../swim_pose_runtime.dart';
 import 'shape_render_overrides.dart';
 import 'shape_spec.dart';
 import 'candy_soft_candidate.dart';
@@ -22,13 +23,33 @@ class ShapeSpecRenderer {
     required ShapeStyle style,
     required double opacity,
     double objectRotation = 0,
+    double paletteTimeSeconds = 0,
+    String? swimKey,
+    String swimProfile = 'standard',
     CrayonTextureSpec? crayonOverride,
     ShapeRenderOverrides? overrides,
   }) {
     if (LabCandidateScope.enabled && CandySoftCandidate.instance.paint(canvas,
         center: center, radius: radius, token: token, style: style,
         opacity: opacity, rotation: objectRotation)) return;
-    final bundle = ShapeSpecRegistry.instance.resolve(style, token.shape);
+
+    final registry = ShapeSpecRegistry.instance;
+    if (registry.isRasterShape(token.shape)) {
+      _paintRasterToken(
+        canvas,
+        center: center,
+        radius: radius,
+        token: token,
+        opacity: opacity,
+        objectRotation: objectRotation,
+        paletteTimeSeconds: paletteTimeSeconds,
+        swimKey: swimKey,
+        swimProfile: swimProfile,
+      );
+      return;
+    }
+
+    final bundle = registry.resolve(style, token.shape);
     final canvasSize = bundle.style.canvasSize;
     final scale = radius * 2 / canvasSize;
 
@@ -199,6 +220,120 @@ class ShapeSpecRenderer {
     canvas.restore();
 
     canvas.restore();
+  }
+
+  static void _paintRasterToken(
+    Canvas canvas, {
+    required Offset center,
+    required double radius,
+    required LockToken token,
+    required double opacity,
+    required double objectRotation,
+    required double paletteTimeSeconds,
+    required String? swimKey,
+    required String swimProfile,
+  }) {
+    final spec = ShapeSpecRegistry.instance.resolveRasterSpec(token.shape);
+    final destination = spec.metadata.destination(center, radius);
+    final source = Offset.zero & spec.metadata.runtimeCanvas;
+    final sampling = Paint()..filterQuality = FilterQuality.high;
+    final pose = spec.metadata.swim.isEmpty || swimKey == null
+        ? 's0'
+        : SwimPoseRuntime.instance.poseFor(
+            key: swimKey,
+            timeSeconds: paletteTimeSeconds,
+            config: spec.metadata.swim,
+            profile: swimProfile,
+          );
+    final poseImages = spec.imagesForPose(pose);
+
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    canvas.rotate(objectRotation);
+    canvas.translate(-center.dx, -center.dy);
+    canvas.saveLayer(
+      destination,
+      Paint()..color = Colors.white.withValues(alpha: opacity),
+    );
+
+    canvas.drawImageRect(
+      poseImages.paletteBase,
+      source,
+      destination,
+      Paint()
+        ..filterQuality = FilterQuality.high
+        ..colorFilter = ColorFilter.mode(
+          baseColorForTone(token.tone),
+          BlendMode.srcIn,
+        ),
+    );
+
+    if (token.tone == ShapeTone.auroraSea) {
+      canvas.drawPaint(
+        Paint()
+          ..shader = auroraSeaGradient(
+            paletteTimeSeconds,
+            config: spec.metadata.aurora,
+          ).createShader(destination)
+          ..blendMode = BlendMode.srcIn,
+      );
+    }
+
+    canvas.drawImageRect(
+      poseImages.fixedFinish,
+      source,
+      destination,
+      sampling,
+    );
+
+    canvas.drawImageRect(
+      poseImages.master ?? poseImages.paletteBase,
+      source,
+      destination,
+      Paint()
+        ..filterQuality = FilterQuality.high
+        ..blendMode = BlendMode.dstIn,
+    );
+
+    canvas.restore();
+    canvas.restore();
+  }
+
+  static LinearGradient auroraSeaGradient(
+    double timeSeconds, {
+    required Map<String, dynamic> config,
+  }) {
+    final period = (config['period_seconds'] as num).toDouble();
+    final phase = (timeSeconds % period) / period * pi * 2;
+    final palette = (config['palette'] as List)
+        .map(
+          (hex) => Color(
+            0xFF000000 |
+                int.parse((hex as String).substring(1), radix: 16),
+          ),
+        )
+        .toList();
+    final colors = [...palette, palette.first].map((color) {
+      final hsl = HSLColor.fromColor(color);
+      return hsl
+          .withSaturation(
+            hsl.saturation *
+                (config['saturation_scale'] as num).toDouble(),
+          )
+          .withLightness(0.73)
+          .toColor();
+    }).toList();
+    return LinearGradient(
+      begin: Alignment(
+        -1.1 + sin(phase) * 0.8,
+        -0.8 + cos(phase) * 0.5,
+      ),
+      end: Alignment(
+        1.1 + sin(phase) * 0.8,
+        0.8 + cos(phase) * 0.5,
+      ),
+      colors: colors,
+    );
   }
 
   static void _paintCrayonToken(

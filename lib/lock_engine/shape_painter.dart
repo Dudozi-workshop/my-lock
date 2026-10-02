@@ -4,21 +4,23 @@ import 'package:flutter/material.dart';
 
 import 'effects.dart';
 import 'models.dart';
+import 'raster_palette_clock.dart';
 import 'shape_spec/shape_spec.dart';
 import 'shape_spec/shape_spec_renderer.dart';
 
 class LockTokenPainter extends CustomPainter {
-  const LockTokenPainter(
+  LockTokenPainter(
     this.token, {
     this.style = ShapeStyle.softBasic,
     this.crayonOverride,
-  });
+  }) : super(
+        repaint: token.shape == ShapeKind.seaTurtle
+            ? RasterPaletteClock.instance
+            : null,
+      );
 
   final LockToken token;
   final ShapeStyle style;
-
-  /// Shape Lab only: try alternate Crayon Soft parameters through the same
-  /// production renderer without changing the active app style spec.
   final CrayonTextureSpec? crayonOverride;
 
   @override
@@ -32,6 +34,8 @@ class LockTokenPainter extends CustomPainter {
       token: token,
       style: style,
       opacity: 1,
+      paletteTimeSeconds: RasterPaletteClock.instance.value,
+      swimKey: 'token:${token.id}',
       crayonOverride: crayonOverride,
     );
   }
@@ -48,11 +52,13 @@ class FloatingShapePainter extends CustomPainter {
     required this.objects,
     this.popStyle = PopStyle.basicPop,
     this.style = ShapeStyle.softBasic,
+    this.speed = FloatingSpeed.normal,
   });
 
   final List<FloatingObject> objects;
   final PopStyle popStyle;
   final ShapeStyle style;
+  final FloatingSpeed speed;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -67,8 +73,8 @@ class FloatingShapePainter extends CustomPainter {
 
       final scale = object.isPopping
           ? popStyle == PopStyle.bubble
-              ? 1 + progress * 0.16
-              : 1 + progress * 0.42
+                ? 1 + progress * 0.16
+                : 1 + progress * 0.42
           : 1.0;
       final opacity = object.isPopping
           ? (1 - progress).clamp(0.0, 1.0).toDouble()
@@ -94,6 +100,13 @@ class FloatingShapePainter extends CustomPainter {
       style: style,
       opacity: opacity,
       objectRotation: object.rotation,
+      paletteTimeSeconds: RasterPaletteClock.instance.value,
+      swimKey: 'floating:${object.id}',
+      swimProfile: switch (speed) {
+        FloatingSpeed.slow => 'calm',
+        FloatingSpeed.normal => 'standard',
+        FloatingSpeed.fast => 'lively',
+      },
     );
   }
 
@@ -143,8 +156,9 @@ class FloatingShapePainter extends CustomPainter {
 
     for (var i = 0; i < 2; i++) {
       final delay = i * 0.18;
-      final localProgress =
-          ((progress - delay) / (1 - delay)).clamp(0.0, 1.0).toDouble();
+      final localProgress = ((progress - delay) / (1 - delay))
+          .clamp(0.0, 1.0)
+          .toDouble();
       if (progress < delay) continue;
 
       final paint = Paint()

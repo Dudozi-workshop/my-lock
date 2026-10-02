@@ -6,6 +6,7 @@ import 'package:my_lock/lock_engine/floating_preview.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 import 'package:my_lock/lock_engine/shape_spec/lab_candidate_scope.dart';
 import 'package:my_lock/features/customize/shape_style/widgets/shape_choice_card.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RuntimeWorkbench extends StatefulWidget {
   const RuntimeWorkbench({super.key, required this.dark});
@@ -15,6 +16,7 @@ class RuntimeWorkbench extends StatefulWidget {
 }
 
 class _RuntimeWorkbenchState extends State<RuntimeWorkbench> {
+  static const apkUrl = 'https://dddpxudwfsydrhfgvvyn.supabase.co/storage/v1/object/public/my-lock-apk/my-lock-arm64-release.apk?v=f60f9c516ae8bfbc80bcf6a120bdf8f3bb91c5a9';
   late final Future<List<Map<String, dynamic>>> registry = _load();
   String? experiment;
   String view = 'sizes';
@@ -91,6 +93,12 @@ class _RuntimeWorkbenchState extends State<RuntimeWorkbench> {
                 ...Uri.base.queryParameters, 'lab':'review', 'experiment':id!}), replace:true);}),
           Text('Source ${(selected['source_commit'] as String).substring(0,7)} · 실제 앱 Painter',style:TextStyle(color:fg)),
           Text('남은 사항: ${selected['pending']}',style:TextStyle(color:fg)),
+          const SizedBox(height:8),
+          FilledButton.icon(
+            onPressed: () => launchUrl(Uri.parse(apkUrl), webOnlyWindowName: '_blank'),
+            icon: const Icon(Icons.android),
+            label: const Text('최신 Android APK 다운로드'),
+          ),
           const SizedBox(height:12),
           Wrap(spacing:8, children:[for(final item in {'sizes':'크기 비교','cards':'앱 카드','motion':'Floating / POP'}.entries)
             ChoiceChip(label:Text(item.value),selected:view==item.key,
