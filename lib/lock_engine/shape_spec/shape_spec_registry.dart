@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
+
 import 'package:flutter/services.dart';
 
 import '../models.dart';
@@ -122,8 +124,17 @@ class ShapeSpecRegistry {
   Future<ui.Image> _loadMaskImage(String asset) async {
     final encoded = (await rootBundle.loadString(asset)).trim();
     final bytes = base64Decode(encoded);
-    final codec = await ui.instantiateImageCodec(bytes);
-    final frame = await codec.getNextFrame();
-    return frame.image;
+    try {
+      final codec = await ui.instantiateImageCodec(bytes);
+      final frame = await codec.getNextFrame();
+      return frame.image;
+    } on EncodingError {
+      if (!kIsWeb) rethrow;
+      final codec = await ui.ImmutableBuffer.fromUint8List(bytes).then(
+        (buffer) => ui.ImageDescriptor.encoded(buffer),
+      );
+      final frame = await codec.instantiateCodec().then((value) => value.getNextFrame());
+      return frame.image;
+    }
   }
 }
