@@ -3,6 +3,19 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+Uint8List seaTurtleFrontFlipperNearRuntimeBytes(String tone) {
+  switch (tone) {
+    case 'pink':
+      return base64Decode(_pinkPng);
+    case 'blue':
+      return base64Decode(_bluePng);
+    case 'yellow':
+      return base64Decode(_yellowPng);
+    default:
+      throw ArgumentError.value(tone, 'tone', 'Unsupported Sea Turtle near flipper tone');
+  }
+}
+
 class SeaTurtleFrontFlipperRuntimeQaScreen extends StatelessWidget {
   const SeaTurtleFrontFlipperRuntimeQaScreen({super.key});
 
