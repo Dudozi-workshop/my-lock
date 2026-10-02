@@ -25,8 +25,11 @@ void main() {
   });
   testWidgets('workflow opens candidate comparison without leaking renderer scope', (tester) async {
     await tester.runAsync(() => CandySoftCandidate.instance.load());
-    await tester.pumpWidget(const MaterialApp(home: Scaffold(body:
-      SingleChildScrollView(child: ProductionFlow(dark: false)))));
+    await tester.runAsync(() async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold(body:
+        SingleChildScrollView(child: ProductionFlow(dark: false)))));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    });
     await tester.pumpAndSettle();
     expect(find.text('작업 목록'), findsOneWidget);
     await tester.tap(find.text('이어서 진행').first);
@@ -42,3 +45,4 @@ void main() {
   });
 
 }
+
