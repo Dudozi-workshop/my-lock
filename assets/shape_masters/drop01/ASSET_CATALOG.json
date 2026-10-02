@@ -1,0 +1,18 @@
+{
+  "schema_version": "mylock_asset_catalog_v1",
+  "drop_id": "drop01",
+  "assets": [
+    {"asset_id":"dolphin_v1","catalog_status":"registered","registry_path":"assets/shape_masters/drop01/dolphin_v1/ASSET_REGISTRY.json"},
+    {"asset_id":"sea_turtle_v3","catalog_status":"registered","registry_path":"assets/shape_masters/drop01/sea_turtle_v3/ASSET_REGISTRY.json"},
+    {"asset_id":"small_fish","catalog_status":"planned","registry_path":null},
+    {"asset_id":"jellyfish","catalog_status":"planned","registry_path":null},
+    {"asset_id":"starfish","catalog_status":"planned","registry_path":null},
+    {"asset_id":"coral","catalog_status":"planned","registry_path":null},
+    {"asset_id":"shell","catalog_status":"planned","registry_path":null}
+  ],
+  "policy": {
+    "planned_is_not_completed": true,
+    "registered_requires_registry_path": true,
+    "production_source_without_registry_is_registration_pending": true
+  }
+}
