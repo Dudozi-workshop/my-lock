@@ -9,6 +9,7 @@ import '../features/qa/sea_turtle_underbelly_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_whole_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_production_runtime_qa_screen.dart';
 import '../features/shell/root_shell.dart';
+import '../lock_engine/raster_shape_bootstrap.dart';
 import 'build_info.dart';
 import 'theme.dart';
 
@@ -37,21 +38,23 @@ class MyLockApp extends StatelessWidget {
           const Positioned.fill(child: BuildStamp()),
         ],
       ),
-      home: showSeaTurtleProductionQa
-          ? const SeaTurtleProductionRuntimeQaScreen()
-          : showWholeTurtleQa
-          ? const SeaTurtleWholeRuntimeQaScreen()
-          : showShellRuntimeQa
-          ? const SeaTurtleShellRuntimeQaScreen()
-          : showFrontFlipperQa
-              ? const SeaTurtleFrontFlipperRuntimeQaScreen()
-              : showFrontFlipperFarQa
-                  ? const SeaTurtleFrontFlipperFarRuntimeQaScreen()
-                  : showBodyWithRearQa
-                  ? const SeaTurtleBodyWithRearRuntimeQaScreen()
-                  : showUnderbellyQa
-                      ? const SeaTurtleUnderbellyRuntimeQaScreen()
-                      : const RootShell(),
+      home: RasterShapeBootstrap(
+        child: showSeaTurtleProductionQa
+            ? const SeaTurtleProductionRuntimeQaScreen()
+            : showWholeTurtleQa
+                ? const SeaTurtleWholeRuntimeQaScreen()
+                : showShellRuntimeQa
+                    ? const SeaTurtleShellRuntimeQaScreen()
+                    : showFrontFlipperQa
+                        ? const SeaTurtleFrontFlipperRuntimeQaScreen()
+                        : showFrontFlipperFarQa
+                            ? const SeaTurtleFrontFlipperFarRuntimeQaScreen()
+                            : showBodyWithRearQa
+                                ? const SeaTurtleBodyWithRearRuntimeQaScreen()
+                                : showUnderbellyQa
+                                    ? const SeaTurtleUnderbellyRuntimeQaScreen()
+                                    : const RootShell(),
+      ),
     );
   }
 }
