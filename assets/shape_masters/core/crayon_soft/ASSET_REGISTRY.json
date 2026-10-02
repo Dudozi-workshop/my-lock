@@ -26,5 +26,18 @@
       "approval_evidence": "active production style on main"
     }
   ],
-  "policy": {}
+  "policy": {
+    "filename_does_not_determine_active_status": true,
+    "user_approval_required_for_final_locked": true,
+    "locked_binary_overwrite_forbidden": true,
+    "archive_before_delete": true,
+    "completion_requires_registration": true
+  },
+  "dependencies": [
+    {
+      "asset_id": "soft_basic",
+      "relationship": "shape_source"
+    }
+  ],
+  "notes": "Crayon Soft v2 reuses Soft Basic geometry."
 }
