@@ -692,6 +692,7 @@ class ShapeSpecRenderer {
     switch (tone) {
       case ShapeTone.pink:
         return (light: 0.88, shade: 1.12);
+      case ShapeTone.auroraSea:
       case ShapeTone.blue:
         return (light: 0.84, shade: 1.00);
       case ShapeTone.yellow:
