@@ -156,11 +156,65 @@ class _WholeTurtleF0 extends StatelessWidget {
           _NeutralLayer(bytes: body, color: color),
           _BakedLayer(bytes: shell),
           _NeutralLayer(bytes: belly, color: color),
-          _BakedLayer(bytes: near, pixelated: true),
+          // Near/outer runtime58 is a tight square crop, not a full-canvas export.
+          // Re-place that locked crop on the Q3 2048 canonical canvas using
+          // Geometry v3 bbox (809,909)-(1318,1460), padded to the 551 px
+          // square used by the approved runtime58 export.
+          const _NearFlipperPlacement(
+            leftRatio: 788 / 2048,
+            topRatio: 909 / 2048,
+            sizeRatio: 551 / 2048,
+            child: SizedBox.shrink(),
+          ),
+          _NearFlipperRuntimePlacement(bytes: near),
         ],
       ),
     );
   }
+}
+
+class _NearFlipperRuntimePlacement extends StatelessWidget {
+  const _NearFlipperRuntimePlacement({required this.bytes});
+
+  final Uint8List bytes;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final side = constraints.maxWidth;
+        return Stack(
+          children: [
+            Positioned(
+              left: side * (788 / 2048),
+              top: side * (909 / 2048),
+              width: side * (551 / 2048),
+              height: side * (551 / 2048),
+              child: _BakedLayer(bytes: bytes, pixelated: true),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// Documentation-only placement constants kept explicit in the QA source.
+class _NearFlipperPlacement extends StatelessWidget {
+  const _NearFlipperPlacement({
+    required this.leftRatio,
+    required this.topRatio,
+    required this.sizeRatio,
+    required this.child,
+  });
+
+  final double leftRatio;
+  final double topRatio;
+  final double sizeRatio;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => child;
 }
 
 class _NeutralLayer extends StatelessWidget {
