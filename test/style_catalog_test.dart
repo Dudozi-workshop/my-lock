@@ -9,13 +9,15 @@ import 'package:my_lock/lock_engine/relock_policy.dart';
 void main() {
   test('Soft Basic starts with the free 3x3 token catalog', () {
     expect(
-      ShapeKind.values,
-      equals([
+      ShapeKind.defaults,
+      equals({
         ShapeKind.circle,
         ShapeKind.triangle,
         ShapeKind.square,
-      ]),
+      }),
     );
+    expect(ShapeKind.values, contains(ShapeKind.seaTurtle));
+    expect(ShapeKind.seaTurtle.premium, isTrue);
     expect(
       ShapeTone.values,
       equals([
@@ -30,8 +32,8 @@ void main() {
     );
 
     final ids = <String>{
-      for (final shape in ShapeKind.values)
-        for (final tone in ShapeTone.values)
+      for (final shape in ShapeKind.defaults)
+        for (final tone in ShapeTone.defaults)
           LockToken(shape: shape, tone: tone).id,
     };
     expect(ids.length, 9);
