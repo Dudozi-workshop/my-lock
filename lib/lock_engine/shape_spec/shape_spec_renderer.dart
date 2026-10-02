@@ -204,19 +204,50 @@ class ShapeSpecRenderer {
         ..translate(-center.dx, -center.dy);
     }
 
-    final paint = Paint()
-      ..filterQuality = FilterQuality.high
-      ..colorFilter = ColorFilter.mode(
-        baseColorForTone(token.tone).withValues(alpha: opacity),
-        BlendMode.color,
-      );
+    final source = Rect.fromLTWH(
+      0,
+      0,
+      image.width.toDouble(),
+      image.height.toDouble(),
+    );
+
+    // Raster palette rule:
+    // 1) keep the authored runtime image as the luminance/material source;
+    // 2) apply ShapeTone with BlendMode.color so shading/highlights survive;
+    // 3) re-apply the original image alpha with dstIn so palette pixels can
+    //    never leak into the transparent runtime canvas.
+    //
+    // The saveLayer opacity is applied only after the alpha-clipped
+    // composition is complete.
+    canvas.saveLayer(
+      destination,
+      Paint()..color = Colors.white.withValues(alpha: opacity),
+    );
 
     canvas.drawImageRect(
       image,
-      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      source,
       destination,
-      paint,
+      Paint()..filterQuality = FilterQuality.high,
     );
+
+    canvas.drawRect(
+      destination,
+      Paint()
+        ..color = baseColorForTone(token.tone)
+        ..blendMode = BlendMode.color,
+    );
+
+    canvas.drawImageRect(
+      image,
+      source,
+      destination,
+      Paint()
+        ..filterQuality = FilterQuality.high
+        ..blendMode = BlendMode.dstIn,
+    );
+
+    canvas.restore();
     canvas.restore();
   }
 
