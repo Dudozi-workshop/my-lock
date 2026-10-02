@@ -42,7 +42,13 @@ class MyLockLabsApp extends StatelessWidget {
         brightness: Brightness.light,
         useMaterial3: true,
       ),
-      home: const LabsPage(),
+      initialRoute: '${Uri.base.path}${Uri.base.hasQuery ? '?${Uri.base.query}' : ''}',
+      onGenerateInitialRoutes: (name) => [
+        MaterialPageRoute<void>(
+          settings: RouteSettings(name: name),
+          builder: (_) => const LabsPage(),
+        ),
+      ],
     );
   }
 }
