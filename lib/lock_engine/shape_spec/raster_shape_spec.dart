@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
-/// Runtime framing in texture pixels, independent of ShapeKind. Swim variants share this frame.
+/// Runtime framing in texture pixels, independent of ShapeKind.
 class RasterShapeMetadata {
   RasterShapeMetadata.fromJson(Map<String, dynamic> json)
     : shapeId = json['shape_id'] as String,
@@ -12,7 +12,10 @@ class RasterShapeMetadata {
       safetyPaddingRatio = (json['safety_padding_ratio'] as num).toDouble(),
       runtimeSourceHash = json['runtime_source_hash'] as String,
       aurora = Map<String, dynamic>.from(json['aurora'] as Map),
-        layers = Map<String, dynamic>.from(json['layers'] as Map) {
+      layers = Map<String, dynamic>.from(json['layers'] as Map),
+      swim = Map<String, dynamic>.from(
+        json['swim'] as Map? ?? const <String, dynamic>{},
+      ) {
     final canvas = ui.Offset.zero & runtimeCanvas;
     if (displayScale <= 0 ||
         contentBbox.isEmpty ||
@@ -33,6 +36,7 @@ class RasterShapeMetadata {
   final String runtimeSourceHash;
   final Map<String, dynamic> layers;
   final Map<String, dynamic> aurora;
+  final Map<String, dynamic> swim;
 
   static ui.Size _size(List v) =>
       ui.Size((v[0] as num).toDouble(), (v[1] as num).toDouble());
@@ -60,6 +64,25 @@ class RasterShapeMetadata {
   }
 
   String asset(String layer) => (layers[layer] as Map)['asset'] as String;
+
+  String? swimAsset(String pose, String layer) {
+    final poses = swim['poses'] as Map?;
+    final poseConfig = poses?[pose] as Map?;
+    final poseLayers = poseConfig?['layers'] as Map?;
+    return poseLayers?[layer] as String?;
+  }
+}
+
+class RasterPoseImages {
+  const RasterPoseImages({
+    required this.master,
+    required this.paletteBase,
+    required this.fixedFinish,
+  });
+
+  final ui.Image master;
+  final ui.Image paletteBase;
+  final ui.Image fixedFinish;
 }
 
 class RasterShapeSpec {
@@ -68,9 +91,28 @@ class RasterShapeSpec {
     required this.master,
     required this.paletteBase,
     required this.fixedFinish,
+    this.swimPoses = const <String, RasterPoseImages>{},
   });
+
   final RasterShapeMetadata metadata;
   final ui.Image master;
   final ui.Image paletteBase;
   final ui.Image fixedFinish;
+  final Map<String, RasterPoseImages> swimPoses;
+
+  RasterPoseImages imagesForPose(String pose) {
+    if (pose == 's0') {
+      return RasterPoseImages(
+        master: master,
+        paletteBase: paletteBase,
+        fixedFinish: fixedFinish,
+      );
+    }
+    return swimPoses[pose] ??
+        RasterPoseImages(
+          master: master,
+          paletteBase: paletteBase,
+          fixedFinish: fixedFinish,
+        );
+  }
 }
