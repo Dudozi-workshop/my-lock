@@ -21,6 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ROOT = ROOT / "assets/shape_masters"
 REGISTRY_JSON = "ASSET_REGISTRY.json"
+CATALOG_JSON = "ASSET_CATALOG.json"
 ALLOWED = {"working","candidate","qa_candidate","lock_candidate","final_locked","superseded","withdrawn","archived"}
 ID_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
 FILE_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*(?:\.[a-z0-9]+)?$")
@@ -144,6 +145,34 @@ def validate(asset_root: Path) -> list[str]:
 
     return errors
 
+def validate_catalog(path: Path) -> list[str]:
+    errors: list[str] = []
+    try:
+        catalog = load(path)
+    except Exception as exc:
+        return [f"invalid catalog JSON: {exc}"]
+    seen: set[str] = set()
+    for i, item in enumerate(catalog.get("assets", [])):
+        prefix = f"{path.relative_to(ROOT)} assets[{i}]"
+        asset_id = item.get("asset_id", "")
+        status = item.get("catalog_status")
+        registry_path = item.get("registry_path")
+        if not ID_RE.fullmatch(asset_id):
+            errors.append(f"{prefix}: invalid asset_id {asset_id!r}")
+        if asset_id in seen:
+            errors.append(f"{prefix}: duplicate asset_id")
+        seen.add(asset_id)
+        if status not in {"planned", "registration_pending", "registered", "archived"}:
+            errors.append(f"{prefix}: invalid catalog_status {status!r}")
+        if status == "registered":
+            if not registry_path:
+                errors.append(f"{prefix}: registered asset requires registry_path")
+            elif not (ROOT / registry_path).is_file():
+                errors.append(f"{prefix}: broken registry_path {registry_path!r}")
+        elif status == "planned" and registry_path:
+            errors.append(f"{prefix}: planned asset must not claim registry_path")
+    return errors
+
 def discover_registries(search_root: Path) -> list[Path]:
     if (search_root / REGISTRY_JSON).is_file():
         return [search_root]
@@ -157,6 +186,8 @@ def validate_all(search_root: Path) -> list[str]:
     for asset_root in roots:
         for error in validate(asset_root):
             errors.append(f"{asset_root.relative_to(ROOT)}: {error}")
+    for catalog in sorted(search_root.rglob(CATALOG_JSON)):
+        errors.extend(validate_catalog(catalog))
     return errors
 
 def bootstrap(asset_root: Path, asset_id: str, parts: list[str]) -> None:
