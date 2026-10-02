@@ -23,6 +23,7 @@ flutter:
     - assets/shape_specs/soft_basic/
     - assets/shape_specs/crayon_soft/
     - assets/shape_masters/drop01/sea_turtle_v3/shell/runtime/
+    - assets/raster_shapes/
 
 flutter_launcher_icons:
   android: true
