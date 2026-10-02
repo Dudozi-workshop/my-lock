@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:my_lock/lock_engine/effects.dart';
@@ -20,6 +21,7 @@ import 'package:my_lock/lock_engine/shape_spec/candy_soft_candidate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  usePathUrlStrategy();
   await ShapeSpecRegistry.instance.load();
   await CandySoftCandidate.instance.load();
   runApp(const MyLockLabsApp());
