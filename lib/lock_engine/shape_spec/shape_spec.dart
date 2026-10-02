@@ -47,7 +47,9 @@ class ShapeStyleSpec {
       shapeSourceId: json['shapeSourceId'] as String?,
       crayon: json['crayon'] == null
           ? null
-          : CrayonTextureSpec.fromJson(json['crayon'] as Map<String, dynamic>),
+          : CrayonTextureSpec.fromJson(
+              json['crayon'] as Map<String, dynamic>,
+            ),
     );
   }
 }
@@ -242,41 +244,65 @@ class CrayonTextureSpec {
       grainOpacity: (json['grainOpacity'] as num).toDouble(),
       edgeOpacity: (json['edgeOpacity'] as num).toDouble(),
       baseStrokeCount: (json['baseStrokeCount'] as num?)?.toInt() ?? 0,
-      underpaintOpacity: (json['underpaintOpacity'] as num?)?.toDouble() ?? 1.0,
-      baseStrokeOpacity: (json['baseStrokeOpacity'] as num?)?.toDouble() ?? 0.0,
-      strokeBreakChance: (json['strokeBreakChance'] as num?)?.toDouble() ?? 0.0,
+      underpaintOpacity:
+          (json['underpaintOpacity'] as num?)?.toDouble() ?? 1.0,
+      baseStrokeOpacity:
+          (json['baseStrokeOpacity'] as num?)?.toDouble() ?? 0.0,
+      strokeBreakChance:
+          (json['strokeBreakChance'] as num?)?.toDouble() ?? 0.0,
       strokeBuiltSurface: json['strokeBuiltSurface'] as bool? ?? false,
-      broadStrokeCount: (json['broadStrokeCount'] as num?)?.toInt() ?? 0,
-      broadStrokeWidth: (json['broadStrokeWidth'] as num?)?.toDouble() ?? 4.0,
+      broadStrokeCount:
+          (json['broadStrokeCount'] as num?)?.toInt() ?? 0,
+      broadStrokeWidth:
+          (json['broadStrokeWidth'] as num?)?.toDouble() ?? 4.0,
       broadStrokeOpacity:
           (json['broadStrokeOpacity'] as num?)?.toDouble() ?? 0.0,
-      angleJitterDeg: (json['angleJitterDeg'] as num?)?.toDouble() ?? 0.0,
-      strokeWidthJitter: (json['strokeWidthJitter'] as num?)?.toDouble() ?? 0.0,
-      strokeLengthMin: (json['strokeLengthMin'] as num?)?.toDouble() ?? 1.0,
-      strokeLengthMax: (json['strokeLengthMax'] as num?)?.toDouble() ?? 1.0,
-      gapChance: (json['gapChance'] as num?)?.toDouble() ?? 0.0,
-      toneVariation: (json['toneVariation'] as num?)?.toDouble() ?? 0.0,
-      edgeWidth: (json['edgeWidth'] as num?)?.toDouble() ?? 0.72,
-      edgeTexture: (json['edgeTexture'] as num?)?.toDouble() ?? 0.0,
+      angleJitterDeg:
+          (json['angleJitterDeg'] as num?)?.toDouble() ?? 0.0,
+      strokeWidthJitter:
+          (json['strokeWidthJitter'] as num?)?.toDouble() ?? 0.0,
+      strokeLengthMin:
+          (json['strokeLengthMin'] as num?)?.toDouble() ?? 1.0,
+      strokeLengthMax:
+          (json['strokeLengthMax'] as num?)?.toDouble() ?? 1.0,
+      gapChance:
+          (json['gapChance'] as num?)?.toDouble() ?? 0.0,
+      toneVariation:
+          (json['toneVariation'] as num?)?.toDouble() ?? 0.0,
+      edgeWidth:
+          (json['edgeWidth'] as num?)?.toDouble() ?? 0.72,
+      edgeTexture:
+          (json['edgeTexture'] as num?)?.toDouble() ?? 0.0,
       edgeMode: CrayonEdgeMode.values.byName(
         (json['edgeMode'] as String?) ?? 'vector',
       ),
-      edgeSegmentLength: (json['edgeSegmentLength'] as num?)?.toDouble() ?? 7.0,
-      edgeSegmentGap: (json['edgeSegmentGap'] as num?)?.toDouble() ?? 3.0,
-      edgeOffsetJitter: (json['edgeOffsetJitter'] as num?)?.toDouble() ?? 0.8,
-      edgeWidthJitter: (json['edgeWidthJitter'] as num?)?.toDouble() ?? 0.25,
+      edgeSegmentLength:
+          (json['edgeSegmentLength'] as num?)?.toDouble() ?? 7.0,
+      edgeSegmentGap:
+          (json['edgeSegmentGap'] as num?)?.toDouble() ?? 3.0,
+      edgeOffsetJitter:
+          (json['edgeOffsetJitter'] as num?)?.toDouble() ?? 0.8,
+      edgeWidthJitter:
+          (json['edgeWidthJitter'] as num?)?.toDouble() ?? 0.25,
       edgeOpacityJitter:
           (json['edgeOpacityJitter'] as num?)?.toDouble() ?? 0.20,
-      edgeBandWidth: (json['edgeBandWidth'] as num?)?.toDouble() ?? 3.0,
-      overflowAmount: (json['overflowAmount'] as num?)?.toDouble() ?? 1.2,
+      edgeBandWidth:
+          (json['edgeBandWidth'] as num?)?.toDouble() ?? 3.0,
+      overflowAmount:
+          (json['overflowAmount'] as num?)?.toDouble() ?? 1.2,
       strokePattern: CrayonStrokePattern.values.byName(
         (json['strokePattern'] as String?) ?? 'hatch',
       ),
-      zigzagAmplitude: (json['zigzagAmplitude'] as num?)?.toDouble() ?? 0.0,
-      zigzagCycles: (json['zigzagCycles'] as num?)?.toInt() ?? 0,
-      negativeGapCount: (json['negativeGapCount'] as num?)?.toInt() ?? 0,
-      negativeGapWidth: (json['negativeGapWidth'] as num?)?.toDouble() ?? 0.0,
-      internalGapChance: (json['internalGapChance'] as num?)?.toDouble() ?? 0.0,
+      zigzagAmplitude:
+          (json['zigzagAmplitude'] as num?)?.toDouble() ?? 0.0,
+      zigzagCycles:
+          (json['zigzagCycles'] as num?)?.toInt() ?? 0,
+      negativeGapCount:
+          (json['negativeGapCount'] as num?)?.toInt() ?? 0,
+      negativeGapWidth:
+          (json['negativeGapWidth'] as num?)?.toDouble() ?? 0.0,
+      internalGapChance:
+          (json['internalGapChance'] as num?)?.toDouble() ?? 0.0,
       internalGapWidthRatio:
           (json['internalGapWidthRatio'] as num?)?.toDouble() ?? 0.0,
       internalGapLengthMin:
@@ -285,17 +311,22 @@ class CrayonTextureSpec {
           (json['internalGapLengthMax'] as num?)?.toDouble() ?? 12.0,
       internalGapStrength:
           (json['internalGapStrength'] as num?)?.toDouble() ?? 1.0,
-      internalStrandCount: (json['internalStrandCount'] as num?)?.toInt() ?? 1,
+      internalStrandCount:
+          (json['internalStrandCount'] as num?)?.toInt() ?? 1,
       internalStrandSpread:
           (json['internalStrandSpread'] as num?)?.toDouble() ?? 0.0,
       internalGapOffsetJitter:
           (json['internalGapOffsetJitter'] as num?)?.toDouble() ?? 0.0,
-      directionPassCount: (json['directionPassCount'] as num?)?.toInt() ?? 1,
+      directionPassCount:
+          (json['directionPassCount'] as num?)?.toInt() ?? 1,
       directionSpreadDeg:
           (json['directionSpreadDeg'] as num?)?.toDouble() ?? 0.0,
-      laneScatter: (json['laneScatter'] as num?)?.toDouble() ?? 0.0,
-      pressureVariation: (json['pressureVariation'] as num?)?.toDouble() ?? 0.0,
-      paperToothCount: (json['paperToothCount'] as num?)?.toInt() ?? 0,
+      laneScatter:
+          (json['laneScatter'] as num?)?.toDouble() ?? 0.0,
+      pressureVariation:
+          (json['pressureVariation'] as num?)?.toDouble() ?? 0.0,
+      paperToothCount:
+          (json['paperToothCount'] as num?)?.toInt() ?? 0,
       paperToothWidthMin:
           (json['paperToothWidthMin'] as num?)?.toDouble() ?? 0.25,
       paperToothWidthMax:
@@ -306,12 +337,16 @@ class CrayonTextureSpec {
           (json['paperToothLengthMax'] as num?)?.toDouble() ?? 3.2,
       paperToothStrength:
           (json['paperToothStrength'] as num?)?.toDouble() ?? 0.85,
-      grainRadiusMin: (json['grainRadiusMin'] as num?)?.toDouble() ?? 0.18,
-      grainRadiusMax: (json['grainRadiusMax'] as num?)?.toDouble() ?? 0.58,
-      contourBaseWidth: (json['contourBaseWidth'] as num?)?.toDouble() ?? 0.0,
+      grainRadiusMin:
+          (json['grainRadiusMin'] as num?)?.toDouble() ?? 0.18,
+      grainRadiusMax:
+          (json['grainRadiusMax'] as num?)?.toDouble() ?? 0.58,
+      contourBaseWidth:
+          (json['contourBaseWidth'] as num?)?.toDouble() ?? 0.0,
       contourBaseOpacity:
           (json['contourBaseOpacity'] as num?)?.toDouble() ?? 0.0,
-      contourGapCount: (json['contourGapCount'] as num?)?.toInt() ?? 0,
+      contourGapCount:
+          (json['contourGapCount'] as num?)?.toInt() ?? 0,
       contourGapLengthMin:
           (json['contourGapLengthMin'] as num?)?.toDouble() ?? 1.4,
       contourGapLengthMax:
@@ -342,9 +377,11 @@ class ShapeColorRuleSpec {
   factory ShapeColorRuleSpec.fromJson(Map<String, dynamic> json) {
     return ShapeColorRuleSpec(
       lightnessUp: (json['lightnessUp'] as num).toDouble(),
-      lightSaturationDelta: (json['lightSaturationDelta'] as num).toDouble(),
+      lightSaturationDelta:
+          (json['lightSaturationDelta'] as num).toDouble(),
       lightnessDown: (json['lightnessDown'] as num).toDouble(),
-      shadeSaturationDelta: (json['shadeSaturationDelta'] as num).toDouble(),
+      shadeSaturationDelta:
+          (json['shadeSaturationDelta'] as num).toDouble(),
       specColor: _parseHexColor(json['specColor'] as String),
     );
   }
@@ -388,7 +425,8 @@ class ShapeSpec {
         for (final value in json['layers'] as List<dynamic>)
           ShapeLayerSpec.fromJson(value as Map<String, dynamic>),
       ],
-      shadow: ShapeShadowSpec.fromJson(json['shadow'] as Map<String, dynamic>),
+      shadow:
+          ShapeShadowSpec.fromJson(json['shadow'] as Map<String, dynamic>),
     );
   }
 }
@@ -433,11 +471,14 @@ class ShapeLayerSpec {
       geometry: ShapeGeometrySpec.fromJson(
         json['geometry'] as Map<String, dynamic>,
       ),
-      toneLightnessDelta: (json['toneLightnessDelta'] as num?)?.toDouble(),
-      toneSaturationDelta: (json['toneSaturationDelta'] as num?)?.toDouble(),
+      toneLightnessDelta:
+          (json['toneLightnessDelta'] as num?)?.toDouble(),
+      toneSaturationDelta:
+          (json['toneSaturationDelta'] as num?)?.toDouble(),
     );
   }
 }
+
 
 class ShapeSurfaceSpec {
   const ShapeSurfaceSpec({
@@ -508,7 +549,10 @@ class ShapeGeometrySpec {
 }
 
 class ShapeSpecBundle {
-  const ShapeSpecBundle({required this.style, required this.shape});
+  const ShapeSpecBundle({
+    required this.style,
+    required this.shape,
+  });
 
   final ShapeStyleSpec style;
   final ShapeSpec shape;
@@ -518,7 +562,6 @@ Color baseColorForTone(ShapeTone tone) {
   switch (tone) {
     case ShapeTone.pink:
       return const Color(0xFFFF8FD1);
-    case ShapeTone.auroraSea:
     case ShapeTone.blue:
       return const Color(0xFF79BFFF);
     case ShapeTone.yellow:
