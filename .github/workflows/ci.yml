@@ -114,6 +114,9 @@ jobs:
       - name: Validate ShapeSpec mask assets
         run: python3 tool/validate_shape_masks.py
 
+      - name: Validate MY LOCK asset lifecycle
+        run: python3 tool/mylock_asset_system.py validate assets/shape_masters/drop01/sea_turtle_v3
+
       - name: Analyze
         run: flutter analyze
 
