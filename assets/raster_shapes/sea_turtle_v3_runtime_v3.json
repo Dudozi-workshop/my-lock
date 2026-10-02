@@ -60,8 +60,11 @@
     "reference_luminance_max_error": 0.0013717647058824056,
     "geometry_material_ownership_changed": false,
     "imagegen_used": false,
-    "swim_pose_candidate": true,
-    "swim_imagegen_used": false
+    "swim_pose_candidate": false,
+    "swim_imagegen_used": false,
+    "swim_pose_locked": true,
+    "swim_motion_master": "v1",
+    "swim_user_visual_qa": true
   },
   "swim": {
     "version": 1,
@@ -132,9 +135,10 @@
       "version": "Motion Master v1",
       "date": "2026-10-03",
       "user_visual_approval": true,
-      "qa_candidate_run_id": 37032606322,
+      "automated_qa_run_id": 37032606322,
       "web_deploy_run_id": 37032606326,
-      "scope_lock": "front flipper swim motion only; static body/shell/underbelly/rear unchanged"
+      "post_lock_web_run_id": 37034687303,
+      "scope_lock": "front flipper swim motion only; body/shell/underbelly/rear remain locked and unchanged"
     }
   }
 }
