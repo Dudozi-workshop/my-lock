@@ -863,6 +863,8 @@ class _SeaTurtleRegionCrayonAssetState
   ui.Image? _image;
 
   String get _asset => switch (widget.tone) {
+        ShapeTone.auroraSea =>
+          'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
         ShapeTone.blue =>
           'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
         ShapeTone.pink =>
@@ -950,6 +952,7 @@ class _SeaTurtleRegionCrayonPainter extends CustomPainter {
   final ShapeTone tone;
 
   Color get _contourColor => switch (tone) {
+        ShapeTone.auroraSea => const Color(0xFF3C7773),
         ShapeTone.blue => const Color(0xFF3C7773),
         ShapeTone.pink => const Color(0xFFB95273),
         ShapeTone.yellow => const Color(0xFF9A742F),
@@ -1521,6 +1524,8 @@ class _SeaTurtleCrayonAssetState extends State<_SeaTurtleCrayonAsset> {
   ui.Image? _image;
 
   String get _asset => switch (widget.tone) {
+        ShapeTone.auroraSea =>
+          'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
         ShapeTone.blue =>
           'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
         ShapeTone.pink =>
@@ -1890,6 +1895,7 @@ class _SeaTurtleStaticAsset extends StatelessWidget {
 }
 
 String _assetForTone(ShapeTone tone) => switch (tone) {
+      ShapeTone.auroraSea => 'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
       ShapeTone.blue => 'assets/sea_turtle_runtime_v2/sea_turtle_blue.png',
       ShapeTone.pink => 'assets/sea_turtle_runtime_v2/sea_turtle_pink.png',
       ShapeTone.yellow => 'assets/sea_turtle_runtime_v2/sea_turtle_yellow.png',
@@ -3170,6 +3176,7 @@ class _TriangleMaterialPainter extends CustomPainter {
   Color _deepTone(ShapeTone tone) {
     return switch (tone) {
       ShapeTone.pink => const Color(0xFFB72F86),
+      ShapeTone.auroraSea => const Color(0xFF2874BC),
       ShapeTone.blue => const Color(0xFF2874BC),
       ShapeTone.yellow => const Color(0xFFC99A18),
     };
