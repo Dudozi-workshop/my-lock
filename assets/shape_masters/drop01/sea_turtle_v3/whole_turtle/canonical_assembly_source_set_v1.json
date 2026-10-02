@@ -1,0 +1,74 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "gate": "whole_turtle_canonical_assembly_source_set",
+  "version": "v1",
+  "status": "QA Candidate",
+  "canvas": {
+    "width": 2048,
+    "height": 2048,
+    "mode": "RGBA"
+  },
+  "rule": "All Final / Locked / Active canonical Parts composite at (0,0). No scaling, bbox placement, crop reconstruction, or runtime assets.",
+  "render_order": [
+    "front_flipper_far",
+    "body_with_rear",
+    "shell_main",
+    "underbelly",
+    "front_flipper_near"
+  ],
+  "parts": [
+    {
+      "part": "front_flipper_far",
+      "file": "front_flipper_far_f0_asset_FINAL_v4_2048.png",
+      "sha256": "3e054e0d71ca3351afc1aee07d54411921eb377efe67de2ba8876b2198b617c4",
+      "status": "Final / Locked / Active"
+    },
+    {
+      "part": "body_with_rear",
+      "file": "body_with_rear_geometry_FINAL_v2_2048.png",
+      "sha256": "4c1cca814c1149b4b29a36b8ccc471ba539bcea0b640a6eed67c253e3699814c",
+      "status": "Final / Locked / Active"
+    },
+    {
+      "part": "shell_main",
+      "file": "sea_turtle_v3_shell_asset_v1_2048.png",
+      "sha256": "ed7a6b6bd3da47e920b8478086d36eba28bfe86e64483db7ce7dabe3f237620a",
+      "status": "Final / Locked"
+    },
+    {
+      "part": "underbelly",
+      "file": "underbelly_asset_FINAL_2048.png",
+      "sha256": "93811e85535dea80059ae57b0b8e848514210aaafc6dc7f277c0af38aedd6005",
+      "status": "Final / Locked"
+    },
+    {
+      "part": "front_flipper_near",
+      "file": "front_flipper_outer_asset_v3_2048.png",
+      "sha256": "4c7a83fe30ec6fe8d8488287243047d547bd61dcceda09e8ffb48ddefcb90888",
+      "status": "Final / Locked / Active"
+    }
+  ],
+  "assembly": {
+    "whole_file": "sea_turtle_v3_whole_canonical_assembly_candidate_v1_2048.png",
+    "sha256": "73f3e583d99d1e9405f54a44862c8c55dda49c464eccd5b73e529b8fab309e4c",
+    "alpha_bbox": [
+      420,
+      688,
+      1640,
+      1460
+    ],
+    "union_visible_pixels": 546384,
+    "multi_part_overlap_pixels": 55220,
+    "max_overlap_depth": 3,
+    "imagegen_used": false
+  },
+  "seam_findings": {
+    "head_underbelly": "bright dotted/anti-aliased seam visible; needs seam policy review",
+    "near_flipper_root": "bright seam plus strong dark attachment line visible; needs seam policy review",
+    "shell_underbelly": "continuous but some internal boundary visibility is strong",
+    "far_flipper_root": "no major disconnect observed",
+    "rear_shell_body": "no major gap observed"
+  },
+  "lock_policy": "No Part Geometry/Material changes at this gate. Findings only.",
+  "next_gate": "User reviews canonical assembly + seam findings, then seam visibility/ownership policy is decided per attachment."
+}
