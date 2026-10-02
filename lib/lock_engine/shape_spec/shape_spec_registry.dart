@@ -130,7 +130,7 @@ class ShapeSpecRegistry {
       final codec = await ui.instantiateImageCodec(bytes);
       final frame = await codec.getNextFrame();
       return frame.image;
-    } on EncodingError {
+    } catch (_) {
       if (!kIsWeb) rethrow;
       final codec = await ui.ImmutableBuffer.fromUint8List(bytes).then(
         (buffer) => ui.ImageDescriptor.encoded(buffer),
