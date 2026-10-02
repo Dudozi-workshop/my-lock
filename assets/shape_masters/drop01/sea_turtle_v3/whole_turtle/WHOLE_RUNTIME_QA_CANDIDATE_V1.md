@@ -1,7 +1,7 @@
 # Sea Turtle v3 · Whole Runtime Derived Export Candidate v1
 
 ## Status
-**QA Candidate / user visual approval pending**
+**Final / Locked Runtime Derived Asset**
 
 ## Source
 - Approved Whole Canonical Assembly v1
@@ -37,4 +37,4 @@ Interpolation: Lanczos.
 - Obvious alpha halo: PASS
 - Obvious disconnected Part: PASS
 
-User visual approval is still required before Runtime QA LOCK / app integration.
+User visual approval completed on 2026-10-02. Runtime Derived Asset v1 is locked; downstream app integration is tracked separately.
