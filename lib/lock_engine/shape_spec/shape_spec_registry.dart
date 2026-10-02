@@ -14,12 +14,22 @@ class ShapeSpecRegistry {
   final Map<ShapeStyle, ShapeStyleSpec> _styles = {};
   final Map<(ShapeStyle, ShapeKind), ShapeSpec> _shapes = {};
   final Map<String, ui.Image> _maskImages = {};
+  final Map<ShapeKind, ui.Image> _rasterImages = {};
+
+  static const Map<ShapeKind, String> _rasterShapeAssets = {
+    ShapeKind.seaTurtle:
+        'assets/raster_shapes/sea_turtle_v3_runtime58.png.b64',
+  };
   bool _loaded = false;
 
   bool get loaded => _loaded;
 
   Future<void> load() async {
     if (_loaded) return;
+
+    for (final entry in _rasterShapeAssets.entries) {
+      _rasterImages[entry.key] = await _loadMaskImage(entry.value);
+    }
 
     for (final style in ShapeStyle.values) {
       final styleSpec = await _loadJson(
@@ -30,6 +40,8 @@ class ShapeSpecRegistry {
       final shapeSourceId = parsedStyle.shapeSourceId ?? style.assetId;
 
       for (final shape in ShapeKind.values) {
+        if (_rasterShapeAssets.containsKey(shape)) continue;
+
         final shapeJson = await _loadJson(
           'assets/shape_specs/$shapeSourceId/${shape.name}.json',
         );
@@ -57,6 +69,16 @@ class ShapeSpecRegistry {
     }
 
     _loaded = true;
+  }
+
+  bool isRasterShape(ShapeKind shape) => _rasterShapeAssets.containsKey(shape);
+
+  ui.Image resolveRasterShape(ShapeKind shape) {
+    final image = _rasterImages[shape];
+    if (image == null) {
+      throw StateError('Missing raster Shape asset: ${shape.name}');
+    }
+    return image;
   }
 
   ShapeSpecBundle resolve(ShapeStyle style, ShapeKind shape) {
