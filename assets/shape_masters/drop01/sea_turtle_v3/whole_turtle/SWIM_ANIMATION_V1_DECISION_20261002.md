@@ -93,5 +93,13 @@ This preserves a natural rhythm while preventing every loop from feeling mechani
 9. User visual approval.
 10. Motion Master Lock.
 
+## Current draft direction update — 2026-10-02
+- User selected the latest shoulder-participation motion as the **working draft direction**.
+- S0 remains the current approved pose.
+- S1/S2 should allow visible motion from the Near flipper root/shoulder region instead of fixing the root and bending only the distal half.
+- The current concept preview amplitude is considered **larger than desired**; production refinement should preserve the same motion character while reducing the total excursion.
+- Far flipper motion is currently acceptable as the supporting rhythm and should remain visually subordinate.
+- This approval is for **motion direction / draft behavior only**. The concept-sheet imagery is not a Production Source and does not promote S1/S2 assets to Locked.
+
 ## Current next gate
-**S1 / S2 Front Flipper pose-variant production**, using the locked Sea Turtle v3 static assembly and S0 as the reference.
+Refine S1 / S2 Near/Far pose variants from this draft direction, with **reduced Near amplitude + root participation**, then replay the loop before any Production LOCK.
