@@ -1,0 +1,108 @@
+{
+  "schema_version": "mylock_asset_registry_v1",
+  "asset_id": "sea_turtle_v3",
+  "lifecycle_vocabulary": [
+    "archived",
+    "candidate",
+    "final_locked",
+    "lock_candidate",
+    "qa_candidate",
+    "superseded",
+    "withdrawn",
+    "working"
+  ],
+  "required_directories": [],
+  "lineages": [
+    {
+      "scope": "shell_main.geometry",
+      "version": "current",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true
+    },
+    {
+      "scope": "body_with_rear.geometry",
+      "version": "v2",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true
+    },
+    {
+      "scope": "body_with_rear.outline",
+      "version": "v3",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true
+    },
+    {
+      "scope": "underbelly.geometry",
+      "version": "v4",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true
+    },
+    {
+      "scope": "underbelly.outline",
+      "version": "v1",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true
+    },
+    {
+      "scope": "underbelly.material",
+      "version": "v2",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true
+    },
+    {
+      "scope": "underbelly.palette_qa",
+      "version": "v2",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true
+    },
+    {
+      "scope": "front_flipper_near.geometry",
+      "version": "current",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true
+    },
+    {
+      "scope": "front_flipper_far.geometry",
+      "version": "v4",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true
+    },
+    {
+      "scope": "front_flipper_far.material_palette_runtime",
+      "version": "v1",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true
+    },
+    {
+      "scope": "underbelly.pattern_detail",
+      "version": "v1",
+      "status": "superseded",
+      "active": false,
+      "user_approved": true
+    },
+    {
+      "scope": "swim_pose",
+      "version": "v1",
+      "status": "qa_candidate",
+      "active": false,
+      "user_approved": false
+    }
+  ],
+  "policy": {
+    "filename_does_not_determine_active_status": true,
+    "user_approval_required_for_final_locked": true,
+    "locked_binary_overwrite_forbidden": true,
+    "archive_before_delete": true
+  },
+  "notes": "Additive normalized registry. Historical manifests remain immutable. Drive storage structure is validated separately because repository and binary storage have different physical roots."
+}

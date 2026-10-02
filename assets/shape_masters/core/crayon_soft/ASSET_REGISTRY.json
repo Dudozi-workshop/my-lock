@@ -1,0 +1,43 @@
+{
+  "schema_version": "mylock_asset_registry_v1",
+  "asset_id": "crayon_soft",
+  "lifecycle_vocabulary": [
+    "archived",
+    "candidate",
+    "final_locked",
+    "lock_candidate",
+    "qa_candidate",
+    "superseded",
+    "withdrawn",
+    "working"
+  ],
+  "required_directories": [],
+  "lineages": [
+    {
+      "scope": "style",
+      "version": "v2",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true,
+      "artifact_path": "assets/shape_specs/crayon_soft/style.json",
+      "registered": true,
+      "completed": true,
+      "qa_evidence": "shape_spec_test and style_catalog_test",
+      "approval_evidence": "active production style on main"
+    }
+  ],
+  "policy": {
+    "filename_does_not_determine_active_status": true,
+    "user_approval_required_for_final_locked": true,
+    "locked_binary_overwrite_forbidden": true,
+    "archive_before_delete": true,
+    "completion_requires_registration": true
+  },
+  "dependencies": [
+    {
+      "asset_id": "soft_basic",
+      "relationship": "shape_source"
+    }
+  ],
+  "notes": "Crayon Soft v2 reuses Soft Basic geometry."
+}

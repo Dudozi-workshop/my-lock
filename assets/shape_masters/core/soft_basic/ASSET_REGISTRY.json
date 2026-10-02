@@ -1,0 +1,73 @@
+{
+  "schema_version": "mylock_asset_registry_v1",
+  "asset_id": "soft_basic",
+  "lifecycle_vocabulary": [
+    "archived",
+    "candidate",
+    "final_locked",
+    "lock_candidate",
+    "qa_candidate",
+    "superseded",
+    "withdrawn",
+    "working"
+  ],
+  "required_directories": [],
+  "lineages": [
+    {
+      "scope": "style",
+      "version": "v2",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true,
+      "artifact_path": "assets/shape_specs/soft_basic/style.json",
+      "registered": true,
+      "completed": true,
+      "qa_evidence": "CI ShapeSpec/runtime validation",
+      "approval_evidence": "Production main active style"
+    },
+    {
+      "scope": "circle.geometry",
+      "version": "v9",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true,
+      "artifact_path": "assets/shape_specs/soft_basic/circle.json",
+      "registered": true,
+      "completed": true,
+      "qa_evidence": "CI ShapeSpec/runtime validation",
+      "approval_evidence": "Production main active ShapeSpec"
+    },
+    {
+      "scope": "triangle.geometry",
+      "version": "v1",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true,
+      "artifact_path": "assets/shape_specs/soft_basic/triangle.json",
+      "registered": true,
+      "completed": true,
+      "qa_evidence": "CI ShapeSpec/runtime validation",
+      "approval_evidence": "Production main active ShapeSpec"
+    },
+    {
+      "scope": "square.geometry",
+      "version": "v1",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true,
+      "artifact_path": "assets/shape_specs/soft_basic/square.json",
+      "registered": true,
+      "completed": true,
+      "qa_evidence": "CI ShapeSpec/runtime validation",
+      "approval_evidence": "Production main active ShapeSpec"
+    }
+  ],
+  "policy": {
+    "filename_does_not_determine_active_status": true,
+    "user_approval_required_for_final_locked": true,
+    "locked_binary_overwrite_forbidden": true,
+    "archive_before_delete": true,
+    "completion_requires_registration": true
+  },
+  "notes": "Registry reflects current production files on main. Historical preview/round labels are not promoted unless their production mapping is explicitly verified."
+}
