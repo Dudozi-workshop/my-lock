@@ -18,6 +18,7 @@ class LockTokenPainter extends CustomPainter {
 
   final LockToken token;
   final ShapeStyle style;
+  final FloatingSpeed speed;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -45,6 +46,7 @@ class FloatingShapePainter extends CustomPainter {
     required this.objects,
     this.popStyle = PopStyle.basicPop,
     this.style = ShapeStyle.softBasic,
+    this.speed = FloatingSpeed.normal,
   });
 
   final List<FloatingObject> objects;
@@ -93,6 +95,11 @@ class FloatingShapePainter extends CustomPainter {
       objectRotation: object.rotation,
       paletteTimeSeconds: RasterPaletteClock.instance.value,
       swimKey: 'floating:${object.id}',
+      swimProfile: switch (speed) {
+        FloatingSpeed.slow => 'calm',
+        FloatingSpeed.normal => 'standard',
+        FloatingSpeed.fast => 'lively',
+      },
     );
   }
 
