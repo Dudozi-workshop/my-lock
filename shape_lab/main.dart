@@ -51,7 +51,7 @@ class MyLockLabsApp extends StatelessWidget {
       onGenerateInitialRoutes: (name) => [
         MaterialPageRoute<void>(
           settings: RouteSettings(name: name),
-          builder: (_) => const LabsPage(),
+          builder: (_) => const RasterShapeBootstrap(child: LabsPage()),
         ),
       ],
     );
