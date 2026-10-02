@@ -2,7 +2,7 @@
   "shape_id": "sea_turtle_v3",
   "gate": "whole_turtle_runtime_derived_export",
   "version": "candidate_v1",
-  "status": "QA Candidate / user visual approval pending",
+  "status": "Final / Locked Runtime Derived Asset",
   "canonical_source": {
     "file": "sea_turtle_v3_whole_canonical_assembly_candidate_v1_2048.png",
     "canvas": [
@@ -52,5 +52,10 @@
   "imagegen_used": false,
   "geometry_changed": false,
   "material_changed": false,
-  "next_gate": "User visual approval -> Runtime QA LOCK / app integration"
+  "next_gate": "App Runtime Integration",
+  "user_visual_approval": {
+    "approved": true,
+    "date": "2026-10-02",
+    "note": "User approved the 58 px Whole Runtime QA and requested proceeding to the next gate."
+  }
 }
