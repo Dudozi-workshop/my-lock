@@ -7,6 +7,7 @@ import 'lock_engine/shape_spec/shape_spec_registry.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ShapeSpecRegistry.instance.load();
+  await ShapeSpecRegistry.instance.loadRasterShapes();
   runApp(const MyLockApp());
 }
 
