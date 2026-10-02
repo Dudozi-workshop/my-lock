@@ -129,6 +129,7 @@ def validate(asset_root: Path) -> list[str]:
             errors.append(f"missing required directory: {rel}")
 
     errors.extend(validate_gate_outputs(reg))
+    errors.extend(validate_gate_sequence(reg))
 
     for rel in reg.get("production_directories", []):
         production = asset_root / rel
