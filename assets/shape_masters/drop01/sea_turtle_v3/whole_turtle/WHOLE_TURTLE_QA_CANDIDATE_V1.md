@@ -1,7 +1,25 @@
 # Sea Turtle v3 · Whole-turtle Seam / Material QA Candidate v1
 
 ## Status
-**QA Candidate / user visual approval pending**
+**Withdrawn / Reference-only — INVALID FOR PRODUCTION WHOLE QA**
+
+## Withdrawal — 2026-10-02
+This Candidate is withdrawn from the Production lineage.
+
+Reason:
+- runtime 512/58 assets were mixed instead of using all Final / Locked / Active 2048 full-canvas Production Assets;
+- Near Flipper was a tight runtime crop and required bbox-based reconstruction;
+- the resulting composition did not contain all Parts correctly and showed visible LOD/resolution mismatch.
+
+Individual Part Finals remain unchanged and locked.
+
+Replacement rule:
+- use only 2048x2048 RGBA full-canvas active Production Assets;
+- composite all Parts at (0,0);
+- perform 2048 Whole QA first;
+- run Runtime/58 px QA only downstream.
+
+See: docs/whole-shape-canonical-assembly-qa-standard.md
 
 ## Scope
 - Static F0 only
