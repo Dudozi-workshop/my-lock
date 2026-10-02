@@ -9,7 +9,8 @@ void main() {
   test('Soft Basic ShapeSpecs load for all active shapes', () async {
     await ShapeSpecRegistry.instance.load();
 
-    for (final shape in ShapeKind.values) {
+    for (final shape in ShapeKind.values.where((shape) =>
+        !ShapeSpecRegistry.instance.isRasterShape(shape))) {
       final bundle = ShapeSpecRegistry.instance.resolve(
         ShapeStyle.softBasic,
         shape,
@@ -87,7 +88,8 @@ void main() {
   test('Crayon Soft reuses shape masters with procedural texture', () async {
     await ShapeSpecRegistry.instance.load();
 
-    for (final shape in ShapeKind.values) {
+    for (final shape in ShapeKind.values.where((shape) =>
+        !ShapeSpecRegistry.instance.isRasterShape(shape))) {
       final bundle = ShapeSpecRegistry.instance.resolve(
         ShapeStyle.crayonSoft,
         shape,
@@ -100,6 +102,18 @@ void main() {
       expect(bundle.shape.styleId, 'soft_basic');
       expect(bundle.shape.shapeId, shape.name);
     }
+  });
+
+  test('Sea Turtle is loaded through the raster production path', () async {
+    await ShapeSpecRegistry.instance.load();
+
+    expect(ShapeSpecRegistry.instance.isRasterShape(ShapeKind.seaTurtle), isTrue);
+    final image =
+        ShapeSpecRegistry.instance.resolveRasterShape(ShapeKind.seaTurtle);
+    expect(image.width, 58);
+    expect(image.height, 58);
+    expect(ShapeKind.defaults.contains(ShapeKind.seaTurtle), isFalse);
+    expect(ShapeKind.seaTurtle.premium, isTrue);
   });
 
 }
