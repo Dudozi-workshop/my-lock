@@ -3,6 +3,7 @@
 
 Commands:
   validate [asset_root]
+  validate-all [search_root]
   bootstrap <asset_root> --asset-id <id> [--parts a,b,c]
 
 This tool manages metadata and directory scaffolding only. It never edits,
@@ -18,7 +19,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_ROOT = ROOT / "assets/shape_masters/drop01/sea_turtle_v3"
+DEFAULT_ROOT = ROOT / "assets/shape_masters"
 REGISTRY_JSON = "ASSET_REGISTRY.json"
 ALLOWED = {"working","candidate","qa_candidate","lock_candidate","final_locked","superseded","withdrawn","archived"}
 ID_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
@@ -132,6 +133,21 @@ def validate(asset_root: Path) -> list[str]:
 
     return errors
 
+def discover_registries(search_root: Path) -> list[Path]:
+    if (search_root / REGISTRY_JSON).is_file():
+        return [search_root]
+    return sorted(path.parent for path in search_root.rglob(REGISTRY_JSON))
+
+def validate_all(search_root: Path) -> list[str]:
+    roots = discover_registries(search_root)
+    if not roots:
+        return [f"no {REGISTRY_JSON} found under {search_root.relative_to(ROOT)}"]
+    errors: list[str] = []
+    for asset_root in roots:
+        for error in validate(asset_root):
+            errors.append(f"{asset_root.relative_to(ROOT)}: {error}")
+    return errors
+
 def bootstrap(asset_root: Path, asset_id: str, parts: list[str]) -> None:
     if not ID_RE.fullmatch(asset_id):
         raise SystemExit("asset-id must be lowercase snake_case")
@@ -166,13 +182,17 @@ def main() -> int:
     p=argparse.ArgumentParser()
     sub=p.add_subparsers(dest="cmd",required=True)
     v=sub.add_parser("validate"); v.add_argument("asset_root",nargs="?",default=str(DEFAULT_ROOT))
+    va=sub.add_parser("validate-all"); va.add_argument("search_root",nargs="?",default=str(DEFAULT_ROOT))
     b=sub.add_parser("bootstrap"); b.add_argument("asset_root"); b.add_argument("--asset-id",required=True); b.add_argument("--parts",default="")
     a=p.parse_args()
     asset_root=Path(a.asset_root)
     if not asset_root.is_absolute(): asset_root=ROOT/asset_root
     if a.cmd=="bootstrap":
         bootstrap(asset_root,a.asset_id,[x for x in a.parts.split(",") if x]); return 0
-    errors=validate(asset_root)
+    if a.cmd=="validate-all":
+        errors=validate_all(asset_root)
+    else:
+        errors=validate(asset_root)
     if errors:
         print("MY LOCK asset validation FAILED:",file=sys.stderr)
         for e in errors: print(f" - {e}",file=sys.stderr)
