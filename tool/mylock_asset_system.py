@@ -27,7 +27,6 @@ ID_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
 FILE_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*(?:\.[a-z0-9]+)?$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 FORBIDDEN_PRODUCTION_TOKENS = ("candidate", "working", "draft", "tmp", "temp", "withdrawn", "legacy")
-STANDARD_DIRS = ("master","parts","whole_turtle","runtime","motion","docs","archive")
 
 def load(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
@@ -236,8 +235,6 @@ def bootstrap(asset_root: Path, asset_id: str, parts: list[str]) -> None:
     if not ID_RE.fullmatch(asset_id):
         raise SystemExit("asset-id must be lowercase snake_case")
     asset_root.mkdir(parents=True, exist_ok=True)
-    for name in STANDARD_DIRS:
-        (asset_root/name).mkdir(exist_ok=True)
     for part in parts:
         if not ID_RE.fullmatch(part):
             raise SystemExit(f"invalid part id: {part}")
@@ -250,7 +247,7 @@ def bootstrap(asset_root: Path, asset_id: str, parts: list[str]) -> None:
       "schema_version":"mylock_asset_registry_v1",
       "asset_id":asset_id,
       "lifecycle_vocabulary":sorted(ALLOWED),
-      "required_directories":list(STANDARD_DIRS),
+      "required_directories":[],
       "lineages":[],
       "policy":{
         "filename_does_not_determine_active_status":True,
