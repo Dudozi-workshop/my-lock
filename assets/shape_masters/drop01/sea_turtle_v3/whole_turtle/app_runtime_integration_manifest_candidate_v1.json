@@ -2,7 +2,7 @@
   "shape_id": "sea_turtle_v3",
   "gate": "app_runtime_integration",
   "version": "candidate_v1",
-  "status": "QA Candidate v2 / production component verification",
+  "status": "Intermediate / Runtime v3 redesign pending",
   "architecture": {
     "shape_kind": "ShapeKind.seaTurtle",
     "premium": true,
@@ -10,9 +10,10 @@
     "render_path": "Raster Shape Registry -> shared ShapeSpecRenderer -> LockTokenPainter",
     "style_behavior": "Raster illustrated Shape bypasses vector Soft Basic/Crayon geometry while remaining compatible with shared token rendering.",
     "palette_behavior": "ShapeTone is applied with BlendMode.color, then original raster alpha is re-applied with dstIn so palette output is clipped to turtle pixels only while luminance/material detail survives.",
-    "runtime_source": "assets/raster_shapes/sea_turtle_v3_runtime58_lossless.webp.b64",
+    "runtime_source": "assets/raster_shapes/sea_turtle_v3_runtime58_v2_lossless.webp.b64",
     "runtime_source_sha256": "022b9365c1d5ab09bf687a26e224b97ce7f70624c80a516c9e355eb5009d3d62",
-    "bootstrap": "RasterShapeBootstrap loads raster assets after runApp for both MyLockApp and MyLockLockApp; loading/error UI prevents blank-screen failure."
+    "bootstrap": "RasterShapeBootstrap loads raster assets after runApp for both MyLockApp and MyLockLockApp; loading/error UI prevents blank-screen failure.",
+    "runtime_note": "Runtime v2 adds safety padding to address crop-edge artifacts, but 58 px remains an intermediate runtime texture source and is not the long-term production architecture."
   },
   "compatibility": [
     "Customize ShapeChoiceCard via shared LockTokenPainter",
@@ -27,7 +28,7 @@
     "flutter_test": "PASS",
     "web_build": "PASS",
     "cloudflare_deploy": "PASS",
-    "android_apk_build": "in_progress",
+    "android_apk_build": "previous integration CI PASS; current v2 follow-up not promoted to Final",
     "web_run_id": 36970589122,
     "android_ci_run_id": 36970589117
   },
@@ -55,5 +56,11 @@
   "imagegen_used": false,
   "geometry_changed": false,
   "material_changed": false,
-  "next_gate": "User visual approval of actual production components; Android APK completion; then App Runtime Integration LOCK."
+  "next_gate": "Runtime v3: 256 padded Runtime Master + metadata-driven placement + 2-layer Palette Base/Fixed Finish renderer + Aurora Sea animated palette + production-component QA.",
+  "known_issues": [
+    "58 px texture used as a runtime source is too small for rotation, enlargement, and animation quality.",
+    "Shape-specific visualScale compensation is a magic-number pattern and should be replaced by metadata-driven framing.",
+    "Single-layer BlendMode.color affects all opaque raster pixels; long-term renderer should separate Palette Base from Fixed Finish.",
+    "Runtime v2 safety padding is an interim fix for rectangular crop-edge artifacts, not the final architecture."
+  ]
 }
