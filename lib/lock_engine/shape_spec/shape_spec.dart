@@ -10,6 +10,10 @@ enum ShapeRotationMode { rotateWithObject, fixed }
 
 enum ShapeRenderMode { layered, crayon }
 
+enum CrayonEdgeMode { vector, none, broken, scribble, overfill, hybrid }
+
+enum CrayonStrokePattern { hatch, zigzag }
+
 class ShapeStyleSpec {
   const ShapeStyleSpec({
     required this.id,
@@ -43,9 +47,7 @@ class ShapeStyleSpec {
       shapeSourceId: json['shapeSourceId'] as String?,
       crayon: json['crayon'] == null
           ? null
-          : CrayonTextureSpec.fromJson(
-              json['crayon'] as Map<String, dynamic>,
-            ),
+          : CrayonTextureSpec.fromJson(json['crayon'] as Map<String, dynamic>),
     );
   }
 }
@@ -66,6 +68,58 @@ class CrayonTextureSpec {
     this.underpaintOpacity = 1.0,
     this.baseStrokeOpacity = 0.0,
     this.strokeBreakChance = 0.0,
+    this.strokeBuiltSurface = false,
+    this.broadStrokeCount = 0,
+    this.broadStrokeWidth = 4.0,
+    this.broadStrokeOpacity = 0.0,
+    this.angleJitterDeg = 0.0,
+    this.strokeWidthJitter = 0.0,
+    this.strokeLengthMin = 1.0,
+    this.strokeLengthMax = 1.0,
+    this.gapChance = 0.0,
+    this.toneVariation = 0.0,
+    this.edgeWidth = 0.72,
+    this.edgeTexture = 0.0,
+    this.edgeMode = CrayonEdgeMode.vector,
+    this.edgeSegmentLength = 7.0,
+    this.edgeSegmentGap = 3.0,
+    this.edgeOffsetJitter = 0.8,
+    this.edgeWidthJitter = 0.25,
+    this.edgeOpacityJitter = 0.20,
+    this.edgeBandWidth = 3.0,
+    this.overflowAmount = 1.2,
+    this.strokePattern = CrayonStrokePattern.hatch,
+    this.zigzagAmplitude = 0.0,
+    this.zigzagCycles = 0,
+    this.negativeGapCount = 0,
+    this.negativeGapWidth = 0.0,
+    this.internalGapChance = 0.0,
+    this.internalGapWidthRatio = 0.0,
+    this.internalGapLengthMin = 4.0,
+    this.internalGapLengthMax = 12.0,
+    this.internalGapStrength = 1.0,
+    this.internalStrandCount = 1,
+    this.internalStrandSpread = 0.0,
+    this.internalGapOffsetJitter = 0.0,
+    this.directionPassCount = 1,
+    this.directionSpreadDeg = 0.0,
+    this.laneScatter = 0.0,
+    this.pressureVariation = 0.0,
+    this.paperToothCount = 0,
+    this.paperToothWidthMin = 0.25,
+    this.paperToothWidthMax = 0.85,
+    this.paperToothLengthMin = 0.8,
+    this.paperToothLengthMax = 3.2,
+    this.paperToothStrength = 0.85,
+    this.grainRadiusMin = 0.18,
+    this.grainRadiusMax = 0.58,
+    this.contourBaseWidth = 0.0,
+    this.contourBaseOpacity = 0.0,
+    this.contourGapCount = 0,
+    this.contourGapLengthMin = 1.4,
+    this.contourGapLengthMax = 3.8,
+    this.contourGapWidthScale = 0.82,
+    this.contourGapStrength = 1.0,
   });
 
   final int darkStrokeCount;
@@ -86,6 +140,95 @@ class CrayonTextureSpec {
   final double baseStrokeOpacity;
   final double strokeBreakChance;
 
+  /// Round 3 experimental renderer: the shape surface is constructed from
+  /// layered pigment strokes instead of a solid fill with texture on top.
+  final bool strokeBuiltSurface;
+  final int broadStrokeCount;
+  final double broadStrokeWidth;
+  final double broadStrokeOpacity;
+  final double angleJitterDeg;
+  final double strokeWidthJitter;
+  final double strokeLengthMin;
+  final double strokeLengthMax;
+  final double gapChance;
+  final double toneVariation;
+
+  /// Crayon outline controls. edgeWidth is in the 100x100 design space.
+  /// edgeTexture adds deterministic offset passes so the contour reads like
+  /// a wax-crayon edge instead of a clean vector stroke.
+  final double edgeWidth;
+  final double edgeTexture;
+  final CrayonEdgeMode edgeMode;
+  final double edgeSegmentLength;
+  final double edgeSegmentGap;
+  final double edgeOffsetJitter;
+  final double edgeWidthJitter;
+  final double edgeOpacityJitter;
+  final double edgeBandWidth;
+  final double overflowAmount;
+
+  /// Internal mark geometry. hatch preserves the existing diagonal fill.
+  /// zigzag produces a hand-coloring lightning / back-and-forth stroke.
+  final CrayonStrokePattern strokePattern;
+  final double zigzagAmplitude;
+  final int zigzagCycles;
+
+  /// True negative-space cuts. These erase pigment inside the isolated token
+  /// layer so the runtime background shows through instead of drawing a
+  /// lighter pigment mark over the fill.
+  final int negativeGapCount;
+  final double negativeGapWidth;
+
+  /// Sparse paper reveal inside an otherwise continuous crayon stroke.
+  /// Unlike negativeGapCount, these marks never cut across the full stroke
+  /// width. They stay inside the pigment band so the outer stroke reads as
+  /// one continuous hand motion.
+  final double internalGapChance;
+  final double internalGapWidthRatio;
+  final double internalGapLengthMin;
+  final double internalGapLengthMax;
+  final double internalGapStrength;
+  final int internalStrandCount;
+  final double internalStrandSpread;
+  final double internalGapOffsetJitter;
+
+  /// Reference-reset controls. Defaults are neutral so the current Production
+  /// style.json keeps PREVIEW 008 behavior until an approved Lab candidate is
+  /// explicitly promoted.
+  ///
+  /// directionPassCount/directionSpreadDeg create several hand-rub direction
+  /// families instead of mechanically parallel lanes. laneScatter blends even
+  /// lanes toward random placement. pressureVariation adds local heavy wax
+  /// deposits along a stroke. paperTooth* removes tiny irregular pigment marks
+  /// so the real background reads through like paper tooth. grainRadius*
+  /// controls pigment clump size rather than adding a blur/airbrush layer.
+  final int directionPassCount;
+  final double directionSpreadDeg;
+  final double laneScatter;
+  final double pressureVariation;
+  final int paperToothCount;
+  final double paperToothWidthMin;
+  final double paperToothWidthMax;
+  final double paperToothLengthMin;
+  final double paperToothLengthMax;
+  final double paperToothStrength;
+  final double grainRadiusMin;
+  final double grainRadiusMax;
+
+  /// Round 2 contour controls. The base contour restores the deliberately
+  /// thick hand-outlined stroke as an independent layer. Sparse contour gaps
+  /// are erased from that stroke, so the outline can still show dry crayon
+  /// paper breaks without disappearing as a structural cue.
+  ///
+  /// Defaults are disabled to preserve the current Production style.json.
+  final double contourBaseWidth;
+  final double contourBaseOpacity;
+  final int contourGapCount;
+  final double contourGapLengthMin;
+  final double contourGapLengthMax;
+  final double contourGapWidthScale;
+  final double contourGapStrength;
+
   factory CrayonTextureSpec.fromJson(Map<String, dynamic> json) {
     return CrayonTextureSpec(
       darkStrokeCount: (json['darkStrokeCount'] as num).toInt(),
@@ -99,12 +242,84 @@ class CrayonTextureSpec {
       grainOpacity: (json['grainOpacity'] as num).toDouble(),
       edgeOpacity: (json['edgeOpacity'] as num).toDouble(),
       baseStrokeCount: (json['baseStrokeCount'] as num?)?.toInt() ?? 0,
-      underpaintOpacity:
-          (json['underpaintOpacity'] as num?)?.toDouble() ?? 1.0,
-      baseStrokeOpacity:
-          (json['baseStrokeOpacity'] as num?)?.toDouble() ?? 0.0,
-      strokeBreakChance:
-          (json['strokeBreakChance'] as num?)?.toDouble() ?? 0.0,
+      underpaintOpacity: (json['underpaintOpacity'] as num?)?.toDouble() ?? 1.0,
+      baseStrokeOpacity: (json['baseStrokeOpacity'] as num?)?.toDouble() ?? 0.0,
+      strokeBreakChance: (json['strokeBreakChance'] as num?)?.toDouble() ?? 0.0,
+      strokeBuiltSurface: json['strokeBuiltSurface'] as bool? ?? false,
+      broadStrokeCount: (json['broadStrokeCount'] as num?)?.toInt() ?? 0,
+      broadStrokeWidth: (json['broadStrokeWidth'] as num?)?.toDouble() ?? 4.0,
+      broadStrokeOpacity:
+          (json['broadStrokeOpacity'] as num?)?.toDouble() ?? 0.0,
+      angleJitterDeg: (json['angleJitterDeg'] as num?)?.toDouble() ?? 0.0,
+      strokeWidthJitter: (json['strokeWidthJitter'] as num?)?.toDouble() ?? 0.0,
+      strokeLengthMin: (json['strokeLengthMin'] as num?)?.toDouble() ?? 1.0,
+      strokeLengthMax: (json['strokeLengthMax'] as num?)?.toDouble() ?? 1.0,
+      gapChance: (json['gapChance'] as num?)?.toDouble() ?? 0.0,
+      toneVariation: (json['toneVariation'] as num?)?.toDouble() ?? 0.0,
+      edgeWidth: (json['edgeWidth'] as num?)?.toDouble() ?? 0.72,
+      edgeTexture: (json['edgeTexture'] as num?)?.toDouble() ?? 0.0,
+      edgeMode: CrayonEdgeMode.values.byName(
+        (json['edgeMode'] as String?) ?? 'vector',
+      ),
+      edgeSegmentLength: (json['edgeSegmentLength'] as num?)?.toDouble() ?? 7.0,
+      edgeSegmentGap: (json['edgeSegmentGap'] as num?)?.toDouble() ?? 3.0,
+      edgeOffsetJitter: (json['edgeOffsetJitter'] as num?)?.toDouble() ?? 0.8,
+      edgeWidthJitter: (json['edgeWidthJitter'] as num?)?.toDouble() ?? 0.25,
+      edgeOpacityJitter:
+          (json['edgeOpacityJitter'] as num?)?.toDouble() ?? 0.20,
+      edgeBandWidth: (json['edgeBandWidth'] as num?)?.toDouble() ?? 3.0,
+      overflowAmount: (json['overflowAmount'] as num?)?.toDouble() ?? 1.2,
+      strokePattern: CrayonStrokePattern.values.byName(
+        (json['strokePattern'] as String?) ?? 'hatch',
+      ),
+      zigzagAmplitude: (json['zigzagAmplitude'] as num?)?.toDouble() ?? 0.0,
+      zigzagCycles: (json['zigzagCycles'] as num?)?.toInt() ?? 0,
+      negativeGapCount: (json['negativeGapCount'] as num?)?.toInt() ?? 0,
+      negativeGapWidth: (json['negativeGapWidth'] as num?)?.toDouble() ?? 0.0,
+      internalGapChance: (json['internalGapChance'] as num?)?.toDouble() ?? 0.0,
+      internalGapWidthRatio:
+          (json['internalGapWidthRatio'] as num?)?.toDouble() ?? 0.0,
+      internalGapLengthMin:
+          (json['internalGapLengthMin'] as num?)?.toDouble() ?? 4.0,
+      internalGapLengthMax:
+          (json['internalGapLengthMax'] as num?)?.toDouble() ?? 12.0,
+      internalGapStrength:
+          (json['internalGapStrength'] as num?)?.toDouble() ?? 1.0,
+      internalStrandCount: (json['internalStrandCount'] as num?)?.toInt() ?? 1,
+      internalStrandSpread:
+          (json['internalStrandSpread'] as num?)?.toDouble() ?? 0.0,
+      internalGapOffsetJitter:
+          (json['internalGapOffsetJitter'] as num?)?.toDouble() ?? 0.0,
+      directionPassCount: (json['directionPassCount'] as num?)?.toInt() ?? 1,
+      directionSpreadDeg:
+          (json['directionSpreadDeg'] as num?)?.toDouble() ?? 0.0,
+      laneScatter: (json['laneScatter'] as num?)?.toDouble() ?? 0.0,
+      pressureVariation: (json['pressureVariation'] as num?)?.toDouble() ?? 0.0,
+      paperToothCount: (json['paperToothCount'] as num?)?.toInt() ?? 0,
+      paperToothWidthMin:
+          (json['paperToothWidthMin'] as num?)?.toDouble() ?? 0.25,
+      paperToothWidthMax:
+          (json['paperToothWidthMax'] as num?)?.toDouble() ?? 0.85,
+      paperToothLengthMin:
+          (json['paperToothLengthMin'] as num?)?.toDouble() ?? 0.8,
+      paperToothLengthMax:
+          (json['paperToothLengthMax'] as num?)?.toDouble() ?? 3.2,
+      paperToothStrength:
+          (json['paperToothStrength'] as num?)?.toDouble() ?? 0.85,
+      grainRadiusMin: (json['grainRadiusMin'] as num?)?.toDouble() ?? 0.18,
+      grainRadiusMax: (json['grainRadiusMax'] as num?)?.toDouble() ?? 0.58,
+      contourBaseWidth: (json['contourBaseWidth'] as num?)?.toDouble() ?? 0.0,
+      contourBaseOpacity:
+          (json['contourBaseOpacity'] as num?)?.toDouble() ?? 0.0,
+      contourGapCount: (json['contourGapCount'] as num?)?.toInt() ?? 0,
+      contourGapLengthMin:
+          (json['contourGapLengthMin'] as num?)?.toDouble() ?? 1.4,
+      contourGapLengthMax:
+          (json['contourGapLengthMax'] as num?)?.toDouble() ?? 3.8,
+      contourGapWidthScale:
+          (json['contourGapWidthScale'] as num?)?.toDouble() ?? 0.82,
+      contourGapStrength:
+          (json['contourGapStrength'] as num?)?.toDouble() ?? 1.0,
     );
   }
 }
@@ -127,11 +342,9 @@ class ShapeColorRuleSpec {
   factory ShapeColorRuleSpec.fromJson(Map<String, dynamic> json) {
     return ShapeColorRuleSpec(
       lightnessUp: (json['lightnessUp'] as num).toDouble(),
-      lightSaturationDelta:
-          (json['lightSaturationDelta'] as num).toDouble(),
+      lightSaturationDelta: (json['lightSaturationDelta'] as num).toDouble(),
       lightnessDown: (json['lightnessDown'] as num).toDouble(),
-      shadeSaturationDelta:
-          (json['shadeSaturationDelta'] as num).toDouble(),
+      shadeSaturationDelta: (json['shadeSaturationDelta'] as num).toDouble(),
       specColor: _parseHexColor(json['specColor'] as String),
     );
   }
@@ -175,8 +388,7 @@ class ShapeSpec {
         for (final value in json['layers'] as List<dynamic>)
           ShapeLayerSpec.fromJson(value as Map<String, dynamic>),
       ],
-      shadow:
-          ShapeShadowSpec.fromJson(json['shadow'] as Map<String, dynamic>),
+      shadow: ShapeShadowSpec.fromJson(json['shadow'] as Map<String, dynamic>),
     );
   }
 }
@@ -221,14 +433,11 @@ class ShapeLayerSpec {
       geometry: ShapeGeometrySpec.fromJson(
         json['geometry'] as Map<String, dynamic>,
       ),
-      toneLightnessDelta:
-          (json['toneLightnessDelta'] as num?)?.toDouble(),
-      toneSaturationDelta:
-          (json['toneSaturationDelta'] as num?)?.toDouble(),
+      toneLightnessDelta: (json['toneLightnessDelta'] as num?)?.toDouble(),
+      toneSaturationDelta: (json['toneSaturationDelta'] as num?)?.toDouble(),
     );
   }
 }
-
 
 class ShapeSurfaceSpec {
   const ShapeSurfaceSpec({
@@ -299,10 +508,7 @@ class ShapeGeometrySpec {
 }
 
 class ShapeSpecBundle {
-  const ShapeSpecBundle({
-    required this.style,
-    required this.shape,
-  });
+  const ShapeSpecBundle({required this.style, required this.shape});
 
   final ShapeStyleSpec style;
   final ShapeSpec shape;
@@ -312,6 +518,7 @@ Color baseColorForTone(ShapeTone tone) {
   switch (tone) {
     case ShapeTone.pink:
       return const Color(0xFFFF8FD1);
+    case ShapeTone.auroraSea:
     case ShapeTone.blue:
       return const Color(0xFF79BFFF);
     case ShapeTone.yellow:

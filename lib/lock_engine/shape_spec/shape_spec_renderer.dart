@@ -261,8 +261,9 @@ class ShapeSpecRenderer {
     required ShapeStyleSpec style,
     required LockToken token,
     required double opacity,
+    CrayonTextureSpec? configOverride,
   }) {
-    final config = style.crayon;
+    final config = configOverride ?? style.crayon;
     if (config == null) {
       throw StateError('Crayon render mode requires crayon style config.');
     }
@@ -284,6 +285,18 @@ class ShapeSpecRenderer {
       saturationDelta: -0.055,
     );
 
+    if (config.strokeBuiltSurface) {
+      _paintStrokeBuiltCrayon(
+        canvas,
+        bodyPath: bodyPath,
+        style: style,
+        token: token,
+        opacity: opacity,
+        config: config,
+      );
+      return;
+    }
+
     canvas.save();
     canvas.translate(0.15, 0.75);
     canvas.drawShadow(
@@ -296,10 +309,14 @@ class ShapeSpecRenderer {
 
     canvas.drawPath(
       bodyPath,
-      Paint()..color = fill.withValues(alpha: opacity),
+      Paint()
+        ..color = fill.withValues(
+          alpha: config.underpaintOpacity * opacity,
+        ),
     );
 
-    final cacheKey = '${style.id}:${style.version}:${token.id}';
+    final cacheKey =
+        '${style.id}:${style.version}:${token.id}:${_crayonConfigKey(config)}';
     final texture = _crayonTextureCache.putIfAbsent(
       cacheKey,
       () => _buildCrayonTexture(config, cacheKey),
@@ -307,6 +324,18 @@ class ShapeSpecRenderer {
 
     canvas.save();
     canvas.clipPath(bodyPath);
+
+    if (texture.baseStrokes.isNotEmpty && config.baseStrokeOpacity > 0) {
+      final basePaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..strokeWidth = config.strokeWidth * 1.12
+        ..color = base.withValues(alpha: config.baseStrokeOpacity * opacity);
+      for (final path in texture.baseStrokes) {
+        canvas.drawPath(path, basePaint);
+      }
+    }
 
     final darkPaint = Paint()
       ..style = PaintingStyle.stroke
@@ -359,13 +388,725 @@ class ShapeSpecRenderer {
     canvas.restore();
   }
 
+  static void _paintStrokeBuiltCrayon(
+    Canvas canvas, {
+    required Path bodyPath,
+    required ShapeStyleSpec style,
+    required LockToken token,
+    required double opacity,
+    required CrayonTextureSpec config,
+  }) {
+    final base = baseColorForTone(token.tone);
+
+    // Color-lock rule: Crayon Soft must preserve the exact palette identity.
+    // Marks may move only a few lightness points to reveal wax pressure;
+    // hue and saturation stay fixed across candidates.
+    // PREVIEW LAB FIX: Round 7 varied geometry/opacity while rendering nearly
+    // the same pigment over an opaque base, so every candidate collapsed to
+    // the same flat-looking result at 58 px. toneVariation now controls an
+    // actual lightness range while hue/saturation remain locked to the palette.
+    final variation = config.toneVariation.clamp(0.0, 0.18);
+    final pressureDark = adjustTone(
+      base,
+      lightnessDelta: -(0.022 + variation * 0.62),
+      saturationDelta: 0.0,
+    );
+    final pressureLight = adjustTone(
+      base,
+      lightnessDelta: 0.018 + variation * 0.52,
+      saturationDelta: 0.0,
+    );
+
+    // Keep the whole internal pigment on an isolated layer. This lets
+    // negative-space marks reveal the real runtime background instead of
+    // faking a "gap" with a lighter pigment color.
+    canvas.saveLayer(bodyPath.getBounds().inflate(3.0), Paint());
+
+    // A light underpaint prevents tiny accidental pinholes while the visible
+    // surface is still built by actual strokes.
+    if (config.underpaintOpacity > 0) {
+      canvas.drawPath(
+        bodyPath,
+        Paint()
+          ..color = base.withValues(
+            alpha: config.underpaintOpacity * opacity,
+          ),
+      );
+    }
+
+    final cacheKey =
+        '${style.id}:${style.version}:${token.id}:HAND:${_crayonConfigKey(config)}';
+    final texture = _crayonTextureCache.putIfAbsent(
+      cacheKey,
+      () => _buildStrokeBuiltTexture(config, cacheKey),
+    );
+
+    canvas.save();
+    canvas.clipPath(bodyPath);
+
+    void paintStroke(_CrayonStroke stroke) {
+      final pigment = switch (stroke.toneBand) {
+        -1 => Color.lerp(base, pressureDark, 0.78)!,
+        1 => Color.lerp(base, pressureLight, 0.72)!,
+        _ => base,
+      };
+      canvas.drawPath(
+        stroke.path,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..strokeWidth = stroke.width
+          ..color = pigment.withValues(alpha: stroke.opacity * opacity),
+      );
+
+      // Paper reveal stays inside the stroke body. dstOut can remove the
+      // underpaint underneath, but the gap width is clamped below the stroke
+      // width so both pigment edges remain continuous.
+      for (final gap in stroke.internalGaps) {
+        canvas.drawPath(
+          gap.path,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeCap = StrokeCap.round
+            ..strokeJoin = StrokeJoin.round
+            ..strokeWidth = gap.width
+            ..blendMode = BlendMode.dstOut
+            ..color = Colors.white.withValues(alpha: gap.strength),
+        );
+      }
+    }
+
+    // Broad passes read as the first hand-filled wax layer. Main and light
+    // passes are not different colors; they simulate pressure and overlap.
+    for (final stroke in texture.broadStrokes) {
+      paintStroke(stroke);
+    }
+    for (final stroke in texture.mainStrokes) {
+      paintStroke(stroke);
+    }
+    for (final stroke in texture.lightPigmentStrokes) {
+      paintStroke(stroke);
+    }
+
+    // Pigment clumps are wax deposits, not pale decorative dots.
+    // Darker low-alpha flecks make overlapping pigment visible while the
+    // paper-tooth pass below removes pigment to expose the real background.
+    final grainPaint = Paint()
+      ..color = pressureDark.withValues(
+        alpha: config.grainOpacity * 0.78 * opacity,
+      );
+    for (final dot in texture.grain) {
+      canvas.drawCircle(dot.center, dot.radius, grainPaint);
+    }
+
+    if (texture.paperTooth.isNotEmpty) {
+      for (final tooth in texture.paperTooth) {
+        canvas.drawPath(
+          tooth.path,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeCap = StrokeCap.round
+            ..strokeJoin = StrokeJoin.round
+            ..strokeWidth = tooth.width
+            ..blendMode = BlendMode.dstOut
+            ..color = Colors.white.withValues(
+              alpha: tooth.strength * opacity,
+            ),
+        );
+      }
+    }
+
+    if (texture.negativeGaps.isNotEmpty && config.negativeGapWidth > 0) {
+      final clearPaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..strokeWidth = config.negativeGapWidth
+        ..blendMode = BlendMode.clear;
+      for (final gap in texture.negativeGaps) {
+        canvas.drawPath(gap, clearPaint);
+      }
+    }
+
+    canvas.restore();
+    canvas.restore();
+
+    // Round 2: restore the deliberately thick hand-drawn contour as its own
+    // layer. Sparse erasures are applied only to this contour layer, so the
+    // outline can look dry and imperfect without losing its structural role.
+    if (config.contourBaseWidth > 0 && config.contourBaseOpacity > 0) {
+      final contourBounds =
+          bodyPath.getBounds().inflate(config.contourBaseWidth * 1.8 + 2.0);
+      canvas.saveLayer(contourBounds, Paint());
+      canvas.drawPath(
+        bodyPath,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeJoin = StrokeJoin.round
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = config.contourBaseWidth
+          ..color = pressureDark.withValues(
+            alpha: config.contourBaseOpacity * opacity,
+          ),
+      );
+
+      if (config.contourGapCount > 0 && config.contourGapStrength > 0) {
+        final contourRandom = Random(
+          _stableSeed(
+            '${style.id}:${token.id}:CONTOUR:${_crayonConfigKey(config)}',
+          ),
+        );
+        final metrics = bodyPath.computeMetrics().toList(growable: false);
+        if (metrics.isNotEmpty) {
+          final totalLength = metrics.fold<double>(
+            0.0,
+            (sum, metric) => sum + metric.length,
+          );
+          final minLength = max(0.5, config.contourGapLengthMin);
+          final maxLength = max(minLength, config.contourGapLengthMax);
+          for (var i = 0; i < config.contourGapCount; i++) {
+            var target = contourRandom.nextDouble() * totalLength;
+            for (final metric in metrics) {
+              if (target <= metric.length) {
+                final gapLength =
+                    minLength +
+                    contourRandom.nextDouble() * (maxLength - minLength);
+                final startGap = max(0.0, target - gapLength / 2);
+                final endGap = min(metric.length, target + gapLength / 2);
+                if (endGap > startGap + 0.2) {
+                  canvas.drawPath(
+                    metric.extractPath(startGap, endGap),
+                    Paint()
+                      ..style = PaintingStyle.stroke
+                      ..strokeJoin = StrokeJoin.round
+                      ..strokeCap = StrokeCap.round
+                      ..strokeWidth = max(
+                        0.45,
+                        config.contourBaseWidth *
+                            config.contourGapWidthScale,
+                      )
+                      ..blendMode = BlendMode.dstOut
+                      ..color = Colors.white.withValues(
+                        alpha: config.contourGapStrength * opacity,
+                      ),
+                  );
+                }
+                break;
+              }
+              target -= metric.length;
+            }
+          }
+        }
+      }
+      canvas.restore();
+    }
+
+    if (config.edgeOpacity <= 0 ||
+        config.edgeMode == CrayonEdgeMode.none) {
+      return;
+    }
+
+    final edgeAlpha = config.edgeOpacity * opacity;
+    final contourColor = pressureDark;
+    final edgeRandom = Random(
+      _stableSeed(
+        '${style.id}:${token.id}:EDGE:${_crayonConfigKey(config)}',
+      ),
+    );
+    final metrics = bodyPath.computeMetrics().toList(growable: false);
+
+    Paint edgePaint({
+      double widthScale = 1.0,
+      double alphaScale = 1.0,
+    }) {
+      final widthJitter =
+          1 + (edgeRandom.nextDouble() - 0.5) * 2 * config.edgeWidthJitter;
+      final opacityJitter =
+          1 + (edgeRandom.nextDouble() - 0.5) * 2 * config.edgeOpacityJitter;
+      return Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = max(
+          0.45,
+          config.edgeWidth * widthScale * widthJitter,
+        )
+        ..strokeJoin = StrokeJoin.round
+        ..strokeCap = StrokeCap.round
+        ..color = contourColor.withValues(
+          alpha: (edgeAlpha * alphaScale * opacityJitter).clamp(0.0, 1.0),
+        );
+    }
+
+    void paintVectorEdge() {
+      canvas.drawPath(bodyPath, edgePaint(alphaScale: 0.72));
+    }
+
+    void paintBrokenEdge() {
+      for (final metric in metrics) {
+        var distance = edgeRandom.nextDouble() * config.edgeSegmentGap;
+        while (distance < metric.length) {
+          final segmentLength = config.edgeSegmentLength *
+              (0.62 + edgeRandom.nextDouble() * 0.72);
+          final gap =
+              config.edgeSegmentGap * (0.55 + edgeRandom.nextDouble() * 1.15);
+          final end = min(metric.length, distance + segmentLength);
+          if (end > distance + 0.2) {
+            final tangent = metric.getTangentForOffset((distance + end) / 2);
+            if (tangent != null) {
+              final normal = Offset(
+                -tangent.vector.dy,
+                tangent.vector.dx,
+              );
+              final offset = (edgeRandom.nextDouble() - 0.5) *
+                  2 *
+                  config.edgeOffsetJitter;
+              canvas.save();
+              canvas.translate(normal.dx * offset, normal.dy * offset);
+              canvas.drawPath(
+                metric.extractPath(distance, end),
+                edgePaint(alphaScale: 0.82),
+              );
+              canvas.restore();
+            }
+          }
+          distance = end + gap;
+        }
+      }
+    }
+
+    void paintScribbleBand() {
+      for (final metric in metrics) {
+        final spacing = max(2.4, config.edgeSegmentLength * 0.72);
+        final count = max(6, (metric.length / spacing).ceil());
+        for (var i = 0; i < count; i++) {
+          final d = ((i + 0.25 + edgeRandom.nextDouble() * 0.5) / count) *
+              metric.length;
+          final tangent = metric.getTangentForOffset(d);
+          if (tangent == null) continue;
+          final unit = tangent.vector;
+          final normal = Offset(-unit.dy, unit.dx);
+          final bandOffset = (edgeRandom.nextDouble() - 0.5) *
+              2 *
+              config.edgeBandWidth;
+          final center = tangent.position + normal * bandOffset;
+          final halfLength = config.edgeSegmentLength *
+              (0.24 + edgeRandom.nextDouble() * 0.34);
+          final wobble =
+              (edgeRandom.nextDouble() - 0.5) * config.edgeOffsetJitter * 1.4;
+          final start =
+              center - unit * halfLength + normal * (wobble * 0.35);
+          final mid = center + normal * wobble;
+          final end =
+              center + unit * halfLength - normal * (wobble * 0.25);
+          final path = Path()
+            ..moveTo(start.dx, start.dy)
+            ..quadraticBezierTo(mid.dx, mid.dy, end.dx, end.dy);
+          canvas.drawPath(path, edgePaint(widthScale: 0.72, alphaScale: 0.66));
+        }
+      }
+    }
+
+    void paintOverfill() {
+      final angle = config.angleDeg * pi / 180;
+      final strokeDirection = Offset(cos(angle), sin(angle));
+      for (final metric in metrics) {
+        final spacing = max(3.0, config.edgeSegmentLength * 0.95);
+        final count = max(5, (metric.length / spacing).ceil());
+        for (var i = 0; i < count; i++) {
+          if (edgeRandom.nextDouble() < 0.22) continue;
+          final d = ((i + edgeRandom.nextDouble()) / count) * metric.length;
+          final tangent = metric.getTangentForOffset(d);
+          if (tangent == null) continue;
+          final normal = Offset(-tangent.vector.dy, tangent.vector.dx);
+          final outside = config.overflowAmount *
+              (0.45 + edgeRandom.nextDouble() * 0.95);
+          final center = tangent.position + normal * outside * 0.45;
+          final len = config.edgeSegmentLength *
+              (0.28 + edgeRandom.nextDouble() * 0.32);
+          final tilt = normal *
+              ((edgeRandom.nextDouble() - 0.5) *
+                  config.edgeOffsetJitter *
+                  1.5);
+          final start = center - strokeDirection * len + tilt;
+          final end = center + strokeDirection * len - tilt * 0.4;
+          final path = Path()
+            ..moveTo(start.dx, start.dy)
+            ..lineTo(end.dx, end.dy);
+          canvas.drawPath(
+            path,
+            edgePaint(widthScale: 0.60, alphaScale: 0.46),
+          );
+        }
+      }
+    }
+
+    switch (config.edgeMode) {
+      case CrayonEdgeMode.vector:
+        paintVectorEdge();
+        break;
+      case CrayonEdgeMode.none:
+        break;
+      case CrayonEdgeMode.broken:
+        paintBrokenEdge();
+        break;
+      case CrayonEdgeMode.scribble:
+        paintScribbleBand();
+        break;
+      case CrayonEdgeMode.overfill:
+        paintOverfill();
+        break;
+      case CrayonEdgeMode.hybrid:
+        paintBrokenEdge();
+        paintOverfill();
+        break;
+    }
+  }
+
+  static _CrayonTextureGeometry _buildStrokeBuiltTexture(
+    CrayonTextureSpec config,
+    String seedText,
+  ) {
+    final random = Random(_stableSeed(seedText));
+
+    List<_CrayonStroke> buildStrokeLayer({
+      required int count,
+      required double nominalWidth,
+      required double nominalOpacity,
+      required double angleOffset,
+      required double breakScale,
+      required double gapScale,
+    }) {
+      final strokes = <_CrayonStroke>[];
+      if (count <= 0 || nominalOpacity <= 0) return strokes;
+
+      for (var i = 0; i < count; i++) {
+        if (random.nextDouble() <
+            (config.gapChance * gapScale).clamp(0.0, 0.92)) {
+          continue;
+        }
+
+        final fraction = count <= 1 ? 0.5 : i / (count - 1);
+        final evenLane = -66 + fraction * 132;
+        final randomLane = -66 + random.nextDouble() * 132;
+        final laneScatter = config.laneScatter.clamp(0.0, 1.0);
+        final lane = evenLane * (1 - laneScatter) +
+            randomLane * laneScatter +
+            (random.nextDouble() - 0.5) * config.jitter * 2.2;
+
+        final passCount = config.directionPassCount.clamp(1, 5);
+        final passIndex = i % passCount;
+        final passPosition = passCount <= 1
+            ? 0.0
+            : -1.0 + 2.0 * passIndex / (passCount - 1);
+        final passAngle = passPosition * config.directionSpreadDeg;
+        final localAngle =
+            config.angleDeg +
+            angleOffset +
+            passAngle +
+            (random.nextDouble() - 0.5) * 2 * config.angleJitterDeg;
+        final angle = localAngle * pi / 180;
+        final direction = Offset(cos(angle), sin(angle));
+        final normal = Offset(-direction.dy, direction.dx);
+
+        final minLength = config.strokeLengthMin.clamp(0.15, 1.0);
+        final maxLength =
+            max(minLength, config.strokeLengthMax.clamp(minLength, 1.15));
+        final lengthRatio =
+            minLength + random.nextDouble() * (maxLength - minLength);
+        final fullTravel = 172.0 * lengthRatio;
+        final centerTravel = (random.nextDouble() - 0.5) * (172 - fullTravel) * 0.75;
+        final start = centerTravel - fullTravel / 2;
+        final end = centerTravel + fullTravel / 2;
+        const steps = 15;
+        final path = Path();
+        var penDown = false;
+
+        for (var step = 0; step <= steps; step++) {
+          final t = step / steps;
+          final travel = start + (end - start) * t;
+          final wobble =
+              (random.nextDouble() - 0.5) * config.jitter * 0.92;
+          final alongWobble =
+              (random.nextDouble() - 0.5) * config.jitter * 0.28;
+          var patternOffset = 0.0;
+          if (config.strokePattern == CrayonStrokePattern.zigzag &&
+              config.zigzagCycles > 0 &&
+              config.zigzagAmplitude > 0) {
+            final phase = (t * config.zigzagCycles) % 1.0;
+            final triangle = phase < 0.5
+                ? -1.0 + phase * 4.0
+                : 3.0 - phase * 4.0;
+            patternOffset = triangle * config.zigzagAmplitude;
+          }
+          final point = const Offset(50, 50) +
+              direction * (travel + alongWobble) +
+              normal * (lane + wobble + patternOffset);
+
+          final shouldBreak = step > 0 &&
+              random.nextDouble() <
+                  (config.strokeBreakChance * breakScale).clamp(0.0, 0.85);
+          if (!penDown || shouldBreak) {
+            path.moveTo(point.dx, point.dy);
+            penDown = true;
+          } else {
+            path.lineTo(point.dx, point.dy);
+          }
+        }
+
+        final pressureVariation =
+            config.pressureVariation.clamp(0.0, 1.0);
+        final widthJitter =
+            1 +
+            (random.nextDouble() - 0.5) * 2 * config.strokeWidthJitter +
+            (random.nextDouble() - 0.5) * 2 * pressureVariation * 0.42;
+        final actualWidth = max(0.35, nominalWidth * widthJitter);
+        final opacityJitter =
+            (0.78 + random.nextDouble() * 0.36) *
+            (1 +
+                (random.nextDouble() - 0.5) *
+                    2 *
+                    pressureVariation *
+                    0.48);
+        final toneRoll = random.nextDouble();
+        final toneBand = toneRoll < 0.24
+            ? -1
+            : toneRoll > 0.76
+                ? 1
+                : 0;
+
+        final internalGaps = <_CrayonInternalGap>[];
+        final gapChance =
+            (config.internalGapChance * gapScale).clamp(0.0, 0.65);
+        final gapWidthRatio =
+            config.internalGapWidthRatio.clamp(0.0, 0.68);
+        if (gapChance > 0 && gapWidthRatio > 0) {
+          final minGapLength = max(1.2, config.internalGapLengthMin);
+          final maxGapLength =
+              max(minGapLength, config.internalGapLengthMax);
+          final strandCount = config.internalStrandCount.clamp(1, 4);
+          final strandSpread =
+              config.internalStrandSpread.clamp(0.0, 0.72);
+          final offsetJitter =
+              config.internalGapOffsetJitter.clamp(0.0, 0.35);
+          final strength = config.internalGapStrength.clamp(0.0, 1.0);
+
+          for (final metric in path.computeMetrics()) {
+            final averageLength = (minGapLength + maxGapLength) / 2;
+            final window = max(5.0, averageLength * 1.55);
+            var cursor = random.nextDouble() * window;
+
+            while (cursor < metric.length) {
+              if (random.nextDouble() < gapChance) {
+                final length = minGapLength +
+                    random.nextDouble() * (maxGapLength - minGapLength);
+                final startGap = cursor
+                    .clamp(0.0, max(0.0, metric.length - 0.2))
+                    .toDouble();
+                final endGap =
+                    min(metric.length, startGap + length).toDouble();
+                if (endGap > startGap + 0.5) {
+                  final midpoint = (startGap + endGap) / 2;
+                  final tangent = metric.getTangentForOffset(midpoint);
+                  if (tangent != null) {
+                    final normal = Offset(
+                      -tangent.vector.dy,
+                      tangent.vector.dx,
+                    );
+                    final track = strandCount == 1
+                        ? 0.0
+                        : -1.0 +
+                            2.0 *
+                                random.nextInt(strandCount) /
+                                (strandCount - 1);
+                    final laneOffset =
+                        track * actualWidth * 0.5 * strandSpread;
+                    final randomOffset =
+                        (random.nextDouble() - 0.5) *
+                        2 *
+                        actualWidth *
+                        offsetJitter;
+                    final gapPath = metric
+                        .extractPath(startGap, endGap)
+                        .shift(normal * (laneOffset + randomOffset));
+                    final widthVariation =
+                        0.82 + random.nextDouble() * 0.30;
+                    internalGaps.add(
+                      _CrayonInternalGap(
+                        path: gapPath,
+                        width: max(
+                          0.22,
+                          actualWidth *
+                              gapWidthRatio *
+                              widthVariation,
+                        ),
+                        strength: strength *
+                            (0.82 + random.nextDouble() * 0.18),
+                      ),
+                    );
+                  }
+                }
+              }
+              cursor += window * (0.72 + random.nextDouble() * 0.72);
+            }
+          }
+        }
+
+        strokes.add(
+          _CrayonStroke(
+            path: path,
+            width: actualWidth,
+            opacity: (nominalOpacity * opacityJitter).clamp(0.01, 0.95),
+            toneBand: toneBand,
+            internalGaps: internalGaps,
+          ),
+        );
+      }
+      return strokes;
+    }
+
+    final broadStrokes = buildStrokeLayer(
+      count: config.broadStrokeCount,
+      nominalWidth: config.broadStrokeWidth,
+      nominalOpacity: config.broadStrokeOpacity,
+      angleOffset: -2.5,
+      breakScale: 0.65,
+      gapScale: 0.55,
+    );
+    final mainStrokes = buildStrokeLayer(
+      count: config.darkStrokeCount,
+      nominalWidth: config.strokeWidth,
+      nominalOpacity: config.darkOpacity,
+      angleOffset: 0,
+      breakScale: 1.0,
+      gapScale: 1.0,
+    );
+    final lightPigmentStrokes = buildStrokeLayer(
+      count: config.lightStrokeCount,
+      nominalWidth: config.strokeWidth * 0.78,
+      nominalOpacity: config.lightOpacity,
+      angleOffset: 5.5,
+      breakScale: 0.82,
+      gapScale: 0.82,
+    );
+
+    final negativeGaps = <Path>[];
+    if (config.negativeGapCount > 0 && config.negativeGapWidth > 0) {
+      for (var i = 0; i < config.negativeGapCount; i++) {
+        final localAngle = (config.angleDeg + 9.0 +
+                (random.nextDouble() - 0.5) * max(8.0, config.angleJitterDeg))
+            * pi /
+            180;
+        final direction = Offset(cos(localAngle), sin(localAngle));
+        final normal = Offset(-direction.dy, direction.dx);
+        final lane = -34 + random.nextDouble() * 68;
+        final length = 18 + random.nextDouble() * 34;
+        final centerTravel = -28 + random.nextDouble() * 56;
+        final start = centerTravel - length / 2;
+        final end = centerTravel + length / 2;
+        final gap = Path();
+        const steps = 7;
+        for (var step = 0; step <= steps; step++) {
+          final t = step / steps;
+          final travel = start + (end - start) * t;
+          final wobble =
+              (random.nextDouble() - 0.5) * max(0.8, config.jitter * 0.55);
+          final point = const Offset(50, 50) +
+              direction * travel +
+              normal * (lane + wobble);
+          if (step == 0) {
+            gap.moveTo(point.dx, point.dy);
+          } else {
+            gap.lineTo(point.dx, point.dy);
+          }
+        }
+        negativeGaps.add(gap);
+      }
+    }
+
+    final paperTooth = <_CrayonPaperToothMark>[];
+    if (config.paperToothCount > 0 && config.paperToothStrength > 0) {
+      final minWidth = max(0.12, config.paperToothWidthMin);
+      final maxWidth = max(minWidth, config.paperToothWidthMax);
+      final minLength = max(0.35, config.paperToothLengthMin);
+      final maxLength = max(minLength, config.paperToothLengthMax);
+      for (var i = 0; i < config.paperToothCount; i++) {
+        final center = Offset(
+          4 + random.nextDouble() * 92,
+          4 + random.nextDouble() * 92,
+        );
+        final localAngle =
+            (config.angleDeg +
+                    (random.nextDouble() - 0.5) *
+                        max(26.0, config.directionSpreadDeg * 2.2 + 18.0))
+                * pi /
+                180;
+        final direction = Offset(cos(localAngle), sin(localAngle));
+        final length =
+            minLength + random.nextDouble() * (maxLength - minLength);
+        final sideJitter =
+            Offset(-direction.dy, direction.dx) *
+            ((random.nextDouble() - 0.5) * config.jitter * 0.35);
+        final start = center - direction * (length / 2) + sideJitter;
+        final end = center + direction * (length / 2) - sideJitter * 0.3;
+        final mid =
+            Offset.lerp(start, end, 0.5)! +
+            Offset(-direction.dy, direction.dx) *
+                ((random.nextDouble() - 0.5) * min(0.9, config.jitter * 0.22));
+        final path = Path()
+          ..moveTo(start.dx, start.dy)
+          ..quadraticBezierTo(mid.dx, mid.dy, end.dx, end.dy);
+        paperTooth.add(
+          _CrayonPaperToothMark(
+            path: path,
+            width: minWidth + random.nextDouble() * (maxWidth - minWidth),
+            strength: (config.paperToothStrength *
+                    (0.62 + random.nextDouble() * 0.38))
+                .clamp(0.0, 1.0),
+          ),
+        );
+      }
+    }
+
+    final grain = <_CrayonGrainDot>[];
+    final minGrainRadius = max(0.08, config.grainRadiusMin);
+    final maxGrainRadius = max(minGrainRadius, config.grainRadiusMax);
+    for (var i = 0; i < config.grainCount; i++) {
+      grain.add(
+        _CrayonGrainDot(
+          Offset(
+            5 + random.nextDouble() * 90,
+            5 + random.nextDouble() * 90,
+          ),
+          minGrainRadius +
+              random.nextDouble() * (maxGrainRadius - minGrainRadius),
+        ),
+      );
+    }
+
+    return _CrayonTextureGeometry(
+      broadStrokes: broadStrokes,
+      mainStrokes: mainStrokes,
+      lightPigmentStrokes: lightPigmentStrokes,
+      negativeGaps: negativeGaps,
+      paperTooth: paperTooth,
+      baseStrokes: const [],
+      darkStrokes: const [],
+      lightStrokes: const [],
+      grain: grain,
+    );
+  }
+
   static _CrayonTextureGeometry _buildCrayonTexture(
     CrayonTextureSpec config,
     String seedText,
   ) {
     final random = Random(_stableSeed(seedText));
 
-    List<Path> buildStrokes(int count, double angleOffset) {
+    List<Path> buildStrokes(
+      int count,
+      double angleOffset, {
+      double breakScale = 1.0,
+    }) {
       final angle = (config.angleDeg + angleOffset) * pi / 180;
       final direction = Offset(cos(angle), sin(angle));
       final normal = Offset(-direction.dy, direction.dx);
@@ -385,7 +1126,10 @@ class ShapeSpecRenderer {
           final point = const Offset(50, 50) +
               direction * (travel + alongWobble) +
               normal * (lane + wobble);
-          if (step == 0) {
+          final shouldBreak = step > 0 &&
+              random.nextDouble() <
+                  (config.strokeBreakChance * breakScale).clamp(0.0, 0.85);
+          if (step == 0 || shouldBreak) {
             path.moveTo(point.dx, point.dy);
           } else {
             path.lineTo(point.dx, point.dy);
@@ -396,8 +1140,17 @@ class ShapeSpecRenderer {
       return strokes;
     }
 
+    final baseStrokes = buildStrokes(
+      config.baseStrokeCount,
+      -3,
+      breakScale: 1.15,
+    );
     final darkStrokes = buildStrokes(config.darkStrokeCount, 0);
-    final lightStrokes = buildStrokes(config.lightStrokeCount, 9);
+    final lightStrokes = buildStrokes(
+      config.lightStrokeCount,
+      9,
+      breakScale: 0.70,
+    );
 
     final grain = <_CrayonGrainDot>[];
     for (var i = 0; i < config.grainCount; i++) {
@@ -413,10 +1166,82 @@ class ShapeSpecRenderer {
     }
 
     return _CrayonTextureGeometry(
+      baseStrokes: baseStrokes,
       darkStrokes: darkStrokes,
       lightStrokes: lightStrokes,
       grain: grain,
     );
+  }
+
+  static String _crayonConfigKey(CrayonTextureSpec config) {
+    return [
+      config.darkStrokeCount,
+      config.lightStrokeCount,
+      config.grainCount,
+      config.strokeWidth,
+      config.angleDeg,
+      config.jitter,
+      config.darkOpacity,
+      config.lightOpacity,
+      config.grainOpacity,
+      config.edgeOpacity,
+      config.baseStrokeCount,
+      config.underpaintOpacity,
+      config.baseStrokeOpacity,
+      config.strokeBreakChance,
+      config.strokeBuiltSurface,
+      config.broadStrokeCount,
+      config.broadStrokeWidth,
+      config.broadStrokeOpacity,
+      config.angleJitterDeg,
+      config.strokeWidthJitter,
+      config.strokeLengthMin,
+      config.strokeLengthMax,
+      config.gapChance,
+      config.toneVariation,
+      config.edgeWidth,
+      config.edgeTexture,
+      config.edgeMode.name,
+      config.edgeSegmentLength,
+      config.edgeSegmentGap,
+      config.edgeOffsetJitter,
+      config.edgeWidthJitter,
+      config.edgeOpacityJitter,
+      config.edgeBandWidth,
+      config.overflowAmount,
+      config.strokePattern.name,
+      config.zigzagAmplitude,
+      config.zigzagCycles,
+      config.negativeGapCount,
+      config.negativeGapWidth,
+      config.internalGapChance,
+      config.internalGapWidthRatio,
+      config.internalGapLengthMin,
+      config.internalGapLengthMax,
+      config.internalGapStrength,
+      config.internalStrandCount,
+      config.internalStrandSpread,
+      config.internalGapOffsetJitter,
+      config.directionPassCount,
+      config.directionSpreadDeg,
+      config.laneScatter,
+      config.pressureVariation,
+      config.paperToothCount,
+      config.paperToothWidthMin,
+      config.paperToothWidthMax,
+      config.paperToothLengthMin,
+      config.paperToothLengthMax,
+      config.paperToothStrength,
+      config.grainRadiusMin,
+      config.grainRadiusMax,
+      config.contourBaseWidth,
+      config.contourBaseOpacity,
+      config.contourGapCount,
+      config.contourGapLengthMin,
+      config.contourGapLengthMax,
+      config.contourGapWidthScale,
+      config.contourGapStrength,
+    ].join(':');
   }
 
   static int _stableSeed(String value) {
@@ -613,14 +1438,66 @@ class ShapeSpecRenderer {
 
 class _CrayonTextureGeometry {
   const _CrayonTextureGeometry({
+    this.broadStrokes = const [],
+    this.mainStrokes = const [],
+    this.lightPigmentStrokes = const [],
+    this.negativeGaps = const [],
+    this.paperTooth = const [],
+    required this.baseStrokes,
     required this.darkStrokes,
     required this.lightStrokes,
     required this.grain,
   });
 
+  final List<_CrayonStroke> broadStrokes;
+  final List<_CrayonStroke> mainStrokes;
+  final List<_CrayonStroke> lightPigmentStrokes;
+  final List<Path> negativeGaps;
+  final List<_CrayonPaperToothMark> paperTooth;
+  final List<Path> baseStrokes;
   final List<Path> darkStrokes;
   final List<Path> lightStrokes;
   final List<_CrayonGrainDot> grain;
+}
+
+class _CrayonStroke {
+  const _CrayonStroke({
+    required this.path,
+    required this.width,
+    required this.opacity,
+    required this.toneBand,
+    this.internalGaps = const [],
+  });
+
+  final Path path;
+  final double width;
+  final double opacity;
+  final int toneBand;
+  final List<_CrayonInternalGap> internalGaps;
+}
+
+class _CrayonInternalGap {
+  const _CrayonInternalGap({
+    required this.path,
+    required this.width,
+    required this.strength,
+  });
+
+  final Path path;
+  final double width;
+  final double strength;
+}
+
+class _CrayonPaperToothMark {
+  const _CrayonPaperToothMark({
+    required this.path,
+    required this.width,
+    required this.strength,
+  });
+
+  final Path path;
+  final double width;
+  final double strength;
 }
 
 class _CrayonGrainDot {
