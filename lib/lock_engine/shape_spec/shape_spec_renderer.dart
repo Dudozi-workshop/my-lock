@@ -20,7 +20,20 @@ class ShapeSpecRenderer {
     required double opacity,
     double objectRotation = 0,
   }) {
-    final bundle = ShapeSpecRegistry.instance.resolve(style, token.shape);
+    final registry = ShapeSpecRegistry.instance;
+    if (registry.isRasterShape(token.shape)) {
+      _paintRasterToken(
+        canvas,
+        center: center,
+        radius: radius,
+        token: token,
+        opacity: opacity,
+        objectRotation: objectRotation,
+      );
+      return;
+    }
+
+    final bundle = registry.resolve(style, token.shape);
     final canvasSize = bundle.style.canvasSize;
     final scale = radius * 2 / canvasSize;
 
@@ -169,6 +182,41 @@ class ShapeSpecRenderer {
     }
     canvas.restore();
 
+    canvas.restore();
+  }
+
+  static void _paintRasterToken(
+    Canvas canvas, {
+    required Offset center,
+    required double radius,
+    required LockToken token,
+    required double opacity,
+    required double objectRotation,
+  }) {
+    final image = ShapeSpecRegistry.instance.resolveRasterShape(token.shape);
+    final destination = Rect.fromCircle(center: center, radius: radius);
+
+    canvas.save();
+    if (objectRotation != 0) {
+      canvas
+        ..translate(center.dx, center.dy)
+        ..rotate(objectRotation)
+        ..translate(-center.dx, -center.dy);
+    }
+
+    final paint = Paint()
+      ..filterQuality = FilterQuality.high
+      ..colorFilter = ColorFilter.mode(
+        baseColorForTone(token.tone).withValues(alpha: opacity),
+        BlendMode.color,
+      );
+
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      destination,
+      paint,
+    );
     canvas.restore();
   }
 
