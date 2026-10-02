@@ -160,12 +160,6 @@ class _WholeTurtleF0 extends StatelessWidget {
           // Re-place that locked crop on the Q3 2048 canonical canvas using
           // Geometry v3 bbox (809,909)-(1318,1460), padded to the 551 px
           // square used by the approved runtime58 export.
-          const _NearFlipperPlacement(
-            leftRatio: 788 / 2048,
-            topRatio: 909 / 2048,
-            sizeRatio: 551 / 2048,
-            child: SizedBox.shrink(),
-          ),
           _NearFlipperRuntimePlacement(bytes: near),
         ],
       ),
@@ -197,24 +191,6 @@ class _NearFlipperRuntimePlacement extends StatelessWidget {
       },
     );
   }
-}
-
-// Documentation-only placement constants kept explicit in the QA source.
-class _NearFlipperPlacement extends StatelessWidget {
-  const _NearFlipperPlacement({
-    required this.leftRatio,
-    required this.topRatio,
-    required this.sizeRatio,
-    required this.child,
-  });
-
-  final double leftRatio;
-  final double topRatio;
-  final double sizeRatio;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) => child;
 }
 
 class _NeutralLayer extends StatelessWidget {
