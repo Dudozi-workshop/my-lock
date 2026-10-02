@@ -22,6 +22,7 @@ class ShapeSpecRenderer {
     double objectRotation = 0,
     double paletteTimeSeconds = 0,
     String? swimKey,
+    String swimProfile = 'standard',
   }) {
     final registry = ShapeSpecRegistry.instance;
     if (registry.isRasterShape(token.shape)) {
@@ -34,6 +35,7 @@ class ShapeSpecRenderer {
         objectRotation: objectRotation,
         paletteTimeSeconds: paletteTimeSeconds,
         swimKey: swimKey,
+        swimProfile: swimProfile,
       );
       return;
     }
@@ -199,6 +201,7 @@ class ShapeSpecRenderer {
     required double objectRotation,
     required double paletteTimeSeconds,
     required String? swimKey,
+    required String swimProfile,
   }) {
     final spec = ShapeSpecRegistry.instance.resolveRasterSpec(token.shape);
     final destination = spec.metadata.destination(center, radius);
@@ -210,6 +213,7 @@ class ShapeSpecRenderer {
             key: swimKey,
             timeSeconds: paletteTimeSeconds,
             config: spec.metadata.swim,
+            profile: swimProfile,
           );
     final poseImages = spec.imagesForPose(pose);
     canvas.save();
