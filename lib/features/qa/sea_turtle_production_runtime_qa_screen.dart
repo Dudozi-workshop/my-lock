@@ -2,9 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../../lock_engine/models.dart';
 import '../../lock_engine/shape_painter.dart';
+import '../../lock_engine/shape_spec/shape_spec_registry.dart';
 
-class SeaTurtleProductionRuntimeQaScreen extends StatelessWidget {
+class SeaTurtleProductionRuntimeQaScreen extends StatefulWidget {
   const SeaTurtleProductionRuntimeQaScreen({super.key});
+
+  @override
+  State<SeaTurtleProductionRuntimeQaScreen> createState() =>
+      _SeaTurtleProductionRuntimeQaScreenState();
+}
+
+class _SeaTurtleProductionRuntimeQaScreenState
+    extends State<SeaTurtleProductionRuntimeQaScreen> {
+  late final Future<void> _rasterReady =
+      ShapeSpecRegistry.instance.loadRasterShapes();
 
   static const _tones = <ShapeTone>[
     ShapeTone.pink,
@@ -16,8 +27,23 @@ class SeaTurtleProductionRuntimeQaScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Sea Turtle v3 · Production Runtime')),
-      body: SafeArea(
-        child: ListView(
+      body: FutureBuilder<void>(
+        future: _rasterReady,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Padding(
+              padding: const EdgeInsets.all(24),
+              child: SelectableText(
+                'Raster asset load failed:\n\n${snapshot.error}',
+              ),
+            );
+          }
+
+          return SafeArea(
+            child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             Text(
@@ -39,7 +65,9 @@ class SeaTurtleProductionRuntimeQaScreen extends StatelessWidget {
               ],
             ),
           ],
-        ),
+            ),
+          );
+        },
       ),
     );
   }
