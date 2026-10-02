@@ -9,14 +9,15 @@ import 'runtime_workbench.dart';
 
 /// Workflow metadata is an evidence index, never an automatic approval gate.
 class ProductionFlow extends StatefulWidget {
-  const ProductionFlow({super.key, required this.dark});
+  const ProductionFlow({super.key, required this.dark, this.configuration});
   final bool dark;
+  final Future<Map<String, dynamic>>? configuration;
   @override
   State<ProductionFlow> createState() => _ProductionFlowState();
 }
 
 class _ProductionFlowState extends State<ProductionFlow> {
-  late final Future<Map<String, dynamic>> data = _load();
+  late final Future<Map<String, dynamic>> data = widget.configuration ?? _load();
   String? id = Uri.base.queryParameters['experiment'];
   String stage = Uri.base.queryParameters['stage'] ?? 'compare';
   String group = 'active';
