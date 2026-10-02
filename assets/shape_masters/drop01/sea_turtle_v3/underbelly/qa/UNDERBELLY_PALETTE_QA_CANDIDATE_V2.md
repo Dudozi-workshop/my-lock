@@ -65,3 +65,8 @@ Pairwise palette alpha mismatch: **0 px**.
 - Deployed QA endpoint: `https://my-lock-preview.rlatkd5959.workers.dev/?qa=sea-turtle-underbelly`.
 - No duplicate production binary upload was created during finalization; existing Drive Material v2 / Palette QA v2 packages remain authoritative.
 - Next Gate: **Whole-turtle Seam / Material QA**.
+
+## Conversation closeout
+- This Underbelly production thread is **CLOSED** as of 2026-10-02.
+- No further Underbelly standalone production work remains in this thread.
+- Subsequent work starts from the locked Underbelly state and moves to **Whole-turtle Seam / Material QA** in a new thread.
