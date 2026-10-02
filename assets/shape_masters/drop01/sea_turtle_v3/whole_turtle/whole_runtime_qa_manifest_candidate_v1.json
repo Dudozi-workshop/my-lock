@@ -1,0 +1,56 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "gate": "whole_turtle_runtime_derived_export",
+  "version": "candidate_v1",
+  "status": "QA Candidate / user visual approval pending",
+  "canonical_source": {
+    "file": "sea_turtle_v3_whole_canonical_assembly_candidate_v1_2048.png",
+    "canvas": [
+      2048,
+      2048
+    ],
+    "approved": true,
+    "assembly_rule": "All locked parts at (0,0)"
+  },
+  "runtime_normalization": {
+    "source_alpha_bbox_xyxy": [
+      420,
+      688,
+      1640,
+      1460
+    ],
+    "square_crop_xyxy": [
+      420,
+      464,
+      1640,
+      1684
+    ],
+    "square_side_px": 1220,
+    "rule": "Square around whole alpha bbox using max(width,height), centered and clamped to canonical canvas.",
+    "canonical_source_unchanged": true
+  },
+  "export": {
+    "interpolation": "Lanczos",
+    "runtime512": {
+      "file": "sea_turtle_v3_whole_runtime512_v1.png",
+      "sha256": "9bae107babb3219a879fb0e867364a1bfa323bfca8b09b4791f7c61df6e61b84"
+    },
+    "runtime58": {
+      "file": "sea_turtle_v3_whole_runtime58_v1.png",
+      "sha256": "dd225477d2e615f326da8f9cdd44fa8ac4e589e5e1631527e71dc4c3410e87d0"
+    }
+  },
+  "qa": {
+    "light_background": "PASS",
+    "dark_background": "PASS",
+    "silhouette_readability_58": "PASS",
+    "shell_body_flipper_separation_58": "PASS",
+    "obvious_alpha_halo_58": "PASS",
+    "obvious_disconnected_part_58": "PASS",
+    "note": "Visual QA by model; user visual approval still required before Lock."
+  },
+  "imagegen_used": false,
+  "geometry_changed": false,
+  "material_changed": false,
+  "next_gate": "User visual approval -> Runtime QA LOCK / app integration"
+}
