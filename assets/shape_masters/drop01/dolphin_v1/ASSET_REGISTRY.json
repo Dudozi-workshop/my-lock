@@ -1,0 +1,36 @@
+{
+  "schema_version": "mylock_asset_registry_v1",
+  "asset_id": "dolphin_v1",
+  "lifecycle_vocabulary": [
+    "archived",
+    "candidate",
+    "final_locked",
+    "lock_candidate",
+    "qa_candidate",
+    "superseded",
+    "withdrawn",
+    "working"
+  ],
+  "required_directories": [],
+  "lineages": [
+    {
+      "scope": "master.geometry",
+      "version": "v1",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true,
+      "external_source": {
+        "provider": "google_drive",
+        "file_id": "1eduN3MkGrEg9BxNirAF0P8-nhUJP4CHn",
+        "role": "locked_master"
+      }
+    }
+  ],
+  "policy": {
+    "filename_does_not_determine_active_status": true,
+    "user_approval_required_for_final_locked": true,
+    "locked_binary_overwrite_forbidden": true,
+    "archive_before_delete": true
+  },
+  "notes": "Dolphin Shape Master v1 / selected 02 streamlined form. Binary master remains locked in Drive; registry migration changes management metadata only."
+}
