@@ -191,13 +191,20 @@ class ShapeSpecRegistry {
     for (final part in parts) {
       encoded.write((await rootBundle.loadString(part)).trim());
     }
-    final codec = await ui.instantiateImageCodec(
-      base64Decode(encoded.toString()),
-    );
+
     try {
-      return (await codec.getNextFrame()).image;
-    } finally {
-      codec.dispose();
+      final codec = await ui.instantiateImageCodec(
+        base64Decode(encoded.toString()),
+      );
+      try {
+        return (await codec.getNextFrame()).image;
+      } finally {
+        codec.dispose();
+      }
+    } catch (error) {
+      throw StateError(
+        'Invalid chunked raster asset: ${parts.join(', ')}: $error',
+      );
     }
   }
 
