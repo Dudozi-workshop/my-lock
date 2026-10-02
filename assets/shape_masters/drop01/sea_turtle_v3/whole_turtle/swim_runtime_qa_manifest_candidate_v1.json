@@ -1,0 +1,75 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "motion_id": "swim_v1",
+  "status": "QA Candidate / user visual approval pending / not locked",
+  "date": "2026-10-03",
+  "scope": {
+    "animated": [
+      "front_flipper_near",
+      "front_flipper_far"
+    ],
+    "locked_static": [
+      "body_with_rear",
+      "shell_main",
+      "underbelly",
+      "rear"
+    ]
+  },
+  "loop": [
+    "S0",
+    "S1",
+    "S2",
+    "S1",
+    "S0"
+  ],
+  "timing_ratio": [
+    23,
+    16,
+    22,
+    16,
+    23
+  ],
+  "profiles": {
+    "calm_seconds": [
+      1.1,
+      1.3
+    ],
+    "standard_seconds": [
+      0.9,
+      1.1
+    ],
+    "lively_seconds": [
+      0.78,
+      0.92
+    ]
+  },
+  "randomization": {
+    "hold_loops": [
+      2,
+      4
+    ],
+    "random_initial_phase": true,
+    "gradual_tempo_transition": true
+  },
+  "implementation": {
+    "branch": "runtime/sea-turtle-v3",
+    "commit": "30258f06288a8f6fe617b6702d776730a95a55f3",
+    "route": "?qa=sea-turtle-swim-v1",
+    "public_url": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=sea-turtle-swim-v1"
+  },
+  "qa": {
+    "web_run_id": 37032606326,
+    "web_run_number": 697,
+    "web_build": "PASS",
+    "cloudflare_deploy": "PASS",
+    "runtime_candidate_run_id": 37032606322,
+    "runtime_candidate_run_number": 34,
+    "validate_analyze_test": "PASS",
+    "production_web_build": "PASS",
+    "android_release_lockMain": "PASS",
+    "artifact_upload": "PASS",
+    "user_visual_qa": "PENDING"
+  },
+  "image_generation_used_for_production": false,
+  "next_gate": "user visual approval -> Motion Master Lock -> final manifest/package registration"
+}
