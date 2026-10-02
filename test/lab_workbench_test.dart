@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_candidate.dart';
 import 'package:my_lock/lock_engine/shape_spec/lab_candidate_scope.dart';
@@ -24,7 +25,11 @@ void main() {
     expect(LabCandidateScope.enabled, isFalse);
   });
   testWidgets('workflow opens candidate comparison without leaking renderer scope', (tester) async {
-    await tester.runAsync(() => CandySoftCandidate.instance.load());
+    await tester.runAsync(() async {
+      await CandySoftCandidate.instance.load();
+      await rootBundle.loadString('assets/lab/experiments.json');
+      await rootBundle.loadString('assets/lab/workflow.json');
+    });
     await tester.runAsync(() async {
       await tester.pumpWidget(const MaterialApp(home: Scaffold(body:
         SingleChildScrollView(child: ProductionFlow(dark: false)))));
