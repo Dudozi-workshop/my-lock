@@ -22,7 +22,7 @@ Future<void> main() async {
   runApp(const MyLockLabsApp());
 }
 
-enum LabTab { shape, style, palette, effect, qa }
+enum LabTab { background, shape, style, palette, effect, qa }
 
 class MyLockLabsApp extends StatelessWidget {
   const MyLockLabsApp({super.key});
@@ -51,6 +51,7 @@ class LabsPage extends StatefulWidget {
 
 class _LabsPageState extends State<LabsPage> {
   LabTab tab = switch (Uri.base.queryParameters['lab']) {
+    'background' => LabTab.background,
     'shape' => LabTab.shape,
     'palette' => LabTab.palette,
     'effect' => LabTab.effect,
@@ -63,6 +64,7 @@ class _LabsPageState extends State<LabsPage> {
     setState(() => tab = next);
     final query = Map<String, String>.from(Uri.base.queryParameters)
       ..['lab'] = switch (next) {
+        LabTab.background => 'background',
         LabTab.shape => 'shape',
         LabTab.style => 'style',
         LabTab.palette => 'palette',
@@ -140,6 +142,11 @@ class _LabsPageState extends State<LabsPage> {
                         child: Row(
                           children: [
                             _TabChip(
+                              label: 'Background Lab',
+                              selected: tab == LabTab.background,
+                              onTap: () => _setTab(LabTab.background),
+                            ),
+                            _TabChip(
                               label: 'Shape Lab',
                               selected: tab == LabTab.shape,
                               onTap: () => _setTab(LabTab.shape),
@@ -185,6 +192,7 @@ class _LabsPageState extends State<LabsPage> {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 1180),
                     child: switch (tab) {
+                      LabTab.background => BackgroundLab(card: card, fg: fg, muted: muted),
                       LabTab.shape => ShapeLab(card: card, fg: fg, muted: muted),
                       LabTab.style => CrayonStyleLab(card: card, fg: fg, muted: muted),
                       LabTab.palette => PaletteLab(card: card, fg: fg, muted: muted),
@@ -6061,4 +6069,104 @@ class _ValueChip extends StatelessWidget {
       ),
     );
   }
+}
+
+
+enum _BackgroundComposition { openWater, lowHorizon, softFrame }
+
+class BackgroundLab extends StatefulWidget {
+  const BackgroundLab({super.key, required this.card, required this.fg, required this.muted});
+  final Color card;
+  final Color fg;
+  final Color muted;
+  @override
+  State<BackgroundLab> createState() => _BackgroundLabState();
+}
+
+class _BackgroundLabState extends State<BackgroundLab> {
+  _BackgroundComposition selected = _BackgroundComposition.openWater;
+  bool showShape = true;
+
+  @override
+  Widget build(BuildContext context) {
+    const items = [
+      (_BackgroundComposition.openWater, 'A', 'Open Water', '넓은 중앙 Play Field · 해저 낮음'),
+      (_BackgroundComposition.lowHorizon, 'B', 'Low Horizon', '해저를 더 낮춰 수중 여백 확대'),
+      (_BackgroundComposition.softFrame, 'C', 'Soft Frame', '가장자리만 약하게 감싸는 구조'),
+    ];
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('Background Lab · Drop 01', style: TextStyle(color: widget.fg, fontSize: 24, fontWeight: FontWeight.w900)),
+      const SizedBox(height: 4),
+      Text('Common · 투명바다 / Gate 01 · Composition', style: TextStyle(color: widget.muted, fontWeight: FontWeight.w700)),
+      const SizedBox(height: 8),
+      Text('동일 Shape · 동일 크기 · 동일 위치 조건에서 공간 구조만 비교합니다. 승인 전 Candidate 상태를 유지합니다.', style: TextStyle(color: widget.muted)),
+      const SizedBox(height: 16),
+      Wrap(spacing: 8, runSpacing: 8, children: [
+        for (final gate in const ['01 Composition','02 Color','03 Light','04 Depth','05 Ambient','06 Environment','07 Motion','08 Final QA'])
+          Chip(label: Text(gate), backgroundColor: gate.startsWith('01') ? const Color(0xFFECE5FF) : widget.card),
+      ]),
+      const SizedBox(height: 16),
+      LayoutBuilder(builder: (context, box) {
+        final w = box.maxWidth >= 800 ? (box.maxWidth - 24) / 3 : box.maxWidth;
+        return Wrap(spacing: 12, runSpacing: 14, children: [
+          for (final item in items) SizedBox(width: w, child: _candidate(item.$1, item.$2, item.$3, item.$4)),
+        ]);
+      }),
+      const SizedBox(height: 12),
+      Row(children: [
+        Expanded(child: Text('Sea Turtle Runtime v2 · 고정 비교 Shape', style: TextStyle(color: widget.fg, fontWeight: FontWeight.w800))),
+        Switch(value: showShape, onChanged: (v) => setState(() => showShape = v)),
+      ]),
+      Text('현재 Gate에서는 배경 Composition만 평가합니다. Shape Asset/색/스타일은 수정하지 않습니다.', style: TextStyle(color: widget.muted, fontSize: 12)),
+    ]);
+  }
+
+  Widget _candidate(_BackgroundComposition value, String code, String title, String note) {
+    final active = selected == value;
+    return InkWell(
+      onTap: () => setState(() => selected = value),
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: widget.card,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: active ? const Color(0xFF7655C9) : const Color(0xFFE4E0E8), width: active ? 2 : 1),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          AspectRatio(aspectRatio: .72, child: ClipRRect(borderRadius: BorderRadius.circular(18), child: Stack(children: [
+            Positioned.fill(child: CustomPaint(painter: _BackgroundCompositionPainter(value))),
+            if (showShape) Positioned.fill(child: Center(child: FractionallySizedBox(widthFactor: .43, child: Image.asset('assets/sea_turtle_runtime_v2/sea_turtle_blue.png', fit: BoxFit.contain)))),
+            Positioned(top: 10, left: 10, child: Chip(label: Text('$code · $title'))),
+          ]))),
+          const SizedBox(height: 8),
+          Text('$code · $title', style: TextStyle(color: widget.fg, fontWeight: FontWeight.w900)),
+          Text(note, style: TextStyle(color: widget.muted, fontSize: 12)),
+        ]),
+      ),
+    );
+  }
+}
+
+class _BackgroundCompositionPainter extends CustomPainter {
+  const _BackgroundCompositionPainter(this.value);
+  final _BackgroundComposition value;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final water = Paint()..shader = const LinearGradient(
+      begin: Alignment.topCenter, end: Alignment.bottomCenter,
+      colors: [Color(0xFFCFF4F2), Color(0xFFAEDFE3), Color(0xFF8CC8D2)],
+    ).createShader(Offset.zero & size);
+    canvas.drawRect(Offset.zero & size, water);
+    canvas.drawOval(Rect.fromCenter(center: Offset(size.width*.5, 0), width: size.width*1.3, height: size.height*.16), Paint()..color=Colors.white.withValues(alpha:.34));
+    final horizon = switch(value) { _BackgroundComposition.openWater => .84, _BackgroundComposition.lowHorizon => .91, _BackgroundComposition.softFrame => .87 };
+    final path=Path()..moveTo(0,size.height*horizon)..quadraticBezierTo(size.width*.45,size.height*(horizon-.025),size.width,size.height*(horizon+.01))..lineTo(size.width,size.height)..lineTo(0,size.height)..close();
+    canvas.drawPath(path, Paint()..color=const Color(0xFFEADFCB).withValues(alpha:.72));
+    if(value==_BackgroundComposition.softFrame){
+      final p=Paint()..color=const Color(0xFF83BFC4).withValues(alpha:.22);
+      canvas.drawOval(Rect.fromLTWH(-size.width*.2,size.height*.58,size.width*.38,size.height*.35),p);
+      canvas.drawOval(Rect.fromLTWH(size.width*.82,size.height*.62,size.width*.35,size.height*.31),p);
+    }
+  }
+  @override bool shouldRepaint(covariant _BackgroundCompositionPainter oldDelegate)=>oldDelegate.value!=value;
 }
