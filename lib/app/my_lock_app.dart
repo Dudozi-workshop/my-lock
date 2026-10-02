@@ -11,6 +11,7 @@ import '../features/qa/sea_turtle_shell_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_underbelly_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_whole_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_production_runtime_qa_screen.dart';
+import '../features/qa/sea_turtle_swim_runtime_qa_screen.dart';
 import '../features/shell/root_shell.dart';
 import '../lock_engine/raster_shape_bootstrap.dart';
 import 'build_info.dart';
@@ -32,7 +33,9 @@ class MyLockApp extends StatelessWidget {
     final showSeaTurtleProductionQa =
         kIsWeb && qa == 'sea-turtle-production';
     final showSeaTurtleAppIntegrationQa =
-        kIsWeb && qa == 'sea-turtle-app-integration';
+        kIsWeb &&
+        (qa == 'sea-turtle-app-integration' || qa == 'sea-turtle-runtime-v3');
+    final showSeaTurtleSwimQa = kIsWeb && qa == 'sea-turtle-swim-v1';
     final showBackgroundCompositionLab =
         kIsWeb && qa == 'background-composition';
 
@@ -50,24 +53,26 @@ class MyLockApp extends StatelessWidget {
         child: showLabHome
             ? const LabHomeScreen()
             : showBackgroundCompositionLab
-            ? const BackgroundCompositionLabScreen()
-            : showSeaTurtleAppIntegrationQa
-                ? const SeaTurtleAppIntegrationQaScreen()
-            : showSeaTurtleProductionQa
-                ? const SeaTurtleProductionRuntimeQaScreen()
-                : showWholeTurtleQa
-                ? const SeaTurtleWholeRuntimeQaScreen()
-                : showShellRuntimeQa
-                    ? const SeaTurtleShellRuntimeQaScreen()
-                    : showFrontFlipperQa
-                        ? const SeaTurtleFrontFlipperRuntimeQaScreen()
-                        : showFrontFlipperFarQa
-                            ? const SeaTurtleFrontFlipperFarRuntimeQaScreen()
-                            : showBodyWithRearQa
-                                ? const SeaTurtleBodyWithRearRuntimeQaScreen()
-                                : showUnderbellyQa
-                                    ? const SeaTurtleUnderbellyRuntimeQaScreen()
-                                    : const RootShell(),
+                ? const BackgroundCompositionLabScreen()
+                : showSeaTurtleSwimQa
+                    ? const SeaTurtleSwimRuntimeQaScreen()
+                    : showSeaTurtleAppIntegrationQa
+                        ? const SeaTurtleAppIntegrationQaScreen()
+                        : showSeaTurtleProductionQa
+                            ? const SeaTurtleProductionRuntimeQaScreen()
+                            : showWholeTurtleQa
+                                ? const SeaTurtleWholeRuntimeQaScreen()
+                                : showShellRuntimeQa
+                                    ? const SeaTurtleShellRuntimeQaScreen()
+                                    : showFrontFlipperQa
+                                        ? const SeaTurtleFrontFlipperRuntimeQaScreen()
+                                        : showFrontFlipperFarQa
+                                            ? const SeaTurtleFrontFlipperFarRuntimeQaScreen()
+                                            : showBodyWithRearQa
+                                                ? const SeaTurtleBodyWithRearRuntimeQaScreen()
+                                                : showUnderbellyQa
+                                                    ? const SeaTurtleUnderbellyRuntimeQaScreen()
+                                                    : const RootShell(),
       ),
     );
   }

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../app/theme.dart';
+
+import 'package:flutter/scheduler.dart';
+
+import 'raster_palette_clock.dart';
 import 'shape_spec/shape_spec_registry.dart';
 
 class RasterShapeBootstrap extends StatefulWidget {
@@ -17,9 +21,25 @@ class RasterShapeBootstrap extends StatefulWidget {
   State<RasterShapeBootstrap> createState() => _RasterShapeBootstrapState();
 }
 
-class _RasterShapeBootstrapState extends State<RasterShapeBootstrap> {
-  late final Future<void> _future =
-      ShapeSpecRegistry.instance.loadRasterShapes();
+class _RasterShapeBootstrapState extends State<RasterShapeBootstrap>
+    with SingleTickerProviderStateMixin {
+  late final Ticker _paletteTicker;
+
+  @override
+  void initState() {
+    super.initState();
+    _paletteTicker = createTicker((_) => RasterPaletteClock.instance.tick())
+      ..start();
+  }
+
+  @override
+  void dispose() {
+    _paletteTicker.dispose();
+    super.dispose();
+  }
+
+  late final Future<void> _future = ShapeSpecRegistry.instance
+      .loadRasterShapes();
 
   @override
   Widget build(BuildContext context) {

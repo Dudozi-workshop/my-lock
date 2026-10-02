@@ -1,0 +1,53 @@
+{
+  "package_id": "sea_turtle_v3_swim_motion_master_v1",
+  "shape_id": "sea_turtle_v3",
+  "motion_id": "swim_v1",
+  "status": "Final / Locked / Active",
+  "locked_at": "2026-10-03",
+  "approval": "User visual approval confirmed in deployed Swim Runtime QA; lock execution requested.",
+  "scope": {
+    "animated": ["front_flipper_near", "front_flipper_far"],
+    "locked_static": ["body_with_rear", "shell_main", "underbelly", "rear"],
+    "source_pose_s0": "existing approved Sea Turtle v3 pose"
+  },
+  "loop": ["S0", "S1", "S2", "S1", "S0"],
+  "timing_ratio": [23, 16, 22, 16, 23],
+  "profiles": {
+    "calm_seconds": [1.1, 1.3],
+    "standard_seconds": [0.9, 1.1],
+    "lively_seconds": [0.78, 0.92]
+  },
+  "randomization": {
+    "hold_loops": [2, 4],
+    "random_initial_phase": true,
+    "gradual_tempo_transition": true,
+    "independent_per_turtle": true
+  },
+  "runtime": {
+    "branch": "runtime/sea-turtle-v3",
+    "final_metadata_commit": "1a95b29e47f00c7922aa95aff746bbbf669d7983",
+    "metadata_path": "assets/raster_shapes/sea_turtle_v3_runtime_v3.json",
+    "qa_route": "?qa=sea-turtle-swim-v1",
+    "public_qa_url": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=sea-turtle-swim-v1"
+  },
+  "production_assets": [
+    {"path":"assets/raster_shapes/swim_v1/s1_fixed_finish.part01.b64","git_blob_sha":"302cf422f1d28cbee427d36c15242eca95f4978f","size":9600},
+    {"path":"assets/raster_shapes/swim_v1/s1_fixed_finish.part02.b64","git_blob_sha":"815b77ad0b581930e08294ecb67c9988b7a74620","size":9600},
+    {"path":"assets/raster_shapes/swim_v1/s1_palette_base.part01.b64","git_blob_sha":"7f74affac98d127256eff0dee46d828ff6380e4b","size":4496},
+    {"path":"assets/raster_shapes/swim_v1/s2_fixed_finish.part01.b64","git_blob_sha":"caf2178c2b8f568145ca81b32bdd2db693deb679","size":9200},
+    {"path":"assets/raster_shapes/swim_v1/s2_fixed_finish.part02.b64","git_blob_sha":"f85bd40d7e7ebef4618ca40864304d227ba22df3","size":9132},
+    {"path":"assets/raster_shapes/swim_v1/s2_palette_base.part01.b64","git_blob_sha":"158605732c6672b869160fd2821385475ca870f1","size":4184}
+  ],
+  "qa": {
+    "candidate_automated_qa_run_id": 37032606322,
+    "candidate_automated_qa": "SUCCESS",
+    "candidate_web_deploy_run_id": 37032606326,
+    "candidate_web_deploy": "SUCCESS",
+    "post_lock_web_run_id": 37034687303,
+    "post_lock_web_deploy": "SUCCESS",
+    "user_visual_qa": "APPROVED",
+    "imagegen_used_for_production": false,
+    "static_geometry_changed": false
+  },
+  "versioning_rule": "Any future motion change must create a new version/candidate. Motion Master v1 must not be silently overwritten."
+}
