@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "sites": {
+    "main": "https://my-lock-preview.rlatkd5959.workers.dev/",
+    "lab": "https://my-lock-shape-lab-pages.pages.dev/"
+  },
+  "experiments": [
+    {
+      "id": "candy-soft",
+      "title": "Candy Soft · 기본 도형",
+      "category": "shape",
+      "status": "Candidate",
+      "profile": "candy-soft",
+      "source_commit": "086ff273be38acf5063f0dd8124bf39d4908ce8e",
+      "sizes": [
+        58,
+        72,
+        96,
+        160
+      ],
+      "object_counts": [
+        6,
+        9,
+        12
+      ],
+      "variants": [
+        {
+          "shape": "circle",
+          "tone": "pink"
+        },
+        {
+          "shape": "triangle",
+          "tone": "yellow"
+        },
+        {
+          "shape": "square",
+          "tone": "blue"
+        }
+      ],
+      "pending": "256px 개별 Master / 알파 정리 / 전체 색상 / 실기기 잠금 QA"
+    },
+    {
+      "id": "basic-baseline",
+      "title": "현재 Lab 기본 도형 · 기준",
+      "category": "shape",
+      "status": "Baseline",
+      "profile": "production",
+      "source_commit": "b0fd0085182c7db402318c219f7c856113141252",
+      "sizes": [
+        58,
+        72,
+        96,
+        160
+      ],
+      "object_counts": [
+        6,
+        9,
+        12
+      ],
+      "variants": [
+        {
+          "shape": "circle",
+          "tone": "pink"
+        },
+        {
+          "shape": "triangle",
+          "tone": "yellow"
+        },
+        {
+          "shape": "square",
+          "tone": "blue"
+        }
+      ],
+      "pending": "기존 Lab 기본 도형 비교 기준. Candy Soft 승격과 별도."
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:my_lock/lock_engine/effects.dart';
@@ -15,14 +16,18 @@ import 'package:my_lock/lock_engine/shape_spec/shape_spec_renderer.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
 
 import 'soft_basic_candidates.dart';
+import 'runtime_workbench.dart';
+import 'package:my_lock/lock_engine/shape_spec/candy_soft_candidate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  usePathUrlStrategy();
   await ShapeSpecRegistry.instance.load();
+  await CandySoftCandidate.instance.load();
   runApp(const MyLockLabsApp());
 }
 
-enum LabTab { shape, style, palette, effect, qa }
+enum LabTab { shape, style, palette, effect, qa, review }
 
 class MyLockLabsApp extends StatelessWidget {
   const MyLockLabsApp({super.key});
@@ -55,6 +60,7 @@ class _LabsPageState extends State<LabsPage> {
     'palette' => LabTab.palette,
     'effect' => LabTab.effect,
     'qa' => LabTab.qa,
+    'review' => LabTab.review,
     _ => LabTab.style,
   };
   bool dark = false;
@@ -68,6 +74,7 @@ class _LabsPageState extends State<LabsPage> {
         LabTab.palette => 'palette',
         LabTab.effect => 'effect',
         LabTab.qa => 'qa',
+        LabTab.review => 'review',
       };
     final nextUri = Uri.base.replace(queryParameters: query);
     SystemNavigator.routeInformationUpdated(uri: nextUri, replace: true);
@@ -115,7 +122,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 035 · Sea Turtle v3 Static Split QA · Decode Fix',
+                                  'LAB 036 · Shared Runtime Workbench',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -159,6 +166,9 @@ class _LabsPageState extends State<LabsPage> {
                               selected: tab == LabTab.effect,
                               onTap: () => _setTab(LabTab.effect),
                             ),
+                            _TabChip(label: '공통 검수',
+                              selected: tab == LabTab.review,
+                              onTap: () => _setTab(LabTab.review)),
                             _TabChip(
                               label: 'Runtime QA',
                               selected: tab == LabTab.qa,
@@ -190,6 +200,7 @@ class _LabsPageState extends State<LabsPage> {
                       LabTab.palette => PaletteLab(card: card, fg: fg, muted: muted),
                       LabTab.effect => EffectLab(card: card, fg: fg, muted: muted),
                       LabTab.qa => RuntimeQaLab(card: card, fg: fg, muted: muted),
+                      LabTab.review => RuntimeWorkbench(dark: dark),
                     },
                   ),
                 ),
