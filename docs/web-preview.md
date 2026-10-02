@@ -31,3 +31,12 @@ Do not use the old GitHub Pages URL (`dudozi-workshop.github.io/my-lock`) for th
 ```bash
 bash tool/build_web.sh
 ```
+
+
+## Asset Book test freeze
+
+The Asset Book is currently a frozen test snapshot.
+
+- Default web builds do not regenerate Asset Book data from Production manifests.
+- Set `ASSET_BOOK_AUTO_SYNC=1` explicitly to regenerate the registry.
+- Until re-enabled, Production asset changes must not be treated as automatically reflected in the Asset Book.
