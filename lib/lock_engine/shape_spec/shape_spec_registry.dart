@@ -18,7 +18,7 @@ class ShapeSpecRegistry {
 
   static const Map<ShapeKind, String> _rasterShapeAssets = {
     ShapeKind.seaTurtle:
-        'assets/raster_shapes/sea_turtle_v3_runtime58.png.b64',
+        'assets/raster_shapes/sea_turtle_v3_runtime58_lossless.webp.b64',
   };
   bool _loaded = false;
 
