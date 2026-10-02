@@ -31,7 +31,12 @@ class ColorChoiceCard extends StatelessWidget {
           CustomPaint(
             size: const Size(58, 58),
             painter: LockTokenPainter(
-              LockToken(shape: ShapeKind.circle, tone: tone),
+              LockToken(
+                shape: tone == ShapeTone.auroraSea
+                    ? ShapeKind.seaTurtle
+                    : ShapeKind.circle,
+                tone: tone,
+              ),
             ),
           ),
           const SizedBox(height: 8),

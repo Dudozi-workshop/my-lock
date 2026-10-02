@@ -204,6 +204,7 @@ class _FloatingPreviewState extends State<FloatingPreview>
               objects: _engine.objects,
               popStyle: widget.popStyle,
               style: widget.style,
+              speed: widget.speed,
             ),
             child: const SizedBox.expand(),
           ),
