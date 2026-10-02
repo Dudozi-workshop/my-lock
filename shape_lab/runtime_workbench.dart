@@ -84,7 +84,7 @@ class _RuntimeWorkbenchState extends State<RuntimeWorkbench> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('공통 Runtime 검수', style: TextStyle(color:fg,fontSize:20,fontWeight:FontWeight.bold)),
           const SizedBox(height: 12),
-          DropdownButton<String>(value:selected['id'] as String,
+          DropdownButton<String>(isExpanded:true,value:selected['id'] as String,
             dropdownColor:bg, style:TextStyle(color:fg),
             items:[for(final item in items) DropdownMenuItem(value:item['id'] as String,
               child:Text('${item['title']} · ${item['status']}'))],
