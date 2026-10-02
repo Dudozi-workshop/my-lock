@@ -1,0 +1,8 @@
+{
+  "schema_version": "mylock_asset_registry_v1",
+  "asset_id": "crayon_soft",
+  "lifecycle_vocabulary": ["archived", "candidate", "final_locked", "lock_candidate", "qa_candidate", "superseded", "withdrawn", "working"],
+  "required_directories": [],
+  "lineages": [],
+  "policy": {}
+}
