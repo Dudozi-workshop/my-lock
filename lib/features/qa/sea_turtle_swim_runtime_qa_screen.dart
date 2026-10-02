@@ -26,13 +26,13 @@ class _SeaTurtleSwimRuntimeQaScreenState
         .metadata;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Sea Turtle v3 · Swim Runtime QA')),
+      appBar: AppBar(title: const Text('Sea Turtle v3 · Swim Motion Master v1')),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
             const Text(
-              'Production Candidate · S0 → S1 → S2 → S1 → S0',
+              'Final / Locked · S0 → S1 → S2 → S1 → S0',
             ),
             const SizedBox(height: 4),
             Text(
