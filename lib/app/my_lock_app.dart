@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../features/qa/background_composition_lab_screen.dart';
 import '../features/qa/sea_turtle_app_integration_qa_screen.dart';
 import '../features/qa/sea_turtle_body_with_rear_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_front_flipper_runtime_qa_screen.dart';
@@ -9,7 +10,6 @@ import '../features/qa/sea_turtle_shell_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_underbelly_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_whole_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_production_runtime_qa_screen.dart';
-import '../features/qa/sea_turtle_swim_runtime_qa_screen.dart';
 import '../features/shell/root_shell.dart';
 import '../lock_engine/raster_shape_bootstrap.dart';
 import 'build_info.dart';
@@ -30,8 +30,9 @@ class MyLockApp extends StatelessWidget {
     final showSeaTurtleProductionQa =
         kIsWeb && qa == 'sea-turtle-production';
     final showSeaTurtleAppIntegrationQa =
-        kIsWeb && (qa == 'sea-turtle-app-integration' || qa == 'sea-turtle-runtime-v3');
-    final showSeaTurtleSwimQa = kIsWeb && qa == 'sea-turtle-swim-v1';
+        kIsWeb && qa == 'sea-turtle-app-integration';
+    final showBackgroundCompositionLab =
+        kIsWeb && qa == 'background-composition';
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -44,10 +45,10 @@ class MyLockApp extends StatelessWidget {
         ],
       ),
       home: RasterShapeBootstrap(
-        child: showSeaTurtleSwimQa
-            ? const SeaTurtleSwimRuntimeQaScreen()
+        child: showBackgroundCompositionLab
+            ? const BackgroundCompositionLabScreen()
             : showSeaTurtleAppIntegrationQa
-            ? const SeaTurtleAppIntegrationQaScreen()
+                ? const SeaTurtleAppIntegrationQaScreen()
             : showSeaTurtleProductionQa
                 ? const SeaTurtleProductionRuntimeQaScreen()
                 : showWholeTurtleQa
