@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../shell/root_shell.dart';
 import '../../lock_engine/models.dart';
 import '../../lock_engine/effects.dart';
 import '../../lock_engine/floating_preview.dart';
@@ -20,6 +21,9 @@ class CandySoftQaScreen extends StatelessWidget {
       const Text('승인 시안 원본 · 실제 LockTokenPainter\n'
         '분홍 원 / 노란 세모 / 파란 네모만 새 시안. 다른 색은 기존 표현.\n'
         '색 변경·알파 정리·256 Master·Android 실기기 검증 전.'),
+      TextButton(onPressed: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => const RootShell())),
+        child: const Text('앱으로 확인하기')),
       Wrap(spacing: 8, children: [for (final token in pairs)
         SizedBox(width: 110, height: 130, child: ShapeChoiceCard(
           kind: token.shape, previewTone: token.tone,

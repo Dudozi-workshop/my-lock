@@ -47,7 +47,7 @@ class MyLockApp extends StatelessWidget {
         ],
       ),
       home: RasterShapeBootstrap(
-        child: CandySoftCandidate.enabled && qa == 'candy-soft'
+        child: CandySoftCandidate.enabled && (qa == 'candy-soft' || !kIsWeb)
             ? const CandySoftQaScreen()
             : showBackgroundCompositionLab
             ? const BackgroundCompositionLabScreen()
