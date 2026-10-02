@@ -1,0 +1,49 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "gate": "app_runtime_integration",
+  "version": "candidate_v1",
+  "status": "QA Candidate / user visual approval pending",
+  "architecture": {
+    "shape_kind": "ShapeKind.seaTurtle",
+    "premium": true,
+    "default_free_catalog_unchanged": true,
+    "render_path": "Raster Shape Registry -> shared ShapeSpecRenderer -> LockTokenPainter",
+    "style_behavior": "Raster illustrated Shape bypasses vector Soft Basic/Crayon geometry while remaining compatible with shared token rendering.",
+    "palette_behavior": "ShapeTone base color applied at runtime with BlendMode.color to preserve source luminance/material structure.",
+    "runtime_source": "assets/raster_shapes/sea_turtle_v3_runtime58.png.b64",
+    "runtime_source_sha256": "dd225477d2e615f326da8f9cdd44fa8ac4e589e5e1631527e71dc4c3410e87d0"
+  },
+  "compatibility": [
+    "Customize Shape tab via ShapeKind.values",
+    "Shop premium Shape catalog",
+    "FloatingEngine selection/token spawning",
+    "Graphical password token persistence",
+    "LockTokenPainter shared rendering"
+  ],
+  "validation": {
+    "flutter_analyze": "PASS",
+    "flutter_test": "PASS",
+    "web_build": "PASS",
+    "cloudflare_deploy": "PASS",
+    "android_apk_build": "in_progress",
+    "web_run_id": 36967955431,
+    "android_ci_run_id": 36967964459
+  },
+  "qa_route": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=sea-turtle-production",
+  "implementation_commits": [
+    "9fdcfde56b403085efbe5b33840528625615817d",
+    "003a524f21d96ca2a78702c5b6813c547c7c328e",
+    "d38cc185351d51099a428ce8b2305553d4fc9dbb",
+    "0ac19872c5c2b8af18560b2bbb372c262e0985ef",
+    "d5391dffef990e5c04ad6ca43079f57f79fb88b3",
+    "a7a55aa8f04c433be01c18bd110049568fef3f51",
+    "fd52a0ebfdd1d07b93f612bdda8af55dffcf35ba",
+    "151ddf33962144bffbbcbc81c5e2d40ff787c4f4",
+    "6008b9e7365ea3b9ed4a344982e54e49ba15d147",
+    "425bbe0625dc786f0b4d313a402fe77b27a24103"
+  ],
+  "imagegen_used": false,
+  "geometry_changed": false,
+  "material_changed": false,
+  "next_gate": "User visual approval of production shared-renderer route; then integration lock."
+}
