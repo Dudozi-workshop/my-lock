@@ -2,7 +2,7 @@
   "shape_id": "sea_turtle_v3",
   "gate": "whole_turtle_seam_material_compatibility",
   "version": "candidate_v1",
-  "status": "QA Candidate / user visual approval pending",
+  "status": "Withdrawn / Reference-only — invalid for Production Whole QA",
   "scope": "Static F0",
   "imagegen_used": false,
   "geometry_changed": false,
@@ -60,8 +60,11 @@
     "android_run_id": 36962408554,
     "android_ci": "pending"
   },
-  "promotion_gate": [
-    "android_ci_pass",
-    "user_visual_approval"
-  ]
+  "promotion_gate": [],
+  "withdrawal": {
+    "date": "2026-10-02",
+    "reason": "Mixed Runtime 512/58 assets instead of full-canvas 2048 canonical Production Assets; incomplete assembly and LOD mismatch.",
+    "individual_part_finals_affected": false,
+    "replacement_standard": "docs/whole-shape-canonical-assembly-qa-standard.md"
+  }
 }
