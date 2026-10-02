@@ -18,7 +18,7 @@ class ShapeSpecRegistry {
 
   static const Map<ShapeKind, String> _rasterShapeAssets = {
     ShapeKind.seaTurtle:
-        'assets/raster_shapes/sea_turtle_v3_runtime58_lossless.webp.b64',
+        'assets/raster_shapes/sea_turtle_v3_runtime58_v2_lossless.webp.b64',
   };
   bool _loaded = false;
 
@@ -67,7 +67,13 @@ class ShapeSpecRegistry {
     _loaded = true;
   }
 
+  static const Map<ShapeKind, double> _rasterVisualScale = {
+    ShapeKind.seaTurtle: 1.075,
+  };
+
   bool isRasterShape(ShapeKind shape) => _rasterShapeAssets.containsKey(shape);
+
+  double rasterVisualScale(ShapeKind shape) => _rasterVisualScale[shape] ?? 1.0;
 
   String? rasterAssetPath(ShapeKind shape) => _rasterShapeAssets[shape];
 
