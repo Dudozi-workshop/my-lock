@@ -1,0 +1,67 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "gate": "whole_turtle_seam_material_compatibility",
+  "version": "candidate_v1",
+  "status": "QA Candidate / user visual approval pending",
+  "scope": "Static F0",
+  "imagegen_used": false,
+  "geometry_changed": false,
+  "material_ownership_changed": false,
+  "render_order": [
+    "front_flipper_far",
+    "body_with_rear",
+    "shell_main",
+    "underbelly",
+    "front_flipper_near"
+  ],
+  "near_runtime_crop_canonical_placement": {
+    "canvas": [
+      2048,
+      2048
+    ],
+    "geometry_bbox_xyxy": [
+      809,
+      909,
+      1318,
+      1460
+    ],
+    "placement_square_xywh": [
+      788,
+      909,
+      551,
+      551
+    ],
+    "reason": "approved runtime58 is tight crop; compositor placement only"
+  },
+  "palettes": {
+    "pink": "#FF8FD1",
+    "blue": "#79BFFF",
+    "yellow": "#FFDA72"
+  },
+  "qa": {
+    "static_f0": "pass",
+    "attachment_gap": "pass",
+    "double_outline_runtime58": "pass",
+    "near_root_continuity": "pass",
+    "far_root_continuity": "pass",
+    "palette_family_continuity": "pass",
+    "light_readability": "pass",
+    "dark_readability": "pass",
+    "runtime58_readability": "pass",
+    "alpha_halo_runtime58": "pass",
+    "render_order_occlusion": "pass"
+  },
+  "runtime": {
+    "route": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=sea-turtle-whole",
+    "commit": "75e1cf4f22bec058f38f33a44d55065c564e8337",
+    "web_run_id": 36962408553,
+    "web_build": "pass",
+    "cloudflare_deploy": "pass",
+    "android_run_id": 36962408554,
+    "android_ci": "pending"
+  },
+  "promotion_gate": [
+    "android_ci_pass",
+    "user_visual_approval"
+  ]
+}
