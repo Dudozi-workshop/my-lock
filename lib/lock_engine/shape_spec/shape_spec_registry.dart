@@ -27,10 +27,6 @@ class ShapeSpecRegistry {
   Future<void> load() async {
     if (_loaded) return;
 
-    for (final entry in _rasterShapeAssets.entries) {
-      _rasterImages[entry.key] = await _loadMaskImage(entry.value);
-    }
-
     for (final style in ShapeStyle.values) {
       final styleSpec = await _loadJson(
         'assets/shape_specs/${style.assetId}/style.json',
@@ -72,6 +68,15 @@ class ShapeSpecRegistry {
   }
 
   bool isRasterShape(ShapeKind shape) => _rasterShapeAssets.containsKey(shape);
+
+  String? rasterAssetPath(ShapeKind shape) => _rasterShapeAssets[shape];
+
+  Future<void> loadRasterShapes() async {
+    for (final entry in _rasterShapeAssets.entries) {
+      if (_rasterImages.containsKey(entry.key)) continue;
+      _rasterImages[entry.key] = await _loadMaskImage(entry.value);
+    }
+  }
 
   ui.Image resolveRasterShape(ShapeKind shape) {
     final image = _rasterImages[shape];
