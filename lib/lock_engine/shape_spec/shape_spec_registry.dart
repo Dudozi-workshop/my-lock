@@ -87,18 +87,33 @@ class ShapeSpecRegistry {
         await _loadJson(entry.value),
       );
       final images = <ui.Image>[];
+      final swimPoses = <String, RasterPoseImages>{};
       try {
         for (final layer in ['master', 'palette_base', 'fixed_finish']) {
-          final data = await rootBundle.load(metadata.asset(layer));
-          final codec = await ui.instantiateImageCodec(
-            data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
-          );
-          try {
-            images.add((await codec.getNextFrame()).image);
-          } finally {
-            codec.dispose();
+          images.add(await _loadRasterImage(metadata.asset(layer)));
+        }
+
+        final poseConfigs = metadata.swim['poses'] as Map?;
+        if (poseConfigs != null) {
+          for (final rawPose in poseConfigs.keys) {
+            final pose = rawPose as String;
+            if (pose == 's0') continue;
+            final paletteParts = metadata.swimAssetParts(pose, 'palette_base');
+            final finishParts = metadata.swimAssetParts(pose, 'fixed_finish');
+            if (paletteParts.isEmpty || finishParts.isEmpty) continue;
+
+            final palette = await _loadChunkedRasterImage(paletteParts);
+            final finish = await _loadChunkedRasterImage(finishParts);
+            images
+              ..add(palette)
+              ..add(finish);
+            swimPoses[pose] = RasterPoseImages(
+              paletteBase: palette,
+              fixedFinish: finish,
+            );
           }
         }
+
         if (images.any(
           (image) =>
               image.width != metadata.runtimeCanvas.width ||
@@ -111,6 +126,7 @@ class ShapeSpecRegistry {
           master: images[0],
           paletteBase: images[1],
           fixedFinish: images[2],
+          swimPoses: swimPoses,
         );
       } catch (_) {
         for (final image in images) {
@@ -156,6 +172,33 @@ class ShapeSpecRegistry {
   Future<Map<String, dynamic>> _loadJson(String path) async {
     final raw = await rootBundle.loadString(path);
     return jsonDecode(raw) as Map<String, dynamic>;
+  }
+
+  Future<ui.Image> _loadRasterImage(String asset) async {
+    final data = await rootBundle.load(asset);
+    final codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+    );
+    try {
+      return (await codec.getNextFrame()).image;
+    } finally {
+      codec.dispose();
+    }
+  }
+
+  Future<ui.Image> _loadChunkedRasterImage(List<String> parts) async {
+    final encoded = StringBuffer();
+    for (final part in parts) {
+      encoded.write((await rootBundle.loadString(part)).trim());
+    }
+    final codec = await ui.instantiateImageCodec(
+      base64Decode(encoded.toString()),
+    );
+    try {
+      return (await codec.getNextFrame()).image;
+    } finally {
+      codec.dispose();
+    }
   }
 
   Future<ui.Image> _loadMaskImage(String asset) async {
