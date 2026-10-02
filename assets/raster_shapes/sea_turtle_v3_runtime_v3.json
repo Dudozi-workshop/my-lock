@@ -65,7 +65,7 @@
   },
   "swim": {
     "version": 1,
-    "status": "QA Candidate / user approval pending",
+    "status": "Final / Locked / Active",
     "sequence": [
       "s0",
       "s1",
@@ -127,6 +127,14 @@
           ]
         }
       }
+    },
+    "lock": {
+      "version": "Motion Master v1",
+      "date": "2026-10-03",
+      "user_visual_approval": true,
+      "qa_candidate_run_id": 37032606322,
+      "web_deploy_run_id": 37032606326,
+      "scope_lock": "front flipper swim motion only; static body/shell/underbelly/rear unchanged"
     }
   }
 }
