@@ -222,22 +222,10 @@ class ShapeSpecRenderer {
         ),
     );
     if (token.tone == ShapeTone.auroraSea) {
-      canvas.saveLayer(destination, Paint());
-      canvas.drawRect(
-        destination,
-        Paint()
-          ..shader = auroraSeaGradient(paletteTimeSeconds, config: spec.metadata.aurora)
-              .createShader(destination),
-      );
-      canvas.drawImageRect(
-        spec.paletteBase,
-        source,
-        destination,
-        Paint()
-          ..filterQuality = FilterQuality.high
-          ..blendMode = BlendMode.dstIn,
-      );
-      canvas.restore();
+      // Full layer coverage avoids antialiased rectangle-edge residue.
+      canvas.drawPaint(Paint()
+        ..shader = auroraSeaGradient(paletteTimeSeconds, config: spec.metadata.aurora).createShader(destination)
+        ..blendMode = BlendMode.srcIn);
     }
     // Layer 2: fixed optical density carries all source outline/shadow/light/detail.
     canvas.drawImageRect(spec.fixedFinish, source, destination, sampling);

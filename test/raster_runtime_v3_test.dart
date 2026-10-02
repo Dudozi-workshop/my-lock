@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -34,10 +33,6 @@ void main() {
     );
     final picture = recorder.endRecording();
     final image = await picture.toImage(192, 192);
-    if(scale > 1) {
-      final png = await image.toByteData(format: ui.ImageByteFormat.png);
-      File('/tmp/turtle-${tone.name}-$rotation.png').writeAsBytesSync(png!.buffer.asUint8List());
-    }
     final data = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
     image.dispose();
     picture.dispose();
