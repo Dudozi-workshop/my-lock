@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 /// Runtime framing in texture pixels, independent of ShapeKind.
+/// Swim pose variants share the same canonical runtime frame.
 class RasterShapeMetadata {
   RasterShapeMetadata.fromJson(Map<String, dynamic> json)
     : shapeId = json['shape_id'] as String,
@@ -65,22 +66,24 @@ class RasterShapeMetadata {
 
   String asset(String layer) => (layers[layer] as Map)['asset'] as String;
 
-  String? swimAsset(String pose, String layer) {
+  List<String> swimAssetParts(String pose, String layer) {
     final poses = swim['poses'] as Map?;
     final poseConfig = poses?[pose] as Map?;
     final poseLayers = poseConfig?['layers'] as Map?;
-    return poseLayers?[layer] as String?;
+    final values = poseLayers?[layer] as List?;
+    if (values == null) return const <String>[];
+    return values.cast<String>();
   }
 }
 
 class RasterPoseImages {
   const RasterPoseImages({
-    required this.master,
+    this.master,
     required this.paletteBase,
     required this.fixedFinish,
   });
 
-  final ui.Image master;
+  final ui.Image? master;
   final ui.Image paletteBase;
   final ui.Image fixedFinish;
 }
