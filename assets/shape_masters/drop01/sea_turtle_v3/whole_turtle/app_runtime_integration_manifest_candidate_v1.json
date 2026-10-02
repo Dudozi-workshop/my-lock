@@ -2,23 +2,25 @@
   "shape_id": "sea_turtle_v3",
   "gate": "app_runtime_integration",
   "version": "candidate_v1",
-  "status": "QA Candidate / user visual approval pending",
+  "status": "QA Candidate v2 / production component verification",
   "architecture": {
     "shape_kind": "ShapeKind.seaTurtle",
     "premium": true,
     "default_free_catalog_unchanged": true,
     "render_path": "Raster Shape Registry -> shared ShapeSpecRenderer -> LockTokenPainter",
     "style_behavior": "Raster illustrated Shape bypasses vector Soft Basic/Crayon geometry while remaining compatible with shared token rendering.",
-    "palette_behavior": "ShapeTone base color applied at runtime with BlendMode.color to preserve source luminance/material structure.",
-    "runtime_source": "assets/raster_shapes/sea_turtle_v3_runtime58.png.b64",
-    "runtime_source_sha256": "dd225477d2e615f326da8f9cdd44fa8ac4e589e5e1631527e71dc4c3410e87d0"
+    "palette_behavior": "ShapeTone is applied with BlendMode.color, then original raster alpha is re-applied with dstIn so palette output is clipped to turtle pixels only while luminance/material detail survives.",
+    "runtime_source": "assets/raster_shapes/sea_turtle_v3_runtime58_lossless.webp.b64",
+    "runtime_source_sha256": "022b9365c1d5ab09bf687a26e224b97ce7f70624c80a516c9e355eb5009d3d62",
+    "bootstrap": "RasterShapeBootstrap loads raster assets after runApp for both MyLockApp and MyLockLockApp; loading/error UI prevents blank-screen failure."
   },
   "compatibility": [
-    "Customize Shape tab via ShapeKind.values",
+    "Customize ShapeChoiceCard via shared LockTokenPainter",
     "Shop premium Shape catalog",
-    "FloatingEngine selection/token spawning",
+    "FloatingEngine/FloatingPreview token spawning",
     "Graphical password token persistence",
-    "LockTokenPainter shared rendering"
+    "Main app runtime through RasterShapeBootstrap",
+    "Android LockActivity runtime through RasterShapeBootstrap"
   ],
   "validation": {
     "flutter_analyze": "PASS",
@@ -26,10 +28,10 @@
     "web_build": "PASS",
     "cloudflare_deploy": "PASS",
     "android_apk_build": "in_progress",
-    "web_run_id": 36967955431,
-    "android_ci_run_id": 36967964459
+    "web_run_id": 36970589122,
+    "android_ci_run_id": 36970589117
   },
-  "qa_route": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=sea-turtle-production",
+  "qa_route": "https://my-lock-preview.rlatkd5959.workers.dev/?qa=sea-turtle-app-integration",
   "implementation_commits": [
     "9fdcfde56b403085efbe5b33840528625615817d",
     "003a524f21d96ca2a78702c5b6813c547c7c328e",
@@ -40,10 +42,18 @@
     "fd52a0ebfdd1d07b93f612bdda8af55dffcf35ba",
     "151ddf33962144bffbbcbc81c5e2d40ff787c4f4",
     "6008b9e7365ea3b9ed4a344982e54e49ba15d147",
-    "425bbe0625dc786f0b4d313a402fe77b27a24103"
+    "425bbe0625dc786f0b4d313a402fe77b27a24103",
+    "72f3a59c06d006cd96a4e4e102662a7c5af0d541",
+    "456ab43580873843e820399161cc453558de2bbe",
+    "c35986f00e30cd81dd10c6ebbaa79365f5fed2f5",
+    "87731acbdf14471c4667466ff8fda5a420e249f7",
+    "8a0912be6ad17b7c4a802bc0aec63b3d39cd7475",
+    "1fe3b872a1d6ba19bc9d83c89a55f1448bf79a05",
+    "a3fc057b74645980aebc3ec3c3ff943c9995ce55",
+    "e38a603435ae002947ca168ddc8b5eaef0f95ba7"
   ],
   "imagegen_used": false,
   "geometry_changed": false,
   "material_changed": false,
-  "next_gate": "User visual approval of production shared-renderer route; then integration lock."
+  "next_gate": "User visual approval of actual production components; Android APK completion; then App Runtime Integration LOCK."
 }
