@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../models.dart';
+import '../swim_pose_runtime.dart';
 import 'shape_spec.dart';
 import 'shape_spec_registry.dart';
 
@@ -20,6 +21,7 @@ class ShapeSpecRenderer {
     required double opacity,
     double objectRotation = 0,
     double paletteTimeSeconds = 0,
+    String? swimKey,
   }) {
     final registry = ShapeSpecRegistry.instance;
     if (registry.isRasterShape(token.shape)) {
@@ -31,6 +33,7 @@ class ShapeSpecRenderer {
         opacity: opacity,
         objectRotation: objectRotation,
         paletteTimeSeconds: paletteTimeSeconds,
+        swimKey: swimKey,
       );
       return;
     }
@@ -195,11 +198,20 @@ class ShapeSpecRenderer {
     required double opacity,
     required double objectRotation,
     required double paletteTimeSeconds,
+    required String? swimKey,
   }) {
     final spec = ShapeSpecRegistry.instance.resolveRasterSpec(token.shape);
     final destination = spec.metadata.destination(center, radius);
     final source = Offset.zero & spec.metadata.runtimeCanvas;
     final sampling = Paint()..filterQuality = FilterQuality.high;
+    final pose = spec.metadata.swim.isEmpty
+        ? 's0'
+        : SwimPoseRuntime.instance.poseFor(
+            key: swimKey ?? 'token:${token.id}',
+            timeSeconds: paletteTimeSeconds,
+            config: spec.metadata.swim,
+          );
+    final poseImages = spec.imagesForPose(pose);
     canvas.save();
     canvas.translate(center.dx, center.dy);
     canvas.rotate(objectRotation);
@@ -211,7 +223,7 @@ class ShapeSpecRenderer {
 
     // Layer 1: optical albedo. No color blend against the full illustration.
     canvas.drawImageRect(
-      spec.paletteBase,
+      poseImages.paletteBase,
       source,
       destination,
       Paint()
@@ -228,10 +240,10 @@ class ShapeSpecRenderer {
         ..blendMode = BlendMode.srcIn);
     }
     // Layer 2: fixed optical density carries all source outline/shadow/light/detail.
-    canvas.drawImageRect(spec.fixedFinish, source, destination, sampling);
+    canvas.drawImageRect(poseImages.fixedFinish, source, destination, sampling);
     // Exactly one true shape-alpha application, after BOTH layers.
     canvas.drawImageRect(
-      spec.master,
+      poseImages.master ?? poseImages.paletteBase,
       source,
       destination,
       Paint()
