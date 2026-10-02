@@ -11,6 +11,7 @@ promotes, deletes, or rewrites locked binary assets.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -21,6 +22,9 @@ DEFAULT_ROOT = ROOT / "assets/shape_masters/drop01/sea_turtle_v3"
 REGISTRY_JSON = "ASSET_REGISTRY.json"
 ALLOWED = {"working","candidate","qa_candidate","lock_candidate","final_locked","superseded","withdrawn","archived"}
 ID_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
+FILE_RE = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*(?:\.[a-z0-9]+)?$")
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+FORBIDDEN_PRODUCTION_TOKENS = ("candidate", "working", "draft", "tmp", "temp", "withdrawn", "legacy")
 STANDARD_DIRS = ("master","parts","whole_turtle","runtime","motion","docs","archive")
 
 def load(path: Path):
@@ -72,9 +76,59 @@ def validate(asset_root: Path) -> list[str]:
         if count != 1:
             errors.append(f"{scope}: expected exactly one active lineage, found {count}")
 
+    scopes = {item.get("scope") for item in entries if item.get("scope")}
+    for i, item in enumerate(entries):
+        prefix = f"lineages[{i}]"
+        derived = item.get("derived_from")
+        if derived and derived not in scopes:
+            errors.append(f"{prefix}: broken derived_from scope {derived!r}")
+
+        artifact_path = item.get("artifact_path")
+        if artifact_path:
+            rel = Path(artifact_path)
+            if rel.is_absolute() or ".." in rel.parts:
+                errors.append(f"{prefix}: artifact_path must stay inside repository")
+            else:
+                target = ROOT / rel
+                if not target.exists():
+                    errors.append(f"{prefix}: broken artifact_path {artifact_path!r}")
+                if not FILE_RE.fullmatch(rel.name):
+                    errors.append(f"{prefix}: filename violates lowercase snake_case grammar: {rel.name!r}")
+
+        source_path = item.get("source_path")
+        source_hash = item.get("source_sha256")
+        if source_path or source_hash:
+            if not source_path or not source_hash:
+                errors.append(f"{prefix}: source_path and source_sha256 must be declared together")
+            elif not SHA256_RE.fullmatch(str(source_hash)):
+                errors.append(f"{prefix}: invalid source_sha256")
+            else:
+                source = ROOT / source_path
+                if not source.is_file():
+                    errors.append(f"{prefix}: broken source_path {source_path!r}")
+                else:
+                    actual = hashlib.sha256(source.read_bytes()).hexdigest()
+                    if actual != source_hash:
+                        errors.append(f"{prefix}: source hash mismatch for {source_path!r}")
+
     for rel in reg.get("required_directories", []):
         if not (asset_root / rel).is_dir():
             errors.append(f"missing required directory: {rel}")
+
+    for rel in reg.get("production_directories", []):
+        production = asset_root / rel
+        if not production.is_dir():
+            errors.append(f"missing production directory: {rel}")
+            continue
+        for item in production.rglob("*"):
+            if not item.is_file():
+                continue
+            normalized = item.name.lower()
+            if any(token in normalized for token in FORBIDDEN_PRODUCTION_TOKENS):
+                errors.append(
+                    f"non-production artifact mixed into production directory: "
+                    f"{item.relative_to(asset_root)}"
+                )
 
     return errors
 
