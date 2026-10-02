@@ -2,7 +2,11 @@
 set -euo pipefail
 
 python3 tool/validate_shape_masks.py
-python3 tool/generate_asset_book.py
+if [ "${ASSET_BOOK_AUTO_SYNC:-0}" = "1" ]; then
+  python3 tool/generate_asset_book.py
+else
+  echo "Asset Book auto-sync paused; using committed frozen snapshot."
+fi
 PLATFORMS=web bash tool/bootstrap.sh
 PREVIEW_VERSION="$(tr -d '[:space:]' < tool/preview_version.txt)"
 flutter build web --release --base-href "/" \
