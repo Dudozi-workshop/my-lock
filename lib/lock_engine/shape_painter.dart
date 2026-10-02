@@ -4,14 +4,19 @@ import 'package:flutter/material.dart';
 
 import 'effects.dart';
 import 'models.dart';
+import 'raster_palette_clock.dart';
 import 'shape_spec/shape_spec.dart';
 import 'shape_spec/shape_spec_renderer.dart';
 
 class LockTokenPainter extends CustomPainter {
-  const LockTokenPainter(
-    this.token, {
-    this.style = ShapeStyle.softBasic,
-  });
+  LockTokenPainter(this.token, {this.style = ShapeStyle.softBasic})
+    : super(
+        repaint:
+            token.shape == ShapeKind.seaTurtle &&
+                token.tone == ShapeTone.auroraSea
+            ? RasterPaletteClock.instance
+            : null,
+      );
 
   final LockToken token;
   final ShapeStyle style;
@@ -27,6 +32,7 @@ class LockTokenPainter extends CustomPainter {
       token: token,
       style: style,
       opacity: 1,
+      paletteTimeSeconds: RasterPaletteClock.instance.value,
     );
   }
 
@@ -59,8 +65,8 @@ class FloatingShapePainter extends CustomPainter {
 
       final scale = object.isPopping
           ? popStyle == PopStyle.bubble
-              ? 1 + progress * 0.16
-              : 1 + progress * 0.42
+                ? 1 + progress * 0.16
+                : 1 + progress * 0.42
           : 1.0;
       final opacity = object.isPopping
           ? (1 - progress).clamp(0.0, 1.0).toDouble()
@@ -86,6 +92,7 @@ class FloatingShapePainter extends CustomPainter {
       style: style,
       opacity: opacity,
       objectRotation: object.rotation,
+      paletteTimeSeconds: RasterPaletteClock.instance.value,
     );
   }
 
@@ -135,8 +142,9 @@ class FloatingShapePainter extends CustomPainter {
 
     for (var i = 0; i < 2; i++) {
       final delay = i * 0.18;
-      final localProgress =
-          ((progress - delay) / (1 - delay)).clamp(0.0, 1.0).toDouble();
+      final localProgress = ((progress - delay) / (1 - delay))
+          .clamp(0.0, 1.0)
+          .toDouble();
       if (progress < delay) continue;
 
       final paint = Paint()

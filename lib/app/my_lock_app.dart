@@ -29,7 +29,7 @@ class MyLockApp extends StatelessWidget {
     final showSeaTurtleProductionQa =
         kIsWeb && qa == 'sea-turtle-production';
     final showSeaTurtleAppIntegrationQa =
-        kIsWeb && qa == 'sea-turtle-app-integration';
+        kIsWeb && (qa == 'sea-turtle-app-integration' || qa == 'sea-turtle-runtime-v3');
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,

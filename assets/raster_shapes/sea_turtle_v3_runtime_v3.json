@@ -1,0 +1,64 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "version": 3,
+  "status": "QA Candidate / user approval pending",
+  "runtime_canvas": [
+    256,
+    256
+  ],
+  "content_bbox": [
+    32,
+    65,
+    224,
+    191
+  ],
+  "anchor": [
+    128.0,
+    128.0
+  ],
+  "display_scale": 1.0,
+  "safety_padding_ratio": 0.125,
+  "runtime_source_hash": "64062a62a56235f6c107216bf9cc06353b318a647d63a6f2312660f28852e505",
+  "canonical_source_hash": "73f3e583d99d1e9405f54a44862c8c55dda49c464eccd5b73e529b8fab309e4c",
+  "source_crop": [
+    420,
+    464,
+    1640,
+    1684
+  ],
+  "layers": {
+    "master": {
+      "asset": "assets/raster_shapes/sea_turtle_v3_master_256_v3.webp",
+      "sha256": "64062a62a56235f6c107216bf9cc06353b318a647d63a6f2312660f28852e505"
+    },
+    "palette_base": {
+      "asset": "assets/raster_shapes/sea_turtle_v3_palette_base_256_v3.webp",
+      "sha256": "2ec4b899af721996b7b23c65318f9213958931db0d9adcc90865c7b142d4f0d0"
+    },
+    "fixed_finish": {
+      "asset": "assets/raster_shapes/sea_turtle_v3_fixed_finish_256_v3.webp",
+      "sha256": "ab11c3552d2563f8c345e090499522cb2bb1874be9b396580aeaa0d63e433da6"
+    }
+  },
+  "material_model": "runtime optical albedo + fixed achromatic finish; locked semantic ownership unchanged",
+  "reference_albedo_luminance": 0.7,
+  "aurora": {
+    "period_seconds": 8,
+    "palette": [
+      "#79BFFF",
+      "#FF8FD1",
+      "#FFDA72",
+      "#B7A4DF"
+    ],
+    "saturation_scale": 0.55,
+    "hue_field": "moving periodic 2D local gradient"
+  },
+  "qa": {
+    "canvas_edge_alpha_pixels": 0,
+    "transparent_rgb_residue_pixels": 0,
+    "lossless_decode_equality": true,
+    "reference_luminance_max_error": 0.0013717647058824056,
+    "geometry_material_ownership_changed": false,
+    "imagegen_used": false
+  }
+}

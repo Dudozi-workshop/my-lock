@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../models.dart';
 import 'shape_spec.dart';
+import 'raster_shape_spec.dart';
 
 class ShapeSpecRegistry {
   ShapeSpecRegistry._();
@@ -14,11 +15,11 @@ class ShapeSpecRegistry {
   final Map<ShapeStyle, ShapeStyleSpec> _styles = {};
   final Map<(ShapeStyle, ShapeKind), ShapeSpec> _shapes = {};
   final Map<String, ui.Image> _maskImages = {};
-  final Map<ShapeKind, ui.Image> _rasterImages = {};
+  final Map<ShapeKind, RasterShapeSpec> _rasterSpecs = {};
+  Future<void>? _rasterLoad;
 
   static const Map<ShapeKind, String> _rasterShapeAssets = {
-    ShapeKind.seaTurtle:
-        'assets/raster_shapes/sea_turtle_v3_runtime58_v2_lossless.webp.b64',
+    ShapeKind.seaTurtle: 'assets/raster_shapes/sea_turtle_v3_runtime_v3.json',
   };
   bool _loaded = false;
 
@@ -56,7 +57,9 @@ class ShapeSpecRegistry {
         for (final layer in spec.layers) {
           if (layer.geometry.kind != 'mask') continue;
           final asset = layer.geometry.values['asset'] as String?;
-          if (asset == null || asset.isEmpty || _maskImages.containsKey(asset)) {
+          if (asset == null ||
+              asset.isEmpty ||
+              _maskImages.containsKey(asset)) {
             continue;
           }
           _maskImages[asset] = await _loadMaskImage(asset);
@@ -67,30 +70,66 @@ class ShapeSpecRegistry {
     _loaded = true;
   }
 
-  static const Map<ShapeKind, double> _rasterVisualScale = {
-    ShapeKind.seaTurtle: 1.075,
-  };
-
   bool isRasterShape(ShapeKind shape) => _rasterShapeAssets.containsKey(shape);
-
-  double rasterVisualScale(ShapeKind shape) => _rasterVisualScale[shape] ?? 1.0;
 
   String? rasterAssetPath(ShapeKind shape) => _rasterShapeAssets[shape];
 
-  Future<void> loadRasterShapes() async {
+  Future<void> loadRasterShapes() =>
+      _rasterLoad ??= _loadRasterSpecs().catchError((Object error) {
+        _rasterLoad = null;
+        throw error;
+      });
+
+  Future<void> _loadRasterSpecs() async {
     for (final entry in _rasterShapeAssets.entries) {
-      if (_rasterImages.containsKey(entry.key)) continue;
-      _rasterImages[entry.key] = await _loadMaskImage(entry.value);
+      if (_rasterSpecs.containsKey(entry.key)) continue;
+      final metadata = RasterShapeMetadata.fromJson(
+        await _loadJson(entry.value),
+      );
+      final images = <ui.Image>[];
+      try {
+        for (final layer in ['master', 'palette_base', 'fixed_finish']) {
+          final data = await rootBundle.load(metadata.asset(layer));
+          final codec = await ui.instantiateImageCodec(
+            data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+          );
+          try {
+            images.add((await codec.getNextFrame()).image);
+          } finally {
+            codec.dispose();
+          }
+        }
+        if (images.any(
+          (image) =>
+              image.width != metadata.runtimeCanvas.width ||
+              image.height != metadata.runtimeCanvas.height,
+        )) {
+          throw StateError('Raster canvas mismatch: ${metadata.shapeId}');
+        }
+        _rasterSpecs[entry.key] = RasterShapeSpec(
+          metadata: metadata,
+          master: images[0],
+          paletteBase: images[1],
+          fixedFinish: images[2],
+        );
+      } catch (_) {
+        for (final image in images) {
+          image.dispose();
+        }
+        rethrow;
+      }
     }
   }
 
-  ui.Image resolveRasterShape(ShapeKind shape) {
-    final image = _rasterImages[shape];
-    if (image == null) {
+  RasterShapeSpec resolveRasterSpec(ShapeKind shape) {
+    final spec = _rasterSpecs[shape];
+    if (spec == null)
       throw StateError('Missing raster Shape asset: ${shape.name}');
-    }
-    return image;
+    return spec;
   }
+
+  ui.Image resolveRasterShape(ShapeKind shape) =>
+      resolveRasterSpec(shape).master;
 
   ShapeSpecBundle resolve(ShapeStyle style, ShapeKind shape) {
     if (!_loaded) {
@@ -123,7 +162,10 @@ class ShapeSpecRegistry {
     final encoded = (await rootBundle.loadString(asset)).trim();
     final bytes = base64Decode(encoded);
     final codec = await ui.instantiateImageCodec(bytes);
-    final frame = await codec.getNextFrame();
-    return frame.image;
+    try {
+      return (await codec.getNextFrame()).image;
+    } finally {
+      codec.dispose();
+    }
   }
 }

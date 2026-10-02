@@ -19,6 +19,7 @@ class ShapeSpecRenderer {
     required ShapeStyle style,
     required double opacity,
     double objectRotation = 0,
+    double paletteTimeSeconds = 0,
   }) {
     final registry = ShapeSpecRegistry.instance;
     if (registry.isRasterShape(token.shape)) {
@@ -29,6 +30,7 @@ class ShapeSpecRenderer {
         token: token,
         opacity: opacity,
         objectRotation: objectRotation,
+        paletteTimeSeconds: paletteTimeSeconds,
       );
       return;
     }
@@ -192,67 +194,81 @@ class ShapeSpecRenderer {
     required LockToken token,
     required double opacity,
     required double objectRotation,
+    required double paletteTimeSeconds,
   }) {
-    final image = ShapeSpecRegistry.instance.resolveRasterShape(token.shape);
-    final visualScale = ShapeSpecRegistry.instance.rasterVisualScale(token.shape);
-    final destination = Rect.fromCircle(
-      center: center,
-      radius: radius * visualScale,
-    );
-
+    final spec = ShapeSpecRegistry.instance.resolveRasterSpec(token.shape);
+    final destination = spec.metadata.destination(center, radius);
+    final source = Offset.zero & spec.metadata.runtimeCanvas;
+    final sampling = Paint()..filterQuality = FilterQuality.high;
     canvas.save();
-    if (objectRotation != 0) {
-      canvas
-        ..translate(center.dx, center.dy)
-        ..rotate(objectRotation)
-        ..translate(-center.dx, -center.dy);
-    }
-
-    final source = Rect.fromLTWH(
-      0,
-      0,
-      image.width.toDouble(),
-      image.height.toDouble(),
-    );
-
-    // Raster palette rule:
-    // 1) keep the authored runtime image as the luminance/material source;
-    // 2) apply ShapeTone with BlendMode.color so shading/highlights survive;
-    // 3) re-apply the original image alpha with dstIn so palette pixels can
-    //    never leak into the transparent runtime canvas.
-    //
-    // The saveLayer opacity is applied only after the alpha-clipped
-    // composition is complete.
+    canvas.translate(center.dx, center.dy);
+    canvas.rotate(objectRotation);
+    canvas.translate(-center.dx, -center.dy);
     canvas.saveLayer(
       destination,
       Paint()..color = Colors.white.withValues(alpha: opacity),
     );
 
+    // Layer 1: optical albedo. No color blend against the full illustration.
     canvas.drawImageRect(
-      image,
+      spec.paletteBase,
       source,
       destination,
-      Paint()..filterQuality = FilterQuality.high,
-    );
-
-    canvas.drawRect(
-      destination,
       Paint()
-        ..color = baseColorForTone(token.tone)
-        ..blendMode = BlendMode.color,
+        ..filterQuality = FilterQuality.high
+        ..colorFilter = ColorFilter.mode(
+          baseColorForTone(token.tone),
+          BlendMode.srcIn,
+        ),
     );
-
+    if (token.tone == ShapeTone.auroraSea) {
+      canvas.saveLayer(destination, Paint());
+      canvas.drawRect(
+        destination,
+        Paint()
+          ..shader = auroraSeaGradient(paletteTimeSeconds, config: spec.metadata.aurora)
+              .createShader(destination),
+      );
+      canvas.drawImageRect(
+        spec.paletteBase,
+        source,
+        destination,
+        Paint()
+          ..filterQuality = FilterQuality.high
+          ..blendMode = BlendMode.dstIn,
+      );
+      canvas.restore();
+    }
+    // Layer 2: fixed optical density carries all source outline/shadow/light/detail.
+    canvas.drawImageRect(spec.fixedFinish, source, destination, sampling);
+    // Exactly one true shape-alpha application, after BOTH layers.
     canvas.drawImageRect(
-      image,
+      spec.master,
       source,
       destination,
       Paint()
         ..filterQuality = FilterQuality.high
         ..blendMode = BlendMode.dstIn,
     );
+    canvas.restore();
+    canvas.restore();
+  }
 
-    canvas.restore();
-    canvas.restore();
+  static LinearGradient auroraSeaGradient(double timeSeconds, {required Map<String, dynamic> config}) {
+    final period = (config['period_seconds'] as num).toDouble();
+    final phase = (timeSeconds % period) / period * pi * 2;
+    final palette = (config['palette'] as List).map((hex) =>
+      Color(0xFF000000 | int.parse((hex as String).substring(1), radix: 16))).toList();
+    final colors = [...palette, palette.first].map((color) {
+      final hsl = HSLColor.fromColor(color);
+      return hsl.withSaturation(hsl.saturation * (config['saturation_scale'] as num).toDouble())
+        .withLightness(0.73).toColor();
+    }).toList();
+    return LinearGradient(
+      begin: Alignment(-1.1 + sin(phase) * 0.8, -0.8 + cos(phase) * 0.5),
+      end: Alignment(1.1 + sin(phase) * 0.8, 0.8 + cos(phase) * 0.5),
+      colors: colors,
+    );
   }
 
   static void _paintCrayonToken(
@@ -558,6 +574,7 @@ class ShapeSpecRenderer {
     switch (tone) {
       case ShapeTone.pink:
         return (light: 0.88, shade: 1.12);
+      case ShapeTone.auroraSea:
       case ShapeTone.blue:
         return (light: 0.84, shade: 1.00);
       case ShapeTone.yellow:

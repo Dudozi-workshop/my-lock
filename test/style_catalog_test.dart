@@ -19,12 +19,12 @@ void main() {
     expect(ShapeKind.values, contains(ShapeKind.seaTurtle));
     expect(ShapeKind.seaTurtle.premium, isTrue);
     expect(
-      ShapeTone.values,
-      equals([
+      ShapeTone.defaults,
+      equals({
         ShapeTone.pink,
         ShapeTone.blue,
         ShapeTone.yellow,
-      ]),
+      }),
     );
     expect(
       ShapeStyle.values,
