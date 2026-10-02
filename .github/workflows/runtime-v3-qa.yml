@@ -1,9 +1,8 @@
 name: Runtime v3 Candidate QA
 on:
-  push:
-    branches: [runtime/sea-turtle-v3, runtime-v3-reconcile]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 permissions:
   contents: read
 concurrency:
