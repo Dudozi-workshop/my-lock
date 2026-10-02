@@ -1,1 +1,0 @@
-# Crayon Soft registration test
