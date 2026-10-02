@@ -128,6 +128,8 @@ def validate(asset_root: Path) -> list[str]:
         if not (asset_root / rel).is_dir():
             errors.append(f"missing required directory: {rel}")
 
+    errors.extend(validate_gate_outputs(reg))
+
     for rel in reg.get("production_directories", []):
         production = asset_root / rel
         if not production.is_dir():
