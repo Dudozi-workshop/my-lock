@@ -2,7 +2,7 @@ name: MY LOCK Web Build
 
 on:
   push:
-    branches: [main]
+    branches: [main, runtime/sea-turtle-v3]
     paths:
       - 'lib/**'
       - 'assets/**'
