@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
-/// Runtime framing in texture pixels, independent of ShapeKind.
+/// Runtime framing in texture pixels, independent of ShapeKind. Swim variants share this frame.
 class RasterShapeMetadata {
   RasterShapeMetadata.fromJson(Map<String, dynamic> json)
     : shapeId = json['shape_id'] as String,
