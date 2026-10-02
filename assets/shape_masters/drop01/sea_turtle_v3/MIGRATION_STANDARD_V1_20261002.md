@@ -74,3 +74,23 @@ Lifecycle truth remains in Manifest. Filename tokens do not independently establ
 - Runtime v3 handoff checked.
 - Drop 01 Asset Master checked.
 - Q3 Whole Canonical and Part locks remain authoritative.
+
+
+## Batch 02 result — 2026-10-02
+- Drive root normalized: only `master / parts / whole_turtle / runtime / motion / docs / archive` remain.
+- Root loose files: **0**.
+- Active locked packages moved without binary replacement:
+  - body_with_rear Geometry FINAL_v2
+  - body_with_rear Outline FINAL_v3
+  - Underbelly Geometry FINAL_v4
+  - Underbelly Outline / Shadow / Material v2 / Palette QA v2 lineages
+  - Shell final package and related QA/source artifacts
+- Runtime S1 256 WebP assets moved to `runtime/`.
+- Swim Pose package corrected from misleading `FINAL` filename to `qa_candidate` and archived under candidates because GitHub status is user-approval-pending.
+- Underbelly Pattern/Detail Final v1 lineage moved to `archive/superseded/` because the current Material Profile explicitly marks it Superseded / Inactive.
+- Legacy Asset Pack and earlier rebuild outputs moved to `archive/legacy_packages/`.
+- Ambiguous duplicate packages were not deleted:
+  - two historical `sea_turtle_v3_underbelly_FINAL.zip`
+  - historical `body_with_rear_FINAL.zip` and `body_with_rear_final_v1.zip`
+  They are isolated in `archive/temp_duplicate_review/` pending hash/content review.
+- Historical folder bundles are preserved; no source pixels were modified.
