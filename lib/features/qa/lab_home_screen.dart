@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:html' as html;
 
 class LabHomeScreen extends StatelessWidget {
   const LabHomeScreen({super.key});
@@ -23,7 +25,7 @@ class LabHomeScreen extends StatelessWidget {
           Text(group.$1,style:const TextStyle(fontSize:18,fontWeight:FontWeight.w900)),
           Text(group.$2,style:const TextStyle(color:Color(0xFF77717F))),
           const SizedBox(height:10),
-          for(final item in group.$3) ListTile(contentPadding:EdgeInsets.zero,title:Text(item.$1,style:const TextStyle(fontWeight:FontWeight.w800)),subtitle:Text(item.$2)),
+          for(final item in group.$3) ListTile(contentPadding:EdgeInsets.zero,title:Text(item.$1,style:const TextStyle(fontWeight:FontWeight.w800)),subtitle:Text(item.$2),trailing:const Icon(Icons.chevron_right_rounded),onTap:()=>_open(item.$2.substring(4))),
         ]))),
       ]),
     );
