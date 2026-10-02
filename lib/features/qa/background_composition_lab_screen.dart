@@ -37,11 +37,11 @@ class _BackgroundCompositionLabScreenState extends State<BackgroundCompositionLa
           const Text('Common · 투명바다 / Composition',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          const Text('지금은 공간 구조만 비교합니다. Color · Light · Depth · Ambient · Environment · Motion은 아직 평가하지 않습니다.'),
+          const Text('A/B/C를 같은 Runtime Shape 조건에서 한 화면으로 비교합니다. 지금은 공간 구조만 평가합니다.'),
           const SizedBox(height: 14),
           _gateStrip(),
           const SizedBox(height: 18),
-          _preview(),
+          _comparisonBoard(),
           const SizedBox(height: 12),
           Row(children: [
             const Expanded(child: Text('실제 Runtime Shape', style: TextStyle(fontWeight: FontWeight.w700))),
@@ -91,28 +91,50 @@ class _BackgroundCompositionLabScreenState extends State<BackgroundCompositionLa
     );
   }
 
-  Widget _preview() {
-    return AspectRatio(
-      aspectRatio: 0.72,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Stack(children: [
-          Positioned.fill(child: CustomPaint(painter: CompositionPainter(selected))),
-          if (showRuntime)
-            const Positioned.fill(
-              child: FloatingPreview(
-                selectedShapes: {ShapeKind.seaTurtle},
-                selectedTones: {ShapeTone.blue},
-                movementStyle: MovementStyle.floating,
-                popStyle: PopStyle.basicPop,
-                style: ShapeStyle.softBasic,
-                objectCount: 6,
-                speed: FloatingSpeed.normal,
-                movementArea: MovementArea.full,
+
+  Widget _comparisonBoard() {
+    return LayoutBuilder(builder: (context, constraints) {
+      final columns = constraints.maxWidth >= 760 ? 3 : 1;
+      final width = columns == 3 ? (constraints.maxWidth - 20) / 3 : constraints.maxWidth;
+      return Wrap(
+        spacing: 10,
+        runSpacing: 12,
+        children: [
+          for (final candidate in CompositionCandidate.values)
+            SizedBox(width: width, child: _preview(candidate)),
+        ],
+      );
+    });
+  }
+
+  Widget _preview(CompositionCandidate candidate) {
+    final active = selected == candidate;
+    return GestureDetector(
+      onTap: () => setState(() => selected = candidate),
+      child: AspectRatio(
+        aspectRatio: 0.72,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(children: [
+            Positioned.fill(child: CustomPaint(painter: CompositionPainter(candidate))),
+            if (showRuntime)
+              const Positioned.fill(
+                child: FloatingPreview(
+                  selectedShapes: {ShapeKind.seaTurtle},
+                  selectedTones: {ShapeTone.blue},
+                  movementStyle: MovementStyle.floating,
+                  popStyle: PopStyle.basicPop,
+                  style: ShapeStyle.softBasic,
+                  objectCount: 6,
+                  speed: FloatingSpeed.normal,
+                  movementArea: MovementArea.full,
+                ),
               ),
-            ),
-          Positioned(top: 12, left: 12, child: _badge(selected.code+' · '+selected.label)),
-        ]),
+            Positioned(top: 12, left: 12, child: _badge(candidate.code+' · '+candidate.label)),
+            if (active)
+              const Positioned(top: 12, right: 12, child: Icon(Icons.check_circle_rounded, color: Color(0xFF7655C9))),
+          ]),
+        ),
       ),
     );
   }
