@@ -18,7 +18,6 @@ class LockTokenPainter extends CustomPainter {
 
   final LockToken token;
   final ShapeStyle style;
-  final FloatingSpeed speed;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -52,6 +51,7 @@ class FloatingShapePainter extends CustomPainter {
   final List<FloatingObject> objects;
   final PopStyle popStyle;
   final ShapeStyle style;
+  final FloatingSpeed speed;
 
   @override
   void paint(Canvas canvas, Size size) {
