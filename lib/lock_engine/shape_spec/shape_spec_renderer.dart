@@ -194,7 +194,11 @@ class ShapeSpecRenderer {
     required double objectRotation,
   }) {
     final image = ShapeSpecRegistry.instance.resolveRasterShape(token.shape);
-    final destination = Rect.fromCircle(center: center, radius: radius);
+    final visualScale = ShapeSpecRegistry.instance.rasterVisualScale(token.shape);
+    final destination = Rect.fromCircle(
+      center: center,
+      radius: radius * visualScale,
+    );
 
     canvas.save();
     if (objectRotation != 0) {
