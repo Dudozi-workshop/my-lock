@@ -204,10 +204,10 @@ class ShapeSpecRenderer {
     final destination = spec.metadata.destination(center, radius);
     final source = Offset.zero & spec.metadata.runtimeCanvas;
     final sampling = Paint()..filterQuality = FilterQuality.high;
-    final pose = spec.metadata.swim.isEmpty
+    final pose = spec.metadata.swim.isEmpty || swimKey == null
         ? 's0'
         : SwimPoseRuntime.instance.poseFor(
-            key: swimKey ?? 'token:${token.id}',
+            key: swimKey,
             timeSeconds: paletteTimeSeconds,
             config: spec.metadata.swim,
           );
