@@ -312,6 +312,7 @@ Color baseColorForTone(ShapeTone tone) {
   switch (tone) {
     case ShapeTone.pink:
       return const Color(0xFFFF8FD1);
+    case ShapeTone.auroraSea:
     case ShapeTone.blue:
       return const Color(0xFF79BFFF);
     case ShapeTone.yellow:

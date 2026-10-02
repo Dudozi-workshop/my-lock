@@ -69,7 +69,7 @@ class ShopScreen extends StatelessWidget {
                   child: CustomPaint(
                     painter: LockTokenPainter(
                       LockToken(
-                        shape: ShapeKind.circle,
+                        shape: tone == ShapeTone.auroraSea ? ShapeKind.seaTurtle : ShapeKind.circle,
                         tone: tone,
                       ),
                     ),

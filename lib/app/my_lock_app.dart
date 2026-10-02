@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../features/qa/background_composition_lab_screen.dart';
-import '../features/qa/lab_home_screen.dart';
 import '../features/qa/sea_turtle_app_integration_qa_screen.dart';
 import '../features/qa/sea_turtle_body_with_rear_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_front_flipper_runtime_qa_screen.dart';
@@ -11,6 +10,7 @@ import '../features/qa/sea_turtle_shell_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_underbelly_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_whole_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_production_runtime_qa_screen.dart';
+import '../features/qa/sea_turtle_swim_runtime_qa_screen.dart';
 import '../features/shell/root_shell.dart';
 import '../lock_engine/raster_shape_bootstrap.dart';
 import 'build_info.dart';
@@ -22,7 +22,6 @@ class MyLockApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final qa = Uri.base.queryParameters['qa'];
-    final showLabHome = kIsWeb && qa == 'lab';
     final showShellRuntimeQa = kIsWeb && qa == 'sea-turtle-shell-runtime';
     final showFrontFlipperQa = kIsWeb && qa == 'front-flipper-outer';
     final showFrontFlipperFarQa = kIsWeb && qa == 'front-flipper-far';
@@ -32,7 +31,9 @@ class MyLockApp extends StatelessWidget {
     final showSeaTurtleProductionQa =
         kIsWeb && qa == 'sea-turtle-production';
     final showSeaTurtleAppIntegrationQa =
-        kIsWeb && qa == 'sea-turtle-app-integration';
+        kIsWeb &&
+        (qa == 'sea-turtle-app-integration' || qa == 'sea-turtle-runtime-v3');
+    final showSeaTurtleSwimQa = kIsWeb && qa == 'sea-turtle-swim-v1';
     final showBackgroundCompositionLab =
         kIsWeb && qa == 'background-composition';
 
@@ -47,27 +48,27 @@ class MyLockApp extends StatelessWidget {
         ],
       ),
       home: RasterShapeBootstrap(
-        child: showLabHome
-            ? const LabHomeScreen()
-            : showBackgroundCompositionLab
+        child: showBackgroundCompositionLab
             ? const BackgroundCompositionLabScreen()
-            : showSeaTurtleAppIntegrationQa
-                ? const SeaTurtleAppIntegrationQaScreen()
-            : showSeaTurtleProductionQa
-                ? const SeaTurtleProductionRuntimeQaScreen()
-                : showWholeTurtleQa
-                ? const SeaTurtleWholeRuntimeQaScreen()
-                : showShellRuntimeQa
-                    ? const SeaTurtleShellRuntimeQaScreen()
-                    : showFrontFlipperQa
-                        ? const SeaTurtleFrontFlipperRuntimeQaScreen()
-                        : showFrontFlipperFarQa
-                            ? const SeaTurtleFrontFlipperFarRuntimeQaScreen()
-                            : showBodyWithRearQa
-                                ? const SeaTurtleBodyWithRearRuntimeQaScreen()
-                                : showUnderbellyQa
-                                    ? const SeaTurtleUnderbellyRuntimeQaScreen()
-                                    : const RootShell(),
+            : showSeaTurtleSwimQa
+                ? const SeaTurtleSwimRuntimeQaScreen()
+                : showSeaTurtleAppIntegrationQa
+                    ? const SeaTurtleAppIntegrationQaScreen()
+                    : showSeaTurtleProductionQa
+                        ? const SeaTurtleProductionRuntimeQaScreen()
+                        : showWholeTurtleQa
+                            ? const SeaTurtleWholeRuntimeQaScreen()
+                            : showShellRuntimeQa
+                                ? const SeaTurtleShellRuntimeQaScreen()
+                                : showFrontFlipperQa
+                                    ? const SeaTurtleFrontFlipperRuntimeQaScreen()
+                                    : showFrontFlipperFarQa
+                                        ? const SeaTurtleFrontFlipperFarRuntimeQaScreen()
+                                        : showBodyWithRearQa
+                                            ? const SeaTurtleBodyWithRearRuntimeQaScreen()
+                                            : showUnderbellyQa
+                                                ? const SeaTurtleUnderbellyRuntimeQaScreen()
+                                                : const RootShell(),
       ),
     );
   }
