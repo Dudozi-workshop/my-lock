@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../lock_engine/models.dart';
 import '../../lock_engine/shape_spec/shape_spec.dart';
 
+Uint8List seaTurtleBodyWithRearNeutralRuntimeBytes() => base64Decode(_neutralWebp);
+
 class SeaTurtleBodyWithRearRuntimeQaScreen extends StatelessWidget {
   const SeaTurtleBodyWithRearRuntimeQaScreen({super.key});
 
