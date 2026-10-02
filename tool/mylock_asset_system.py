@@ -73,6 +73,17 @@ def validate(asset_root: Path) -> list[str]:
         if status == "final_locked" and active is True and not item.get("user_approved",False):
             errors.append(f"{prefix}: final_locked active lineage requires user_approved=true")
 
+        if item.get("completed", False):
+            if not item.get("registered", False):
+                errors.append(f"{prefix}: completed lineage must be registered")
+            durable = item.get("artifact_path") or item.get("external_source")
+            if not durable:
+                errors.append(f"{prefix}: completed lineage requires a durable artifact reference")
+            if not item.get("qa_evidence"):
+                errors.append(f"{prefix}: completed lineage requires qa_evidence")
+            if status == "final_locked" and not item.get("approval_evidence"):
+                errors.append(f"{prefix}: final_locked completed lineage requires approval_evidence")
+
     for scope,count in active_by_scope.items():
         if count != 1:
             errors.append(f"{scope}: expected exactly one active lineage, found {count}")
