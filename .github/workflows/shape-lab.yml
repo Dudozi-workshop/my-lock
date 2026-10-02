@@ -103,13 +103,41 @@ jobs:
         run: |
           set -e
           echo "Checking $PRIMARY_URL"
-          curl --fail --show-error --silent --location             --retry 5 --retry-delay 3 --retry-all-errors             --output /tmp/pages-index.html             --write-out "HTTP %{http_code}\n"             "$PRIMARY_URL"
-          grep -q "<html" /tmp/pages-index.html
-          grep -q "flutter_bootstrap.js" /tmp/pages-index.html
           curl --fail --show-error --silent --location \
             --retry 5 --retry-delay 3 --retry-all-errors \
-            "$PRIMARY_URL/version.json?commit=$GITHUB_SHA" --output /tmp/lab-version.json
-          python3 -c 'import json,os; assert json.load(open("/tmp/lab-version.json"))["commit"] == os.environ["GITHUB_SHA"], "Stable Lab serves a different commit"'
+            --output /tmp/pages-index.html \
+            --write-out "HTTP %{http_code}\n" \
+            "$PRIMARY_URL"
+          grep -q "<html" /tmp/pages-index.html
+          grep -q "flutter_bootstrap.js" /tmp/pages-index.html
+
+          # Cloudflare Pages can report deployment complete a few seconds
+          # before the stable project URL starts serving the new production
+          # revision. Poll the immutable version stamp instead of accepting
+          # a stale HTTP 200.
+          for attempt in $(seq 1 30); do
+            curl --fail --show-error --silent --location \
+              "$PRIMARY_URL/version.json?commit=$GITHUB_SHA&attempt=$attempt" \
+              --output /tmp/lab-version.json || true
+            if python3 - <<'PYCODE'
+          import json, os, sys
+          try:
+              data = json.load(open('/tmp/lab-version.json'))
+          except Exception:
+              sys.exit(1)
+          sys.exit(0 if data.get('commit') == os.environ['GITHUB_SHA'] else 1)
+          PYCODE
+            then
+              echo "Stable Lab revision verified on attempt $attempt"
+              exit 0
+            fi
+            echo "Stable Lab still propagating ($attempt/30)"
+            sleep 2
+          done
+
+          echo "Stable Lab did not publish commit $GITHUB_SHA in time"
+          cat /tmp/lab-version.json || true
+          exit 1
 
       # Backup host: Worker. Keep it available, but do not fail the job if
       # workers.dev is temporarily unreachable for a network or DNS reason.
