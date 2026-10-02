@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../features/lock_mode/lock_mode_screen.dart';
+import '../lock_engine/raster_shape_bootstrap.dart';
 import 'my_lock_settings_controller.dart';
 import 'theme.dart';
 
@@ -14,7 +15,7 @@ class MyLockLockApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'MY LOCK',
       theme: buildMyLockTheme(),
-      home: const _LockActivityHost(),
+      home: const RasterShapeBootstrap(child: _LockActivityHost()),
     );
   }
 }
