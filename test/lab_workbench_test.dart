@@ -7,6 +7,7 @@ import 'package:my_lock/lock_engine/shape_spec/lab_candidate_scope.dart';
 import 'package:my_lock/features/customize/shape_style/widgets/shape_choice_card.dart';
 import '../shape_lab/runtime_workbench.dart';
 import '../shape_lab/production_flow.dart';
+import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
 
 void main() {
   testWidgets('candidate scope follows workbench lifecycle and real cards', (tester) async {
@@ -27,6 +28,7 @@ void main() {
   });
   testWidgets('workflow opens candidate comparison without leaking renderer scope', (tester) async {
     await tester.runAsync(() => CandySoftCandidate.instance.load());
+    await tester.runAsync(() => ShapeSpecRegistry.instance.load());
     final experiments = jsonDecode(File('assets/lab/experiments.json').readAsStringSync());
     final workflow = jsonDecode(File('assets/lab/workflow.json').readAsStringSync());
     final configuration = Future<Map<String, dynamic>>.value({
@@ -49,3 +51,4 @@ void main() {
   });
 
 }
+
