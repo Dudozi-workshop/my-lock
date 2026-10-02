@@ -3,16 +3,12 @@ import 'package:flutter/material.dart';
 class LabHomeScreen extends StatelessWidget {
   const LabHomeScreen({super.key});
 
-  void _open(String qa) {
-    // Lab keeps one stable host; cards expose the canonical QA query.
-    // ignore: avoid_web_libraries_in_flutter
-  }
 
   @override
   Widget build(BuildContext context) {
     final groups = <(String,String,List<(String,String)>)>[
       ('Background Lab','Drop 01 · 작은 바닷속',[('Common · 투명바다 · Gate 01','?qa=background-composition')]),
-      ('Shape Lab','Sea Turtle v3 · QA',[('Whole Runtime','?qa=sea-turtle-whole'),('Production Runtime','?qa=sea-turtle-production'),('App Integration','?qa=sea-turtle-app-integration')]),
+      ('Shape Lab','Sea Turtle v3 · QA',[('Whole Runtime','?qa=sea-turtle-whole'),('Production Runtime','?qa=sea-turtle-production'),('App Integration','?qa=sea-turtle-app-integration'),('Swim Motion Master v1','?qa=sea-turtle-swim-v1')]),
       ('Part QA','Locked part 검증',[('Shell','?qa=sea-turtle-shell-runtime'),('Front Flipper · Near','?qa=front-flipper-outer'),('Front Flipper · Far','?qa=front-flipper-far'),('Body + Rear','?qa=sea-turtle-body-with-rear'),('Underbelly','?qa=sea-turtle-underbelly')]),
     ];
     return Scaffold(
