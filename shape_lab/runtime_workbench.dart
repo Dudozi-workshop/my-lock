@@ -9,8 +9,10 @@ import 'package:my_lock/features/customize/shape_style/widgets/shape_choice_card
 import 'package:url_launcher/url_launcher.dart';
 
 class RuntimeWorkbench extends StatefulWidget {
-  const RuntimeWorkbench({super.key, required this.dark});
+  const RuntimeWorkbench({super.key, required this.dark, this.experimentId, this.showDownload = true});
   final bool dark;
+  final String? experimentId;
+  final bool showDownload;
   @override
   State<RuntimeWorkbench> createState() => _RuntimeWorkbenchState();
 }
@@ -26,7 +28,7 @@ class _RuntimeWorkbenchState extends State<RuntimeWorkbench> {
   @override
   void initState() {
     super.initState();
-    experiment = Uri.base.queryParameters['experiment'];
+    experiment = widget.experimentId ?? Uri.base.queryParameters['experiment'];
   }
 
   Future<List<Map<String, dynamic>>> _load() async {
@@ -84,7 +86,7 @@ class _RuntimeWorkbenchState extends State<RuntimeWorkbench> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('공통 Runtime 검수', style: TextStyle(color:fg,fontSize:20,fontWeight:FontWeight.bold)),
           const SizedBox(height: 12),
-          DropdownButton<String>(isExpanded:true,value:selected['id'] as String,
+          if (widget.experimentId == null) DropdownButton<String>(isExpanded:true,value:selected['id'] as String,
             dropdownColor:bg, style:TextStyle(color:fg),
             items:[for(final item in items) DropdownMenuItem(value:item['id'] as String,
               child:Text('${item['title']} · ${item['status']}'))],
@@ -94,10 +96,10 @@ class _RuntimeWorkbenchState extends State<RuntimeWorkbench> {
           Text('Source ${(selected['source_commit'] as String).substring(0,7)} · 실제 앱 Painter',style:TextStyle(color:fg)),
           Text('남은 사항: ${selected['pending']}',style:TextStyle(color:fg)),
           const SizedBox(height:8),
-          FilledButton.icon(
+          if (widget.showDownload) FilledButton.icon(
             onPressed: () => launchUrl(Uri.parse(apkUrl), webOnlyWindowName: '_blank'),
             icon: const Icon(Icons.android),
-            label: const Text('최신 Android APK 다운로드'),
+            label: const Text('정식 APK · Candy Soft 후보 미포함'),
           ),
           const SizedBox(height:12),
           Wrap(spacing:8, children:[for(final item in {'sizes':'크기 비교','cards':'앱 카드','motion':'Floating / POP'}.entries)

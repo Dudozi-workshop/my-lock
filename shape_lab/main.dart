@@ -18,6 +18,7 @@ import 'package:my_lock/lock_engine/raster_shape_bootstrap.dart';
 
 import 'soft_basic_candidates.dart';
 import 'runtime_workbench.dart';
+import 'production_flow.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_candidate.dart';
 
 Future<void> main() async {
@@ -28,7 +29,7 @@ Future<void> main() async {
   runApp(const MyLockLabsApp());
 }
 
-enum LabTab { shape, style, palette, effect, qa, review }
+enum LabTab { home, shape, style, palette, effect, qa, review }
 
 class MyLockLabsApp extends StatelessWidget {
   const MyLockLabsApp({super.key});
@@ -72,7 +73,7 @@ class _LabsPageState extends State<LabsPage> {
     'effect' => LabTab.effect,
     'qa' => LabTab.qa,
     'review' => LabTab.review,
-    _ => LabTab.style,
+    _ => LabTab.home,
   };
   bool dark = false;
 
@@ -80,6 +81,7 @@ class _LabsPageState extends State<LabsPage> {
     setState(() => tab = next);
     final query = Map<String, String>.from(Uri.base.queryParameters)
       ..['lab'] = switch (next) {
+        LabTab.home => 'home',
         LabTab.shape => 'shape',
         LabTab.style => 'style',
         LabTab.palette => 'palette',
@@ -133,7 +135,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 036 · Shared Runtime Workbench',
+                                  'LAB 037 · 제작 · 검수 · 마감',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -157,6 +159,7 @@ class _LabsPageState extends State<LabsPage> {
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children: [
+                            _TabChip(label: '작업 목록', selected: tab == LabTab.home, onTap: () => _setTab(LabTab.home)),
                             _TabChip(
                               label: 'Shape Lab',
                               selected: tab == LabTab.shape,
@@ -206,6 +209,7 @@ class _LabsPageState extends State<LabsPage> {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 1180),
                     child: switch (tab) {
+                      LabTab.home => ProductionFlow(dark: dark),
                       LabTab.shape => ShapeLab(card: card, fg: fg, muted: muted),
                       LabTab.style => CrayonStyleLab(card: card, fg: fg, muted: muted),
                       LabTab.palette => PaletteLab(card: card, fg: fg, muted: muted),

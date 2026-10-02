@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "candy-soft",
+      "group": "active",
+      "stage": "compare",
+      "current_label": "후보 비교",
+      "next_action": "동일 조건 비교 → 개별 Runtime Master 정리",
+      "goal": "말랑한 기본 도형의 앱 표현 확정",
+      "scope": "Candy Soft Runtime Derived만; 기존 Vector Geometry 무수정",
+      "qa_status": "필수 검수 대기",
+      "approval": "방향 채택; Runtime 최종 승인 전",
+      "integration": "후보 Main 미반영",
+      "android": "Candy Soft 후보는 정식 APK 미포함",
+      "source_url": "https://github.com/Dudozi-workshop/my-lock/tree/086ff273be38acf5063f0dd8124bf39d4908ce8e",
+      "checks": [
+        {
+          "label": "실제 표시 크기 · Light / Dark",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        },
+        {
+          "label": "실제 Customize 카드 · Floating",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        },
+        {
+          "label": "반복 spawn · 회전 · POP",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        },
+        {
+          "label": "알파 / crop / 디테일 유지",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        },
+        {
+          "label": "Android 실제 잠금 경로",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        }
+      ]
+    },
+    {
+      "id": "sea-turtle-swim-v1",
+      "group": "baseline",
+      "stage": "qa",
+      "current_label": "승인 기준본 · 기기 검수 별도",
+      "next_action": "실제 앱 구성요소 및 기기 확인",
+      "goal": "현재 승인본으로 공통 검수 틀 확인",
+      "scope": "기준본 확인만; Locked Source 변경 금지",
+      "qa_status": "필수 검수 대기",
+      "approval": "Final / Locked",
+      "integration": "기준 Source f60f9c516ae8bfbc80bcf6a120bdf8f3bb91c5a9",
+      "android": "실기기 결과 별도 기록 필요",
+      "source_url": "https://github.com/Dudozi-workshop/my-lock/tree/f60f9c516ae8bfbc80bcf6a120bdf8f3bb91c5a9",
+      "checks": [
+        {
+          "label": "실제 표시 크기 · Light / Dark",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        },
+        {
+          "label": "실제 Customize 카드 · Floating",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        },
+        {
+          "label": "반복 spawn · 회전 · POP",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        },
+        {
+          "label": "알파 / crop / 디테일 유지",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        },
+        {
+          "label": "Android 실제 잠금 경로",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        }
+      ],
+      "apk_url": "https://dddpxudwfsydrhfgvvyn.supabase.co/storage/v1/object/public/my-lock-apk/my-lock-arm64-release.apk?v=f60f9c516ae8bfbc80bcf6a120bdf8f3bb91c5a9"
+    },
+    {
+      "id": "basic-baseline",
+      "group": "baseline",
+      "stage": "qa",
+      "current_label": "승인 기준본 · 기기 검수 별도",
+      "next_action": "실제 앱 구성요소 및 기기 확인",
+      "goal": "현재 승인본으로 공통 검수 틀 확인",
+      "scope": "기준본 확인만; Locked Source 변경 금지",
+      "qa_status": "필수 검수 대기",
+      "approval": "Baseline",
+      "integration": "기준 Source b0fd0085182c7db402318c219f7c856113141252",
+      "android": "실기기 결과 별도 기록 필요",
+      "source_url": "https://github.com/Dudozi-workshop/my-lock/tree/b0fd0085182c7db402318c219f7c856113141252",
+      "checks": [
+        {
+          "label": "실제 표시 크기 · Light / Dark",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        },
+        {
+          "label": "실제 Customize 카드 · Floating",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        },
+        {
+          "label": "반복 spawn · 회전 · POP",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        },
+        {
+          "label": "알파 / crop / 디테일 유지",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        },
+        {
+          "label": "Android 실제 잠금 경로",
+          "result": "미확인 · 이번 작업의 검수 근거 등록 전"
+        }
+      ]
+    }
+  ]
+}
