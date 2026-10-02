@@ -21,6 +21,20 @@ void main() {
     expect(config.contourGapCount, 14);
   });
 
+  test('Production bootstrap decodes the active padded raster asset', () async {
+    await ShapeSpecRegistry.instance.loadRasterShapes();
+    final image = ShapeSpecRegistry.instance.resolveRasterShape(ShapeKind.seaTurtle);
+    expect(image.width, 58);
+    expect(image.height, 58);
+    final rgba = (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!
+        .buffer.asUint8List();
+    for (var i = 0; i < 58; i++) {
+      for (final pixel in [i, 57 * 58 + i, i * 58, i * 58 + 57]) {
+        expect(rgba[pixel * 4 + 3], 0);
+      }
+    }
+  });
+
   test('Approved Crayon renders all basic shapes deterministically at 58px', () async {
     Future<List<int>> render(ShapeKind shape, ShapeTone tone) async {
       final recorder = ui.PictureRecorder();
