@@ -154,6 +154,12 @@ GATE_ORDER = ("source", "ownership_overlay", "mask", "asset", "removed_remainder
 def validate_gate_sequence(reg: dict) -> list[str]:
     errors = []
     gates = reg.get("gates", [])
+    ids = [gate.get("gate_id") for gate in gates]
+    if len(ids) != len(set(ids)):
+        errors.append("duplicate gate_id")
+    unknown = sorted({gate_id for gate_id in ids if gate_id not in GATE_ORDER})
+    if unknown:
+        errors.append(f"unknown gate_id: {unknown}")
     by_id = {gate.get("gate_id"): gate for gate in gates}
     reached_open_gate = False
     for gate_id in GATE_ORDER:
@@ -166,8 +172,8 @@ def validate_gate_sequence(reg: dict) -> list[str]:
             errors.append(f"{gate_id}: previous gate is not complete")
         if not done:
             reached_open_gate = True
-        if gate_id == "lock" and done and not gate.get("approval_evidence"):
-            errors.append("lock: approval_evidence is required")
+        if gate_id in {"approval", "lock"} and done and not gate.get("approval_evidence"):
+            errors.append(f"{gate_id}: approval_evidence is required")
     return errors
 
 
