@@ -145,6 +145,16 @@ def validate(asset_root: Path) -> list[str]:
 
     return errors
 
+def validate_gate_outputs(reg: dict) -> list[str]:
+    errors = []
+    for gate in reg.get("gates", []):
+        if gate.get("state") == "completed":
+            required = set(gate.get("required_outputs", []))
+            present = {item.get("type") for item in gate.get("outputs", [])}
+            if required - present:
+                errors.append("completed gate is missing required outputs")
+    return errors
+
 def validate_catalog(path: Path) -> list[str]:
     errors: list[str] = []
     try:
