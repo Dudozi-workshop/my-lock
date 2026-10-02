@@ -12,8 +12,10 @@ class ShapeChoiceCard extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
+    this.previewTone = ShapeTone.pink,
   });
 
+  final ShapeTone previewTone;
   final ShapeKind kind;
   final String label;
   final bool selected;
@@ -31,7 +33,7 @@ class ShapeChoiceCard extends StatelessWidget {
           CustomPaint(
             size: const Size(58, 58),
             painter: LockTokenPainter(
-              LockToken(shape: kind, tone: ShapeTone.pink),
+              LockToken(shape: kind, tone: previewTone),
             ),
           ),
           const SizedBox(height: 8),

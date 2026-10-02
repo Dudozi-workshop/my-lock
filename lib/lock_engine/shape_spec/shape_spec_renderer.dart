@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../models.dart';
 import 'shape_render_overrides.dart';
 import 'shape_spec.dart';
+import 'candy_soft_candidate.dart';
+import 'lab_candidate_scope.dart';
 import 'shape_spec_registry.dart';
 
 class ShapeSpecRenderer {
@@ -23,6 +25,9 @@ class ShapeSpecRenderer {
     CrayonTextureSpec? crayonOverride,
     ShapeRenderOverrides? overrides,
   }) {
+    if (LabCandidateScope.enabled && CandySoftCandidate.instance.paint(canvas,
+        center: center, radius: radius, token: token, style: style,
+        opacity: opacity, rotation: objectRotation)) return;
     final bundle = ShapeSpecRegistry.instance.resolve(style, token.shape);
     final canvasSize = bundle.style.canvasSize;
     final scale = radius * 2 / canvasSize;

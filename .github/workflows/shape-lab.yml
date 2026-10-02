@@ -1,13 +1,18 @@
-name: MY LOCK Crayon Shape Lab
+name: MY LOCK Shared Shape Lab
 
 on:
   push:
     branches:
-      - feat/crayon-style-lab
+      - feat/lab-runtime-workbench
+      - feat/style-lab-integration
     paths:
       - 'lib/lock_engine/shape_spec/**'
       - 'lib/lock_engine/shape_painter.dart'
       - 'assets/shape_specs/**'
+      - 'assets/lab/**'
+      - 'assets/raster_shapes/**'
+      - 'lib/features/customize/shape_style/widgets/shape_choice_card.dart'
+      - 'test/lab_workbench_test.dart'
       - 'shape_lab/**'
       - 'tool/build_shape_lab.sh'
       - 'tool/validate_shape_masks.py'
@@ -48,7 +53,7 @@ jobs:
         run: python3 tool/validate_shape_masks.py
 
       - name: Test ShapeSpec
-        run: flutter test test/shape_spec_test.dart
+        run: flutter test --dart-define=CANDY_SOFT_CANDIDATE=true test/shape_spec_test.dart test/lab_workbench_test.dart
 
       - name: Build Shape Lab
         run: bash tool/build_shape_lab.sh

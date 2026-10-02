@@ -9,6 +9,7 @@ PLATFORMS=web bash tool/bootstrap.sh
 
 flutter build web \
   --release \
+  --dart-define=CANDY_SOFT_CANDIDATE=true \
   --target shape_lab/main.dart \
   --base-href "/"
 
