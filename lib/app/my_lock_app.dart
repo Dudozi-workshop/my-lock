@@ -1,3 +1,5 @@
+import '../features/qa/candy_soft_qa_screen.dart';
+import '../lock_engine/shape_spec/candy_soft_candidate.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -45,7 +47,9 @@ class MyLockApp extends StatelessWidget {
         ],
       ),
       home: RasterShapeBootstrap(
-        child: showBackgroundCompositionLab
+        child: CandySoftCandidate.enabled && (qa == 'candy-soft' || !kIsWeb)
+            ? const CandySoftQaScreen()
+            : showBackgroundCompositionLab
             ? const BackgroundCompositionLabScreen()
             : showSeaTurtleAppIntegrationQa
                 ? const SeaTurtleAppIntegrationQaScreen()

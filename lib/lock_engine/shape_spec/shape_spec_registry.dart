@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 
 import '../models.dart';
 import 'shape_spec.dart';
+import 'candy_soft_candidate.dart';
 
 class ShapeSpecRegistry {
   ShapeSpecRegistry._();
@@ -80,6 +81,7 @@ class ShapeSpecRegistry {
   String? rasterAssetPath(ShapeKind shape) => _rasterShapeAssets[shape];
 
   Future<void> loadRasterShapes() async {
+    if (CandySoftCandidate.enabled) await CandySoftCandidate.instance.load();
     for (final entry in _rasterShapeAssets.entries) {
       if (_rasterImages.containsKey(entry.key)) continue;
       _rasterImages[entry.key] = await _loadMaskImage(entry.value);
@@ -128,7 +130,7 @@ class ShapeSpecRegistry {
       final codec = await ui.instantiateImageCodec(bytes);
       final frame = await codec.getNextFrame();
       return frame.image;
-    } on EncodingError {
+    } catch (_) {
       if (!kIsWeb) rethrow;
       final codec = await ui.ImmutableBuffer.fromUint8List(bytes).then(
         (buffer) => ui.ImageDescriptor.encoded(buffer),

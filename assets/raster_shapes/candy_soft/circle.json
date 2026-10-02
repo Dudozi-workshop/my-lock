@@ -1,0 +1,29 @@
+{
+  "shape_id": "circle",
+  "status": "runtime-review-candidate",
+  "authored_tone": "pink",
+  "atlas_asset": "assets/raster_shapes/candy_soft/approved_direction_atlas.png",
+  "atlas_rect": [
+    0,
+    0,
+    724,
+    724
+  ],
+  "runtime_canvas": [
+    724,
+    724
+  ],
+  "content_bbox": [
+    47,
+    39,
+    713,
+    686
+  ],
+  "anchor": [
+    362,
+    362
+  ],
+  "display_scale": 1.0,
+  "safety_padding_ratio": 0.015193370165745856,
+  "runtime_source_hash": "f32b0ef21c5aa16e4329ec966eaf5cd435947afb7334ee928f9421af837ca3c2"
+}
