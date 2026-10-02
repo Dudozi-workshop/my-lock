@@ -93,9 +93,18 @@
     {
       "scope": "swim_pose",
       "version": "v1",
-      "status": "qa_candidate",
-      "active": false,
-      "user_approved": false
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true,
+      "lock_evidence": "assets/shape_masters/drop01/sea_turtle_v3/whole_turtle/SWIM_MOTION_MASTER_V1_FINAL_20261003.md"
+    },
+    {
+      "scope": "runtime_v3",
+      "version": "v3",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true,
+      "lock_evidence": "assets/raster_shapes/sea_turtle_v3_runtime_v3.json"
     }
   ],
   "policy": {
