@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../features/qa/sea_turtle_app_integration_qa_screen.dart';
 import '../features/qa/sea_turtle_body_with_rear_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_front_flipper_runtime_qa_screen.dart';
 import '../features/qa/sea_turtle_front_flipper_far_runtime_qa_screen.dart';
@@ -27,6 +28,8 @@ class MyLockApp extends StatelessWidget {
     final showWholeTurtleQa = kIsWeb && qa == 'sea-turtle-whole';
     final showSeaTurtleProductionQa =
         kIsWeb && qa == 'sea-turtle-production';
+    final showSeaTurtleAppIntegrationQa =
+        kIsWeb && qa == 'sea-turtle-app-integration';
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -39,9 +42,11 @@ class MyLockApp extends StatelessWidget {
         ],
       ),
       home: RasterShapeBootstrap(
-        child: showSeaTurtleProductionQa
-            ? const SeaTurtleProductionRuntimeQaScreen()
-            : showWholeTurtleQa
+        child: showSeaTurtleAppIntegrationQa
+            ? const SeaTurtleAppIntegrationQaScreen()
+            : showSeaTurtleProductionQa
+                ? const SeaTurtleProductionRuntimeQaScreen()
+                : showWholeTurtleQa
                 ? const SeaTurtleWholeRuntimeQaScreen()
                 : showShellRuntimeQa
                     ? const SeaTurtleShellRuntimeQaScreen()
