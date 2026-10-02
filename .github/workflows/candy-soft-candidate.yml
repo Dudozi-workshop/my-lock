@@ -1,0 +1,41 @@
+name: Candy Soft Candidate QA
+on:
+  push:
+    branches: [feat/candy-soft-runtime]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+      - name: Bootstrap production entry points
+        env:
+          PLATFORMS: android,web
+        run: bash tool/bootstrap.sh
+      - run: flutter analyze
+      - name: Test default production behavior
+        run: flutter test
+      - name: Test enabled candidate decode and color identity
+        run: flutter test --dart-define=CANDY_SOFT_CANDIDATE=true test/candy_soft_candidate_test.dart
+      - name: Build review web
+        run: flutter build web --release --dart-define=CANDY_SOFT_CANDIDATE=true
+      - name: Build review Android including lockMain
+        run: flutter build apk --release --target-platform android-arm64 --dart-define=CANDY_SOFT_CANDIDATE=true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candy-soft-review
+          path: |
+            build/web
+            build/app/outputs/flutter-apk/app-release.apk
+            assets/raster_shapes/candy_soft

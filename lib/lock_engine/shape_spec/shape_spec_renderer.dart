@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models.dart';
 import 'shape_spec.dart';
+import 'candy_soft_candidate.dart';
 import 'shape_spec_registry.dart';
 
 class ShapeSpecRenderer {
@@ -20,6 +21,8 @@ class ShapeSpecRenderer {
     required double opacity,
     double objectRotation = 0,
   }) {
+    if (CandySoftCandidate.instance.paint(canvas, center: center, radius: radius,
+        token: token, style: style, opacity: opacity, rotation: objectRotation)) return;
     final registry = ShapeSpecRegistry.instance;
     if (registry.isRasterShape(token.shape)) {
       _paintRasterToken(
