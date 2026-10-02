@@ -2,7 +2,7 @@
 
 ## Status
 - Motion concept: **Selected / Approved direction**
-- Production pose assets: **Not yet locked**
+- Production pose assets: **Final / Locked / Active**
 - Scope: front flipper Shape Animation only.
 - Static Body / Shell / Underbelly / Rear geometry remain locked and must not be modified.
 
@@ -109,5 +109,15 @@ This preserves a natural rhythm while preventing every loop from feeling mechani
 - Body / Shell / Underbelly / Rear remain static and locked.
 - This approval promotes the motion/pose direction to the **Production Candidate preparation gate**, but does **not** yet promote S1/S2 assets to Final / Locked.
 
+## Final Lock — 2026-10-03
+- User approved the deployed visual/runtime behavior and requested the lock step.
+- Motion Master: **Sea Turtle v3 Swim v1 / Final / Locked / Active**.
+- Final authored pose loop: `S0 → S1 → S2 → S1 → S0`.
+- Near/Far root/shoulder participation, subordinate Far amplitude, runtime-size readability, palette/Aurora behavior, cadence profiles, random initial phase, and gradual tempo resampling are accepted as the locked v1 behavior.
+- Body / Shell / Underbelly / Rear remain static and locked; this lock does not alter those parts.
+- Runtime implementation remains on `runtime/sea-turtle-v3`; swim metadata was promoted to `Final / Locked / Active`.
+- Automated QA run `37032606322`: SUCCESS.
+- Web deploy run `37032606326`: SUCCESS.
+
 ## Current next gate
-Build S1/S2 Near/Far **Production Candidate bundle**: Mask → Asset → Removed Remainder → Recomposite / Residual QA → user approval → LOCK candidate.
+No additional Swim v1 production gate remains. Any future motion change must create a new version/candidate and must not silently modify Motion Master v1.
