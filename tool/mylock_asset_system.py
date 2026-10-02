@@ -266,7 +266,8 @@ def main() -> int:
     va=sub.add_parser("validate-all"); va.add_argument("search_root",nargs="?",default=str(DEFAULT_ROOT))
     b=sub.add_parser("bootstrap"); b.add_argument("asset_root"); b.add_argument("--asset-id",required=True); b.add_argument("--parts",default="")
     a=p.parse_args()
-    asset_root=Path(a.asset_root)
+    root_arg = a.search_root if a.cmd == "validate-all" else a.asset_root
+    asset_root=Path(root_arg)
     if not asset_root.is_absolute(): asset_root=ROOT/asset_root
     if a.cmd=="bootstrap":
         bootstrap(asset_root,a.asset_id,[x for x in a.parts.split(",") if x]); return 0
