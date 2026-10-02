@@ -3,9 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:my_lock/lock_engine/models.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_candidate.dart';
+import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  test('production bootstrap decodes the active Turtle and candidate assets', () async {
+    await ShapeSpecRegistry.instance.loadRasterShapes();
+    final turtle = ShapeSpecRegistry.instance.resolveRasterShape(ShapeKind.seaTurtle);
+    expect(turtle.width, 58);
+    expect(turtle.height, 58);
+  });
   test('approved atlas decodes and all three source slot edges are transparent', () async {
     final data = await rootBundle.load('assets/raster_shapes/candy_soft/approved_direction_atlas.png');
     final codec = await ui.instantiateImageCodec(data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes));
