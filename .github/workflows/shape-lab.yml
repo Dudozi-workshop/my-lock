@@ -101,7 +101,7 @@ jobs:
           curl --fail --show-error --silent --location \
             --retry 5 --retry-delay 3 --retry-all-errors \
             "$PRIMARY_URL/version.json?commit=$GITHUB_SHA" --output /tmp/lab-version.json
-          python3 -c 'import json,os; assert json.load(open("/tmp/lab-version.json"))["commit"] == os.environ["GITHUB_SHA"], "Stable Lab serves a different commit"' 
+          python3 -c 'import json,os; assert json.load(open("/tmp/lab-version.json"))["commit"] == os.environ["GITHUB_SHA"], "Stable Lab serves a different commit"'
 
       # Backup host: Worker. Keep it available, but do not fail the job if
       # workers.dev is temporarily unreachable for a network or DNS reason.

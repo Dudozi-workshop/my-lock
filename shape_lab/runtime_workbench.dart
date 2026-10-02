@@ -78,7 +78,7 @@ class _RuntimeWorkbenchState extends State<RuntimeWorkbench> {
       final token = pairs[variant.clamp(0, pairs.length-1)];
       final fg = widget.dark ? Colors.white : const Color(0xff171923);
       final bg = widget.dark ? const Color(0xff171929) : const Color(0xfffaf9ff);
-      return Container(padding: const EdgeInsets.all(16), color: bg,
+      return Container(key: ValueKey(selected['id']), padding: const EdgeInsets.all(16), color: bg,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('공통 Runtime 검수', style: TextStyle(color:fg,fontSize:20,fontWeight:FontWeight.bold)),
           const SizedBox(height: 12),

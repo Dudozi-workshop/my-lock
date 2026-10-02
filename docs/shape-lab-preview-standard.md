@@ -66,3 +66,10 @@ records of a review result.
 운영 순서: 원본/스펙 최신 확인 → 에셋/프로필 및 실험 등록 → CI 테스트/빌드 → 기존 Lab 배포 → 동일 검수 서식으로 실제 확인 → 검수 기록 → 사용자 승인 → Main 적용.
 딥링크는 실험 ID를 유지한다. 각 항목에 Source commit과 Candidate 상태, 미완료 QA를 표시한다.
 웹 검수만으로 Android LockActivity / lockMain 실기기 검증을 완료 처리하지 않는다.
+
+## 배포 최신본 확인
+
+Pages 배포는 프로젝트에 이미 설정된 production branch를 읽어 같은 고정 URL로 올린다.
+Preview alias 배포 성공/HTTP 200만으로 완료 처리하지 않고, 고정 Lab의 `version.json` commit이 빌드 commit과 일치해야 통과한다.
+Lab은 PWA 캐시를 사용하지 않고 정적 파일에 no-store 헤더를 적용한다.
+Candy Soft와 기존 기본 도형 Baseline은 같은 검수 화면의 실험 선택 목록에서 전환한다.
