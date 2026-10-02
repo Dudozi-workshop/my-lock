@@ -1,0 +1,40 @@
+{
+  "shape_id": "sea_turtle_v3",
+  "motion_id": "swim_v1",
+  "motion_master": "v1",
+  "status": "Final / Locked / Active",
+  "lock_date": "2026-10-03",
+  "approval": {
+    "user_visual_qa": "APPROVED",
+    "lock_requested": true
+  },
+  "loop": ["S0", "S1", "S2", "S1", "S0"],
+  "timing_ratio": [23, 16, 22, 16, 23],
+  "profiles": {
+    "calm_seconds": [1.1, 1.3],
+    "standard_seconds": [0.9, 1.1],
+    "lively_seconds": [0.78, 0.92]
+  },
+  "scope": {
+    "animated": ["front_flipper_near", "front_flipper_far"],
+    "locked_static": ["body_with_rear", "shell_main", "underbelly", "rear"]
+  },
+  "runtime": {
+    "branch": "runtime/sea-turtle-v3",
+    "metadata_path": "assets/raster_shapes/sea_turtle_v3_runtime_v3.json",
+    "package_path": "assets/raster_shapes/swim_v1",
+    "package_manifest": "assets/raster_shapes/swim_v1/MOTION_MASTER_V1_FINAL.json",
+    "final_metadata_commit": "1a95b29e47f00c7922aa95aff746bbbf669d7983",
+    "final_package_manifest_commit": "375d2fe2a6ca3247c85e055f381d2fb4752c642a",
+    "final_package_readme_commit": "48f53b9a07bf7b9038199f9c1bf724fb391a2dc0"
+  },
+  "qa": {
+    "candidate_automated_qa_run": 37032606322,
+    "candidate_web_deploy_run": 37032606326,
+    "post_lock_web_deploy_run": 37034687303,
+    "all_above": "SUCCESS",
+    "imagegen_used_for_production": false,
+    "static_geometry_changed": false
+  },
+  "versioning_rule": "Any future motion change must create a new candidate/version."
+}
