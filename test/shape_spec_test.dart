@@ -110,7 +110,7 @@ void main() {
     expect(ShapeSpecRegistry.instance.isRasterShape(ShapeKind.seaTurtle), isTrue);
     expect(
       ShapeSpecRegistry.instance.rasterAssetPath(ShapeKind.seaTurtle),
-      'assets/raster_shapes/sea_turtle_v3_runtime58.png.b64',
+      'assets/raster_shapes/sea_turtle_v3_runtime58_lossless.webp.b64',
     );
     expect(ShapeKind.defaults.contains(ShapeKind.seaTurtle), isFalse);
     expect(ShapeKind.seaTurtle.premium, isTrue);
