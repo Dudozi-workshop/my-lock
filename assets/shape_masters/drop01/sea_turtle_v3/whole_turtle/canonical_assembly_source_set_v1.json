@@ -2,7 +2,7 @@
   "shape_id": "sea_turtle_v3",
   "gate": "whole_turtle_canonical_assembly_source_set",
   "version": "v1",
-  "status": "QA Candidate",
+  "status": "Approved / Locked Canonical Assembly Source Set",
   "canvas": {
     "width": 2048,
     "height": 2048,
@@ -70,5 +70,10 @@
     "rear_shell_body": "no major gap observed"
   },
   "lock_policy": "No Part Geometry/Material changes at this gate. Findings only.",
-  "next_gate": "User reviews canonical assembly + seam findings, then seam visibility/ownership policy is decided per attachment."
+  "next_gate": "Runtime Derived Export 2048->512->58 and Light/Dark readability QA",
+  "user_visual_approval": {
+    "approved": true,
+    "date": "2026-10-02",
+    "note": "User reviewed the 2048 canonical assembly and confirmed current state is acceptable."
+  }
 }
