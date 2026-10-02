@@ -117,7 +117,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 035 · Sea Turtle v3 Static Split QA · Decode Fix',
+                                  'LAB 036 · Background Lab Gate 01 · Composition',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
