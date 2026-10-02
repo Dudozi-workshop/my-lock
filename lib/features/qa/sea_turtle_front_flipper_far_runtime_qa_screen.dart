@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../lock_engine/models.dart';
 import '../../lock_engine/shape_spec/shape_spec.dart';
 
+Uint8List seaTurtleFrontFlipperFarNeutralRuntimeBytes() => base64Decode(_neutralWebp);
+
 class SeaTurtleFrontFlipperFarRuntimeQaScreen extends StatelessWidget {
   const SeaTurtleFrontFlipperFarRuntimeQaScreen({super.key});
 
