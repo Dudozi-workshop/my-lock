@@ -26,8 +26,8 @@ enum ShapeTone {
   aquaMint('아쿠아 민트', true, true),
   coralPink('코랄 핑크', true, true),
   sandBeige('샌드 베이지', true, true),
-  lavender('라벤더', true, true),
-  peachOrange('피치 오렌지', true, true),
+  lavender('젤리 바이올렛', true, true),
+  peachOrange('쉘 피치', true, true),
   auroraSea('오로라 씨', true, false);
 
   const ShapeTone(this.label, this.premium, this.directSale);
