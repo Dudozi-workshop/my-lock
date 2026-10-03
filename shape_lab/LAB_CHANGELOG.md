@@ -13,3 +13,12 @@
 - **Impact:** future patches must bump the visible LAB number before deployment.
 - **Preview asset fix:** replaced the broken/truncated static split preview with a verified 1200×430 PNG under a cache-busted LAB 035 filename.
 - **QA source:** local PNG open/verify PASS before GitHub blob creation.
+
+## LABS-2026.10.03-R03 · Water Wave R2
+- Purpose: replace rejected wave strokes with a coupled broad refractive color field and organic caustic area field.
+- H01 Sunlit Caustic / H02 Living Water (baseline candidate) / H03 Deep Glass Sea.
+- Enlarged + 58px Light/Dark, freeze/resume, 2-second exposure auto-pause.
+- Existing locked palette-base alpha and fixed-finish pixels reused without modification.
+- W01/W02/W03 Rejected / Archived; R1 history remains in Git.
+- C02 Quick Signature v2 remains Production Final / Locked / Active. No candidate auto-promotion.
+- CPU mesh field at 24Hz, shared across enlarged/58px previews; Android runtime/performance unverified.

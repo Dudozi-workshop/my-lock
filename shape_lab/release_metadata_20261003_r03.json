@@ -1,0 +1,16 @@
+{
+  "version": "LABS-2026.10.03-R03",
+  "purpose": "Compare Water Wave R2 coupled Broad Refraction + Organic Caustic fields at enlarged and 58px sizes, including 2-second exposure.",
+  "scope": "Palette Lab only · H01 Sunlit Caustic / H02 Living Water / H03 Deep Glass Sea",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "resolved by workflow GITHUB_SHA",
+  "status": "QA Candidate / User visual approval pending",
+  "production_mutation": false,
+  "imagegen_used": false,
+  "rejected": [
+    "W01",
+    "W02",
+    "W03"
+  ],
+  "production_active": "Aurora Sea C02 Quick Signature v2 Final / Locked / Active"
+}

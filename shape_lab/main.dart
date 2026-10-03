@@ -15,6 +15,7 @@ import 'package:my_lock/lock_engine/shape_spec/shape_spec_renderer.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
 
 import 'soft_basic_candidates.dart';
+import 'water_refraction_field.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -117,7 +118,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.03-R02 · Palette Lab · Aurora Sea Water Wave R1 · Candidate',
+                                  'LABS-2026.10.03-R03 · Palette Lab · Aurora Sea Water Wave R2 · Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5636,61 +5637,35 @@ class _PaletteLabState extends State<PaletteLab>
   Duration _previous = Duration.zero;
   double _seconds = 0;
   bool _paused = false;
+  double? _peekEnd;
   ui.Image? _paletteBase;
   ui.Image? _fixedFinish;
   Object? _loadError;
 
-  static const _candidates = <_WaterWaveCandidate>[
+  final _candidates = <_WaterWaveCandidate>[
     _WaterWaveCandidate(
-      id: 'W01',
-      name: 'Shallow Flash',
-      note: '밝은 얕은 바다. 빠른 Cyan/Aqua 수면광이 가장 즉각적으로 읽히는 안.',
-      colors: [
-        Color(0xFFC6F8FF),
-        Color(0xFF79E8F0),
-        Color(0xFF42BEEF),
-        Color(0xFF2387DF),
-      ],
-      periodSeconds: 5.2,
-      waveAmplitude: 0.052,
-      waveFrequency: 2.55,
-      causticOpacity: 0.52,
-      causticWidth: 0.030,
-      travel: 1.15,
+      id: 'H01', name: 'Sunlit Caustic',
+      note: '밝은 Aqua 수면광. 넓은 굴절면 위로 햇빛 집광이 갈라지고 합쳐지는 안.',
+      field: WaterRefractionField(
+        colors: const [Color(0xFF087CBD), Color(0xFF17BDCF), Color(0xFF94ECF0), Color(0xFFCDF9F8)],
+        speed: 1.12, refraction: .68, cellScale: 4.2, light: .86, seed: 13,
+      ),
     ),
     _WaterWaveCandidate(
-      id: 'W02',
-      name: 'Blue Current',
-      note: '기준안. Cyan → Aqua → Ocean → Deep Blue와 큰 물결 + 밝은 Caustic 이중 흐름.',
-      colors: [
-        Color(0xFFA8F3FF),
-        Color(0xFF53D8E8),
-        Color(0xFF2FA8F4),
-        Color(0xFF176BC6),
-      ],
-      periodSeconds: 5.8,
-      waveAmplitude: 0.066,
-      waveFrequency: 2.20,
-      causticOpacity: 0.60,
-      causticWidth: 0.034,
-      travel: 1.28,
+      id: 'H02', name: 'Living Water',
+      note: '기준 후보. Cyan과 Ocean Blue가 같은 굴절장에서 압축·팽창하며 면광이 흐르는 안.',
+      field: WaterRefractionField(
+        colors: const [Color(0xFF0754A3), Color(0xFF138BD3), Color(0xFF20CCD7), Color(0xFF9AF0F3)],
+        speed: 1.28, refraction: .92, cellScale: 3.7, light: .72, seed: 29,
+      ),
     ),
     _WaterWaveCandidate(
-      id: 'W03',
-      name: 'Deep Wave',
-      note: '깊은 Ocean/Deep Blue 위에 선명한 Cyan 반사광이 지나가는 프리미엄형.',
-      colors: [
-        Color(0xFF73E0EE),
-        Color(0xFF329FD9),
-        Color(0xFF1767C4),
-        Color(0xFF0B397E),
-      ],
-      periodSeconds: 6.2,
-      waveAmplitude: 0.078,
-      waveFrequency: 1.92,
-      causticOpacity: 0.66,
-      causticWidth: 0.032,
-      travel: 1.36,
+      id: 'H03', name: 'Deep Glass Sea',
+      note: '깊은 Blue 굴절면. 어두운 수심과 선명한 Cyan 집광의 대비가 큰 안.',
+      field: WaterRefractionField(
+        colors: const [Color(0xFF082955), Color(0xFF0A51A0), Color(0xFF168FC4), Color(0xFF5BDBE7)],
+        speed: .98, refraction: 1.08, cellScale: 3.2, light: .9, seed: 47,
+      ),
     ),
   ];
 
@@ -5746,6 +5721,11 @@ class _PaletteLabState extends State<PaletteLab>
     _previous = elapsed;
     if (!_paused && delta > 0) {
       _seconds += delta.clamp(0.0, 0.05).toDouble();
+      if (_peekEnd != null && _seconds >= _peekEnd!) {
+        _seconds = _peekEnd!;
+        _peekEnd = null;
+        _paused = true;
+      }
       setState(() {});
     }
   }
@@ -5771,9 +5751,9 @@ class _PaletteLabState extends State<PaletteLab>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _SectionTitle(
-                title: 'Aurora Sea · Water Wave R1',
+                title: 'Aurora Sea · Water Wave R2',
                 subtitle:
-                    'Production C02는 잠금 유지. 동일 Sea Turtle Production Palette Base + Fixed Finish에서 바다색/물결 효과만 비교합니다.',
+                    'Production C02는 잠금 유지. 동일 Sea Turtle Production Palette Base + Fixed Finish에서 굴절면과 불규칙 수면광만 비교합니다. W01~W03은 Reject / Archived.',
                 fg: widget.fg,
                 muted: widget.muted,
               ),
@@ -5782,7 +5762,7 @@ class _PaletteLabState extends State<PaletteLab>
                 spacing: 7,
                 runSpacing: 7,
                 children: [
-                  _ValueChip(label: 'Version', value: 'LABS-2026.10.03-R02'),
+                  _ValueChip(label: 'Version', value: 'LABS-2026.10.03-R03'),
                   _ValueChip(label: 'State', value: 'CANDIDATE'),
                   _ValueChip(label: 'Source', value: 'Runtime v4 source'),
                   _ValueChip(label: 'Production', value: 'LOCKED'),
@@ -5799,11 +5779,20 @@ class _PaletteLabState extends State<PaletteLab>
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
-                onPressed: () => setState(() => _paused = !_paused),
+                onPressed: () => setState(() { _peekEnd = null; _paused = !_paused; }),
                 icon: Icon(
                   _paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
                 ),
                 label: Text(_paused ? '효과 재개' : '효과 멈춤'),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () => setState(() {
+                  _peekEnd = _seconds + 2;
+                  _paused = false;
+                }),
+                icon: const Icon(Icons.timer_outlined),
+                label: const Text('2초 노출 비교 · 자동 정지'),
               ),
               const SizedBox(height: 14),
               if (_loadError != null)
@@ -5952,15 +5941,15 @@ class _WaterWaveCandidateCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
-        color: candidate.id == 'W02'
+        color: candidate.id == 'H02'
             ? const Color(0xFFEAF8FF)
             : const Color(0xFFF8F8FB),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: candidate.id == 'W02'
+          color: candidate.id == 'H02'
               ? const Color(0xFF38AEE8)
               : const Color(0xFFE4E5EB),
-          width: candidate.id == 'W02' ? 2 : 1,
+          width: candidate.id == 'H02' ? 2 : 1,
         ),
       ),
       child: Column(
@@ -5978,7 +5967,7 @@ class _WaterWaveCandidateCard extends StatelessWidget {
                   ),
                 ),
               ),
-              if (candidate.id == 'W02')
+              if (candidate.id == 'H02')
                 const Chip(
                   visualDensity: VisualDensity.compact,
                   label: Text(
@@ -6056,78 +6045,13 @@ class _WaterWaveSeaTurtlePainter extends CustomPainter {
       paletteBase.height.toDouble(),
     );
     final dest = Offset.zero & size;
-    final phase = (timeSeconds / candidate.periodSeconds) * pi * 2;
-
-    final gradientShift = sin(phase) * candidate.travel;
-    final gradient = LinearGradient(
-      begin: Alignment(-1.25 + gradientShift, -0.75 + cos(phase) * 0.34),
-      end: Alignment(1.25 + gradientShift, 0.75 + sin(phase) * 0.34),
-      colors: [...candidate.colors, candidate.colors.first],
-      stops: const [0.0, 0.22, 0.52, 0.82, 1.0],
-    );
-
-    // Candidate color field + caustic wave are clipped by the exact
-    // Production Palette Base alpha. Fixed Finish is composited afterwards.
+    // R2 replaces the complete R1 wave-line pass. One coupled optical field
+    // controls color refraction and organic caustics. Reused at all sizes.
     canvas.saveLayer(dest, Paint());
-    canvas.drawRect(
-      dest,
-      Paint()..shader = gradient.createShader(dest),
-    );
-
-    final wavePaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..blendMode = BlendMode.screen
-      ..color = const Color(0xFFD6FAFF)
-          .withValues(alpha: candidate.causticOpacity);
-
-    final secondaryPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..blendMode = BlendMode.screen
-      ..color = const Color(0xFF7EEBFF)
-          .withValues(alpha: candidate.causticOpacity * 0.52);
-
-    final side = size.shortestSide;
-    for (var band = 0; band < 4; band++) {
-      final baseY =
-          size.height * (0.20 + band * 0.20) +
-          sin(phase * 1.22 + band * 1.17) * side * 0.075;
-      final path = Path();
-      const steps = 42;
-      for (var i = 0; i <= steps; i++) {
-        final x = size.width * i / steps;
-        final normalizedX = i / steps;
-        final y = baseY +
-            sin(
-                  normalizedX * pi * 2 * candidate.waveFrequency +
-                      phase * 1.55 +
-                      band * 0.82,
-                ) *
-                side *
-                candidate.waveAmplitude +
-            sin(normalizedX * pi * 4.4 - phase * 0.72) *
-                side *
-                candidate.waveAmplitude *
-                0.28;
-        if (i == 0) {
-          path.moveTo(x, y);
-        } else {
-          path.lineTo(x, y);
-        }
-      }
-      wavePaint.strokeWidth =
-          max(1.0, side * candidate.causticWidth * (band.isEven ? 1.0 : 0.72));
-      secondaryPaint.strokeWidth = max(0.8, wavePaint.strokeWidth * 0.46);
-      canvas.drawPath(path, wavePaint);
-      canvas.save();
-      canvas.translate(
-        0,
-        side * (0.025 + 0.012 * sin(phase + band)),
-      );
-      canvas.drawPath(path, secondaryPaint);
-      canvas.restore();
-    }
+    canvas.save();
+    canvas.scale(size.width, size.height);
+    canvas.drawVertices(candidate.field.mesh(timeSeconds), BlendMode.src, Paint());
+    canvas.restore();
 
     canvas.drawImageRect(
       paletteBase,
@@ -6162,28 +6086,10 @@ class _WaterWaveSeaTurtlePainter extends CustomPainter {
 
 class _WaterWaveCandidate {
   const _WaterWaveCandidate({
-    required this.id,
-    required this.name,
-    required this.note,
-    required this.colors,
-    required this.periodSeconds,
-    required this.waveAmplitude,
-    required this.waveFrequency,
-    required this.causticOpacity,
-    required this.causticWidth,
-    required this.travel,
+    required this.id, required this.name, required this.note, required this.field,
   });
-
-  final String id;
-  final String name;
-  final String note;
-  final List<Color> colors;
-  final double periodSeconds;
-  final double waveAmplitude;
-  final double waveFrequency;
-  final double causticOpacity;
-  final double causticWidth;
-  final double travel;
+  final String id, name, note;
+  final WaterRefractionField field;
 }
 
 class EffectLab extends StatefulWidget {
