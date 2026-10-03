@@ -23,6 +23,7 @@ class ShapeSpecRenderer {
     double paletteTimeSeconds = 0,
     String? swimKey,
     String swimProfile = 'standard',
+    Map<String, dynamic>? auroraConfigOverride,
   }) {
     final registry = ShapeSpecRegistry.instance;
     if (registry.isRasterShape(token.shape)) {
@@ -36,6 +37,7 @@ class ShapeSpecRenderer {
         paletteTimeSeconds: paletteTimeSeconds,
         swimKey: swimKey,
         swimProfile: swimProfile,
+        auroraConfigOverride: auroraConfigOverride,
       );
       return;
     }
@@ -65,6 +67,7 @@ class ShapeSpecRenderer {
         token: token,
         opacity: opacity,
         paletteTimeSeconds: paletteTimeSeconds,
+        auroraConfigOverride: auroraConfigOverride,
       );
       canvas.restore();
       return;
@@ -112,6 +115,7 @@ class ShapeSpecRenderer {
     if (token.tone == ShapeTone.auroraSea) {
       bodyPaint.shader = auroraSeaGradient(
         paletteTimeSeconds,
+        config: auroraConfigOverride,
         opacity: opacity,
       ).createShader(Rect.fromLTWH(0, 0, canvasSize, canvasSize));
     } else if (bundle.shape.surface.kind == 'radial') {
@@ -208,6 +212,7 @@ class ShapeSpecRenderer {
     required double paletteTimeSeconds,
     required String? swimKey,
     required String swimProfile,
+    required Map<String, dynamic>? auroraConfigOverride,
   }) {
     final spec = ShapeSpecRegistry.instance.resolveRasterSpec(token.shape);
     final destination = spec.metadata.destination(center, radius);
@@ -248,7 +253,7 @@ class ShapeSpecRenderer {
       canvas.drawPaint(Paint()
         ..shader = auroraSeaGradient(
           paletteTimeSeconds,
-          config: spec.metadata.aurora,
+          config: auroraConfigOverride ?? spec.metadata.aurora,
         ).createShader(destination)
         ..blendMode = BlendMode.srcIn);
     }
@@ -275,26 +280,87 @@ class ShapeSpecRenderer {
     final period = (config?['period_seconds'] as num?)?.toDouble() ?? 8.0;
     final rawPalette = (config?['palette'] as List<dynamic>?) ??
         const ['#A7D8F7', '#7FB8FF', '#9FA8F2', '#C7B6F3'];
+    final mode = (config?['mode'] as String?) ?? 'drift';
     final phase = (timeSeconds % period) / period * pi * 2;
+    final progress = (timeSeconds % period) / period;
 
-    final palette = rawPalette.map((rawHex) {
+    Color parseColor(dynamic rawHex) {
       final hex = rawHex as String;
       return Color(
         0xFF000000 | int.parse(hex.substring(1), radix: 16),
       ).withValues(alpha: opacity);
-    }).toList(growable: false);
+    }
+
+    final palette = rawPalette.map(parseColor).toList(growable: false);
+
+    Color sample(double t) {
+      final normalized = t - t.floorToDouble();
+      final scaled = normalized * palette.length;
+      final index = scaled.floor() % palette.length;
+      final next = (index + 1) % palette.length;
+      final local = scaled - scaled.floorToDouble();
+      return Color.lerp(palette[index], palette[next], local)!;
+    }
+
+    if (mode == 'breath') {
+      final center = sample(progress);
+      final edgeA = sample(progress + 0.12);
+      final edgeB = sample(progress - 0.12);
+      return LinearGradient(
+        begin: const Alignment(-1, -0.35),
+        end: const Alignment(1, 0.35),
+        colors: [edgeA, center, edgeB],
+        stops: const [0.0, 0.5, 1.0],
+      );
+    }
+
     final colors = [...palette, palette.first];
+    final rawStops = config?['stops'] as List<dynamic>?;
+    final stops = rawStops == null
+        ? null
+        : rawStops.map((value) => (value as num).toDouble()).toList();
+
+    final travelX = (config?['travel_x'] as num?)?.toDouble() ?? 0.7;
+    final travelY = (config?['travel_y'] as num?)?.toDouble() ?? 0.42;
+
+    Alignment begin;
+    Alignment end;
+    switch (mode) {
+      case 'horizontal':
+        begin = Alignment(-1.25 + sin(phase) * travelX, -0.1);
+        end = Alignment(1.25 + sin(phase) * travelX, 0.1);
+        break;
+      case 'vertical':
+        begin = Alignment(-0.12, -1.25 + sin(phase) * travelY);
+        end = Alignment(0.12, 1.25 + sin(phase) * travelY);
+        break;
+      case 'ribbon':
+        begin = Alignment(
+          -0.95 + sin(phase) * travelX,
+          -0.55 + cos(phase) * travelY,
+        );
+        end = Alignment(
+          0.95 + sin(phase) * travelX,
+          0.55 + cos(phase) * travelY,
+        );
+        break;
+      case 'drift':
+      default:
+        begin = Alignment(
+          -1.05 + sin(phase) * travelX,
+          -0.70 + cos(phase) * travelY,
+        );
+        end = Alignment(
+          1.05 + sin(phase) * travelX,
+          0.70 + cos(phase) * travelY,
+        );
+    }
 
     return LinearGradient(
-      begin: Alignment(
-        -1.05 + sin(phase) * 0.7,
-        -0.70 + cos(phase) * 0.42,
-      ),
-      end: Alignment(
-        1.05 + sin(phase) * 0.7,
-        0.70 + cos(phase) * 0.42,
-      ),
+      begin: begin,
+      end: end,
       colors: colors,
+      stops: stops,
     );
   }
 
@@ -305,6 +371,7 @@ class ShapeSpecRenderer {
     required LockToken token,
     required double opacity,
     required double paletteTimeSeconds,
+    required Map<String, dynamic>? auroraConfigOverride,
   }) {
     final config = style.crayon;
     if (config == null) {
@@ -343,6 +410,7 @@ class ShapeSpecRenderer {
       basePaint
         ..shader = auroraSeaGradient(
           paletteTimeSeconds,
+          config: auroraConfigOverride,
           opacity: opacity,
         ).createShader(
           Rect.fromLTWH(0, 0, style.canvasSize, style.canvasSize),
