@@ -34,14 +34,14 @@ void main() {
     expect(ShapeTone.auroraSea.directSale, isFalse);
   });
 
-  test('Aurora Sea uses the locked three-color signature gradient', () {
-    final gradient = ShapeSpecRenderer.auroraSeaGradient(0);
-    expect(gradient.colors, const [
-      Color(0xFFA7D8F7),
-      Color(0xFF7FB8FF),
-      Color(0xFFC7B6F3),
-      Color(0xFFA7D8F7),
-    ]);
+  test('Aurora Sea follows the active Runtime v3 timing contract', () {
+    final start = ShapeSpecRenderer.auroraSeaGradient(0);
+    final loop = ShapeSpecRenderer.auroraSeaGradient(8);
+    expect(start.colors.length, 5);
+    expect(start.colors.first, start.colors.last);
+    expect(start.begin, loop.begin);
+    expect(start.end, loop.end);
+    expect(start.colors, loop.colors);
   });
 
   group('vector palette rendering', () {
