@@ -6050,22 +6050,21 @@ class _WaterWaveSeaTurtlePainter extends CustomPainter {
     // Hard clip removes subpixel mesh coverage outside the alpha-mask rectangle.
     canvas.save();
     canvas.clipRect(dest, doAntiAlias: false);
-    // R2 replaces the complete R1 wave-line pass. One coupled optical field
-    // controls color refraction and organic caustics. Reused at all sizes.
+    // Alpha-first compositing prevents filtered dstIn edge coverage from
+    // leaving a rectangular fringe. The optical field is srcIn of exact alpha.
     canvas.saveLayer(dest, Paint());
+    canvas.drawImageRect(
+      paletteBase, src, dest,
+      Paint()..filterQuality = FilterQuality.high,
+    );
     canvas.save();
     canvas.scale(size.width, size.height);
-    canvas.drawVertices(candidate.field.mesh(timeSeconds), BlendMode.src, Paint());
-    canvas.restore();
-
-    canvas.drawImageRect(
-      paletteBase,
-      src,
-      dest,
-      Paint()
-        ..filterQuality = FilterQuality.high
-        ..blendMode = BlendMode.dstIn,
+    canvas.drawVertices(
+      candidate.field.mesh(timeSeconds),
+      BlendMode.src,
+      Paint()..blendMode = BlendMode.srcIn,
     );
+    canvas.restore();
     canvas.restore();
 
     canvas.drawImageRect(
