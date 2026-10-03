@@ -10,7 +10,8 @@
         "sea_turtle_app_integration": "?qa=sea-turtle-app-integration",
         "aurora_sea_palette_round1": "?qa=aurora-sea-palette-round1",
         "sea_turtle_swim_v1": "?qa=sea-turtle-swim-v1",
-        "background_composition": "?qa=background-composition"
+        "background_composition": "?qa=background-composition",
+        "aurora_sea_palette_round2": "?qa=aurora-sea-palette-round2"
       },
       "static_paths": {
         "asset_book": "asset-book/"
