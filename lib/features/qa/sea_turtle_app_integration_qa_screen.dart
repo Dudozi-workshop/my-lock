@@ -28,6 +28,7 @@ class _QaState extends State<SeaTurtleAppIntegrationQaScreen>
   )..repeat();
   ShapeTone _tone = ShapeTone.auroraSea;
   bool _dark = false;
+  bool _rotationPaused = false;
   int _count = 9;
   int _spawn = 0;
 
@@ -87,10 +88,38 @@ class _QaState extends State<SeaTurtleAppIntegrationQaScreen>
                 ),
             ],
           ),
-          SwitchListTile(
-            title: const Text('Dark'),
-            value: _dark,
-            onChanged: (value) => setState(() => _dark = value),
+          Row(
+            children: [
+              Expanded(
+                child: SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Dark'),
+                  value: _dark,
+                  onChanged: (value) => setState(() => _dark = value),
+                ),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _rotationPaused = !_rotationPaused;
+                    if (_rotationPaused) {
+                      _rotation.stop();
+                    } else {
+                      _rotation.repeat();
+                    }
+                  });
+                },
+                icon: Icon(
+                  _rotationPaused
+                      ? Icons.play_arrow_rounded
+                      : Icons.pause_rounded,
+                ),
+                label: Text(
+                  _rotationPaused ? '회전 재개' : '회전 멈춤',
+                ),
+              ),
+            ],
           ),
           Container(
             color: bg,
