@@ -30,6 +30,9 @@ jobs:
         with:
           ref: feat/style-lab-integration
 
+      - name: Validate two-site governance
+        run: python3 tool/validate_site_governance.py
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -62,19 +65,19 @@ jobs:
         run: |
           set -e
           API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$PAGES_PROJECT"
-          curl --fail --show-error --silent             --request PATCH             --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN"             --header "Content-Type: application/json"             --data '{"production_branch":"feat/style-lab-integration"}'             "$API"             --output /tmp/pages-project-update.json
+          curl --fail --show-error --silent --request PATCH --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" --header "Content-Type: application/json" --data '{"production_branch":"feat/style-lab-integration"}' "$API" --output /tmp/pages-project-update.json
 
       - name: Deploy integrated Labs
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           set -e
-          npx wrangler pages deploy build/shape_lab             --project-name "$PAGES_PROJECT"             --branch "feat/style-lab-integration"             --commit-hash "$(git rev-parse HEAD)"
+          npx wrangler pages deploy build/shape_lab --project-name "$PAGES_PROJECT" --branch "feat/style-lab-integration" --commit-hash "$(git rev-parse HEAD)"
 
       - name: Verify public Labs
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           set -e
-          curl --fail --show-error --silent --location             --retry 5 --retry-delay 3 --retry-all-errors             --output /tmp/pages-index.html             "$PRIMARY_URL"
+          curl --fail --show-error --silent --location --retry 5 --retry-delay 3 --retry-all-errors --output /tmp/pages-index.html "$PRIMARY_URL"
           grep -q "<html" /tmp/pages-index.html
           grep -q "flutter_bootstrap.js" /tmp/pages-index.html
 
@@ -85,7 +88,6 @@ jobs:
             echo "## MY LOCK Integrated Labs"
             echo ""
             echo "- Public: $PRIMARY_URL"
-            echo "- Soft Basic: $PRIMARY_URL?lab=style&style=soft-basic"
-            echo "- Crayon Soft: $PRIMARY_URL?lab=style&style=crayon-soft"
-            echo "- Commit: $GITHUB_SHA"
+            echo "- Site metadata: config/site_registry.json"
+            echo "- Commit: $(git rev-parse HEAD)"
           } >> "$GITHUB_STEP_SUMMARY"
