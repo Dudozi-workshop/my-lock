@@ -53,11 +53,14 @@ jobs:
       - name: Write release identity
         run: |
           python3 - <<'PYCODE'
-          import json, os
+          import json, os, html
           from pathlib import Path
           meta = json.loads(Path('shape_lab/release_metadata_20261003_r03.json').read_text())
           meta['source_commit'] = os.environ['GITHUB_SHA']
-          Path('build/shape_lab/version.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2))
+          Path('build/shape_lab/labs-release.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2))
+          page = Path('build/shape_lab/index.html')
+          tags = ''.join('<meta name="mylock-' + key + '" content="' + html.escape(str(meta[key]), quote=True) + '">' for key in ['version', 'source_commit', 'purpose', 'scope', 'source_branch', 'status'])
+          page.write_text(page.read_text().replace('</head>', tags + '\n</head>'))
           PYCODE
 
       - name: Upload recovery artifact
@@ -93,22 +96,22 @@ jobs:
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           python3 - <<'PYCODE'
-          import json, os, time, urllib.request
+          import os, time, subprocess
           sha = os.environ['GITHUB_SHA']
+          expected = '<meta name="mylock-source_commit" content="' + sha + '">'
           for attempt in range(12):
-              url = os.environ['PRIMARY_URL'].rstrip('/') + '/version.json?sha=' + sha + '&attempt=' + str(attempt)
+              url = os.environ['PRIMARY_URL'] + '?release=' + sha + '&attempt=' + str(attempt)
               try:
-                  request = urllib.request.Request(url, headers={'Cache-Control': 'no-cache'})
-                  release = json.load(urllib.request.urlopen(request, timeout=20))
-                  if release.get('source_commit') == sha and release.get('version') == 'LABS-2026.10.03-R03':
+                  page = subprocess.check_output(['curl', '--fail', '--silent', '--show-error', '--location', '--max-time', '20', url], text=True)
+                  if expected in page and 'LABS-2026.10.03-R03' in page:
                       print('Canonical R2 release verified:', sha)
                       break
-                  print('Canonical release propagation pending:', release.get('source_commit'))
+                  print('Canonical HTML release propagation pending', flush=True)
               except Exception as error:
-                  print('Canonical release retry:', type(error).__name__)
+                  print('Canonical release retry:', type(error).__name__, flush=True)
               time.sleep(5)
           else:
-              raise AssertionError('Canonical release identity did not converge to the deployed commit')
+              raise AssertionError('Canonical HTML release identity did not converge')
           PYCODE
 
       - name: Publish access summary
