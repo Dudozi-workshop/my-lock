@@ -77,7 +77,7 @@ void main() {
     }
     expect(
       await render(ShapeTone.auroraSea, 0),
-      equals(await render(ShapeTone.auroraSea, 8)),
+      equals(await render(ShapeTone.auroraSea, 6.5)),
     );
   });
 
