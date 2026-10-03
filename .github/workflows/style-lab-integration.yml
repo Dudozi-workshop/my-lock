@@ -28,6 +28,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: feat/style-lab-integration
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -46,13 +48,13 @@ jobs:
         run: flutter test
 
       - name: Build integrated Labs
-        run: bash tool/build_web.sh
+        run: bash tool/build_shape_lab.sh
 
       - name: Upload recovery artifact
         uses: actions/upload-artifact@v4
         with:
           name: my-lock-integrated-labs
-          path: build/web
+          path: build/shape_lab
           if-no-files-found: error
           retention-days: 14
 
@@ -67,7 +69,7 @@ jobs:
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           set -e
-          npx wrangler pages deploy build/web             --project-name "$PAGES_PROJECT"             --branch "feat/style-lab-integration"             --commit-hash "$GITHUB_SHA"
+          npx wrangler pages deploy build/shape_lab             --project-name "$PAGES_PROJECT"             --branch "feat/style-lab-integration"             --commit-hash "$(git rev-parse HEAD)"
 
       - name: Verify public Labs
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
