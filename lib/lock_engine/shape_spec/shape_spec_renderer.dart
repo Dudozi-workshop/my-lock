@@ -315,7 +315,9 @@ class ShapeSpecRenderer {
     }
 
     final colors = [...palette, palette.first];
-    final rawStops = config?['stops'] as List<dynamic>?;
+    final rawStops = config == null
+        ? const <dynamic>[0.0, 0.18, 0.50, 0.82, 1.0]
+        : config['stops'] as List<dynamic>?;
     final stops = rawStops == null
         ? null
         : rawStops.map((value) => (value as num).toDouble()).toList();
