@@ -1,0 +1,11 @@
+{
+  "version": "LABS-2026.10.03-R02",
+  "purpose": "Compare three Aurora Sea ocean-wave signature candidates using the locked Sea Turtle production palette-base and fixed-finish sources.",
+  "scope": "Palette Lab only. W01 Shallow Flash / W02 Blue Current / W03 Deep Wave. Production C02 remains locked and unchanged.",
+  "source_branch": "feat/labs-aurora-water-wave-r1",
+  "implementation_commit": "cb854a79396abe22e55a9eb4ffe1ce821882427f",
+  "target_branch": "feat/style-lab-integration",
+  "status": "QA Candidate",
+  "production_mutation": false,
+  "imagegen_used": false
+}
