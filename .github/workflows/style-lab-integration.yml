@@ -92,7 +92,7 @@ jobs:
       - name: Verify R2 release identity
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
-          curl --fail --show-error --silent --location --retry 5 --retry-delay 3 --retry-all-errors "$PRIMARY_URL/version.json?sha=$GITHUB_SHA" --output /tmp/labs-version.json
+          curl --fail --show-error --silent --location --retry 5 --retry-delay 3 --retry-all-errors "${PRIMARY_URL}version.json?sha=$GITHUB_SHA" --output /tmp/labs-version.json
           python3 - <<'PYCODE'
           import json, os
           release = json.load(open('/tmp/labs-version.json'))
