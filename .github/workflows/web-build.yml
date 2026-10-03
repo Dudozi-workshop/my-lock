@@ -9,6 +9,7 @@ on:
       - 'pubspec.yaml'
       - 'analysis_options.yaml'
       - 'tool/**'
+      - 'config/site_registry.json'
       - 'web/**'
       - 'wrangler.jsonc'
       - '.github/workflows/web-build.yml'
@@ -39,6 +40,9 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Validate two-site governance
+        run: python3 tool/validate_site_governance.py
+
       - name: Validate public preview routes
         run: python3 tool/validate_public_preview_routes.py
 
@@ -67,7 +71,6 @@ jobs:
             echo "## MY LOCK Main Preview"
             echo ""
             echo "- Main: https://my-lock-preview.rlatkd5959.workers.dev/"
-            echo "- Aurora Sea Round 1: https://my-lock-preview.rlatkd5959.workers.dev/?qa=aurora-sea-palette-round1"
-            echo "- Sea Turtle App Integration: https://my-lock-preview.rlatkd5959.workers.dev/?qa=sea-turtle-app-integration"
+            echo "- Site metadata: config/site_registry.json"
             echo "- Route registry: docs/public-preview-routes.json"
           } >> "$GITHUB_STEP_SUMMARY"
