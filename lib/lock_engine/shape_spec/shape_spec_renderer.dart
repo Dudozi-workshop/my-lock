@@ -112,8 +112,8 @@ class ShapeSpecRenderer {
     if (token.tone == ShapeTone.auroraSea) {
       bodyPaint.shader = auroraSeaGradient(
         paletteTimeSeconds,
+        opacity: opacity,
       ).createShader(Rect.fromLTWH(0, 0, canvasSize, canvasSize));
-      bodyPaint.color = Colors.white.withValues(alpha: opacity);
     } else if (bundle.shape.surface.kind == 'radial') {
       final surface = bundle.shape.surface;
       bodyPaint.shader = RadialGradient(
@@ -270,15 +270,20 @@ class ShapeSpecRenderer {
   static LinearGradient auroraSeaGradient(
     double timeSeconds, {
     Map<String, dynamic>? config,
+    double opacity = 1.0,
   }) {
     final period = (config?['period_seconds'] as num?)?.toDouble() ?? 8.0;
     final phase = (timeSeconds % period) / period * pi * 2;
 
-    const colors = [
+    const palette = [
       Color(0xFFA7D8F7),
       Color(0xFF7FB8FF),
       Color(0xFFC7B6F3),
       Color(0xFFA7D8F7),
+    ];
+    final colors = [
+      for (final color in palette)
+        color.withValues(alpha: opacity),
     ];
 
     return LinearGradient(
@@ -337,10 +342,12 @@ class ShapeSpecRenderer {
     final basePaint = Paint();
     if (token.tone == ShapeTone.auroraSea) {
       basePaint
-        ..shader = auroraSeaGradient(paletteTimeSeconds).createShader(
+        ..shader = auroraSeaGradient(
+          paletteTimeSeconds,
+          opacity: opacity,
+        ).createShader(
           Rect.fromLTWH(0, 0, style.canvasSize, style.canvasSize),
-        )
-        ..color = Colors.white.withValues(alpha: opacity);
+        );
     } else {
       basePaint.color = fill.withValues(alpha: opacity);
     }
