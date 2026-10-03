@@ -6045,6 +6045,9 @@ class _WaterWaveSeaTurtlePainter extends CustomPainter {
       paletteBase.height.toDouble(),
     );
     final dest = Offset.zero & size;
+    // Hard clip removes subpixel mesh coverage outside the alpha-mask rectangle.
+    canvas.save();
+    canvas.clipRect(dest, doAntiAlias: false);
     // R2 replaces the complete R1 wave-line pass. One coupled optical field
     // controls color refraction and organic caustics. Reused at all sizes.
     canvas.saveLayer(dest, Paint());
@@ -6074,6 +6077,7 @@ class _WaterWaveSeaTurtlePainter extends CustomPainter {
       dest,
       Paint()..filterQuality = FilterQuality.high,
     );
+    canvas.restore();
   }
 
   @override
