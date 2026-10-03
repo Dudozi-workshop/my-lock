@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'aurora_sea_palette_lab_screen.dart';
 import 'background_composition_lab_screen.dart';
 import 'sea_turtle_app_integration_qa_screen.dart';
 import 'sea_turtle_body_with_rear_runtime_qa_screen.dart';
@@ -16,6 +17,7 @@ class LabHomeScreen extends StatelessWidget {
 
   void _open(BuildContext context, String query) {
     final page = switch (query) {
+      '?qa=aurora-sea-palette-round1' => const AuroraSeaPaletteLabScreen(),
       '?qa=background-composition' => const BackgroundCompositionLabScreen(),
       '?qa=sea-turtle-whole' => const SeaTurtleWholeRuntimeQaScreen(),
       '?qa=sea-turtle-production' => const SeaTurtleProductionRuntimeQaScreen(),
@@ -41,6 +43,11 @@ class LabHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groups = <(String, String, List<(String, String)>)>[
+      (
+        'Palette Lab',
+        'Drop 01 · Aurora Sea',
+        [('Aurora Sea · Round 1 · 8 candidates', '?qa=aurora-sea-palette-round1')],
+      ),
       (
         'Background Lab',
         'Drop 01 · 작은 바닷속',
