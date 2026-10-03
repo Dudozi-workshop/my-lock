@@ -11,7 +11,8 @@ import 'shape_spec/shape_spec_renderer.dart';
 class LockTokenPainter extends CustomPainter {
   LockTokenPainter(this.token, {this.style = ShapeStyle.softBasic})
     : super(
-        repaint: token.shape == ShapeKind.seaTurtle
+        repaint: token.shape == ShapeKind.seaTurtle ||
+                token.tone == ShapeTone.auroraSea
             ? RasterPaletteClock.instance
             : null,
       );
