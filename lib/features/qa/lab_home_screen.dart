@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'aurora_sea_palette_lab_screen.dart';
 import 'aurora_sea_palette_round2_screen.dart';
+import 'aurora_sea_palette_round3_screen.dart';
 import 'background_composition_lab_screen.dart';
 import 'sea_turtle_app_integration_qa_screen.dart';
 import 'sea_turtle_body_with_rear_runtime_qa_screen.dart';
@@ -18,6 +19,7 @@ class LabHomeScreen extends StatelessWidget {
 
   void _open(BuildContext context, String query) {
     final page = switch (query) {
+      '?qa=aurora-sea-palette-round3' => const AuroraSeaPaletteRound3Screen(),
       '?qa=aurora-sea-palette-round2' => const AuroraSeaPaletteRound2Screen(),
       '?qa=aurora-sea-palette-round1' => const AuroraSeaPaletteLabScreen(),
       '?qa=background-composition' => const BackgroundCompositionLabScreen(),
@@ -49,6 +51,7 @@ class LabHomeScreen extends StatelessWidget {
         'Palette Lab',
         'Drop 01 · Aurora Sea',
         [
+          ('Aurora Sea · Round 3 · B08 speed', '?qa=aurora-sea-palette-round3'),
           ('Aurora Sea · Round 2 · A08 refinement', '?qa=aurora-sea-palette-round2'),
           ('Aurora Sea · Round 1 · 8 candidates', '?qa=aurora-sea-palette-round1'),
         ],
