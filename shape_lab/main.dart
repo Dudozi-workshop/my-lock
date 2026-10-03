@@ -5779,6 +5779,7 @@ class _PaletteLabState extends State<PaletteLab>
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(foregroundColor: widget.fg),
                 onPressed: () => setState(() { _peekEnd = null; _paused = !_paused; }),
                 icon: Icon(
                   _paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
@@ -5787,6 +5788,7 @@ class _PaletteLabState extends State<PaletteLab>
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(foregroundColor: widget.fg),
                 onPressed: () => setState(() {
                   _peekEnd = _seconds + 2;
                   _paused = false;
@@ -5942,8 +5944,8 @@ class _WaterWaveCandidateCard extends StatelessWidget {
       padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
         color: candidate.id == 'H02'
-            ? const Color(0xFFEAF8FF)
-            : const Color(0xFFF8F8FB),
+            ? (fg.computeLuminance() > .5 ? const Color(0xFF123743) : const Color(0xFFEAF8FF))
+            : (fg.computeLuminance() > .5 ? const Color(0xFF16232D) : const Color(0xFFF8F8FB)),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: candidate.id == 'H02'
