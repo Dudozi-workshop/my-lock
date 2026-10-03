@@ -16,7 +16,6 @@ class AuroraSeaPaletteLabScreen extends StatefulWidget {
 class _AuroraSeaPaletteLabScreenState
     extends State<AuroraSeaPaletteLabScreen> {
   bool _dark = false;
-  bool _paused = false;
 
   static const _candidates = <_AuroraCandidate>[
     _AuroraCandidate(
@@ -117,25 +116,6 @@ class _AuroraSeaPaletteLabScreenState
     ),
   ];
 
-  void _togglePause() {
-    setState(() {
-      _paused = !_paused;
-      if (_paused) {
-        RasterPaletteClock.instance.stop();
-      } else {
-        RasterPaletteClock.instance.start();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    if (_paused) {
-      RasterPaletteClock.instance.start();
-    }
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final bg = _dark ? const Color(0xFF17151F) : const Color(0xFFF5F6FA);
@@ -160,13 +140,6 @@ class _AuroraSeaPaletteLabScreenState
                 label: const Text('Dark'),
                 selected: _dark,
                 onSelected: (value) => setState(() => _dark = value),
-              ),
-              OutlinedButton.icon(
-                onPressed: _togglePause,
-                icon: Icon(
-                  _paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
-                ),
-                label: Text(_paused ? '색 변화 재개' : '색 변화 멈춤'),
               ),
             ],
           ),
