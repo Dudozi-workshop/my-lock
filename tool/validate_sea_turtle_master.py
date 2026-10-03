@@ -182,8 +182,8 @@ def main() -> None:
     v3 = json.loads(V3_SPEC.read_text(encoding="utf-8"))
     if v3.get("version") != 3:
         fail("Sea Turtle canonical draft spec must be version 3")
-    if v3.get("status") != "canonical_2048_draft_f0_part_split":
-        fail("unexpected v3 canonical draft status")
+    if v3.get("status") != "canonical_ready_semantic_rework":
+        fail("unexpected v3 canonical status")
     canvas = v3.get("canvas", {})
     if canvas.get("width") != 2048 or canvas.get("height") != 2048 or canvas.get("transparent") is not True:
         fail("v3 canonical canvas must be 2048x2048 transparent")
@@ -196,15 +196,17 @@ def main() -> None:
     if animation.get("implemented") is not False:
         fail("v3 animation must remain unimplemented until Static Master Lock")
     qa = v3.get("qa", {})
-    if qa.get("f0RebuildMaxChannelDiff") != 0 or qa.get("f0RebuildChangedChannelCount") != 0:
-        fail("v3 F0 rebuild QA must remain exact")
+    if qa.get("previousF0DraftRebuildMaxChannelDiff") != 0 or qa.get("previousF0DraftRebuildChangedChannelCount") != 0:
+        fail("v3 previous F0 draft rebuild QA must remain exact")
+    if qa.get("newCanonicalQaStatus") != "pending_after_reference_rebuild":
+        fail("v3 canonical QA status changed unexpectedly")
 
     print("[sea-turtle-master] PASS")
     print("- Geometry: source_locked_no_redraw")
     print("- Region tokens: main / underbelly / deep / detail / outline")
     print("- Shape Animation: front-flipper ownership defined; implementation deferred until Static Master Lock")
     print("- Motion Set: whole-shape movement remains owned by FloatingEngine")
-    print("- v3 Canonical Draft: 2048x2048 transparent / F0 exact rebuild QA locked")
+    print("- v3 Canonical: 2048x2048 transparent / semantic rework state recognized")
     print("- Palette: ShapeTone Pink / Blue / Yellow only")
     if source_present:
         print("- Source pack: complete; byte size + SHA-256 verified")
