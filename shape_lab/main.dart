@@ -117,7 +117,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 036 · Background Lab Gate 01 · Composition · Deploy',
+                                  'LABS-2026.10.03-R02 · Palette Lab · Aurora Sea Water Wave R1 · Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
