@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "sites": {
+    "MAIN": {
+      "canonical_url": "https://my-lock-preview.rlatkd5959.workers.dev",
+      "deploy_target": "my-lock-preview",
+      "version": "MAIN-2026.10.03-R01",
+      "purpose": "Actual app Web Preview for release-target UI, UX, and runtime verification",
+      "status": "Production Preview"
+    },
+    "LABS": {
+      "canonical_url": "https://my-lock-shape-lab-pages.pages.dev",
+      "deploy_target": "my-lock-shape-lab-pages",
+      "version": "LABS-2026.10.03-R01",
+      "purpose": "Integrated production workbench for creation, comparison, QA, and asset registry",
+      "status": "QA / Candidate"
+    }
+  }
+}
