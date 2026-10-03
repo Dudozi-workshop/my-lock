@@ -1,0 +1,50 @@
+{
+  "asset_id": "sea_turtle_v3",
+  "palette_id": "aurora_sea",
+  "version": "v2",
+  "status": "Final / Locked / Active",
+  "approval_date": "2026-10-03",
+  "user_approval": "C02 · Quick Signature confirmed",
+  "production_runtime": "assets/raster_shapes/sea_turtle_v3_runtime_v4.json",
+  "lineage": {
+    "round1": "A08 · Deep Aurora",
+    "round2": "B08 · Full Travel",
+    "round3": "C02 · Quick Signature"
+  },
+  "palette": {
+    "colors": [
+      "#91D5F4",
+      "#66ADEB",
+      "#8A9BEF",
+      "#B7A9EC"
+    ],
+    "mode": "ribbon",
+    "period_seconds": 6.5,
+    "travel_x": 1.45,
+    "travel_y": 0.86,
+    "stops": [
+      0,
+      0.18,
+      0.5,
+      0.82,
+      1
+    ]
+  },
+  "layer_contract": {
+    "moving_layer": "base color/albedo only",
+    "fixed_layers": [
+      "shadow",
+      "pattern",
+      "division lines",
+      "highlight",
+      "outline"
+    ],
+    "geometry_changed": false,
+    "ownership_changed": false,
+    "mask_changed": false,
+    "motion_changed": false,
+    "imagegen_used": false
+  },
+  "approval_scope": "Aurora Sea dynamic palette only. Existing Sea Turtle geometry, material ownership, Swim Motion Master v1, and fixed finish remain locked and unchanged.",
+  "versioning_rule": "This v2 palette master supersedes older Aurora Sea palette values for active production use. Historical manifests remain immutable."
+}

@@ -277,10 +277,10 @@ class ShapeSpecRenderer {
     Map<String, dynamic>? config,
     double opacity = 1.0,
   }) {
-    final period = (config?['period_seconds'] as num?)?.toDouble() ?? 8.0;
+    final period = (config?['period_seconds'] as num?)?.toDouble() ?? 6.5;
     final rawPalette = (config?['palette'] as List<dynamic>?) ??
-        const ['#A7D8F7', '#7FB8FF', '#9FA8F2', '#C7B6F3'];
-    final mode = (config?['mode'] as String?) ?? 'drift';
+        const ['#91D5F4', '#66ADEB', '#8A9BEF', '#B7A9EC'];
+    final mode = (config?['mode'] as String?) ?? 'ribbon';
     final phase = (timeSeconds % period) / period * pi * 2;
     final progress = (timeSeconds % period) / period;
 
@@ -315,13 +315,15 @@ class ShapeSpecRenderer {
     }
 
     final colors = [...palette, palette.first];
-    final rawStops = config?['stops'] as List<dynamic>?;
+    final rawStops = config == null
+        ? const <dynamic>[0.0, 0.18, 0.50, 0.82, 1.0]
+        : config['stops'] as List<dynamic>?;
     final stops = rawStops == null
         ? null
         : rawStops.map((value) => (value as num).toDouble()).toList();
 
-    final travelX = (config?['travel_x'] as num?)?.toDouble() ?? 0.7;
-    final travelY = (config?['travel_y'] as num?)?.toDouble() ?? 0.42;
+    final travelX = (config?['travel_x'] as num?)?.toDouble() ?? 1.45;
+    final travelY = (config?['travel_y'] as num?)?.toDouble() ?? 0.86;
 
     Alignment begin;
     Alignment end;
