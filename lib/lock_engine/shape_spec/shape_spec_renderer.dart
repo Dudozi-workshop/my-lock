@@ -273,18 +273,26 @@ class ShapeSpecRenderer {
     double opacity = 1.0,
   }) {
     final period = (config?['period_seconds'] as num?)?.toDouble() ?? 8.0;
+    final rawPalette = (config?['palette'] as List<dynamic>?) ??
+        const ['#79BFFF', '#FF8FD1', '#FFDA72', '#B7A4DF'];
+    final saturationScale =
+        (config?['saturation_scale'] as num?)?.toDouble() ?? 0.55;
+    final lightness = (config?['lightness'] as num?)?.toDouble() ?? 0.73;
     final phase = (timeSeconds % period) / period * pi * 2;
 
-    const palette = [
-      Color(0xFFA7D8F7),
-      Color(0xFF7FB8FF),
-      Color(0xFFC7B6F3),
-      Color(0xFFA7D8F7),
-    ];
-    final colors = [
-      for (final color in palette)
-        color.withValues(alpha: opacity),
-    ];
+    final palette = rawPalette.map((rawHex) {
+      final hex = rawHex as String;
+      final color = Color(
+        0xFF000000 | int.parse(hex.substring(1), radix: 16),
+      );
+      final hsl = HSLColor.fromColor(color);
+      return hsl
+          .withSaturation((hsl.saturation * saturationScale).clamp(0.0, 1.0))
+          .withLightness(lightness.clamp(0.0, 1.0))
+          .toColor()
+          .withValues(alpha: opacity);
+    }).toList(growable: false);
+    final colors = [...palette, palette.first];
 
     return LinearGradient(
       begin: Alignment(
