@@ -101,10 +101,37 @@
     {
       "scope": "runtime_v3",
       "version": "v3",
+      "status": "superseded",
+      "active": false,
+      "user_approved": true,
+      "lock_evidence": "assets/raster_shapes/sea_turtle_v3_runtime_v3.json",
+      "superseded_by": "runtime_v4"
+    },
+    {
+      "scope": "runtime_v4",
+      "version": "v4",
       "status": "final_locked",
       "active": true,
       "user_approved": true,
-      "lock_evidence": "assets/raster_shapes/sea_turtle_v3_runtime_v3.json"
+      "artifact_path": "assets/raster_shapes/sea_turtle_v3_runtime_v4.json",
+      "qa_evidence": "GitHub CI + Web Build for final-lock commit",
+      "approval_evidence": "User explicitly selected C02 · Quick Signature on 2026-10-03",
+      "registered": true,
+      "completed": true,
+      "derived_from": "runtime_v3"
+    },
+    {
+      "scope": "aurora_sea.palette_runtime",
+      "version": "v2",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true,
+      "artifact_path": "assets/shape_masters/drop01/sea_turtle_v3/whole_turtle/aurora_sea_palette_master_v2_final_manifest.json",
+      "qa_evidence": "Round 1 A08 -> Round 2 B08 -> Round 3 C02 visual QA",
+      "approval_evidence": "User explicitly selected C02 · Quick Signature on 2026-10-03",
+      "registered": true,
+      "completed": true,
+      "derived_from": "runtime_v4"
     }
   ],
   "policy": {
