@@ -312,11 +312,24 @@ Color baseColorForTone(ShapeTone tone) {
   switch (tone) {
     case ShapeTone.pink:
       return const Color(0xFFFF8FD1);
-    case ShapeTone.auroraSea:
     case ShapeTone.blue:
       return const Color(0xFF79BFFF);
     case ShapeTone.yellow:
       return const Color(0xFFFFDA72);
+    case ShapeTone.deepOcean:
+      return const Color(0xFF4F8EDB);
+    case ShapeTone.aquaMint:
+      return const Color(0xFF7CCFC4);
+    case ShapeTone.coralPink:
+      return const Color(0xFFF7A7B5);
+    case ShapeTone.sandBeige:
+      return const Color(0xFFEFD59A);
+    case ShapeTone.lavender:
+      return const Color(0xFFB9A7E8);
+    case ShapeTone.peachOrange:
+      return const Color(0xFFF7B385);
+    case ShapeTone.auroraSea:
+      return const Color(0xFF7FB8FF);
   }
 }
 

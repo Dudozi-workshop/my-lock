@@ -13,7 +13,7 @@ class ShopScreen extends StatelessWidget {
     final premiumShapes =
         ShapeKind.values.where((item) => item.premium).toList();
     final premiumTones =
-        ShapeTone.values.where((item) => item.premium).toList();
+        ShapeTone.values.where((item) => item.directSale).toList();
     final premiumStyles =
         ShapeStyle.values.where((item) => item.premium).toList();
     final premiumBackgrounds =

@@ -64,6 +64,7 @@ class ShapeSpecRenderer {
         style: bundle.style,
         token: token,
         opacity: opacity,
+        paletteTimeSeconds: paletteTimeSeconds,
       );
       canvas.restore();
       return;
@@ -108,7 +109,12 @@ class ShapeSpecRenderer {
     );
 
     final bodyPaint = Paint();
-    if (bundle.shape.surface.kind == 'radial') {
+    if (token.tone == ShapeTone.auroraSea) {
+      bodyPaint.shader = auroraSeaGradient(
+        paletteTimeSeconds,
+        opacity: opacity,
+      ).createShader(Rect.fromLTWH(0, 0, canvasSize, canvasSize));
+    } else if (bundle.shape.surface.kind == 'radial') {
       final surface = bundle.shape.surface;
       bodyPaint.shader = RadialGradient(
         center: Alignment(surface.centerX, surface.centerY),
@@ -240,7 +246,10 @@ class ShapeSpecRenderer {
     if (token.tone == ShapeTone.auroraSea) {
       // Full layer coverage avoids antialiased rectangle-edge residue.
       canvas.drawPaint(Paint()
-        ..shader = auroraSeaGradient(paletteTimeSeconds, config: spec.metadata.aurora).createShader(destination)
+        ..shader = auroraSeaGradient(
+          paletteTimeSeconds,
+          config: spec.metadata.aurora,
+        ).createShader(destination)
         ..blendMode = BlendMode.srcIn);
     }
     // Layer 2: fixed optical density carries all source outline/shadow/light/detail.
@@ -258,19 +267,34 @@ class ShapeSpecRenderer {
     canvas.restore();
   }
 
-  static LinearGradient auroraSeaGradient(double timeSeconds, {required Map<String, dynamic> config}) {
-    final period = (config['period_seconds'] as num).toDouble();
+  static LinearGradient auroraSeaGradient(
+    double timeSeconds, {
+    Map<String, dynamic>? config,
+    double opacity = 1.0,
+  }) {
+    final period = (config?['period_seconds'] as num?)?.toDouble() ?? 8.0;
     final phase = (timeSeconds % period) / period * pi * 2;
-    final palette = (config['palette'] as List).map((hex) =>
-      Color(0xFF000000 | int.parse((hex as String).substring(1), radix: 16))).toList();
-    final colors = [...palette, palette.first].map((color) {
-      final hsl = HSLColor.fromColor(color);
-      return hsl.withSaturation(hsl.saturation * (config['saturation_scale'] as num).toDouble())
-        .withLightness(0.73).toColor();
-    }).toList();
+
+    const palette = [
+      Color(0xFFA7D8F7),
+      Color(0xFF7FB8FF),
+      Color(0xFFC7B6F3),
+      Color(0xFFA7D8F7),
+    ];
+    final colors = [
+      for (final color in palette)
+        color.withValues(alpha: opacity),
+    ];
+
     return LinearGradient(
-      begin: Alignment(-1.1 + sin(phase) * 0.8, -0.8 + cos(phase) * 0.5),
-      end: Alignment(1.1 + sin(phase) * 0.8, 0.8 + cos(phase) * 0.5),
+      begin: Alignment(
+        -1.1 + sin(phase) * 0.8,
+        -0.8 + cos(phase) * 0.5,
+      ),
+      end: Alignment(
+        1.1 + sin(phase) * 0.8,
+        0.8 + cos(phase) * 0.5,
+      ),
       colors: colors,
     );
   }
@@ -281,6 +305,7 @@ class ShapeSpecRenderer {
     required ShapeStyleSpec style,
     required LockToken token,
     required double opacity,
+    required double paletteTimeSeconds,
   }) {
     final config = style.crayon;
     if (config == null) {
@@ -314,10 +339,19 @@ class ShapeSpecRenderer {
     );
     canvas.restore();
 
-    canvas.drawPath(
-      bodyPath,
-      Paint()..color = fill.withValues(alpha: opacity),
-    );
+    final basePaint = Paint();
+    if (token.tone == ShapeTone.auroraSea) {
+      basePaint
+        ..shader = auroraSeaGradient(
+          paletteTimeSeconds,
+          opacity: opacity,
+        ).createShader(
+          Rect.fromLTWH(0, 0, style.canvasSize, style.canvasSize),
+        );
+    } else {
+      basePaint.color = fill.withValues(alpha: opacity);
+    }
+    canvas.drawPath(bodyPath, basePaint);
 
     final cacheKey = '${style.id}:${style.version}:${token.id}';
     final texture = _crayonTextureCache.putIfAbsent(
@@ -577,12 +611,19 @@ class ShapeSpecRenderer {
   ) {
     switch (tone) {
       case ShapeTone.pink:
+      case ShapeTone.coralPink:
+      case ShapeTone.peachOrange:
         return (light: 0.88, shade: 1.12);
-      case ShapeTone.auroraSea:
       case ShapeTone.blue:
+      case ShapeTone.deepOcean:
+      case ShapeTone.aquaMint:
+      case ShapeTone.auroraSea:
         return (light: 0.84, shade: 1.00);
       case ShapeTone.yellow:
+      case ShapeTone.sandBeige:
         return (light: 0.68, shade: 1.30);
+      case ShapeTone.lavender:
+        return (light: 0.82, shade: 1.04);
     }
   }
 
