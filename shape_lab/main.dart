@@ -117,7 +117,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LAB 036 · Background Lab Gate 01 · Composition · Deploy',
+                                  'LABS-2026.10.03-R02 · Palette Lab · Aurora Sea Water Wave R1 · Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5614,7 +5614,7 @@ class _SelectedCandidatePanel extends StatelessWidget {
   }
 }
 
-class PaletteLab extends StatelessWidget {
+class PaletteLab extends StatefulWidget {
   const PaletteLab({
     super.key,
     required this.card,
@@ -5627,67 +5627,563 @@ class PaletteLab extends StatelessWidget {
   final Color muted;
 
   @override
+  State<PaletteLab> createState() => _PaletteLabState();
+}
+
+class _PaletteLabState extends State<PaletteLab>
+    with SingleTickerProviderStateMixin {
+  late final Ticker _ticker;
+  Duration _previous = Duration.zero;
+  double _seconds = 0;
+  bool _paused = false;
+  ui.Image? _paletteBase;
+  ui.Image? _fixedFinish;
+  Object? _loadError;
+
+  static const _candidates = <_WaterWaveCandidate>[
+    _WaterWaveCandidate(
+      id: 'W01',
+      name: 'Shallow Flash',
+      note: '밝은 얕은 바다. 빠른 Cyan/Aqua 수면광이 가장 즉각적으로 읽히는 안.',
+      colors: [
+        Color(0xFFC6F8FF),
+        Color(0xFF79E8F0),
+        Color(0xFF42BEEF),
+        Color(0xFF2387DF),
+      ],
+      periodSeconds: 5.2,
+      waveAmplitude: 0.052,
+      waveFrequency: 2.55,
+      causticOpacity: 0.52,
+      causticWidth: 0.030,
+      travel: 1.15,
+    ),
+    _WaterWaveCandidate(
+      id: 'W02',
+      name: 'Blue Current',
+      note: '기준안. Cyan → Aqua → Ocean → Deep Blue와 큰 물결 + 밝은 Caustic 이중 흐름.',
+      colors: [
+        Color(0xFFA8F3FF),
+        Color(0xFF53D8E8),
+        Color(0xFF2FA8F4),
+        Color(0xFF176BC6),
+      ],
+      periodSeconds: 5.8,
+      waveAmplitude: 0.066,
+      waveFrequency: 2.20,
+      causticOpacity: 0.60,
+      causticWidth: 0.034,
+      travel: 1.28,
+    ),
+    _WaterWaveCandidate(
+      id: 'W03',
+      name: 'Deep Wave',
+      note: '깊은 Ocean/Deep Blue 위에 선명한 Cyan 반사광이 지나가는 프리미엄형.',
+      colors: [
+        Color(0xFF73E0EE),
+        Color(0xFF329FD9),
+        Color(0xFF1767C4),
+        Color(0xFF0B397E),
+      ],
+      periodSeconds: 6.2,
+      waveAmplitude: 0.078,
+      waveFrequency: 1.92,
+      causticOpacity: 0.66,
+      causticWidth: 0.032,
+      travel: 1.36,
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProductionLayers();
+    _ticker = createTicker(_onTick)..start();
+  }
+
+  Future<ui.Image> _loadImage(String asset) async {
+    final data = await rootBundle.load(asset);
+    final codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+    );
+    final frame = await codec.getNextFrame();
+    codec.dispose();
+    return frame.image;
+  }
+
+  Future<void> _loadProductionLayers() async {
+    try {
+      final results = await Future.wait([
+        _loadImage(
+          'assets/raster_shapes/sea_turtle_v3_palette_base_256_v3.webp',
+        ),
+        _loadImage(
+          'assets/raster_shapes/sea_turtle_v3_fixed_finish_256_v3.webp',
+        ),
+      ]);
+      if (!mounted) {
+        for (final image in results) {
+          image.dispose();
+        }
+        return;
+      }
+      setState(() {
+        _paletteBase = results[0];
+        _fixedFinish = results[1];
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _loadError = error);
+    }
+  }
+
+  void _onTick(Duration elapsed) {
+    if (!mounted) return;
+    final delta = _previous == Duration.zero
+        ? 0.0
+        : (elapsed - _previous).inMicroseconds /
+            Duration.microsecondsPerSecond;
+    _previous = elapsed;
+    if (!_paused && delta > 0) {
+      _seconds += delta.clamp(0.0, 0.05).toDouble();
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    _paletteBase?.dispose();
+    _fixedFinish?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     const tones = [ShapeTone.pink, ShapeTone.blue, ShapeTone.yellow];
 
-    return _Panel(
-      color: card,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _Panel(
+          color: widget.card,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionTitle(
+                title: 'Aurora Sea · Water Wave R1',
+                subtitle:
+                    'Production C02는 잠금 유지. 동일 Sea Turtle Production Palette Base + Fixed Finish에서 바다색/물결 효과만 비교합니다.',
+                fg: widget.fg,
+                muted: widget.muted,
+              ),
+              const SizedBox(height: 10),
+              const Wrap(
+                spacing: 7,
+                runSpacing: 7,
+                children: [
+                  _ValueChip(label: 'Version', value: 'LABS-2026.10.03-R02'),
+                  _ValueChip(label: 'State', value: 'CANDIDATE'),
+                  _ValueChip(label: 'Source', value: 'Runtime v4 source'),
+                  _ValueChip(label: 'Production', value: 'LOCKED'),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '평가 기준: 1~2초 노출에서도 바다로 즉시 읽힘 · 색 변화 체감 큼 · 물결/수면광이 눈에 띔 · Fixed Finish 디테일 유지.',
+                style: TextStyle(
+                  color: widget.muted,
+                  fontSize: 11.5,
+                  height: 1.35,
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => setState(() => _paused = !_paused),
+                icon: Icon(
+                  _paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+                ),
+                label: Text(_paused ? '효과 재개' : '효과 멈춤'),
+              ),
+              const SizedBox(height: 14),
+              if (_loadError != null)
+                Text(
+                  'Production raster load error: $_loadError',
+                  style: const TextStyle(color: Colors.red),
+                )
+              else if (_paletteBase == null || _fixedFinish == null)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(28),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    const gap = 12.0;
+                    final columns = constraints.maxWidth >= 850 ? 3 : 1;
+                    final width =
+                        (constraints.maxWidth - gap * (columns - 1)) / columns;
+                    return Wrap(
+                      spacing: gap,
+                      runSpacing: gap,
+                      children: [
+                        for (final candidate in _candidates)
+                          SizedBox(
+                            width: width,
+                            child: _WaterWaveCandidateCard(
+                              candidate: candidate,
+                              paletteBase: _paletteBase!,
+                              fixedFinish: _fixedFinish!,
+                              timeSeconds: _seconds,
+                              fg: widget.fg,
+                              muted: widget.muted,
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        _Panel(
+          color: widget.card,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionTitle(
+                title: 'Core Palette Reference',
+                subtitle: '기존 기본 3색 Soft Basic / Crayon Soft 비교는 그대로 유지합니다.',
+                fg: widget.fg,
+                muted: widget.muted,
+              ),
+              const SizedBox(height: 16),
+              for (final tone in tones) ...[
+                Text(
+                  tone.label,
+                  style: TextStyle(
+                    color: widget.fg,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 18,
+                  runSpacing: 10,
+                  children: [
+                    _TokenWithLabel(
+                      shape: ShapeKind.circle,
+                      tone: tone,
+                      style: ShapeStyle.softBasic,
+                      label: 'Soft',
+                      muted: widget.muted,
+                    ),
+                    _TokenWithLabel(
+                      shape: ShapeKind.circle,
+                      tone: tone,
+                      style: ShapeStyle.crayonSoft,
+                      label: 'Crayon',
+                      muted: widget.muted,
+                    ),
+                    _TokenWithLabel(
+                      shape: ShapeKind.triangle,
+                      tone: tone,
+                      style: ShapeStyle.crayonSoft,
+                      label: 'Triangle',
+                      muted: widget.muted,
+                    ),
+                    _TokenWithLabel(
+                      shape: ShapeKind.square,
+                      tone: tone,
+                      style: ShapeStyle.crayonSoft,
+                      label: 'Square',
+                      muted: widget.muted,
+                    ),
+                  ],
+                ),
+                if (tone != tones.last) const SizedBox(height: 18),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _WaterWaveCandidateCard extends StatelessWidget {
+  const _WaterWaveCandidateCard({
+    required this.candidate,
+    required this.paletteBase,
+    required this.fixedFinish,
+    required this.timeSeconds,
+    required this.fg,
+    required this.muted,
+  });
+
+  final _WaterWaveCandidate candidate;
+  final ui.Image paletteBase;
+  final ui.Image fixedFinish;
+  final double timeSeconds;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget preview(double size, Color background) {
+      return Container(
+        width: size,
+        height: size,
+        color: background,
+        child: CustomPaint(
+          painter: _WaterWaveSeaTurtlePainter(
+            paletteBase: paletteBase,
+            fixedFinish: fixedFinish,
+            candidate: candidate,
+            timeSeconds: timeSeconds,
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: candidate.id == 'W02'
+            ? const Color(0xFFEAF8FF)
+            : const Color(0xFFF8F8FB),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: candidate.id == 'W02'
+              ? const Color(0xFF38AEE8)
+              : const Color(0xFFE4E5EB),
+          width: candidate.id == 'W02' ? 2 : 1,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionTitle(
-            title: 'Palette Lab',
-            subtitle: '기본 3색을 Soft Basic / Crayon Soft에 동일 적용해 색 구분을 확인합니다.',
-            fg: fg,
-            muted: muted,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '${candidate.id} · ${candidate.name}',
+                  style: TextStyle(
+                    color: fg,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              if (candidate.id == 'W02')
+                const Chip(
+                  visualDensity: VisualDensity.compact,
+                  label: Text(
+                    'BASE',
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+            ],
           ),
-          const SizedBox(height: 16),
-          for (final tone in tones) ...[
-            Text(
-              tone.label,
-              style: TextStyle(color: fg, fontWeight: FontWeight.w900),
+          Text(
+            candidate.note,
+            style: TextStyle(color: muted, fontSize: 10.5, height: 1.3),
+          ),
+          const SizedBox(height: 9),
+          Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: preview(190, const Color(0xFFF4FBFF)),
             ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 18,
-              runSpacing: 10,
-              children: [
-                _TokenWithLabel(
-                  shape: ShapeKind.circle,
-                  tone: tone,
-                  style: ShapeStyle.softBasic,
-                  label: 'Soft',
-                  muted: muted,
-                ),
-                _TokenWithLabel(
-                  shape: ShapeKind.circle,
-                  tone: tone,
-                  style: ShapeStyle.crayonSoft,
-                  label: 'Crayon',
-                  muted: muted,
-                ),
-                _TokenWithLabel(
-                  shape: ShapeKind.triangle,
-                  tone: tone,
-                  style: ShapeStyle.crayonSoft,
-                  label: 'Triangle',
-                  muted: muted,
-                ),
-                _TokenWithLabel(
-                  shape: ShapeKind.square,
-                  tone: tone,
-                  style: ShapeStyle.crayonSoft,
-                  label: 'Square',
-                  muted: muted,
-                ),
-              ],
+          ),
+          const SizedBox(height: 9),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: preview(58, const Color(0xFFF5FBFF)),
+              ),
+              const SizedBox(width: 10),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: preview(58, const Color(0xFF071A2D)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 7),
+          Center(
+            child: Text(
+              '58px · Light / Dark',
+              style: TextStyle(
+                color: muted,
+                fontSize: 9.5,
+                fontWeight: FontWeight.w800,
+              ),
             ),
-            if (tone != tones.last) const SizedBox(height: 18),
-          ],
+          ),
         ],
       ),
     );
   }
+}
+
+class _WaterWaveSeaTurtlePainter extends CustomPainter {
+  const _WaterWaveSeaTurtlePainter({
+    required this.paletteBase,
+    required this.fixedFinish,
+    required this.candidate,
+    required this.timeSeconds,
+  });
+
+  final ui.Image paletteBase;
+  final ui.Image fixedFinish;
+  final _WaterWaveCandidate candidate;
+  final double timeSeconds;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final src = Rect.fromLTWH(
+      0,
+      0,
+      paletteBase.width.toDouble(),
+      paletteBase.height.toDouble(),
+    );
+    final dest = Offset.zero & size;
+    final phase = (timeSeconds / candidate.periodSeconds) * pi * 2;
+
+    final gradientShift = sin(phase) * candidate.travel;
+    final gradient = LinearGradient(
+      begin: Alignment(-1.25 + gradientShift, -0.75 + cos(phase) * 0.34),
+      end: Alignment(1.25 + gradientShift, 0.75 + sin(phase) * 0.34),
+      colors: [...candidate.colors, candidate.colors.first],
+      stops: const [0.0, 0.22, 0.52, 0.82, 1.0],
+    );
+
+    // Candidate color field + caustic wave are clipped by the exact
+    // Production Palette Base alpha. Fixed Finish is composited afterwards.
+    canvas.saveLayer(dest, Paint());
+    canvas.drawRect(
+      dest,
+      Paint()..shader = gradient.createShader(dest),
+    );
+
+    final wavePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..blendMode = BlendMode.screen
+      ..color = const Color(0xFFD6FAFF)
+          .withValues(alpha: candidate.causticOpacity);
+
+    final secondaryPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..blendMode = BlendMode.screen
+      ..color = const Color(0xFF7EEBFF)
+          .withValues(alpha: candidate.causticOpacity * 0.52);
+
+    final side = size.shortestSide;
+    for (var band = 0; band < 4; band++) {
+      final baseY =
+          size.height * (0.20 + band * 0.20) +
+          sin(phase * 1.22 + band * 1.17) * side * 0.075;
+      final path = Path();
+      const steps = 42;
+      for (var i = 0; i <= steps; i++) {
+        final x = size.width * i / steps;
+        final normalizedX = i / steps;
+        final y = baseY +
+            sin(
+                  normalizedX * pi * 2 * candidate.waveFrequency +
+                      phase * 1.55 +
+                      band * 0.82,
+                ) *
+                side *
+                candidate.waveAmplitude +
+            sin(normalizedX * pi * 4.4 - phase * 0.72) *
+                side *
+                candidate.waveAmplitude *
+                0.28;
+        if (i == 0) {
+          path.moveTo(x, y);
+        } else {
+          path.lineTo(x, y);
+        }
+      }
+      wavePaint.strokeWidth =
+          max(1.0, side * candidate.causticWidth * (band.isEven ? 1.0 : 0.72));
+      secondaryPaint.strokeWidth = max(0.8, wavePaint.strokeWidth * 0.46);
+      canvas.drawPath(path, wavePaint);
+      canvas.save();
+      canvas.translate(
+        0,
+        side * (0.025 + 0.012 * sin(phase + band)),
+      );
+      canvas.drawPath(path, secondaryPaint);
+      canvas.restore();
+    }
+
+    canvas.drawImageRect(
+      paletteBase,
+      src,
+      dest,
+      Paint()
+        ..filterQuality = FilterQuality.high
+        ..blendMode = BlendMode.dstIn,
+    );
+    canvas.restore();
+
+    canvas.drawImageRect(
+      fixedFinish,
+      Rect.fromLTWH(
+        0,
+        0,
+        fixedFinish.width.toDouble(),
+        fixedFinish.height.toDouble(),
+      ),
+      dest,
+      Paint()..filterQuality = FilterQuality.high,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _WaterWaveSeaTurtlePainter oldDelegate) =>
+      oldDelegate.timeSeconds != timeSeconds ||
+      oldDelegate.candidate != candidate ||
+      oldDelegate.paletteBase != paletteBase ||
+      oldDelegate.fixedFinish != fixedFinish;
+}
+
+class _WaterWaveCandidate {
+  const _WaterWaveCandidate({
+    required this.id,
+    required this.name,
+    required this.note,
+    required this.colors,
+    required this.periodSeconds,
+    required this.waveAmplitude,
+    required this.waveFrequency,
+    required this.causticOpacity,
+    required this.causticWidth,
+    required this.travel,
+  });
+
+  final String id;
+  final String name;
+  final String note;
+  final List<Color> colors;
+  final double periodSeconds;
+  final double waveAmplitude;
+  final double waveFrequency;
+  final double causticOpacity;
+  final double causticWidth;
+  final double travel;
 }
 
 class EffectLab extends StatefulWidget {
