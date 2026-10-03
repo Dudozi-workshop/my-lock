@@ -45,13 +45,21 @@
   "aurora": {
     "period_seconds": 8,
     "palette": [
-      "#79BFFF",
-      "#FF8FD1",
-      "#FFDA72",
-      "#B7A4DF"
+      "#A7D8F7",
+      "#7FB8FF",
+      "#9FA8F2",
+      "#C7B6F3"
     ],
-    "saturation_scale": 0.55,
-    "hue_field": "moving periodic 2D local gradient"
+    "hue_field": "moving periodic 2D local gradient",
+    "moving_layer": "base color/albedo only",
+    "fixed_layers": [
+      "shadow",
+      "pattern",
+      "division lines",
+      "highlight",
+      "outline"
+    ],
+    "note": "Aurora Sea v2 cool-spectrum master; no yellow or strong pink; authored colors used directly without HSL remapping"
   },
   "qa": {
     "canvas_edge_alpha_pixels": 0,
