@@ -36,19 +36,20 @@ void main() {
     expect(ShapeTone.auroraSea.directSale, isFalse);
   });
 
-  test('Aurora Sea v2 uses the approved cool-spectrum master', () {
+  test('Aurora Sea Final v2 uses locked C02 Quick Signature', () {
     final start = ShapeSpecRenderer.auroraSeaGradient(0);
-    final loop = ShapeSpecRenderer.auroraSeaGradient(8);
+    final loop = ShapeSpecRenderer.auroraSeaGradient(6.5);
     expect(start.colors, const [
-      Color(0xFFA7D8F7),
-      Color(0xFF7FB8FF),
-      Color(0xFF9FA8F2),
-      Color(0xFFC7B6F3),
-      Color(0xFFA7D8F7),
+      Color(0xFF91D5F4),
+      Color(0xFF66ADEB),
+      Color(0xFF8A9BEF),
+      Color(0xFFB7A9EC),
+      Color(0xFF91D5F4),
     ]);
     expect(start.begin, loop.begin);
     expect(start.end, loop.end);
     expect(start.colors, loop.colors);
+    expect(start.stops, const [0.0, 0.18, 0.50, 0.82, 1.0]);
   });
 
   group('vector palette rendering', () {
