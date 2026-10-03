@@ -21,6 +21,8 @@ void main() {
       ShapeTone.peachOrange,
     });
     expect(ShapeTone.drop01Signature, ShapeTone.auroraSea);
+    expect(ShapeTone.lavender.label, '젤리 바이올렛');
+    expect(ShapeTone.peachOrange.label, '쉘 피치');
 
     expect(baseColorForTone(ShapeTone.deepOcean), const Color(0xFF4F8EDB));
     expect(baseColorForTone(ShapeTone.aquaMint), const Color(0xFF7CCFC4));
@@ -34,11 +36,16 @@ void main() {
     expect(ShapeTone.auroraSea.directSale, isFalse);
   });
 
-  test('Aurora Sea follows the active Runtime v3 timing contract', () {
+  test('Aurora Sea v2 uses the approved cool-spectrum master', () {
     final start = ShapeSpecRenderer.auroraSeaGradient(0);
     final loop = ShapeSpecRenderer.auroraSeaGradient(8);
-    expect(start.colors.length, 5);
-    expect(start.colors.first, start.colors.last);
+    expect(start.colors, const [
+      Color(0xFFA7D8F7),
+      Color(0xFF7FB8FF),
+      Color(0xFF9FA8F2),
+      Color(0xFFC7B6F3),
+      Color(0xFFA7D8F7),
+    ]);
     expect(start.begin, loop.begin);
     expect(start.end, loop.end);
     expect(start.colors, loop.colors);
