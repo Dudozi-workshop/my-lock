@@ -3,7 +3,6 @@ name: MY LOCK Integrated Labs
 on:
   push:
     branches:
-      - main
       - feat/style-lab-integration
   pull_request:
     branches:

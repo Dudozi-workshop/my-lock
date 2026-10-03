@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "updated": "2026-10-03",
+  "rule": "Never mix route families across hosts. ?qa= belongs only to main_preview; ?lab= belongs only to integrated_labs.",
+  "surfaces": {
+    "main_preview": {
+      "base_url": "https://my-lock-preview.rlatkd5959.workers.dev/",
+      "query_family": "qa",
+      "routes": {
+        "sea_turtle_app_integration": "?qa=sea-turtle-app-integration",
+        "aurora_sea_palette_round1": "?qa=aurora-sea-palette-round1",
+        "sea_turtle_swim_v1": "?qa=sea-turtle-swim-v1",
+        "background_composition": "?qa=background-composition"
+      },
+      "static_paths": {
+        "asset_book": "asset-book/"
+      }
+    },
+    "integrated_labs": {
+      "base_url": "https://my-lock-shape-lab-pages.pages.dev/",
+      "query_family": "lab",
+      "routes": {
+        "background": "?lab=background",
+        "shape": "?lab=shape",
+        "style": "?lab=style",
+        "palette": "?lab=palette",
+        "effect": "?lab=effect",
+        "runtime_qa": "?lab=qa"
+      }
+    }
+  }
+}

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../lock_engine/models.dart';
 import '../../lock_engine/raster_palette_clock.dart';
-import '../../lock_engine/shape_spec/shape_spec_registry.dart';
 import '../../lock_engine/shape_spec/shape_spec_renderer.dart';
 
 class AuroraSeaPaletteLabScreen extends StatefulWidget {
