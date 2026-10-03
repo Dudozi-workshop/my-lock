@@ -11,9 +11,12 @@
     "LABS": {
       "canonical_url": "https://my-lock-shape-lab-pages.pages.dev",
       "deploy_target": "my-lock-shape-lab-pages",
-      "version": "LABS-2026.10.03-R01",
-      "purpose": "Integrated production workbench for creation, comparison, QA, and asset registry",
-      "status": "QA / Candidate"
+      "version": "LABS-2026.10.03-R02",
+      "purpose": "Integrated Palette Lab comparison for Aurora Sea Water Wave R1 candidates using locked Sea Turtle production raster sources",
+      "status": "QA / Candidate",
+      "scope": "Palette Lab · Aurora Sea Water Wave R1 · W01/W02/W03",
+      "source_branch": "feat/style-lab-integration",
+      "source_commit": "87e0a63edaf2a419c9a11d07b255f980a51ba791"
     }
   }
 }
