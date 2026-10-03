@@ -274,34 +274,25 @@ class ShapeSpecRenderer {
   }) {
     final period = (config?['period_seconds'] as num?)?.toDouble() ?? 8.0;
     final rawPalette = (config?['palette'] as List<dynamic>?) ??
-        const ['#79BFFF', '#FF8FD1', '#FFDA72', '#B7A4DF'];
-    final saturationScale =
-        (config?['saturation_scale'] as num?)?.toDouble() ?? 0.55;
-    final lightness = (config?['lightness'] as num?)?.toDouble() ?? 0.73;
+        const ['#A7D8F7', '#7FB8FF', '#9FA8F2', '#C7B6F3'];
     final phase = (timeSeconds % period) / period * pi * 2;
 
     final palette = rawPalette.map((rawHex) {
       final hex = rawHex as String;
-      final color = Color(
+      return Color(
         0xFF000000 | int.parse(hex.substring(1), radix: 16),
-      );
-      final hsl = HSLColor.fromColor(color);
-      return hsl
-          .withSaturation((hsl.saturation * saturationScale).clamp(0.0, 1.0))
-          .withLightness(lightness.clamp(0.0, 1.0))
-          .toColor()
-          .withValues(alpha: opacity);
+      ).withValues(alpha: opacity);
     }).toList(growable: false);
     final colors = [...palette, palette.first];
 
     return LinearGradient(
       begin: Alignment(
-        -1.1 + sin(phase) * 0.8,
-        -0.8 + cos(phase) * 0.5,
+        -1.05 + sin(phase) * 0.7,
+        -0.70 + cos(phase) * 0.42,
       ),
       end: Alignment(
-        1.1 + sin(phase) * 0.8,
-        0.8 + cos(phase) * 0.5,
+        1.05 + sin(phase) * 0.7,
+        0.70 + cos(phase) * 0.42,
       ),
       colors: colors,
     );
