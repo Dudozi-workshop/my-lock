@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../features/qa/aurora_sea_palette_lab_screen.dart';
 import '../features/qa/aurora_sea_palette_round2_screen.dart';
+import '../features/qa/aurora_sea_palette_round3_screen.dart';
 import '../features/qa/background_composition_lab_screen.dart';
 import '../features/qa/lab_home_screen.dart';
 import '../features/qa/sea_turtle_app_integration_qa_screen.dart';
@@ -44,6 +45,8 @@ class MyLockApp extends StatelessWidget {
         kIsWeb && qa == 'aurora-sea-palette-round1';
     final showAuroraSeaPaletteRound2 =
         kIsWeb && qa == 'aurora-sea-palette-round2';
+    final showAuroraSeaPaletteRound3 =
+        kIsWeb && qa == 'aurora-sea-palette-round3';
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -58,8 +61,10 @@ class MyLockApp extends StatelessWidget {
       home: RasterShapeBootstrap(
         child: showLabHome
             ? const LabHomeScreen()
-            : showAuroraSeaPaletteRound2
-                ? const AuroraSeaPaletteRound2Screen()
+            : showAuroraSeaPaletteRound3
+                ? const AuroraSeaPaletteRound3Screen()
+                : showAuroraSeaPaletteRound2
+                    ? const AuroraSeaPaletteRound2Screen()
                 : showAuroraSeaPaletteLab
                     ? const AuroraSeaPaletteLabScreen()
                     : showBackgroundCompositionLab
