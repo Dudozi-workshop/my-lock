@@ -155,7 +155,7 @@ jobs:
           echo "summary_file=/tmp/my-lock-change-summary.txt" >> "$GITHUB_OUTPUT"
 
       - name: Email APK
-        if: ${{ success() }}
+        if: ${{ success() && !contains(github.event.head_commit.message, '[skip-apk-email]') }}
         env:
           SMTP_USERNAME: ${{ secrets.APK_MAIL_USERNAME }}
           SMTP_APP_PASSWORD: ${{ secrets.APK_MAIL_APP_PASSWORD }}

@@ -7,6 +7,7 @@ import '../water_refraction_field.dart';
 import '../swim_pose_runtime.dart';
 import 'shape_spec.dart';
 import 'shape_spec_registry.dart';
+import 'candy_soft_runtime.dart';
 
 class ShapeSpecRenderer {
   const ShapeSpecRenderer._();
@@ -31,7 +32,12 @@ class ShapeSpecRenderer {
     String? swimKey,
     String swimProfile = 'standard',
     Map<String, dynamic>? auroraConfigOverride,
+    bool useCandySoft = true,
   }) {
+    if (useCandySoft && CandySoftRuntime.instance.paint(
+      canvas, center: center, radius: radius, token: token, style: style,
+      opacity: opacity, rotation: objectRotation,
+    )) return;
     final registry = ShapeSpecRegistry.instance;
     if (registry.isRasterShape(token.shape)) {
       _paintRasterToken(
