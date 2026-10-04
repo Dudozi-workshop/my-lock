@@ -16,6 +16,7 @@ import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
 import 'soft_basic_candidates.dart';
 import 'background_asset_registry.dart';
 import 'water_refraction_field.dart';
+import 'surface_refraction_field.dart';
 import 'candy_soft_review.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
 
@@ -5218,6 +5219,41 @@ extension on _SurfaceRefractionCandidate {
     _SurfaceRefractionCandidate.softPrism => 'Planning Master의 Peach/Pink 반사광을 가장 적극적으로 반영',
     _SurfaceRefractionCandidate.livingSurface => 'Cyan/White 중심 · 물이 살아있는 체감이 가장 큼',
   };
+  SurfaceRefractionProfile get profile => switch (this) {
+    _SurfaceRefractionCandidate.calmBroad => const SurfaceRefractionProfile(
+        mode: SurfaceRefractionMode.broadField,
+        seed: 101,
+        speed: .34,
+        scale: 1.55,
+        warp: .28,
+        energy: .34,
+        softness: .86,
+        warmth: .06,
+        topFraction: .42,
+      ),
+    _SurfaceRefractionCandidate.softPrism => const SurfaceRefractionProfile(
+        mode: SurfaceRefractionMode.surfaceSweep,
+        seed: 211,
+        speed: .42,
+        scale: 1.82,
+        warp: .36,
+        energy: .38,
+        softness: .78,
+        warmth: .18,
+        topFraction: .46,
+      ),
+    _SurfaceRefractionCandidate.livingSurface => const SurfaceRefractionProfile(
+        mode: SurfaceRefractionMode.organicCaustic,
+        seed: 307,
+        speed: .50,
+        scale: 2.20,
+        warp: .44,
+        energy: .42,
+        softness: .70,
+        warmth: .04,
+        topFraction: .48,
+      ),
+  };
 }
 
 enum _BackgroundWorkbenchStep { image, effects, composite, finalState }
@@ -5911,8 +5947,8 @@ class _BackgroundLabState extends State<BackgroundLab>
                     ),
                     if (showSurface)
                       CustomPaint(
-                        painter: _SurfaceRefractionPainter(
-                          candidate: candidate,
+                        painter: SurfaceRefractionFieldPainter(
+                          profile: candidate.profile,
                           animation: _surfaceClock,
                           intensity: intensity,
                         ),
@@ -6057,8 +6093,8 @@ class _BackgroundLabState extends State<BackgroundLab>
                     ),
                     if (showSurface)
                       CustomPaint(
-                        painter: _SurfaceRefractionPainter(
-                          candidate: selected,
+                        painter: SurfaceRefractionFieldPainter(
+                          profile: selected.profile,
                           animation: _surfaceClock,
                           intensity: intensity,
                         ),
@@ -6319,161 +6355,6 @@ class _BackgroundSafeZonePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _BackgroundSafeZonePainter oldDelegate) => false;
 }
-
-class _SurfaceRefractionPainter extends CustomPainter {
-  _SurfaceRefractionPainter({
-    required this.candidate,
-    required Animation<double> animation,
-    required this.intensity,
-  })  : animation = animation,
-        super(repaint: animation);
-
-  final _SurfaceRefractionCandidate candidate;
-  final Animation<double> animation;
-  final double intensity;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final t = animation.value * pi * 2;
-    final h = size.height * .31;
-    canvas.save();
-    canvas.clipRect(Rect.fromLTWH(0, 0, size.width, h));
-
-    final config = switch (candidate) {
-      _SurfaceRefractionCandidate.calmBroad => (
-          cells: 7,
-          alpha: .20,
-          scale: 1.30,
-          speed: .55,
-          peach: .20,
-          cyan: .24,
-        ),
-      _SurfaceRefractionCandidate.softPrism => (
-          cells: 9,
-          alpha: .25,
-          scale: 1.00,
-          speed: .72,
-          peach: .48,
-          cyan: .20,
-        ),
-      _SurfaceRefractionCandidate.livingSurface => (
-          cells: 12,
-          alpha: .28,
-          scale: .78,
-          speed: 1.05,
-          peach: .12,
-          cyan: .48,
-        ),
-    };
-
-    final veil = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          const Color(0xFFFFC4CF).withValues(
-            alpha: config.peach * .32 * intensity,
-          ),
-          Colors.white.withValues(alpha: .12 * intensity),
-          const Color(0xFFB8F4F2).withValues(
-            alpha: config.cyan * .42 * intensity,
-          ),
-          Colors.transparent,
-        ],
-        stops: const [0, .28, .56, 1],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, h));
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, h), veil);
-
-    for (var i = 0; i < config.cells; i++) {
-      final seed = i * 1.731;
-      final baseX = ((i * 0.61803398875) % 1.0) * size.width;
-      final baseY = (.03 + ((i * .287) % .22)) * size.height;
-      final driftX = sin(t * config.speed + seed) * size.width * .045;
-      final driftY = cos(t * config.speed * .83 + seed * .7) * h * .08;
-      final radius =
-          size.width * (.075 + ((i * .037) % .045)) * config.scale;
-
-      final center = Offset(baseX + driftX, baseY + driftY);
-      final path = Path();
-      const points = 9;
-      for (var p = 0; p < points; p++) {
-        final a = p / points * pi * 2;
-        final warp = 1 +
-            sin(a * 3 + seed + t * config.speed * .6) * .16 +
-            cos(a * 2 - t * config.speed * .4 + seed) * .09;
-        final rx = radius * warp;
-        final ry = radius * .46 * (1 + sin(a * 2 + seed) * .10);
-        final point = Offset(
-          center.dx + cos(a) * rx,
-          center.dy + sin(a) * ry,
-        );
-        if (p == 0) {
-          path.moveTo(point.dx, point.dy);
-        } else {
-          path.lineTo(point.dx, point.dy);
-        }
-      }
-      path.close();
-
-      final isWarm = candidate == _SurfaceRefractionCandidate.softPrism &&
-          i % 3 == 0;
-      final cellColor = isWarm
-          ? const Color(0xFFFFD0D6)
-          : (i.isEven
-              ? const Color(0xFFD8FFFF)
-              : const Color(0xFFFFFFFF));
-
-      final glow = Paint()
-        ..color = cellColor.withValues(
-          alpha: config.alpha * .38 * intensity,
-        )
-        ..maskFilter = MaskFilter.blur(
-          BlurStyle.normal,
-          max(4.0, size.width * .018),
-        )
-        ..blendMode = BlendMode.screen;
-      canvas.drawPath(path, glow);
-
-      final core = Paint()
-        ..color = cellColor.withValues(
-          alpha: config.alpha * .34 * intensity,
-        )
-        ..style = PaintingStyle.fill
-        ..blendMode = BlendMode.screen;
-      canvas.drawPath(path, core);
-    }
-
-    final broad = Paint()
-      ..color = Colors.white.withValues(alpha: .10 * intensity)
-      ..maskFilter = MaskFilter.blur(
-        BlurStyle.normal,
-        max(8.0, size.width * .028),
-      )
-      ..blendMode = BlendMode.screen;
-    final y = h * (.18 + sin(t * .34) * .035);
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(
-          size.width * (.50 + sin(t * .29) * .06),
-          y,
-        ),
-        width: size.width * 1.15,
-        height: h * .22,
-      ),
-      broad,
-    );
-
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant _SurfaceRefractionPainter oldDelegate) {
-    return oldDelegate.candidate != candidate ||
-        oldDelegate.intensity != intensity ||
-        oldDelegate.animation != animation;
-  }
-}
-
 
 class JellyfishMultiColorExperiment extends StatelessWidget {
   const JellyfishMultiColorExperiment({
