@@ -35,6 +35,9 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Validate Background assets
+        run: python3 tool/validate_background_assets.py
+
       - name: Validate ShapeSpec masks
         run: python3 tool/validate_shape_masks.py
 
@@ -91,6 +94,10 @@ jobs:
           curl --fail --show-error --silent --location             --retry 5 --retry-delay 3 --retry-all-errors             --output /tmp/pages-index.html             "$PRIMARY_URL"
           grep -q "<html" /tmp/pages-index.html
           grep -q "flutter_bootstrap.js" /tmp/pages-index.html
+          ASSET_URL="${PRIMARY_URL}assets/assets/backgrounds/drop01/shallow_clear_base_v1.webp"
+          curl --fail --show-error --silent --location --retry 5 --retry-delay 3 --retry-all-errors --output /tmp/shallow_clear_base_v1.webp "$ASSET_URL"
+          test "$(wc -c < /tmp/shallow_clear_base_v1.webp | tr -d ' ')" = "27242"
+          echo "e04aa1a84cbac0d6635fed2d67b703c81ebb9353d3894e7a6e9af18e7a05c599  /tmp/shallow_clear_base_v1.webp" | sha256sum -c -
 
       - name: Verify R2 release identity
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
