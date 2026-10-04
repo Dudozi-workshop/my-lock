@@ -21,6 +21,7 @@ class ShapeSpecRegistry {
 
   static const Map<ShapeKind, String> _rasterShapeAssets = {
     ShapeKind.seaTurtle: 'assets/raster_shapes/sea_turtle_v3_runtime_v5.json',
+    ShapeKind.starfish: 'assets/raster_shapes/starfish_runtime_v1.json',
   };
   bool _loaded = false;
 
