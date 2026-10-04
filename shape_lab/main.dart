@@ -6553,6 +6553,8 @@ class _BackgroundLabState extends State<BackgroundLab>
   late final AnimationController _surfaceClock;
 
   int selectedBackground = 0;
+  int selectedRatio = 2;
+  bool showSafeZone = true;
   _BackgroundWorkbenchStep step = _BackgroundWorkbenchStep.image;
   _SurfaceRefractionCandidate selected = _SurfaceRefractionCandidate.calmBroad;
   bool showSurface = true;
@@ -6563,6 +6565,14 @@ class _BackgroundLabState extends State<BackgroundLab>
     ('01', '투명한 얕은 바다', 'Image Selected · Effects In Progress'),
     ('02', '바닷속 하루', 'Not Started'),
     ('03', '고요한 심해', 'Not Started'),
+  ];
+
+  static const deviceRatios = [
+    ('16:9', 9 / 16, 'Legacy / short'),
+    ('18:9', 9 / 18, 'Tall'),
+    ('19.5:9', 9 / 19.5, 'Common'),
+    ('20:9', 9 / 20, 'Common tall'),
+    ('21:9', 9 / 21, 'Extreme tall'),
   ];
 
   @override
@@ -6809,6 +6819,10 @@ class _BackgroundLabState extends State<BackgroundLab>
               );
             },
           ),
+          const SizedBox(height: 18),
+          Divider(color: widget.muted.withValues(alpha: .18)),
+          const SizedBox(height: 12),
+          _deviceRatioQa(),
         ],
       ),
     );
@@ -6838,6 +6852,110 @@ class _BackgroundLabState extends State<BackgroundLab>
               height: 1.4,
               fontWeight: FontWeight.w800,
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _deviceRatioQa() {
+    final ratio = deviceRatios[selectedRatio];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Device Ratio QA',
+                    style: TextStyle(
+                      color: widget.fg,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '같은 Base를 기기 비율별 BoxFit.cover로 표시해 실제 잘림과 Play Field를 확인합니다.',
+                    style: TextStyle(
+                      color: widget.muted,
+                      fontSize: 11,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            FilterChip(
+              label: const Text('Safe Zone'),
+              selected: showSafeZone,
+              onSelected: (v) => setState(() => showSafeZone = v),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              for (var i = 0; i < deviceRatios.length; i++) ...[
+                if (i > 0) const SizedBox(width: 7),
+                ChoiceChip(
+                  label: Text(deviceRatios[i].$1),
+                  selected: selectedRatio == i,
+                  onSelected: (_) => setState(() => selectedRatio = i),
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 330),
+            child: AspectRatio(
+              aspectRatio: ratio.$2,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      'assets/backgrounds/drop01/shallow_clear_base_v1.webp',
+                      fit: BoxFit.cover,
+                      alignment: Alignment.center,
+                      gaplessPlayback: true,
+                    ),
+                    if (showSafeZone)
+                      IgnorePointer(
+                        child: CustomPaint(
+                          painter: _BackgroundSafeZonePainter(),
+                        ),
+                      ),
+                    Positioned(
+                      left: 10,
+                      top: 10,
+                      child: _previewBadge(ratio.$1 + ' · ' + ratio.$3),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'QA 원칙: 배경은 늘리거나 찌그러뜨리지 않고 cover crop을 사용합니다. '
+          '핵심 오브젝트와 중앙 Play Field는 모든 지원 비율의 공통 Safe Zone 안에서 유지되어야 합니다. '
+          '현재 Base가 특정 비율에서 잘리면 Base를 억지로 스케일하지 않고 Production Background Master의 overscan/anchor 설계를 수정합니다.',
+          style: TextStyle(
+            color: widget.muted,
+            fontSize: 11,
+            height: 1.45,
           ),
         ),
       ],
@@ -7450,6 +7568,46 @@ class _BackgroundLabState extends State<BackgroundLab>
       ),
     );
   }
+}
+
+class _BackgroundSafeZonePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final safe = Rect.fromLTWH(
+      size.width * .10,
+      size.height * .08,
+      size.width * .80,
+      size.height * .84,
+    );
+
+    final shade = Paint()..color = Colors.black.withValues(alpha: .12);
+    final outer = Path()..addRect(Offset.zero & size);
+    final inner = Path()..addRRect(RRect.fromRectAndRadius(safe, const Radius.circular(18)));
+    final cut = Path.combine(PathOperation.difference, outer, inner);
+    canvas.drawPath(cut, shade);
+
+    final line = Paint()
+      ..color = Colors.white.withValues(alpha: .88)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(safe, const Radius.circular(18)),
+      line,
+    );
+
+    final centerLine = Paint()
+      ..color = Colors.white.withValues(alpha: .36)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    canvas.drawLine(
+      Offset(size.width * .5, safe.top),
+      Offset(size.width * .5, safe.bottom),
+      centerLine,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _BackgroundSafeZonePainter oldDelegate) => false;
 }
 
 class _SurfaceRefractionPainter extends CustomPainter {
