@@ -124,7 +124,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R10 · Background Effects · Solo Review',
+                                  'LABS-2026.10.04-R11 · Background Effects · Floor Caustic v2',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
