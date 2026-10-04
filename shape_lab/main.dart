@@ -5752,11 +5752,63 @@ class _PaletteLabState extends State<PaletteLab>
 
   @override
   Widget build(BuildContext context) {
+    final experiment = Uri.base.queryParameters['experiment'];
+    if (experiment == 'jellyfish-multicolor') {
+      return JellyfishMultiColorExperiment(
+        card: widget.card,
+        fg: widget.fg,
+        muted: widget.muted,
+      );
+    }
+
     const tones = [ShapeTone.pink, ShapeTone.blue, ShapeTone.yellow];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        _Panel(
+          color: widget.card,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionTitle(
+                title: 'Experimental · Jellyfish Multi-Color',
+                subtitle:
+                    'Production Palette와 분리된 별도 실험. 선정된 Jellyfish R4 Static Master를 잠근 뒤 Color Weight Map 기반 정적 Multi-Color 가능성을 검증합니다.',
+                fg: widget.fg,
+                muted: widget.muted,
+              ),
+              const SizedBox(height: 10),
+              const Wrap(
+                spacing: 7,
+                runSpacing: 7,
+                children: [
+                  _ValueChip(label: 'Class', value: 'Palette Lab / Experimental'),
+                  _ValueChip(label: 'Experiment', value: 'jellyfish-multicolor'),
+                  _ValueChip(label: 'State', value: 'POC / NOT PRODUCTION'),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: FilledButton.tonal(
+                  onPressed: () {
+                    final next = Uri.base.replace(
+                      queryParameters: {
+                        ...Uri.base.queryParameters,
+                        'lab': 'palette',
+                        'experiment': 'jellyfish-multicolor',
+                      },
+                    );
+                    SystemNavigator.routeInformationUpdated(uri: next, replace: true);
+                  },
+                  child: const Text('Multi-Color 실험 열기'),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
         _Panel(
           color: widget.card,
           child: Column(
@@ -7760,5 +7812,181 @@ class _SurfaceRefractionPainter extends CustomPainter {
     return oldDelegate.candidate != candidate ||
         oldDelegate.intensity != intensity ||
         oldDelegate.animation != animation;
+  }
+}
+
+
+class JellyfishMultiColorExperiment extends StatelessWidget {
+  const JellyfishMultiColorExperiment({
+    super.key,
+    required this.card,
+    required this.fg,
+    required this.muted,
+  });
+
+  final Color card;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    const palettes = <({String name, List<Color> colors})>[
+      (
+        name: 'Original',
+        colors: [Color(0xFF8FCBFF), Color(0xFFB7A8F2), Color(0xFFF2B7DD), Color(0xFFFFE8C8)],
+      ),
+      (
+        name: 'Ocean Dream',
+        colors: [Color(0xFF7FC8FF), Color(0xFFB8A7F2), Color(0xFFFFE7C7), Color(0xFF7098E8)],
+      ),
+      (
+        name: 'Coral Dawn',
+        colors: [Color(0xFFFF9FBA), Color(0xFFFFC5A8), Color(0xFFFFF0D2), Color(0xFFC88BE8)],
+      ),
+      (
+        name: 'Moon Jelly',
+        colors: [Color(0xFFA9D5FF), Color(0xFFC5B2F4), Color(0xFFF8ECFF), Color(0xFF7F91D8)],
+      ),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _Panel(
+          color: card,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionTitle(
+                title: 'Jellyfish Multi-Color · Experimental',
+                subtitle:
+                    'Palette Lab 하위의 독립 실험 기능입니다. Production Color / Signature Color와 분리하며, Master Geometry·Alpha·Motion은 변경하지 않습니다.',
+                fg: fg,
+                muted: muted,
+              ),
+              const SizedBox(height: 10),
+              const Wrap(
+                spacing: 7,
+                runSpacing: 7,
+                children: [
+                  _ValueChip(label: 'Route', value: '?lab=palette&experiment=jellyfish-multicolor'),
+                  _ValueChip(label: 'Scope', value: 'Jellyfish R4 only'),
+                  _ValueChip(label: 'Status', value: 'POC / Candidate'),
+                  _ValueChip(label: 'Production', value: 'NO'),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Gate: Static Master LOCK → Color/Light decomposition → 4-region soft Weight Map → Multi-Color render → 58px QA → 별도 승인 후에만 공통 Color System 후보로 승격',
+                style: TextStyle(color: muted, height: 1.45),
+              ),
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: OutlinedButton(
+                  onPressed: () {
+                    final query = Map<String, String>.from(Uri.base.queryParameters)
+                      ..['lab'] = 'palette'
+                      ..remove('experiment');
+                    final next = Uri.base.replace(queryParameters: query);
+                    SystemNavigator.routeInformationUpdated(uri: next, replace: true);
+                  },
+                  child: const Text('Palette Lab으로 돌아가기'),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        _Panel(
+          color: card,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionTitle(
+                title: 'PoC Palette Set',
+                subtitle:
+                    '현재는 색 조합과 분류만 보존합니다. 실제 Jellyfish Master 파생 렌더는 Master LOCK 이후 durable asset으로 연결합니다.',
+                fg: fg,
+                muted: muted,
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  for (final palette in palettes)
+                    Container(
+                      width: 220,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: card,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: muted.withValues(alpha: 0.22)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            palette.name,
+                            style: TextStyle(
+                              color: fg,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              for (final color in palette.colors)
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 7),
+                                  child: Container(
+                                    width: 28,
+                                    height: 28,
+                                    decoration: BoxDecoration(
+                                      color: color,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: fg.withValues(alpha: 0.08),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        _Panel(
+          color: card,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionTitle(
+                title: 'Separation Rule',
+                subtitle: '이 실험이 Production Palette를 오염시키지 않도록 명시적으로 분리합니다.',
+                fg: fg,
+                muted: muted,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '• 일반 6색 / Aurora Sea Final에는 영향 없음\n'
+                '• Jellyfish Authoritative Master 승격과 별개\n'
+                '• Weight Map은 파생 실험 산출물이며 Geometry/Alpha Source가 아님\n'
+                '• 사용자 승인 전 상품 Color 목록 / 비밀번호 identity에 등록 금지\n'
+                '• 성공 시에만 Solid / Multi / Dynamic Signature 통합 Color System 후보로 별도 승격',
+                style: TextStyle(color: muted, height: 1.55),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
