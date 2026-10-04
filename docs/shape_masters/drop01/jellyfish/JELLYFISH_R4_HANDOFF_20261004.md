@@ -99,3 +99,13 @@ Do not use as production masters:
 - Color / Multi Palette and Motion remain separate tracks and were not modified.
 - Prior CleanSplit v1 / Registered v3 cross-ownership assets and rejected Hidden Underlap v2/v6/v7-style outputs remain excluded from Production.
 - This promotion supersedes Candidate status for the static 2-part geometry only.
+
+
+## STATIC GEOMETRY CLOSEOUT / MOTION HANDOFF — 2026-10-04
+- Static 2-Part FINAL / LOCKED package uploaded to Google Drive Production Master.
+- Drive file ID: 18mSUeYltnd4AW0l8RDAnUWybRXF__3Rq
+- Package: Jellyfish_R4_Static2Part_FINAL_LOCKED_20261004.zip
+- Static geometry track: CLOSED.
+- Motion work must start from the locked Body v13 + Legs v3 masters. Appearance J04-M3-R4 Compact remains locked.
+- Color / Multi Palette remains a separate track and must not be modified during Motion.
+- Do not resurrect CleanSplit v1, Registered v3 cross-ownership, or rejected underlap generations.
