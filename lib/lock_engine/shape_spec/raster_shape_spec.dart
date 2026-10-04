@@ -16,6 +16,9 @@ class RasterShapeMetadata {
       layers = Map<String, dynamic>.from(json['layers'] as Map),
       swim = Map<String, dynamic>.from(
         json['swim'] as Map? ?? const <String, dynamic>{},
+      ),
+      idle = Map<String, dynamic>.from(
+        json['idle'] as Map? ?? const <String, dynamic>{},
       ) {
     final canvas = ui.Offset.zero & runtimeCanvas;
     if (displayScale <= 0 ||
@@ -38,6 +41,7 @@ class RasterShapeMetadata {
   final Map<String, dynamic> layers;
   final Map<String, dynamic> aurora;
   final Map<String, dynamic> swim;
+  final Map<String, dynamic> idle;
 
   static ui.Size _size(List v) =>
       ui.Size((v[0] as num).toDouble(), (v[1] as num).toDouble());
