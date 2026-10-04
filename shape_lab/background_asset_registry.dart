@@ -41,10 +41,13 @@ class BackgroundAssetRegistry {
       'assets/backgrounds/drop01/ASSET_REGISTRY.json',
     );
     final json = jsonDecode(raw) as Map<String, dynamic>;
-    final entries = json['active_backgrounds'] as List<dynamic>;
     final records = <String, BackgroundAssetRecord>{};
+    final groups = <List<dynamic>>[
+      (json['active_backgrounds'] as List<dynamic>? ?? const []),
+      (json['lab_assets'] as List<dynamic>? ?? const []),
+    ];
 
-    for (final entry in entries.cast<Map<String, dynamic>>()) {
+    for (final entry in groups.expand((items) => items).cast<Map<String, dynamic>>()) {
       final runtime = entry['runtime_ref'] as Map<String, dynamic>?;
       final record = BackgroundAssetRecord(
         assetId: entry['asset_id'] as String,
