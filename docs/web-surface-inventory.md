@@ -1,3 +1,5 @@
+> Superseded on 2026-10-04 by [Route Consolidation Inventory v2](route-consolidation-inventory.md). Use that single classification table; the historical recommendations below are not current execution instructions.
+
 # MY LOCK Web Surface Inventory v1
 
 Updated: 2026-10-04
