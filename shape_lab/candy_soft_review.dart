@@ -37,7 +37,7 @@ class _CandySoftReviewState extends State<CandySoftReview> {
       const SizedBox(height:6),
       const Text('선택한 캔디 볼륨과 광택을 유지한 256px 정규화본. 3도형 × 핑크·블루·옐로우를 같은 크기로 비교합니다.'),
       const SizedBox(height:8),
-      const Text('QA CANDIDATE · 시각 확정 대기 · 정식 앱 미반영',style:TextStyle(fontWeight:FontWeight.w800,color:Color(0xFF7257F5))),
+      const Text('VISUAL FINAL · 사용자 승인 완료 · Android 실기기 QA 대기',style:TextStyle(fontWeight:FontWeight.w800,color:Color(0xFF7257F5))),
       const SizedBox(height:14),
       Wrap(spacing:8,runSpacing:6,children:[
         ChoiceChip(label:const Text('Candy Soft'),selected:candidate&&!crayon,onSelected:(_)=>setState((){candidate=true;crayon=false;})),
@@ -90,7 +90,7 @@ class _CandySoftReviewState extends State<CandySoftReview> {
         candySoftCandidate:candidate,onTokenTap:(_)=>setState(()=>taps++),
       )),
       const SizedBox(height:10),
-      const Text('원본 PNG와 Crayon 파라미터는 보존. 작은 크기 색 구분·광택·회전·POP 확인 후 최종 승인합니다. Android 실기기 QA는 별도 미완료.',style:TextStyle(fontSize:12)),
+      const Text('원본 PNG와 Crayon 파라미터는 보존. 작은 크기 색 구분·광택·회전·POP 웹 검수 및 사용자 승인 완료. Android 실기기 QA는 별도 미완료.',style:TextStyle(fontSize:12)),
     ]));
   }
 }

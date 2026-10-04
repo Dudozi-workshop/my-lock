@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "status": "qa_candidate",
+  "status": "final_locked_active",
   "user_direction_approved": true,
-  "production_approved": false,
+  "production_approved": true,
   "source_sha256": "f32b0ef21c5aa16e4329ec966eaf5cd435947afb7334ee928f9421af837ca3c2",
   "palette_mode": "chroma_times_selected_hue_plus_common_channel_finish",
   "shapes": [
@@ -132,5 +132,10 @@
       },
       "removed_alpha_pixels": 0
     }
-  ]
+  ],
+  "approval_date": "2026-10-04",
+  "approval_evidence": "User approved reviewed Candy Soft R2 3 shapes x 3 default tones and requested MAIN/APK integration.",
+  "device_qa": "pending",
+  "review_source_commit": "6209c329aadb89d5ab0e599bd485e28f1078da8e",
+  "scope": "Soft Basic / circle triangle square / pink blue yellow"
 }

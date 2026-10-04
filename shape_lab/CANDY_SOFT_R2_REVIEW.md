@@ -23,7 +23,4 @@ Review: 3×3 identities, 58/96/160px, light/dark, actual selection cards,
 safe edges, distinct colors, Crayon invariance and opacity. Web technical QA
 does not replace physical Android LockActivity performance and visual QA.
 
-Status: QA Candidate / visual final approval pending / physical device pending.
-After visual approval, port the opt-in runtime to current main, verify production
-and Android builds, register an immutable final master, then activate it.
-Do not merge the old integration branch wholesale into main.
+Status: Visual Master Final / Locked / Active. User approved the reviewed candidate on 2026-10-04. Production PR #52 merged as 1cbaa3ac8e30239794ab3d10ea6d4fe6ccccdd52; 99 tests and Android/Web premerge builds passed. Physical Android QA remains pending. LABS keeps its explicit review flag; production uses the approved default renderer. No wholesale integration-branch merge.
