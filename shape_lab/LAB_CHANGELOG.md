@@ -1,3 +1,9 @@
+## LABS-2026.10.05-R20 · Volumetric A distributed composition
+- R19 Modify: entry points clustered centrally; shafts too wide and similar.
+- Unequal large/medium/small planes spread across the surface with irregular gaps and distinct angles.
+- Warmth limited to the upper source, then blends toward sky blue; asymmetric internal density and individual taper/fade lengths.
+- A only; Base/B/C/other effects unchanged; no ImageGen. Candidate awaiting Live Keep/Modify/Reject.
+
 ## LABS-2026.10.05-R19 · Volumetric A illustrated planes
 - R18 Modify: direction acceptable, needs anime-style painted light per user 76038.png.
 - Broad near-flat translucent cream/mint planes, narrow feathered edges, normal alpha compositing; white Gaussian spines removed.

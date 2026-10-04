@@ -41,6 +41,23 @@ void main() {
     }
   });
 
+  test('A distributes upper light across both sides of the surface', () async {
+    for (final phase in [0.0, .25, .5, .75]) {
+      final pixels = await frame(phase, 320);
+      final thirds = [0, 0, 0];
+      for (var y = 0; y < 58; y++) {
+        for (var x = 0; x < 180; x++) {
+          thirds[x ~/ 60] += pixels[(y * 180 + x) * 4 + 3];
+        }
+      }
+      final total = thirds.reduce((a, b) => a + b);
+      // Regression guard: one central source must not swallow the composition.
+      expect(thirds.first / total, greaterThan(.15));
+      expect(thirds.last / total, greaterThan(.15));
+      expect(thirds[1] / total, lessThan(.55));
+    }
+  });
+
   test('A changes in two seconds and its loop has no discontinuity', () async {
     final a = await frame(0, 320);
     final b = await frame(2 / 24, 320);

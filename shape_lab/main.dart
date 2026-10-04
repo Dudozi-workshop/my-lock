@@ -124,7 +124,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R19 · Background Effects · A Broad Sunbeam',
+                                  'LABS-2026.10.05-R20 · Background Effects · A Broad Sunbeam',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -6044,7 +6044,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   ];
 
   static const _volumetricLabels = <String>[
-    'A · Broad Sunbeam · R19',
+    'A · Broad Sunbeam · R20',
     'B · Living Rays',
     'C · Soft Drift',
   ];

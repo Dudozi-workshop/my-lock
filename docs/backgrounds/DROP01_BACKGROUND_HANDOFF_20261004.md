@@ -1,6 +1,11 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · R19 candidate
+## Current handoff · R20 candidate
+- R19 deployed at `5fd0f95603c508e7e72856a360751bf27e06245c`, CI `37218031852` success. User verdict Modify: central entry cluster and excessive similar widths.
+- A R20 distributes unequal large/medium/small light planes across the surface with irregular blue gaps and varied angles. Warm tint only near the source; sky-blue depth blend, asymmetric density, individual taper/fade.
+- LABS-2026.10.05-R20; CI/deploy/public verification then user Live Keep/Modify/Reject. Base/B/C/other effects immutable; no ImageGen. Not Final/LOCK.
+
+## Previous handoff · R19 candidate
 - R18 deployed at `c3087cd458c64e7a732b00601e4c1aef6ab9bb10`, run `37217486802` success. User verdict Modify: wants illustrated anime-style light per `76038.png`.
 - A R19: broad translucent cream/mint light planes, near-flat fill with narrow soft edges; width and opacity motion prioritised over positional sway. Mid-water fade retained.
 - LABS-2026.10.05-R19; CI/deploy/public verification then user Live Keep/Modify/Reject. Base v2/B/C/other effects immutable; no ImageGen. Background not Final/LOCK.

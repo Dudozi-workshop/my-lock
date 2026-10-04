@@ -179,15 +179,17 @@ class VolumetricLightPainter extends CustomPainter {
   final Animation<double> animation;
   final VolumetricLightProfile profile;
 
-  // R19 A only: translucent painted planes with narrow feathered edges.
+  // R20 A only: distributed illustrated light planes of unequal scale.
   // Vertex alpha carries both lateral falloff and depth attenuation.
   void _drawBroadSunbeams(Canvas canvas, Size size, double t) {
-    const centers = [.36, .40, .45, .50, .55, .60, .65];
-    const widths = [.12, .16, .13, .19, .11, .15, .10];
-    const depths = [.54, .63, .58, .64, .55, .61, .56];
-    const phases = [.3, 1.7, 3.1, 4.6, 2.4, 5.3, .9];
-    const strengths = [.26, .34, .28, .39, .27, .33, .25];
-    const angles = [-.36, -.24, -.13, -.025, .11, .24, .36];
+    const centers = [.045, .18, .255, .42, .485, .65, .725, .875, .97];
+    const widths = [.055, .125, .040, .090, .035, .145, .045, .095, .038];
+    const depths = [.44, .62, .49, .57, .43, .64, .50, .56, .45];
+    const phases = [.3, 1.7, 3.1, 4.6, 2.4, 5.3, .9, 3.7, 5.8];
+    const strengths = [.30, .33, .37, .31, .35, .30, .37, .33, .31];
+    const angles = [.075, .035, .115, -.055, .025, .065, -.045, -.080, -.135];
+    const fadeStarts = [.10, .22, .08, .17, .06, .25, .12, .19, .08];
+    const taper = [.25, .12, .42, .20, .46, .08, .38, .18, .42];
     const columns = 32;
     const rows = 36;
     for (var beam = 0; beam < centers.length; beam++) {
@@ -209,10 +211,12 @@ class VolumetricLightPainter extends CustomPainter {
         final flow = t * 2 + phase - v * 2.3;
         final center = centers[beam] + sway + angle * v +
             sin(flow) * .008 * v;
-        final halfWidth = width * (.50 + .76 * v) *
+        final halfWidth = width * (.50 + .58 * v) *
+            (1 - taper[beam] * v * v) *
             (1 + .09 * sin(flow + .7));
         // Smoothly dissolve through mid-water; nothing reaches the floor.
-        final fade = ((v - .18) / .82).clamp(0.0, 1.0);
+        final fadeStart = fadeStarts[beam];
+        final fade = ((v - fadeStart) / (1 - fadeStart)).clamp(0.0, 1.0);
         final attenuation = 1 - fade * fade * (3 - 2 * fade);
         final depthEnergy = (1 - .28 * v) * attenuation;
         for (var column = 0; column <= columns; column++) {
@@ -221,14 +225,15 @@ class VolumetricLightPainter extends CustomPainter {
           // Only the outer 24% feathers; there is no white Gaussian spine.
           final edge = ((u.abs() - .76) / .24).clamp(0.0, 1.0);
           final feather = 1 - edge * edge * (3 - 2 * edge);
-          final aperture = .94 + .06 * sin(flow + u * 1.8);
-          final density = .97 + .03 * cos(t * 2 + phase - v * 1.7);
+          final aperture = .88 + .10 * sin(flow + u * 1.8);
+          final density = .93 + .07 * cos(t * 2 + phase - v * 1.7 + u * 2.4);
           positions.add(Offset(
             size.width * (center + u * halfWidth),
             size.height * depth * v,
           ));
           colors.add(Color.lerp(
-            const Color(0xFFFFF2D5), const Color(0xFFBCEEE2), v,
+            const Color(0xFFFFF8EB), const Color(0xFFC6EFFE),
+            (v * 3.3).clamp(0.0, 1.0),
           )!.withValues(alpha: (energy * feather * aperture * density * depthEnergy)
               .clamp(0.0, 1.0)));
           if (row < rows && column < columns) {
