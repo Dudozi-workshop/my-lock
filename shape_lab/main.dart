@@ -123,7 +123,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R03 · Candy Soft 3도형 · 3색 및 58px Runtime 검수 · QA Candidate',
+                                  'LABS-2026.10.04-R04 · Candy Soft Final · MAIN 적용 · Android 기기 QA 대기',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],

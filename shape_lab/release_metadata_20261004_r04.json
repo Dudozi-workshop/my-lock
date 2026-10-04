@@ -1,10 +1,8 @@
 {
   "version": "LABS-2026.10.04-R04",
-  "purpose": "Isolate Jellyfish Multi-Color PoC as a Palette Lab experimental sub-route",
-  "status": "Experimental / PoC / Candidate",
-  "scope": "Palette Lab > Experimental > Jellyfish Multi-Color only; no Production Palette changes",
-  "route": "?lab=palette&experiment=jellyfish-multicolor",
+  "purpose": "Candy Soft R2 visual final approval and MAIN integration closeout",
+  "scope": "Approved 3 default shapes x 3 default tones; other LABS work preserved",
   "source_branch": "feat/style-lab-integration",
-  "production_impact": "none",
-  "next_gate": "Jellyfish Static Master canonicalization and lock"
+  "source_commit": "resolved_by_workflow",
+  "status": "Visual Final / MAIN applied / Android device QA pending"
 }
