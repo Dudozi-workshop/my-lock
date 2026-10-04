@@ -150,40 +150,168 @@ class FloorCausticPainter extends CustomPainter {
       oldDelegate.animation != animation;
 }
 
+enum VolumetricLightMode { broadCalm, livingRays, softDrift }
+
+class VolumetricLightProfile {
+  const VolumetricLightProfile({
+    required this.mode,
+    required this.energy,
+    required this.drift,
+    required this.width,
+    required this.depth,
+  });
+
+  final VolumetricLightMode mode;
+  final double energy;
+  final double drift;
+  final double width;
+  final double depth;
+}
+
 class VolumetricLightPainter extends CustomPainter {
-  VolumetricLightPainter({required this.animation}) : super(repaint: animation);
+  VolumetricLightPainter({
+    required this.animation,
+    required this.profile,
+  }) : super(repaint: animation);
+
   final Animation<double> animation;
+  final VolumetricLightProfile profile;
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final t = animation.value * pi * 2;
-    final shift = sin(t * .23) * size.width * .035;
-    final path = Path()
-      ..moveTo(size.width * .20 + shift, 0)
-      ..lineTo(size.width * .44 + shift, 0)
-      ..lineTo(size.width * .68 + shift, size.height * .72)
-      ..lineTo(size.width * .34 + shift, size.height * .72)
+  Path _beam(
+    Size size, {
+    required double topCenter,
+    required double topWidth,
+    required double bottomCenter,
+    required double bottomWidth,
+    required double bottomY,
+  }) {
+    return Path()
+      ..moveTo(size.width * (topCenter - topWidth * .5), 0)
+      ..lineTo(size.width * (topCenter + topWidth * .5), 0)
+      ..lineTo(size.width * (bottomCenter + bottomWidth * .5), bottomY)
+      ..lineTo(size.width * (bottomCenter - bottomWidth * .5), bottomY)
       ..close();
+  }
 
+  void _drawBeam(
+    Canvas canvas,
+    Size size, {
+    required Path path,
+    required double alpha,
+    required double blur,
+  }) {
+    final bounds = path.getBounds();
     final paint = Paint()
       ..shader = const LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          Color(0x22FFFFFF),
-          Color(0x12E7FFFF),
+          Color(0xFFFFFFFF),
+          Color(0xFFE9FFFF),
           Color(0x00FFFFFF),
         ],
-        stops: [0, .52, 1],
-      ).createShader(Offset.zero & size)
+        stops: [0, .48, 1],
+      ).createShader(bounds)
+      ..color = Colors.white.withValues(alpha: alpha)
       ..blendMode = BlendMode.screen
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, max(18.0, size.width * .06));
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
     canvas.drawPath(path, paint);
   }
 
   @override
+  void paint(Canvas canvas, Size size) {
+    final t = animation.value * pi * 2;
+    final bottomY = size.height * profile.depth;
+    final breathe = .5 + .5 * sin(t * .43);
+    final sway = sin(t * .31) * profile.drift;
+    final sway2 = cos(t * .27 + 1.2) * profile.drift * .72;
+
+    switch (profile.mode) {
+      case VolumetricLightMode.broadCalm:
+        final p = _beam(
+          size,
+          topCenter: .38 + sway,
+          topWidth: profile.width,
+          bottomCenter: .49 + sway * .45,
+          bottomWidth: profile.width * 1.65,
+          bottomY: bottomY,
+        );
+        _drawBeam(
+          canvas,
+          size,
+          path: p,
+          alpha: (.12 + breathe * .045) * profile.energy,
+          blur: max(22.0, size.width * .075),
+        );
+        break;
+
+      case VolumetricLightMode.livingRays:
+        final centers = <double>[.24, .49, .72];
+        for (var i = 0; i < centers.length; i++) {
+          final phase = t * (.34 + i * .035) + i * 1.7;
+          final open = .78 + .22 * (.5 + .5 * sin(phase));
+          final localSway = sin(phase * .71) * profile.drift;
+          final p = _beam(
+            size,
+            topCenter: centers[i] + localSway,
+            topWidth: profile.width * (.55 + i * .07) * open,
+            bottomCenter:
+                centers[i] + .08 - i * .035 + localSway * .45,
+            bottomWidth: profile.width * (1.28 + i * .10) * open,
+            bottomY: bottomY * (.88 + i * .045),
+          );
+          _drawBeam(
+            canvas,
+            size,
+            path: p,
+            alpha: (.075 + .055 * (.5 + .5 * cos(phase * .83))) *
+                profile.energy,
+            blur: max(18.0, size.width * (.052 + i * .006)),
+          );
+        }
+        break;
+
+      case VolumetricLightMode.softDrift:
+        for (var i = 0; i < 2; i++) {
+          final dir = i == 0 ? 1.0 : -1.0;
+          final local = (i == 0 ? sway : sway2) * dir;
+          final p = _beam(
+            size,
+            topCenter: (i == 0 ? .30 : .63) + local,
+            topWidth: profile.width * .78,
+            bottomCenter: (i == 0 ? .47 : .55) + local * .25,
+            bottomWidth: profile.width * 1.30,
+            bottomY: bottomY * (i == 0 ? .95 : .82),
+          );
+          _drawBeam(
+            canvas,
+            size,
+            path: p,
+            alpha: (.085 + breathe * .030) * profile.energy,
+            blur: max(24.0, size.width * .082),
+          );
+        }
+        break;
+    }
+
+    final veil = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Colors.white.withValues(alpha: .035 * profile.energy),
+          const Color(0xFFDAFFFF).withValues(alpha: .020 * profile.energy),
+          Colors.transparent,
+        ],
+        stops: const [0, .34, 1],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, bottomY))
+      ..blendMode = BlendMode.screen;
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, bottomY), veil);
+  }
+
+  @override
   bool shouldRepaint(covariant VolumetricLightPainter oldDelegate) =>
-      oldDelegate.animation != animation;
+      oldDelegate.animation != animation || oldDelegate.profile != profile;
 }
 
 class AmbientParticlePainter extends CustomPainter {
