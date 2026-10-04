@@ -1,5 +1,5 @@
 ## LABS-2026.10.05-R22 — A texture motion study
-A texture-density prototype from user panel 03 reference, subtle local shader warp, preserved R21 comparison and static/play controls. Low-resolution approximate study, not approved production art. Base/B/C/non-A unchanged. Drive upload explicitly authorized, registered and read-back verified. CI/deploy/public checks precede art approval.
+A texture-density prototype from user panel 03 reference, subtle local shader warp, preserved R21 comparison and static/play controls. Low-resolution approximate study, not approved production art. Base/B/C/non-A unchanged. Drive upload explicitly authorized, registered and read-back verified. A shader/texture/R21 CI tests PASS (37237651130). Whole Analyze blocked by 18 inherited runtime integration errors; R22 not deployed. Public remains R21.
 
 ## LABS-2026.10.05-R21 · Volumetric A reference-led fan
 - R20 rejected direction: unrelated overhead lights, shafts too thick, no shared fan.
