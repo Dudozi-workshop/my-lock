@@ -179,15 +179,16 @@ class VolumetricLightPainter extends CustomPainter {
   final Animation<double> animation;
   final VolumetricLightProfile profile;
 
-  // R15 A only: a feathered volume, not a blurred straight cone.
+  // R16 A only: broad volumes with moving, overlapping light lobes.
   // Vertex alpha carries both lateral falloff and depth attenuation.
   void _drawBroadSunbeams(Canvas canvas, Size size, double t) {
     const centers = [.17, .49, .80];
     const widths = [.20, .25, .19];
     const depths = [.57, .64, .59];
     const phases = [.3, 2.5, 4.6];
-    const columns = 24;
-    const rows = 28;
+    const strengths = [.30, .43, .24];
+    const columns = 40;
+    const rows = 36;
     for (var beam = 0; beam < 3; beam++) {
       final phase = phases[beam];
       final sway = sin(t + phase) * profile.drift;
@@ -195,15 +196,20 @@ class VolumetricLightPainter extends CustomPainter {
       final width = widths[beam] * (profile.width / .24) *
           (1 + .16 * sin(t + phase + 1.1));
       final depth = depths[beam] * (profile.depth / .64);
-      final energy = (.31 + .065 * sin(t * 2 + phase)) * profile.energy;
+      final energy = (strengths[beam] + .055 * sin(t * 2 + phase)) *
+          profile.energy;
       final positions = <Offset>[];
       final colors = <Color>[];
       final indices = <int>[];
       for (var row = 0; row <= rows; row++) {
         final v = row / rows;
+        // Depth delays the moving surface aperture; the shaft never moves
+        // as a single rigid strip. All time frequencies close at 24 s.
+        final flow = t * 2 + phase - v * 2.3;
         final center = centers[beam] + sway + angle * v +
-            sin(v * pi + t + phase) * .012 * v;
-        final halfWidth = width * (.58 + .48 * v);
+            sin(flow) * .022 * v;
+        final halfWidth = width * (.58 + .48 * v) *
+            (1 + .09 * sin(flow + .7));
         // Smoothly dissolve through mid-water; nothing reaches the floor.
         final fade = ((v - .18) / .82).clamp(0.0, 1.0);
         final attenuation = 1 - fade * fade * (3 - 2 * fade);
@@ -212,13 +218,24 @@ class VolumetricLightPainter extends CustomPainter {
           final u = column / columns * 2 - 1;
           final feather = (exp(-u * u * 4.2) - exp(-4.2)) /
               (1 - exp(-4.2));
+          // Two broad off-centre lobes separate and merge inside the
+          // soft envelope. No thin stripes, particles or caustic layer.
+          final split = .24 + .14 * sin(flow + .5);
+          final left = exp(-pow((u + split + .10 * sin(flow)) / .39, 2));
+          final right = exp(-pow((u - split) / .46, 2));
+          final aperture = .55 +
+              left * (.24 + .12 * sin(t * 3 + phase - v * 1.4)) +
+              right * (.25 + .11 * cos(t * 2 + phase - v * 2.1));
+          final density = .92 + .08 * sin(u * 4.1 + flow) *
+              cos(u * 2.7 - v * 3.2 + t + phase);
           positions.add(Offset(
             size.width * (center + u * halfWidth),
             size.height * depth * v,
           ));
           colors.add(Color.lerp(
             const Color(0xFFFFF7DE), const Color(0xFFE0FCFF), v,
-          )!.withValues(alpha: (energy * feather * depthEnergy).clamp(0.0, 1.0)));
+          )!.withValues(alpha: (energy * feather * aperture * density * depthEnergy)
+              .clamp(0.0, 1.0)));
           if (row < rows && column < columns) {
             final a = row * (columns + 1) + column;
             final b = a + columns + 1;

@@ -1,5 +1,12 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
+## Current handoff · R16 candidate
+- Preflight reconciliation: older R14 sections below are history. R15 deployed at `365e0f02998a54efbb7bccbb63432453ea90d33f`, Actions `37215859267` success; user verdict Modify (visible, quality insufficient).
+- A Broad Sunbeam R16: original procedural light with broad merging lobes, unequal main/support energy and depth-delayed motion. Reference: https://motionarray.com/stock-motion-graphics/light-rays-overlay-loop-1055584/ (preview study only; no stock import).
+- Release identity: LABS-2026.10.05-R16. CI/deploy/public checks required before live review; user Keep/Modify/Reject pending.
+- Base Only v2 Approved / immutable; B/C R14 unchanged; Surface Deferred; Floor Rework Required; all other effects locked. Background is not Final/LOCK.
+- Base v2 is registered and rendered through `background.drop01.shallow_clear.base_only_v2`; older registration-pending notes below are history.
+
 ## Scope
 Drop 01 Background production handoff after Background Lab structure, Reference Asset Rule v1, Background Canvas Standard v1, and shallow-clear Base Only approval.
 

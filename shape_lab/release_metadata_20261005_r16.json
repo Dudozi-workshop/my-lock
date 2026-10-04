@@ -1,0 +1,12 @@
+{
+  "version": "LABS-2026.10.05-R16",
+  "source_branch": "feat/style-lab-integration",
+  "date": "2026-10-05",
+  "purpose": "Volumetric A: reference-informed moving internal light lobes",
+  "status": "QA / Candidate / Awaiting Keep-Modify-Reject",
+  "scope": "Background Lab \u00b7 Volumetric A only; Base, B/C and other effects immutable",
+  "source_asset": "background.drop01.shallow_clear.base_only_v2",
+  "gate": "A visual approval required before B/C expansion",
+  "reference": "https://motionarray.com/stock-motion-graphics/light-rays-overlay-loop-1055584/",
+  "reference_usage": "Visual study only; original procedural renderer; no stock media imported"
+}

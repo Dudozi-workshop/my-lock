@@ -1,3 +1,9 @@
+## LABS-2026.10.05-R16 · Volumetric A refinement
+- R15 user verdict: Modify — visible, quality needs refinement.
+- A only: unequal main/support beams, overlapping soft internal lobes, depth-delayed aperture movement; 24-second closed loop.
+- Reference: Motion Array Light Rays Overlay Loop (1055584), visual study only; no downloaded stock media.
+- Base v2 immutable; B/C R14 and all other effects unchanged. Candidate awaiting Keep/Modify/Reject.
+
 # MY LOCK Labs Patch Log
 
 ## Patch version policy
