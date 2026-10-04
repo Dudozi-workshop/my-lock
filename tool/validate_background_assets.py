@@ -30,12 +30,29 @@ def webp_size(data: bytes) -> tuple[int, int]:
     raise ValueError(f"unsupported WEBP chunk {chunk!r}")
 
 
+def png_size(data: bytes) -> tuple[int, int]:
+    if len(data) < 24 or data[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError("invalid PNG signature")
+    if data[12:16] != b"IHDR":
+        raise ValueError("missing PNG IHDR")
+    return struct.unpack(">II", data[16:24])
+
+
+def image_size(data: bytes, mime: str) -> tuple[int, int]:
+    if mime == "image/webp":
+        return webp_size(data)
+    if mime == "image/png":
+        return png_size(data)
+    raise ValueError(f"unsupported image mime {mime!r}")
+
+
 def main() -> int:
     registry_path = Path("assets/backgrounds/drop01/ASSET_REGISTRY.json")
     registry = json.loads(registry_path.read_text(encoding="utf-8"))
     failures: list[str] = []
 
-    for item in registry["active_backgrounds"]:
+    items = registry.get("active_backgrounds", []) + registry.get("lab_assets", [])
+    for item in items:
         runtime = item.get("runtime_ref")
         integrity = item.get("expected_integrity")
         if not item.get("active_for_lab") or not runtime or not integrity:
@@ -58,7 +75,7 @@ def main() -> int:
             )
 
         try:
-            width, height = webp_size(data)
+            width, height = image_size(data, integrity["mime"])
         except Exception as exc:
             failures.append(f"{item['asset_id']}: decode/header validation failed: {exc}")
             continue
