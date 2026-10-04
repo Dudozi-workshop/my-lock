@@ -492,7 +492,7 @@ class _StarfishSizeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tileSize = math.max(size + 24, 96.0);
+    final tileSize = max(size + 24, 96.0);
     return Container(
       width: tileSize,
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 9),
@@ -640,6 +640,7 @@ class _ShapeGateChip extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _StarfishCandidateCard extends StatelessWidget {
   const _StarfishCandidateCard({
     required this.code,
