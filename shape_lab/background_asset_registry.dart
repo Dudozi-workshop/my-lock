@@ -27,6 +27,14 @@ class BackgroundAssetRegistry {
 
   static BackgroundAssetRegistry? _instance;
 
+  static BackgroundAssetRegistry get instance {
+    final value = _instance;
+    if (value == null) {
+      throw StateError('BackgroundAssetRegistry.load() must run first.');
+    }
+    return value;
+  }
+
   static Future<BackgroundAssetRegistry> load() async {
     if (_instance != null) return _instance!;
     final raw = await rootBundle.loadString(
