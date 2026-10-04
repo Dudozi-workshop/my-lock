@@ -55,7 +55,7 @@ jobs:
           python3 - <<'PYCODE'
           import json, os, html
           from pathlib import Path
-          meta = json.loads(Path('shape_lab/release_metadata_20261004_r01.json').read_text())
+          meta = json.loads(Path('shape_lab/release_metadata_20261004_r02.json').read_text())
           meta['source_commit'] = os.environ['GITHUB_SHA']
           Path('build/shape_lab/labs-release.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2))
           page = Path('build/shape_lab/index.html')
@@ -72,20 +72,20 @@ jobs:
           retention-days: 14
 
       - name: Set Pages production branch to integration
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           set -e
           API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$PAGES_PROJECT"
           curl --fail --show-error --silent             --request PATCH             --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN"             --header "Content-Type: application/json"             --data '{"production_branch":"feat/style-lab-integration"}'             "$API"             --output /tmp/pages-project-update.json
 
       - name: Deploy integrated Labs
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           set -e
           npx wrangler pages deploy build/shape_lab             --project-name "$PAGES_PROJECT"             --branch "feat/style-lab-integration"             --commit-hash "$GITHUB_SHA"
 
       - name: Verify public Labs
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           set -e
           curl --fail --show-error --silent --location             --retry 5 --retry-delay 3 --retry-all-errors             --output /tmp/pages-index.html             "$PRIMARY_URL"
@@ -93,7 +93,7 @@ jobs:
           grep -q "flutter_bootstrap.js" /tmp/pages-index.html
 
       - name: Verify R2 release identity
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           python3 - <<'PYCODE'
           import os, time, subprocess
@@ -103,7 +103,7 @@ jobs:
               url = os.environ['PRIMARY_URL'] + '?release=' + sha + '&attempt=' + str(attempt)
               try:
                   page = subprocess.check_output(['curl', '--fail', '--silent', '--show-error', '--location', '--max-time', '20', url], text=True)
-                  if expected in page and 'LABS-2026.10.04-R01' in page:
+                  if expected in page and 'LABS-2026.10.04-R02' in page:
                       print('Canonical R2 release verified:', sha)
                       break
                   print('Canonical HTML release propagation pending', flush=True)

@@ -118,7 +118,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R01 · Integrated production workbench for creation, comparison, QA, and asset registry · QA / Candidate',
+                                  'LABS-2026.10.04-R02 · Integrated production workbench for creation, comparison, QA, and asset registry · QA / Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5751,7 +5751,7 @@ class _PaletteLabState extends State<PaletteLab>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _SectionTitle(
-                title: 'Water Wave R2 · H02 Refinement',
+                title: 'Water Wave R2 · H02B Final',
                 subtitle:
                     'Production C02는 잠금 유지. 동일 Sea Turtle Production Palette Base + Fixed Finish에서 굴절면과 불규칙 수면광만 비교합니다. W01~W03은 Reject / Archived.',
                 fg: widget.fg,
@@ -5762,8 +5762,8 @@ class _PaletteLabState extends State<PaletteLab>
                 spacing: 7,
                 runSpacing: 7,
                 children: [
-                  _ValueChip(label: 'Version', value: 'LABS-2026.10.04-R01'),
-                  _ValueChip(label: 'State', value: 'CANDIDATE'),
+                  _ValueChip(label: 'Version', value: 'LABS-2026.10.04-R02'),
+                  _ValueChip(label: 'State', value: 'FINAL / LOCKED'),
                   _ValueChip(label: 'Source', value: 'Runtime v4 source'),
                   _ValueChip(label: 'Production', value: 'LOCKED'),
                 ],
@@ -5943,15 +5943,15 @@ class _WaterWaveCandidateCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
-        color: candidate.id == 'H02'
+        color: candidate.id == 'H02B'
             ? (fg.computeLuminance() > .5 ? const Color(0xFF123743) : const Color(0xFFEAF8FF))
             : (fg.computeLuminance() > .5 ? const Color(0xFF16232D) : const Color(0xFFF8F8FB)),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: candidate.id == 'H02'
+          color: candidate.id == 'H02B'
               ? const Color(0xFF38AEE8)
               : const Color(0xFFE4E5EB),
-          width: candidate.id == 'H02' ? 2 : 1,
+          width: candidate.id == 'H02B' ? 2 : 1,
         ),
       ),
       child: Column(
@@ -5969,11 +5969,11 @@ class _WaterWaveCandidateCard extends StatelessWidget {
                   ),
                 ),
               ),
-              if (candidate.id == 'H02')
+              if (candidate.id == 'H02B')
                 const Chip(
                   visualDensity: VisualDensity.compact,
                   label: Text(
-                    'BASE',
+                    'FINAL',
                     style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w900,

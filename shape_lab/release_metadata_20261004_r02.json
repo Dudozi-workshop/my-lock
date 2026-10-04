@@ -1,0 +1,8 @@
+{
+  "version": "LABS-2026.10.04-R02",
+  "purpose": "Record user-approved H02B Brighter as Final Locked visual master without changing candidate rendering.",
+  "scope": "Palette Lab labels and H02B selection only",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "resolved by workflow GITHUB_SHA",
+  "status": "Visual Final / Locked; Production integration under verification"
+}
