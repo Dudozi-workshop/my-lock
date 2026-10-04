@@ -86,6 +86,50 @@ Recent Store Showcase references:
 - 13_shop_showcase_preview_size_fullscreen_flow_mockup_20261004.png
   https://drive.google.com/file/d/1rnHgp61t3uB9KxmMzfDyyIrUc2yRgaEa/view
 
+## Production UI execution protocol — 2026-10-05
+
+Status: In Progress / Planning Locked -> Visual Candidate
+
+The confirmed IA and UX remain locked. Production visual polish must not redesign screen structure or functional responsibility.
+
+Per-screen workflow is fixed to:
+1. Production UI mockup
+2. User approval
+3. Component and state definition
+4. Android implementation
+5. Responsive / runtime / permission / state QA
+6. Post-approval synchronization to Notion / GitHub / Drive
+
+Screen-state progression:
+- Planning Locked
+- Visual Candidate
+- Visual Approved
+- Implemented / QA Passed
+
+Mockup strategy:
+- Primary: ImageGen for broad visual direction -> approved direction reproduced precisely in Flutter Mock Screen -> Production promotion
+- Fallback: Flutter Mock Screen -> rendered screenshot -> user approval, so UI work does not stop when image generation is unavailable
+
+Phase order:
+- Phase A: Foundation
+- Phase B: Customize
+- Phase C: Store
+- Phase D: Lock Settings
+- Phase E: Integrated Production QA
+
+Phase A scope:
+- Root Shell
+- Bottom Navigation
+- Minimum Production Design System
+- App Bar / base surface / Card / Section Header / CTA / Chip / Tab / Toggle-Switch / List Row / Badge / Bottom Sheet / Snackbar / Modal
+- Loading / Empty / Error / Disabled states
+- Minimum design tokens: typography hierarchy / spacing / radius / icon size / divider / shadow / selected / pressed / disabled / Safe Area
+
+Current gate:
+**Create and approve the Phase A Foundation Production UI mockup before moving to Customize production screens.**
+
+TS-004 remains mandatory for all external repository writes: execute repositories independently, read back immediately after each write, and resume idempotently from the first unverified step.
+
 ## Next Gate
 Production UI mockup/component-state definition -> Android implementation -> real-device responsive/performance/permission QA -> UX/UI map implementation-state update.
 
