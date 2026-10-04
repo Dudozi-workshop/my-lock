@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "domain": "background",
   "drop_id": "drop01",
   "reference_policy": "asset_id_to_runtime_path",
@@ -44,6 +44,34 @@
       "lifecycle": "planned",
       "active_for_lab": false,
       "runtime_ref": null
+    }
+  ],
+  "lab_assets": [
+    {
+      "asset_id": "background.drop01.shallow_clear.base_only_v2",
+      "slot": "01",
+      "name_ko": "투명한 얕은 바다 · Base Only v2",
+      "lifecycle": "approved_base_candidate",
+      "active_for_lab": true,
+      "production_role": "immutable_lab_base",
+      "runtime_ref": {
+        "type": "flutter_asset",
+        "path": "assets/backgrounds/drop01/shallow_clear_base_only_v2_approved_candidate.png",
+        "git_blob_sha": "8ee380141d767cb1b712cf2758d9b343d14ca3af"
+      },
+      "source_of_truth": {
+        "decision": "Notion Drop 01 Asset Master · Base Only v2 approval",
+        "binary": "Google Drive / MY LOCK Assets / Drop 01 - 작은 바닷속 / Background Masters / shallow_clear_base_only_v2_approved_candidate.png",
+        "binary_url": "https://drive.google.com/file/d/1S_kuKZd9HWtKiVzrJNKNfgm0NivgQc4O/view"
+      },
+      "expected_integrity": {
+        "mime": "image/png",
+        "width": 841,
+        "height": 1870,
+        "byte_size": 1547439,
+        "sha256": "0bbc263d61b3a524b9c027e1894fab3209085d631c7a2c313d261a17ecf98ff2"
+      },
+      "current_integrity": "verified_source_binary"
     }
   ]
 }
