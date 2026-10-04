@@ -2,6 +2,9 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/animation.dart';
+import 'package:flutter/rendering.dart';
+
 enum SurfaceRefractionMode {
   broadField,
   organicCaustic,
@@ -37,7 +40,7 @@ class SurfaceRefractionProfile {
 /// This intentionally avoids stroked wave paths and repeated polygon cells.
 /// The output is a translucent per-vertex illumination field that can be
 /// composited over an immutable approved Base.
-class SurfaceRefractionFieldPainter extends ui.CustomPainter {
+class SurfaceRefractionFieldPainter extends CustomPainter {
   SurfaceRefractionFieldPainter({
     required this.profile,
     required this.animation,
@@ -45,7 +48,7 @@ class SurfaceRefractionFieldPainter extends ui.CustomPainter {
   }) : super(repaint: animation);
 
   final SurfaceRefractionProfile profile;
-  final ui.Animation<double> animation;
+  final Animation<double> animation;
   final double intensity;
 
   static const int _xResolution = 34;
