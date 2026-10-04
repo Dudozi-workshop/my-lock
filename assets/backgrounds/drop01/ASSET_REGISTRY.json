@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "domain": "background",
+  "drop_id": "drop01",
+  "reference_policy": "asset_id_to_runtime_path",
+  "active_backgrounds": [
+    {
+      "asset_id": "background.drop01.shallow_clear.v1",
+      "slot": "01",
+      "name_ko": "투명한 얕은 바다",
+      "lifecycle": "selected_base_candidate",
+      "active_for_lab": true,
+      "runtime_ref": {
+        "type": "flutter_asset",
+        "path": "assets/backgrounds/drop01/shallow_clear_base_v1.webp"
+      },
+      "source_of_truth": {
+        "decision": "Notion Drop 01 Asset Master",
+        "binary": "Google Drive canonical binary (registration pending)"
+      },
+      "expected_integrity": {
+        "mime": "image/webp",
+        "width": 1024,
+        "height": 1536,
+        "byte_size": 27242,
+        "sha256": "e04aa1a84cbac0d6635fed2d67b703c81ebb9353d3894e7a6e9af18e7a05c599"
+      },
+      "current_integrity": "mismatch_pending_binary_restore"
+    },
+    {
+      "asset_id": "background.drop01.undersea_day.v1",
+      "slot": "02",
+      "name_ko": "바닷속 하루",
+      "lifecycle": "planned",
+      "active_for_lab": false,
+      "runtime_ref": null
+    },
+    {
+      "asset_id": "background.drop01.calm_deep_sea.v1",
+      "slot": "03",
+      "name_ko": "고요한 심해",
+      "lifecycle": "planned",
+      "active_for_lab": false,
+      "runtime_ref": null
+    }
+  ]
+}
