@@ -179,18 +179,18 @@ class VolumetricLightPainter extends CustomPainter {
   final Animation<double> animation;
   final VolumetricLightProfile profile;
 
-  // R17 A only: luminous fan-shaped shafts, separated by clear water.
+  // R18 A only: irregular overlapping shafts fan out from a surface source.
   // Vertex alpha carries both lateral falloff and depth attenuation.
   void _drawBroadSunbeams(Canvas canvas, Size size, double t) {
-    const centers = [.30, .50, .71];
-    const widths = [.15, .21, .14];
-    const depths = [.57, .64, .59];
-    const phases = [.3, 2.5, 4.6];
-    const strengths = [.57, .78, .50];
-    const angles = [-.13, .025, .15];
-    const columns = 56;
+    const centers = [.36, .40, .45, .50, .55, .60, .65];
+    const widths = [.075, .11, .08, .14, .075, .105, .065];
+    const depths = [.54, .63, .58, .64, .55, .61, .56];
+    const phases = [.3, 1.7, 3.1, 4.6, 2.4, 5.3, .9];
+    const strengths = [.43, .65, .49, .78, .46, .63, .40];
+    const angles = [-.36, -.24, -.13, -.025, .11, .24, .36];
+    const columns = 32;
     const rows = 36;
-    for (var beam = 0; beam < 3; beam++) {
+    for (var beam = 0; beam < centers.length; beam++) {
       final phase = phases[beam];
       final sway = sin(t + phase) * profile.drift * .55;
       final angle = angles[beam] + .035 * sin(t + phase + .8);
@@ -219,16 +219,13 @@ class VolumetricLightPainter extends CustomPainter {
           final u = column / columns * 2 - 1;
           final feather = (exp(-u * u * 3.2) - exp(-3.2)) /
               (1 - exp(-3.2));
-          // Unequal broad ribs retain visible shafts, with moving blue gaps.
-          // Ribs bend and breathe within each fan; no uniform haze floor.
-          final split = .47 + .10 * sin(flow + .5);
-          final left = exp(-pow((u + split + .08 * sin(flow)) / .20, 2));
-          final middle = exp(-pow((u - .07 * sin(flow + 1.1)) / .20, 2));
-          final right = exp(-pow((u - split) / .19, 2));
-          final aperture = .16 +
-              left * (.65 + .12 * sin(t * 3 + phase - v * 1.4)) +
-              middle * (.82 + .14 * cos(t * 2 + phase - v * 2.1)) +
-              right * (.60 + .10 * sin(t * 2 + phase + v));
+          // Unequal apertures split the luminous fan into overlapping soft
+          // shafts, retaining blue gaps instead of a uniform bright wash.
+          final core = exp(-pow((u - .13 * sin(flow)) / .52, 2));
+          final shoulder = exp(-pow((u + .38 + .10 * sin(flow + .8)) / .34, 2));
+          final aperture = .42 +
+              core * (.45 + .12 * cos(t * 2 + phase - v * 2.1)) +
+              shoulder * (.18 + .08 * sin(t * 3 + phase - v * 1.4));
           final density = .94 + .06 * sin(u * 4.1 + flow) *
               cos(u * 2.7 - v * 3.2 + t + phase);
           positions.add(Offset(

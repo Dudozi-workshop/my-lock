@@ -1,6 +1,11 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · R17 candidate
+## Current handoff · R18 candidate
+- User clarification supersedes three-shaft constraint: follow the initial concept with many unequal soft rays spreading from one upper source. R17 `25dbb42ed1065ba5f068d009fb13c946a8a4817e` superseded before art review.
+- R18 A uses seven unequal overlapping soft shafts as the current implementation of the concept fan; count is not an approval requirement. Existing mid-water fade retained; Base/B/C/other effects locked.
+- LABS-2026.10.05-R18; CI/deploy/public verification then user Live Keep/Modify/Reject.
+
+## Previous handoff · R17 superseded
 - R16 deployed at `00f656e8a57c9e0c9b44f531573f5ec9fcb3bf2e`, CI `37216758856` success; user verdict Modify: too weak.
 - R17 uses user concept `76252.png`, panel 03 Volumetric Light v1 as visual direction: brighter cores, broad irregular ribs and clear gaps within 3 fan-shaped shafts. Mid-water fade retained; no surface/floor changes.
 - Current release: LABS-2026.10.05-R17. CI/deploy/public verification before user Live review. A art approval pending.

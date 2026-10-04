@@ -1,3 +1,8 @@
+## LABS-2026.10.05-R18 · Volumetric A concept fan
+- User clarification: do not preserve a three-shaft count; use the original concept fan. R17 superseded before art review.
+- Seven unequal soft shafts fan out from upper centre, overlap at the source and separate downward; bright core, irregular widths, mid-water fade.
+- A only; all locked assets/effects unchanged. Candidate pending Live Keep/Modify/Reject.
+
 ## LABS-2026.10.05-R17 · Volumetric A luminous fan
 - R16 Modify: still weak; user concept 76252.png panel 03 is the visual reference.
 - Brighter cores, unequal broad ribs, clear blue gaps, fan-shaped spread from upper centre; mid-water fade unchanged.

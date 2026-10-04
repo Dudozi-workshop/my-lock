@@ -1,0 +1,12 @@
+{
+  "version": "LABS-2026.10.05-R18",
+  "source_branch": "feat/style-lab-integration",
+  "date": "2026-10-05",
+  "purpose": "Volumetric A irregular multi-shaft fan matching user initial concept",
+  "status": "QA / Candidate / Awaiting Keep-Modify-Reject",
+  "scope": "Background Lab \u00b7 Volumetric A only; Base, B/C and other effects immutable",
+  "source_asset": "background.drop01.shallow_clear.base_only_v2",
+  "gate": "A visual approval required before B/C expansion",
+  "reference": "User 76252.png \u2014 03 Volumetric Light v1; visual direction only",
+  "reference_usage": "Original procedural renderer; no stock image import; no ImageGen"
+}
