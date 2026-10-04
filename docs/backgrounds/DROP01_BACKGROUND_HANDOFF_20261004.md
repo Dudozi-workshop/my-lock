@@ -80,16 +80,46 @@ Drop 01 Background production handoff after Background Lab structure, Reference 
 - LABS must use the approved Base as the immutable visual input for Layer Effect work.
 - Production changes outside the active step remain locked.
 
-## Current Lab State
-- 01 배경 이미지: **Base Only v2 Approved**.
-- 02 레이어 효과: **Next Active Step**.
+## Current Lab State · Closeout 2026-10-05
+- 01 배경 이미지: **A Open Water · Base Only v2 Approved**. Background 전체 Final/LOCK은 아님.
+- 02 레이어 효과: **In Progress**.
 - 03 합성 QA: Not Started.
 - 04 Final: Not Started.
-- First Layer Effect target: Surface Refraction; Floor Caustic / Volumetric Light / Ambient / Bubble remain independent layers.
+- Approved Base remains immutable while Effect work is active.
+- LABS review layout: one fixed **Full Live Preview** at the top, Effect Queue below it.
+- Legacy Surface Refraction A/B/C large candidate UI was removed from the active review flow. Surface Refraction remains **Deferred**.
+- Effect card direction: expand one Effect, compare/select its A/B/C candidates, and apply the selection immediately to the top Full Live. Approved Effects should leave the active queue or collapse into an Approved Effects section.
 
-## Next Discussion
-Before implementation, decide the minimum LABS changes needed so that:
-1. the approved Base is referenced as the immutable Background input,
-2. Layer Effect candidates can be compared independently with ON/OFF and Freeze/Play,
-3. ratio QA remains automated in LABS instead of being recreated as report images,
-4. approved effect presets can progress directly to Composite QA and Registry/CI without parallel ad-hoc workflows.
+## Effect Status
+- **Volumetric Light:** Active / Rework. R14 A Broad Calm / B Living Rays / C Soft Drift are deployed and technically functional, but all three are visually too weak for art approval.
+- **Ambient Particle:** Active / Pending.
+- **Bubble:** Active / Pending.
+- **Floor Caustic:** Rework Required. R11/R2 procedural line-network approach reads as thin grid/lines and does not meet the organic caustic target.
+- **Surface Refraction:** Deferred.
+
+## Latest LABS / CI
+- Visible LABS version: **LABS-2026.10.04-R14 · Background Effects · Volumetric Light A-C**.
+- Latest verified deployment commit: `317d3812fe0cc94a71356c76f11397207135e7a7`.
+- GitHub Actions run: `37213054524` — **SUCCESS**.
+- Previous R13 cleanup and first R14 attempts failed Analyze; latest success includes the required fixes. Do not interpret an earlier failed deploy as current public state.
+
+## Volumetric Light Art Direction · Next Gate
+Do not tune all three R14 variants in parallel. First establish the target visibility and spatial language with **A · Broad Sunbeam** only.
+
+Target:
+- 2–3 broad sunbeams starting at the upper water region.
+- Soft edges, but clearly readable against the already-bright Base.
+- Solo perceptual strength roughly 2–3× the current R14 impression; composite can later be reduced.
+- Beams fade naturally around the middle of the scene rather than extending like lasers to the floor.
+- Width, angle, position, and brightness evolve slowly so motion is perceptible within ~1–2 seconds.
+- Avoid thin straight rays, hard cones, regular looping, or generic white overlays.
+- After A establishes the art baseline, derive B/C as distinct motion characters rather than simple intensity changes.
+
+## Next Session Start
+Mandatory MY LOCK Preflight first. Then:
+1. inspect the actual current branch/LABS version before editing,
+2. keep Base Only v2 and every non-Volumetric effect locked,
+3. redesign **Volumetric Light A · Broad Sunbeam only**,
+4. deploy to LABS and verify CI/public state,
+5. user decides Keep / Modify / Reject,
+6. only after A is accepted, expand B/C or proceed to the next Effect.
