@@ -27,11 +27,6 @@ class _StarfishMotionLabApp extends StatelessWidget {
 class _StarfishMotionQa extends StatelessWidget {
   const _StarfishMotionQa();
 
-  static const _token = LockToken(
-    shape: ShapeKind.starfish,
-    tone: ShapeTone.coralPink,
-  );
-
   Widget _star(double size, {ShapeTone tone = ShapeTone.coralPink}) {
     return SizedBox.square(
       dimension: size,
