@@ -6854,7 +6854,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   void initState() {
     super.initState();
     _shallowClearBase = BackgroundAssetRegistry.instance.resolve(
-      'background.drop01.shallow_clear.v1',
+      'background.drop01.shallow_clear.base_only_v2',
     );
     _surfaceClock = AnimationController(
       vsync: this,
@@ -7110,8 +7110,8 @@ class _BackgroundLabState extends State<BackgroundLab>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _infoRow('현재 기준', 'Planning Visual Master v1'),
-        _infoRow('Base', 'shallow_clear_base_v1'),
+        _infoRow('현재 기준', 'A Open Water · Base Only v2 · Approved'),
+        _infoRow('Base Asset ID', _shallowClearBase.assetId),
         _infoRow('구도', '중앙 Play Field 확보 · 좌하단 환경 요소 집중'),
         _infoRow('잠금', '구도 · 오브젝트 밀도 · 색감 계열 · 세계관'),
         _infoRow('동적 요소', 'Base에 Bake하지 않음'),
@@ -7157,7 +7157,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    '현재 2:3 Core를 기기 비율별 BoxFit.cover로 표시해 실제 잘림을 확인합니다. Production 목표는 20:9 Master입니다.',
+                    '승인 Base를 Asset ID → Registry → Runtime Path로 불러와 기기 비율별 BoxFit.cover로 확인합니다. Production 목표는 20:9 Master입니다.',
                     style: TextStyle(
                       color: widget.muted,
                       fontSize: 11,
@@ -7227,8 +7227,8 @@ class _BackgroundLabState extends State<BackgroundLab>
         ),
         const SizedBox(height: 10),
         Text(
-          'QA 원칙: 배경은 늘리거나 찌그러뜨리지 않습니다. 현재 1024×1536 이미지는 Core Composition으로 보존하고, '
-          'Production Master는 1440×3200(20:9)로 세로 방향을 확장합니다. 16:9에서는 상·하 약 10%씩만 bleed, '
+          'QA 원칙: 배경은 늘리거나 찌그러뜨리지 않습니다. 기존 1024×1536 Core Composition은 별도 Reference로 보존하고, '
+          '현재 LABS는 승인된 Base Only v2를 immutable input으로 사용합니다. Production Master는 1440×3200(20:9) 기준이며 16:9에서는 상·하 약 10%씩만 bleed, '
           '21:9에서는 좌·우 약 2.4%씩만 bleed가 발생하도록 설계합니다. 산호·주요 암석과 Play Field는 공통 Safe Zone 안에 유지합니다.',
           style: TextStyle(
             color: widget.muted,
