@@ -6,10 +6,20 @@ class BuildInfo {
 
   static const String previewVersion = String.fromEnvironment(
     'PREVIEW_VERSION',
-    defaultValue: '000',
+    defaultValue: 'MAIN-2026.10.03-R01',
   );
 
-  static String get display => 'PREVIEW $previewVersion';
+  static const String purpose = String.fromEnvironment(
+    'PREVIEW_PURPOSE',
+    defaultValue: 'Actual app UI / UX / Runtime verification',
+  );
+
+  static const String status = String.fromEnvironment(
+    'PREVIEW_STATUS',
+    defaultValue: 'Production Preview',
+  );
+
+  static String get display => '$previewVersion · $purpose · $status';
 }
 
 class BuildStamp extends StatelessWidget {
@@ -31,10 +41,7 @@ class BuildStamp extends StatelessWidget {
               border: Border.all(color: Colors.white24),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 9,
-                vertical: 5,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
               child: Text(
                 BuildInfo.display,
                 style: const TextStyle(
