@@ -12,11 +12,13 @@
       "active_for_lab": true,
       "runtime_ref": {
         "type": "flutter_asset",
-        "path": "assets/backgrounds/drop01/shallow_clear_base_v1.webp"
+        "path": "assets/backgrounds/drop01/shallow_clear_base_v1.webp",
+        "git_blob_sha": "eebdfbe68427aacdb7dc4309ac9c6c957bed17f6"
       },
       "source_of_truth": {
         "decision": "Notion Drop 01 Asset Master",
-        "binary": "Google Drive canonical binary (registration pending)"
+        "binary": "Google Drive / MY LOCK Assets / Drop 01 - 작은 바닷속 / Background Masters / shallow_clear_base_v1.webp",
+        "binary_url": "https://drive.google.com/file/d/1ZU0voqoochV_-U5h3FxpR4BWlBG3M_jI/view"
       },
       "expected_integrity": {
         "mime": "image/webp",
@@ -25,7 +27,7 @@
         "byte_size": 27242,
         "sha256": "e04aa1a84cbac0d6635fed2d67b703c81ebb9353d3894e7a6e9af18e7a05c599"
       },
-      "current_integrity": "mismatch_pending_binary_restore"
+      "current_integrity": "verified_binary_restored"
     },
     {
       "asset_id": "background.drop01.undersea_day.v1",
