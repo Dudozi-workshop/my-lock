@@ -9,14 +9,21 @@
 - User explicitly approved Drive upload on 2026-10-05. Uploaded and read-back verified: file `1hVs9mcDvkYdltEQoinaOiEAGSg8xQxeR`, PNG 20,248 bytes. Registry linked. CI/deploy/public verification next; art approval pending.
 - Base checksum unchanged. Non-A effect renderer file unchanged. Background remains not Final/LOCK.
 
-### R22 validation / deployment blocker
+### R22 prior validation / deployment blocker (resolved below)
 - A-only tests in CI `37237651130`, commit `b13f7c3dfeb485b68b26ff5045fed4655ef3188a`: texture decode / gap contrast / floor alpha, shader 2-second change / loop continuity, preserved R21 tests PASS. Background integrity PASS.
 - Full CI fails Analyze with the same 18 inherited Shape runtime errors as `a31ced6`: missing runtime dependency files, removed LABS renderer arguments and ShapeTone switch compatibility. Build/Deploy/Public skipped.
 - R22 introduces no additional Analyze error. No scope-out runtime rollback or approved asset change performed.
 - Actual Public metadata still R21 / source `32820b4210959188ba0b1c3392fd4f1747d333b0`. R22 is registered but not deployed, not art-approved or locked.
 - Notion TS-007 records the integration blocker and recurrence prevention. Next: reconcile shared runtime dependencies/caller APIs, then whole CI/deploy/public and user Live review.
 
-## Current deployed handoff · R21 candidate
+### R22 deployed validation · 2026-10-05 · art review pending
+- User authorized shared-runtime repair. Source `72345db0f3a0328a9b3895ffba750ea7d25e0236`; CI [37243341257](https://github.com/Dudozi-workshop/my-lock/actions/runs/37243341257) success: A texture/R21 tests, Analyze, full tests, web build/deploy, Public release identity and both PNG SHA256 checks.
+- TS-007 repaired through missing MAIN runtime modules, restored LABS caller options/enum compatibility, exact approved raster dependency assets and root bootstrap. Free vector catalog/spec tests use their original free defaults; new actual raster loading/rendering test checks premium dependency closure.
+- Starfish static runtime uses approved MAIN binaries and manifest anchors. Micro-idle configuration was absent; idle remains disabled, not invented or art-approved. No background Base, B/C, or other effect source changes in this repair.
+- Public LABS-2026.10.05-R22 at https://my-lock-shape-lab-pages.pages.dev/?lab=background. Cloud browser actual texture/shader renders, reference pause captures are identical, play captures differ, and R21 comparison is visible. No application error observed; extension metadata noise excluded. Physical Android/device performance smoke remains pending.
+- Use 02 레이어 효과 → A 그림 레이어 · R22 → A 기준 프레임 / A 재생. Selecting A reference/comparison solos Volumetric Light and switches other effects OFF. User Keep/Modify/Reject still required. Approximate low-resolution density study remains QA Candidate, not Production Master or Background Final/LOCK.
+
+## Previous deployed handoff · R21 candidate
 - R20 deployed `5be8a8d3029afc77f8494c6119dee3a3f2fccd04`, CI `37218684946` success; user rejects direction: independent overhead lamps, too thick, missing coherent fan.
 - User `76038.png` is primary art reference. R21 uses broad upper source region with a coherent outward fan, thin/medium shafts, faint broad support, irregular blue gaps, asymmetric soft boundaries.
 - A reference-frame/pause/play in Full Live: inspect frozen composition first, then motion. B/C clocks and every other effect unchanged.
