@@ -67,7 +67,7 @@ class _PaintedSunbeamLayerState extends State<PaintedSunbeamLayer> {
 }
 
 /// Image-only Canvas path also renders when web falls back to CPU.
-/// Narrow overlapping strips warp the registered texture, not its artwork.
+/// Adjacent strips warp the registered texture, not its artwork.
 class PaintedSunbeamPainter extends CustomPainter {
   PaintedSunbeamPainter(this.image, this.animation) : super(repaint: animation);
   final ui.Image image;
@@ -93,7 +93,7 @@ class PaintedSunbeamPainter extends CustomPainter {
       final vertical = envelope * .007 *
           (math.sin(phase * 3 + a) - math.sin(a));
       final sourceY = (y + vertical).clamp(0.0, 1.0);
-      final sourceH = math.min(1.0 / bands + .0008, 1 - sourceY);
+      final sourceH = math.min(1.0 / bands, 1 - sourceY);
       final alpha = (1 + .18 *
           (math.sin(phase * 5 + a) - math.sin(a))).clamp(.55, 1.0);
       paint.color = Colors.white.withValues(alpha: alpha);
