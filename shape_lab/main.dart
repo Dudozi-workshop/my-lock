@@ -118,7 +118,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.03-R03 · Palette Lab · Aurora Sea Water Wave R2 · Candidate',
+                                  'LABS-2026.10.04-R01 · Palette Lab · Aurora Sea Water Wave R2 · Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -1903,7 +1903,7 @@ const _candidates = <_CrayonCandidate>[
     id: 'C08-A',
     name: 'C08 Baseline',
     intent: '현재 C08 목표안. 다음 후보와 비교하기 위한 기준.',
-    badge: 'BASE',
+    badge: 'ORIGINAL',
     config: CrayonTextureSpec(
       darkStrokeCount: 44,
       lightStrokeCount: 20,
@@ -5644,27 +5644,27 @@ class _PaletteLabState extends State<PaletteLab>
 
   final _candidates = <_WaterWaveCandidate>[
     _WaterWaveCandidate(
-      id: 'H01', name: 'Sunlit Caustic',
-      note: '밝은 Aqua 수면광. 넓은 굴절면 위로 햇빛 집광이 갈라지고 합쳐지는 안.',
-      field: WaterRefractionField(
-        colors: const [Color(0xFF087CBD), Color(0xFF17BDCF), Color(0xFF94ECF0), Color(0xFFCDF9F8)],
-        speed: 1.12, refraction: .68, cellScale: 4.2, light: .86, seed: 13,
-      ),
-    ),
-    _WaterWaveCandidate(
-      id: 'H02', name: 'Living Water',
-      note: '기준 후보. Cyan과 Ocean Blue가 같은 굴절장에서 압축·팽창하며 면광이 흐르는 안.',
+      id: 'H02', name: 'Living Water · Original',
+      note: '선택된 원본 기준안. 자연스러운 흐름과 눈에 띄는 물빛 유지.',
       field: WaterRefractionField(
         colors: const [Color(0xFF0754A3), Color(0xFF138BD3), Color(0xFF20CCD7), Color(0xFF9AF0F3)],
-        speed: 1.28, refraction: .92, cellScale: 3.7, light: .72, seed: 29,
+        speed: 1.28, refraction: .92, cellScale: 3.7, light: 0.72, seed: 29,
       ),
     ),
     _WaterWaveCandidate(
-      id: 'H03', name: 'Deep Glass Sea',
-      note: '깊은 Blue 굴절면. 어두운 수심과 선명한 Cyan 집광의 대비가 큰 안.',
+      id: 'H02B', name: 'Living Water · Brighter',
+      note: '원본과 같은 흐름. 집광 밝기만 높여 58px에서 물빛을 더 또렷하게.',
       field: WaterRefractionField(
-        colors: const [Color(0xFF082955), Color(0xFF0A51A0), Color(0xFF168FC4), Color(0xFF5BDBE7)],
-        speed: .98, refraction: 1.08, cellScale: 3.2, light: .9, seed: 47,
+        colors: const [Color(0xFF0754A3), Color(0xFF138BD3), Color(0xFF20CCD7), Color(0xFF9AF0F3)],
+        speed: 1.28, refraction: .92, cellScale: 3.7, light: 0.84, seed: 29,
+      ),
+    ),
+    _WaterWaveCandidate(
+      id: 'H02C', name: 'Living Water · Broad',
+      note: '원본과 같은 밝기. 굴절 면광을 넓혀 작은 크기에서도 면의 변화를 읽기 쉽게.',
+      field: WaterRefractionField(
+        colors: const [Color(0xFF0754A3), Color(0xFF138BD3), Color(0xFF20CCD7), Color(0xFF9AF0F3)],
+        speed: 1.28, refraction: .92, cellScale: 3.1, light: 0.72, seed: 29,
       ),
     ),
   ];
@@ -5751,7 +5751,7 @@ class _PaletteLabState extends State<PaletteLab>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _SectionTitle(
-                title: 'Aurora Sea · Water Wave R2',
+                title: 'Water Wave R2 · H02 Refinement',
                 subtitle:
                     'Production C02는 잠금 유지. 동일 Sea Turtle Production Palette Base + Fixed Finish에서 굴절면과 불규칙 수면광만 비교합니다. W01~W03은 Reject / Archived.',
                 fg: widget.fg,
@@ -5762,7 +5762,7 @@ class _PaletteLabState extends State<PaletteLab>
                 spacing: 7,
                 runSpacing: 7,
                 children: [
-                  _ValueChip(label: 'Version', value: 'LABS-2026.10.03-R03'),
+                  _ValueChip(label: 'Version', value: 'LABS-2026.10.04-R01'),
                   _ValueChip(label: 'State', value: 'CANDIDATE'),
                   _ValueChip(label: 'Source', value: 'Runtime v4 source'),
                   _ValueChip(label: 'Production', value: 'LOCKED'),

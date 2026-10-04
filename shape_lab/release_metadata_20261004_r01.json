@@ -1,0 +1,16 @@
+{
+  "version": "LABS-2026.10.04-R01",
+  "purpose": "Refine selected H02 Living Water for 58px and 1–2 second perception with exact original control and one-axis comparisons.",
+  "scope": "Palette Lab only · H02 Original / H02B Brighter / H02C Broad",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "resolved by workflow GITHUB_SHA",
+  "status": "H02 selected direction / Refinement QA Candidate / Not Final",
+  "production_mutation": false,
+  "imagegen_used": false,
+  "rejected": [
+    "W01",
+    "W02",
+    "W03"
+  ],
+  "production_active": "Aurora Sea C02 Quick Signature v2 Final / Locked / Active"
+}
