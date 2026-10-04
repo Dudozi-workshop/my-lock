@@ -49,7 +49,7 @@ void main() {
   });
   test('opt-in never changes Crayon and default painter remains off', () async {
     const token = LockToken(shape:ShapeKind.circle,tone:ShapeTone.pink);
-    expect(LockTokenPainter(token).candySoftCandidate,isFalse);
+    expect(const LockTokenPainter(token).candySoftCandidate,isFalse);
     expect(await render(ShapeKind.circle,ShapeTone.pink,style:ShapeStyle.crayonSoft),
       await render(ShapeKind.circle,ShapeTone.pink,style:ShapeStyle.crayonSoft,candidate:false));
     expect(await render(ShapeKind.circle,ShapeTone.pink),
