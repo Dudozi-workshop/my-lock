@@ -19,6 +19,7 @@ import 'water_refraction_field.dart';
 import 'surface_refraction_field.dart';
 import 'background_easy_effects.dart';
 import 'painted_sunbeam_layer.dart';
+import 'package:my_lock/lock_engine/raster_shape_bootstrap.dart';
 import 'candy_soft_review.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
 
@@ -40,6 +41,7 @@ class MyLockLabsApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'MY LOCK Labs',
+      builder: (context, child) => RasterShapeBootstrap(child: child ?? const SizedBox.shrink()),
       theme: ThemeData(
         colorSchemeSeed: const Color(0xFF7257F5),
         brightness: Brightness.light,

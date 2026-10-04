@@ -9,7 +9,7 @@ import 'package:my_lock/lock_engine/relock_policy.dart';
 void main() {
   test('base catalog keeps the free 3x3 tokens and active styles', () {
     expect(
-      ShapeKind.values,
+      ShapeKind.defaults.toList(),
       equals([
         ShapeKind.circle,
         ShapeKind.triangle,
@@ -17,7 +17,7 @@ void main() {
       ]),
     );
     expect(
-      ShapeTone.values,
+      ShapeTone.defaults.toList(),
       equals([
         ShapeTone.pink,
         ShapeTone.blue,
@@ -33,8 +33,8 @@ void main() {
     );
 
     final ids = <String>{
-      for (final shape in ShapeKind.values)
-        for (final tone in ShapeTone.values)
+      for (final shape in ShapeKind.defaults.toList())
+        for (final tone in ShapeTone.defaults.toList())
           LockToken(shape: shape, tone: tone).id,
     };
     expect(ids.length, 9);

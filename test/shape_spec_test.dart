@@ -9,7 +9,7 @@ void main() {
   test('Soft Basic ShapeSpecs load for all active shapes', () async {
     await ShapeSpecRegistry.instance.load();
 
-    for (final shape in ShapeKind.values) {
+    for (final shape in ShapeKind.defaults.toList()) {
       final bundle = ShapeSpecRegistry.instance.resolve(
         ShapeStyle.softBasic,
         shape,
@@ -115,7 +115,7 @@ void main() {
   test('Crayon Soft uses frozen geometry masters with procedural texture', () async {
     await ShapeSpecRegistry.instance.load();
 
-    for (final shape in ShapeKind.values) {
+    for (final shape in ShapeKind.defaults.toList()) {
       final bundle = ShapeSpecRegistry.instance.resolve(
         ShapeStyle.crayonSoft,
         shape,
@@ -133,7 +133,7 @@ void main() {
   test('Core styles resolve the same canonical body geometry', () async {
     await ShapeSpecRegistry.instance.load();
 
-    for (final shape in ShapeKind.values) {
+    for (final shape in ShapeKind.defaults.toList()) {
       final soft = ShapeSpecRegistry.instance.resolve(
         ShapeStyle.softBasic,
         shape,
@@ -177,7 +177,7 @@ void main() {
       'edge_leaf',
     ];
 
-    for (final shape in ShapeKind.values) {
+    for (final shape in ShapeKind.defaults.toList()) {
       final bundle = ShapeSpecRegistry.instance.resolve(
         ShapeStyle.softBasic,
         shape,

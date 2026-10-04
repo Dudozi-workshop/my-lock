@@ -1,0 +1,44 @@
+{
+  "shape_id": "starfish",
+  "version": 1,
+  "status": "Approved static runtime / motion configuration pending",
+  "runtime_canvas": [
+    256,
+    256
+  ],
+  "content_bbox": [
+    40,
+    48,
+    222,
+    210
+  ],
+  "anchor": [
+    128,
+    128
+  ],
+  "display_scale": 1,
+  "safety_padding_ratio": 0.125,
+  "runtime_source_hash": "b3a35bba9d238afba67d2e17b8649129a75f905f7c52048dc82ba09d105f9e60",
+  "canonical_source_hash": "e782ae23622e549ecc75b6cfb067438398dd0aa21b88fcf6dc34a4b50c8dcceb",
+  "layers": {
+    "master": {
+      "asset": "assets/raster_shapes/starfish_runtime_master_final_v1_256.webp",
+      "sha256": "b3a35bba9d238afba67d2e17b8649129a75f905f7c52048dc82ba09d105f9e60"
+    },
+    "palette_base": {
+      "asset": "assets/raster_shapes/starfish_palette_base_final_v1_256.webp",
+      "sha256": "90e2156eccfc4fb25db403276f1e9211d3c85a0fdbd2b6d9843c2531c9bf644b"
+    },
+    "fixed_finish": {
+      "asset": "assets/raster_shapes/starfish_fixed_finish_final_v1_256.webp",
+      "sha256": "b5951a7bf8366139a1ce07d7d1671a5cb768ce5de3c583859c8af14cd421f3cc"
+    }
+  },
+  "aurora": {},
+  "swim": {},
+  "idle": {
+    "enabled": false
+  },
+  "derived_from": "MAIN assets/shape_masters/drop01/starfish/production/starfish_production_manifest_final_v1.json",
+  "note": "Restore approved static binary only; do not invent missing micro-idle approval/configuration."
+}
