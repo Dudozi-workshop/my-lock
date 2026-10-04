@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.05-R15",
+  "source_branch": "feat/style-lab-integration",
+  "date": "2026-10-05",
+  "purpose": "Volumetric Light A Broad Sunbeam live art review",
+  "status": "QA / Candidate / Awaiting Keep-Modify-Reject",
+  "scope": "Background Lab · Volumetric A only; Base, B/C and other effects immutable",
+  "source_asset": "background.drop01.shallow_clear.base_only_v2",
+  "gate": "A visual approval required before B/C expansion"
+}

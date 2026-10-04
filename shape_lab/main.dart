@@ -124,7 +124,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R14 · Background Effects · Volumetric Light A-C',
+                                  'LABS-2026.10.05-R15 · Background Effects · A Broad Sunbeam',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5564,8 +5564,9 @@ class BackgroundLab extends StatefulWidget {
 }
 
 class _BackgroundLabState extends State<BackgroundLab>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _surfaceClock;
+  late final AnimationController _broadSunbeamClock;
 
   int selectedBackground = 0;
   int selectedRatio = 2;
@@ -5607,11 +5608,16 @@ class _BackgroundLabState extends State<BackgroundLab>
       vsync: this,
       duration: const Duration(seconds: 12),
     )..repeat();
+    _broadSunbeamClock = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 24),
+    )..repeat();
   }
 
   @override
   void dispose() {
     _surfaceClock.dispose();
+    _broadSunbeamClock.dispose();
     super.dispose();
   }
 
@@ -6017,7 +6023,7 @@ class _BackgroundLabState extends State<BackgroundLab>
     VolumetricLightProfile(
       mode: VolumetricLightMode.broadCalm,
       energy: 1.0,
-      drift: .025,
+      drift: .045,
       width: .24,
       depth: .64,
     ),
@@ -6038,7 +6044,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   ];
 
   static const _volumetricLabels = <String>[
-    'A · Broad Calm',
+    'A · Broad Sunbeam · R15',
     'B · Living Rays',
     'C · Soft Drift',
   ];
@@ -6056,7 +6062,7 @@ class _BackgroundLabState extends State<BackgroundLab>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '빛이 내려오는 방식 선택 · 선택 즉시 상단 Full Live에 반영',
+              'A · Broad Sunbeam 검수 중 · B/C는 R14 보존본',
               style: TextStyle(
                 color: widget.muted,
                 fontSize: 10.5,
@@ -6232,7 +6238,8 @@ class _BackgroundLabState extends State<BackgroundLab>
             if (showVolumetricLight)
               CustomPaint(
                 painter: VolumetricLightPainter(
-                  animation: _surfaceClock,
+                  animation: selectedVolumetric == 0
+                      ? _broadSunbeamClock : _surfaceClock,
                   profile: _volumetricProfiles[selectedVolumetric],
                 ),
               ),

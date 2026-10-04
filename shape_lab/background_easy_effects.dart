@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/animation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart' show Colors;
@@ -178,6 +179,62 @@ class VolumetricLightPainter extends CustomPainter {
   final Animation<double> animation;
   final VolumetricLightProfile profile;
 
+  // R15 A only: a feathered volume, not a blurred straight cone.
+  // Vertex alpha carries both lateral falloff and depth attenuation.
+  void _drawBroadSunbeams(Canvas canvas, Size size, double t) {
+    const centers = [.17, .49, .80];
+    const widths = [.20, .25, .19];
+    const depths = [.57, .64, .59];
+    const phases = [.3, 2.5, 4.6];
+    const columns = 24;
+    const rows = 28;
+    for (var beam = 0; beam < 3; beam++) {
+      final phase = phases[beam];
+      final sway = sin(t + phase) * profile.drift;
+      final angle = .075 + .035 * sin(t + phase + .8);
+      final width = widths[beam] * (profile.width / .24) *
+          (1 + .16 * sin(t + phase + 1.1));
+      final depth = depths[beam] * (profile.depth / .64);
+      final energy = (.31 + .065 * sin(t * 2 + phase)) * profile.energy;
+      final positions = <Offset>[];
+      final colors = <Color>[];
+      final indices = <int>[];
+      for (var row = 0; row <= rows; row++) {
+        final v = row / rows;
+        final center = centers[beam] + sway + angle * v +
+            sin(v * pi + t + phase) * .012 * v;
+        final halfWidth = width * (.58 + .48 * v);
+        // Smoothly dissolve through mid-water; nothing reaches the floor.
+        final fade = ((v - .18) / .82).clamp(0.0, 1.0);
+        final attenuation = 1 - fade * fade * (3 - 2 * fade);
+        final depthEnergy = (1 - .28 * v) * attenuation;
+        for (var column = 0; column <= columns; column++) {
+          final u = column / columns * 2 - 1;
+          final feather = (exp(-u * u * 4.2) - exp(-4.2)) /
+              (1 - exp(-4.2));
+          positions.add(Offset(
+            size.width * (center + u * halfWidth),
+            size.height * depth * v,
+          ));
+          colors.add(Color.lerp(
+            const Color(0xFFFFF7DE), const Color(0xFFE0FCFF), v,
+          )!.withValues(alpha: (energy * feather * depthEnergy).clamp(0.0, 1.0)));
+          if (row < rows && column < columns) {
+            final a = row * (columns + 1) + column;
+            final b = a + columns + 1;
+            indices.addAll([a, b, a + 1, a + 1, b, b + 1]);
+          }
+        }
+      }
+      canvas.drawVertices(
+        ui.Vertices(ui.VertexMode.triangles, positions,
+            colors: colors, indices: indices),
+        BlendMode.modulate,
+        Paint()..color = Colors.white..blendMode = BlendMode.screen,
+      );
+    }
+  }
+
   Path _beam(
     Size size, {
     required double topCenter,
@@ -222,6 +279,10 @@ class VolumetricLightPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final t = animation.value * pi * 2;
+    if (profile.mode == VolumetricLightMode.broadCalm) {
+      _drawBroadSunbeams(canvas, size, t);
+      return; // B/C keep their exact R14 renderer and veil.
+    }
     final bottomY = size.height * profile.depth;
     final breathe = .5 + .5 * sin(t * .43);
     final sway = sin(t * .31) * profile.drift;
@@ -229,21 +290,6 @@ class VolumetricLightPainter extends CustomPainter {
 
     switch (profile.mode) {
       case VolumetricLightMode.broadCalm:
-        final p = _beam(
-          size,
-          topCenter: .38 + sway,
-          topWidth: profile.width,
-          bottomCenter: .49 + sway * .45,
-          bottomWidth: profile.width * 1.65,
-          bottomY: bottomY,
-        );
-        _drawBeam(
-          canvas,
-          size,
-          path: p,
-          alpha: (.12 + breathe * .045) * profile.energy,
-          blur: max(22.0, size.width * .075),
-        );
         break;
 
       case VolumetricLightMode.livingRays:

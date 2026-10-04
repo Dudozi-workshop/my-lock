@@ -39,3 +39,10 @@
 - Exact Drop 01 colors: Deep Ocean #4F8EDB / Aqua Mint #7CCFC4 / Coral Pink #F7A7B5 / Sand Beige #EFD59A / Lavender #B9A7E8 / Peach Orange #F7B385.
 - Color QA uses the same locked 2048 RGBA master and preserves alpha/luminosity via BlendMode.color; no new raster candidates are generated.
 - Aurora Sea is intentionally not approximated as a static image; exact H02B dynamic renderer is deferred to Starfish Runtime palette binding QA.
+
+## LABS-2026.10.05-R15 · A Broad Sunbeam
+- A only: 3 feathered, gently bending volumes; warm-to-aqua light; mid-scene smooth attenuation.
+- Dedicated seamless 24-second A clock; width, angle, brightness and position evolve in 1–2 seconds. B/C retain R14 timing and renderer.
+- Base Only v2 and non-volumetric renderers/binaries unchanged. No ImageGen.
+- Release identity now uses R15 metadata rather than stale R10 Starfish metadata.
+- Art status: Candidate / Keep-Modify-Reject pending. No Final/LOCK or B/C expansion.
