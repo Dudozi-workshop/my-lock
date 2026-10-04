@@ -240,7 +240,10 @@ class ShapeSpecRenderer {
             radius: radius,
           );
     void applyObjectTransform() {
-      applyObjectTransform();
+      canvas.translate(center.dx + idle.offset.dx, center.dy + idle.offset.dy);
+      canvas.rotate(objectRotation + idle.rotationRadians);
+      canvas.scale(idle.scaleX, idle.scaleY);
+      canvas.translate(-center.dx, -center.dy);
     }
     final sampling = Paint()..filterQuality = FilterQuality.high;
     final pose = spec.metadata.swim.isEmpty || swimKey == null
