@@ -124,7 +124,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R11 · Background Effects · Floor Caustic v2',
+                                  'LABS-2026.10.04-R12 · Background Effects · Full Live First',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -6012,17 +6012,15 @@ class _BackgroundLabState extends State<BackgroundLab>
           _stepHeader(
             '02 · 레이어 효과',
             '승인 Base는 그대로 유지하고 Effect만 독립 제작',
-            '5 Layer Candidates',
+            'Full Live First',
           ),
           const SizedBox(height: 14),
-          _layerStatusList(),
-          const SizedBox(height: 12),
-          _soloReviewPanel(),
+          _fullLivePanel(),
           const SizedBox(height: 16),
           Divider(color: widget.muted.withValues(alpha: .18)),
           const SizedBox(height: 12),
           Text(
-            'Layer Stack · Independent ON/OFF',
+            'Effect Queue',
             style: TextStyle(
               color: widget.fg,
               fontSize: 15,
@@ -6031,15 +6029,31 @@ class _BackgroundLabState extends State<BackgroundLab>
           ),
           const SizedBox(height: 4),
           Text(
-            'Base는 잠금. 각 Effect는 독립 ON/OFF로 하나씩 Solo 검수할 수 있습니다.',
+            '아래 Effect를 조작하면 상단 Full Live Preview에 즉시 반영됩니다.',
+            style: TextStyle(color: widget.muted, fontSize: 11.5),
+          ),
+          const SizedBox(height: 12),
+          _layerStatusList(),
+          const SizedBox(height: 16),
+          Divider(color: widget.muted.withValues(alpha: .18)),
+          const SizedBox(height: 12),
+          Text(
+            'Surface Refraction · Deferred Reference',
+            style: TextStyle(
+              color: widget.fg,
+              fontSize: 15,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Surface는 현재 Deferred입니다. 후보 UI는 다음 Effect 카드 개편 전까지 참고용으로만 유지합니다.',
             style: TextStyle(color: widget.muted, fontSize: 11.5),
           ),
           const SizedBox(height: 12),
           _surfaceCandidates(),
           const SizedBox(height: 14),
           _controls(),
-          const SizedBox(height: 14),
-          _selectedPreview(),
         ],
       ),
     );
@@ -6122,7 +6136,7 @@ class _BackgroundLabState extends State<BackgroundLab>
     _ => 'Easy Stack · Composite',
   };
 
-  Widget _soloReviewPanel() {
+  Widget _fullLivePanel() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
@@ -6135,14 +6149,14 @@ class _BackgroundLabState extends State<BackgroundLab>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            soloEffectIndex == null ? 'Preview · Easy Stack' : 'SOLO · $_soloEffectName',
+            'Full Live Preview' + (soloEffectIndex == null ? '' : ' · SOLO $_soloEffectName'),
             style: TextStyle(color: widget.fg, fontSize: 14, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 3),
           Text(
             soloEffectIndex == null
-                ? '각 레이어의 Solo를 누르면 이 자리에서 즉시 단독 검수합니다.'
-                : 'Approved Base + $_soloEffectName만 표시 중',
+                ? 'Approved Base + 현재 ON Effect 전체 합성'
+                : '현재는 Approved Base + $_soloEffectName 단독 표시 중',
             style: TextStyle(color: widget.muted, fontSize: 10.5, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 10),
@@ -6444,59 +6458,6 @@ class _BackgroundLabState extends State<BackgroundLab>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _selectedPreview() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Selected Runtime Preview · ' + selected.code + ' ' + selected.label,
-          style: TextStyle(
-            color: widget.fg,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        const SizedBox(height: 9),
-        Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: AspectRatio(
-              aspectRatio: .67,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset(
-                      _shallowClearBase.runtimePath!,
-                      fit: BoxFit.cover,
-                      gaplessPlayback: true,
-                    ),
-                    if (showSurface)
-                      CustomPaint(
-                        painter: SurfaceRefractionFieldPainter(
-                          profile: selected.profile,
-                          animation: _surfaceClock,
-                          intensity: intensity,
-                        ),
-                      ),
-                    if (showVolumetricLight)
-                      CustomPaint(painter: VolumetricLightPainter(animation: _surfaceClock)),
-                    if (showFloorCaustic)
-                      CustomPaint(painter: FloorCausticPainter(animation: _surfaceClock)),
-                    if (showAmbientParticle)
-                      CustomPaint(painter: AmbientParticlePainter(animation: _surfaceClock)),
-                    if (showBubble)
-                      CustomPaint(painter: BubblePainter(animation: _surfaceClock)),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
