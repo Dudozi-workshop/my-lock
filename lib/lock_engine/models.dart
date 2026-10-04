@@ -3,7 +3,9 @@ import 'dart:ui';
 enum ShapeKind {
   circle('원', false),
   triangle('세모', false),
-  square('네모', false);
+  square('네모', false),
+  seaTurtle('바다거북', true),
+  starfish('불가사리', true);
 
   const ShapeKind(this.label, this.premium);
 
@@ -18,20 +20,39 @@ enum ShapeKind {
 }
 
 enum ShapeTone {
-  pink('핑크', false),
-  blue('블루', false),
-  yellow('옐로우', false);
+  pink('핑크', false, false),
+  blue('블루', false, false),
+  yellow('옐로우', false, false),
+  deepOcean('딥 오션 블루', true, true),
+  aquaMint('아쿠아 민트', true, true),
+  coralPink('코랄 핑크', true, true),
+  sandBeige('샌드 베이지', true, true),
+  lavender('젤리 바이올렛', true, true),
+  peachOrange('쉘 피치', true, true),
+  auroraSea('오로라 씨', true, false);
 
-  const ShapeTone(this.label, this.premium);
+  const ShapeTone(this.label, this.premium, this.directSale);
 
   final String label;
   final bool premium;
+  final bool directSale;
 
   static const Set<ShapeTone> defaults = {
     ShapeTone.pink,
     ShapeTone.blue,
     ShapeTone.yellow,
   };
+
+  static const Set<ShapeTone> drop01Palette = {
+    ShapeTone.deepOcean,
+    ShapeTone.aquaMint,
+    ShapeTone.coralPink,
+    ShapeTone.sandBeige,
+    ShapeTone.lavender,
+    ShapeTone.peachOrange,
+  };
+
+  static const ShapeTone drop01Signature = ShapeTone.auroraSea;
 }
 
 enum ShapeStyle {
