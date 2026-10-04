@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../models.dart';
 import '../water_refraction_field.dart';
 import '../swim_pose_runtime.dart';
+import '../whole_shape_idle_runtime.dart';
 import 'shape_spec.dart';
 import 'shape_spec_registry.dart';
 import 'candy_soft_runtime.dart';
@@ -230,6 +231,9 @@ class ShapeSpecRenderer {
     final spec = ShapeSpecRegistry.instance.resolveRasterSpec(token.shape);
     final destination = spec.metadata.destination(center, radius);
     final source = Offset.zero & spec.metadata.runtimeCanvas;
+    final idle = spec.metadata.idle.isEmpty || swimKey == null
+        ? const WholeShapeIdleTransform()
+        : WholeShapeIdleRuntime.instance.transformFor(key: swimKey, timeSeconds: paletteTimeSeconds, config: spec.metadata.idle, radius: radius);
     final sampling = Paint()..filterQuality = FilterQuality.high;
     final pose = spec.metadata.swim.isEmpty || swimKey == null
         ? 's0'
@@ -243,8 +247,9 @@ class ShapeSpecRenderer {
     final auroraConfig = auroraConfigOverride ?? spec.metadata.aurora;
     if (token.tone == ShapeTone.auroraSea && auroraConfig['mode'] == 'water_refraction') {
       canvas.save();
-      canvas.translate(center.dx, center.dy);
-      canvas.rotate(objectRotation);
+      canvas.translate(center.dx + idle.offset.dx, center.dy + idle.offset.dy);
+      canvas.rotate(objectRotation + idle.rotationRadians);
+      canvas.scale(idle.scaleX, idle.scaleY);
       canvas.translate(-center.dx, -center.dy);
       canvas.clipRect(destination, doAntiAlias: false);
       canvas.saveLayer(destination, Paint()..color = Colors.white.withValues(alpha: opacity));
@@ -264,8 +269,9 @@ class ShapeSpecRenderer {
       return;
     }
     canvas.save();
-    canvas.translate(center.dx, center.dy);
-    canvas.rotate(objectRotation);
+    canvas.translate(center.dx + idle.offset.dx, center.dy + idle.offset.dy);
+    canvas.rotate(objectRotation + idle.rotationRadians);
+    canvas.scale(idle.scaleX, idle.scaleY);
     canvas.translate(-center.dx, -center.dy);
     canvas.saveLayer(
       destination,
