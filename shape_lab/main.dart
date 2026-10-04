@@ -6078,11 +6078,10 @@ class _BackgroundLabState extends State<BackgroundLab>
                   ChoiceChip(
                     label: Text(_volumetricLabels[i]),
                     selected: selectedVolumetric == i,
-                    onSelected: (_) => setState(() {
-                      selectedVolumetric = i;
-                      showVolumetricLight = true;
-                      soloEffectIndex = 2;
-                    }),
+                    onSelected: (_) {
+                      setState(() => selectedVolumetric = i);
+                      _soloEffect(2);
+                    },
                   ),
               ],
             ),
