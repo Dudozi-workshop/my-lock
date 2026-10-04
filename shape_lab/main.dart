@@ -122,7 +122,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R06 · Shape Production Hub · Legacy Cleanup',
+                                  'LABS-2026.10.04-R07 · Background Effects · Surface Refraction R2',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
