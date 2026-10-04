@@ -19,7 +19,7 @@ class ShapeSpecRegistry {
   Future<void>? _rasterLoad;
 
   static const Map<ShapeKind, String> _rasterShapeAssets = {
-    ShapeKind.seaTurtle: 'assets/raster_shapes/sea_turtle_v3_runtime_v4.json',
+    ShapeKind.seaTurtle: 'assets/raster_shapes/sea_turtle_v3_runtime_v5.json',
   };
   bool _loaded = false;
 
