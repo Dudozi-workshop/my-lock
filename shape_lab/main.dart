@@ -15,6 +15,7 @@ import 'package:my_lock/lock_engine/shape_spec/shape_spec_renderer.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
 
 import 'soft_basic_candidates.dart';
+import 'background_asset_registry.dart';
 import 'water_refraction_field.dart';
 import 'candy_soft_review.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
@@ -23,6 +24,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ShapeSpecRegistry.instance.load();
   await CandySoftRuntime.instance.load();
+  await BackgroundAssetRegistry.load();
   runApp(const MyLockLabsApp());
 }
 
@@ -6606,6 +6608,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   int selectedBackground = 0;
   int selectedRatio = 2;
   bool showSafeZone = true;
+  late final BackgroundAssetRecord _shallowClearBase;
   _BackgroundWorkbenchStep step = _BackgroundWorkbenchStep.image;
   _SurfaceRefractionCandidate selected = _SurfaceRefractionCandidate.calmBroad;
   bool showSurface = true;
@@ -6629,6 +6632,9 @@ class _BackgroundLabState extends State<BackgroundLab>
   @override
   void initState() {
     super.initState();
+    _shallowClearBase = BackgroundAssetRegistry.instance.resolve(
+      'background.drop01.shallow_clear.v1',
+    );
     _surfaceClock = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 12),
@@ -6976,7 +6982,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                   fit: StackFit.expand,
                   children: [
                     Image.asset(
-                      'assets/backgrounds/drop01/shallow_clear_base_v1.webp',
+                      _shallowClearBase.runtimePath!,
                       fit: BoxFit.cover,
                       alignment: Alignment.center,
                       gaplessPlayback: true,
@@ -7204,7 +7210,7 @@ class _BackgroundLabState extends State<BackgroundLab>
           fit: StackFit.expand,
           children: [
             Image.asset(
-              'assets/backgrounds/drop01/shallow_clear_base_v1.webp',
+              _shallowClearBase.runtimePath!,
               fit: BoxFit.cover,
               gaplessPlayback: true,
             ),
@@ -7246,7 +7252,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                   fit: StackFit.expand,
                   children: [
                     Image.asset(
-                      'assets/backgrounds/drop01/shallow_clear_base_v1.webp',
+                      _shallowClearBase.runtimePath!,
                       fit: BoxFit.cover,
                       gaplessPlayback: true,
                     ),
@@ -7392,7 +7398,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                   fit: StackFit.expand,
                   children: [
                     Image.asset(
-                      'assets/backgrounds/drop01/shallow_clear_base_v1.webp',
+                      _shallowClearBase.runtimePath!,
                       fit: BoxFit.cover,
                       gaplessPlayback: true,
                     ),
