@@ -33,6 +33,7 @@ class ShapeSpecRenderer {
     String swimProfile = 'standard',
     Map<String, dynamic>? auroraConfigOverride,
     bool useCandySoft = true,
+    ShapeSpecBundle? bundleOverride,
   }) {
     if (useCandySoft && CandySoftRuntime.instance.paint(
       canvas, center: center, radius: radius, token: token, style: style,
@@ -55,7 +56,7 @@ class ShapeSpecRenderer {
       return;
     }
 
-    final bundle = registry.resolve(style, token.shape);
+    final bundle = bundleOverride ?? registry.resolve(style, token.shape);
     final canvasSize = bundle.style.canvasSize;
     final scale = radius * 2 / canvasSize;
 
