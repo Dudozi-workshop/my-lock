@@ -377,10 +377,10 @@ class _StarfishProductionSystemPanel extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          Wrap(
+          const Wrap(
             spacing: 7,
             runSpacing: 7,
-            children: const [
+            children: [
               _ShapeGateChip('01 Source', true),
               _ShapeGateChip('02 Silhouette', true),
               _ShapeGateChip('03 Style', false),
