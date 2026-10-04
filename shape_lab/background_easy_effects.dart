@@ -179,25 +179,25 @@ class VolumetricLightPainter extends CustomPainter {
   final Animation<double> animation;
   final VolumetricLightProfile profile;
 
-  // R18 A only: irregular overlapping shafts fan out from a surface source.
+  // R19 A only: translucent painted planes with narrow feathered edges.
   // Vertex alpha carries both lateral falloff and depth attenuation.
   void _drawBroadSunbeams(Canvas canvas, Size size, double t) {
     const centers = [.36, .40, .45, .50, .55, .60, .65];
-    const widths = [.075, .11, .08, .14, .075, .105, .065];
+    const widths = [.12, .16, .13, .19, .11, .15, .10];
     const depths = [.54, .63, .58, .64, .55, .61, .56];
     const phases = [.3, 1.7, 3.1, 4.6, 2.4, 5.3, .9];
-    const strengths = [.43, .65, .49, .78, .46, .63, .40];
+    const strengths = [.26, .34, .28, .39, .27, .33, .25];
     const angles = [-.36, -.24, -.13, -.025, .11, .24, .36];
     const columns = 32;
     const rows = 36;
     for (var beam = 0; beam < centers.length; beam++) {
       final phase = phases[beam];
-      final sway = sin(t + phase) * profile.drift * .55;
-      final angle = angles[beam] + .035 * sin(t + phase + .8);
+      final sway = sin(t + phase) * profile.drift * .15;
+      final angle = angles[beam] + .012 * sin(t + phase + .8);
       final width = widths[beam] * (profile.width / .24) *
           (1 + .16 * sin(t + phase + 1.1));
       final depth = depths[beam] * (profile.depth / .64);
-      final energy = (strengths[beam] + .055 * sin(t * 2 + phase)) *
+      final energy = (strengths[beam] + .060 * sin(t * 2 + phase)) *
           profile.energy;
       final positions = <Offset>[];
       final colors = <Color>[];
@@ -208,7 +208,7 @@ class VolumetricLightPainter extends CustomPainter {
         // as a single rigid strip. All time frequencies close at 24 s.
         final flow = t * 2 + phase - v * 2.3;
         final center = centers[beam] + sway + angle * v +
-            sin(flow) * .022 * v;
+            sin(flow) * .008 * v;
         final halfWidth = width * (.50 + .76 * v) *
             (1 + .09 * sin(flow + .7));
         // Smoothly dissolve through mid-water; nothing reaches the floor.
@@ -217,23 +217,18 @@ class VolumetricLightPainter extends CustomPainter {
         final depthEnergy = (1 - .28 * v) * attenuation;
         for (var column = 0; column <= columns; column++) {
           final u = column / columns * 2 - 1;
-          final feather = (exp(-u * u * 3.2) - exp(-3.2)) /
-              (1 - exp(-3.2));
-          // Unequal apertures split the luminous fan into overlapping soft
-          // shafts, retaining blue gaps instead of a uniform bright wash.
-          final core = exp(-pow((u - .13 * sin(flow)) / .52, 2));
-          final shoulder = exp(-pow((u + .38 + .10 * sin(flow + .8)) / .34, 2));
-          final aperture = .42 +
-              core * (.45 + .12 * cos(t * 2 + phase - v * 2.1)) +
-              shoulder * (.18 + .08 * sin(t * 3 + phase - v * 1.4));
-          final density = .94 + .06 * sin(u * 4.1 + flow) *
-              cos(u * 2.7 - v * 3.2 + t + phase);
+          // A broad, nearly flat fill reads as an illustrated light plane.
+          // Only the outer 24% feathers; there is no white Gaussian spine.
+          final edge = ((u.abs() - .76) / .24).clamp(0.0, 1.0);
+          final feather = 1 - edge * edge * (3 - 2 * edge);
+          final aperture = .94 + .06 * sin(flow + u * 1.8);
+          final density = .97 + .03 * cos(t * 2 + phase - v * 1.7);
           positions.add(Offset(
             size.width * (center + u * halfWidth),
             size.height * depth * v,
           ));
           colors.add(Color.lerp(
-            const Color(0xFFFFF7DE), const Color(0xFFE0FCFF), v,
+            const Color(0xFFFFF2D5), const Color(0xFFBCEEE2), v,
           )!.withValues(alpha: (energy * feather * aperture * density * depthEnergy)
               .clamp(0.0, 1.0)));
           if (row < rows && column < columns) {
@@ -247,7 +242,7 @@ class VolumetricLightPainter extends CustomPainter {
         ui.Vertices(ui.VertexMode.triangles, positions,
             colors: colors, indices: indices),
         BlendMode.modulate,
-        Paint()..color = Colors.white..blendMode = BlendMode.screen,
+        Paint()..color = Colors.white..blendMode = BlendMode.srcOver,
       );
     }
   }

@@ -1,3 +1,9 @@
+## LABS-2026.10.05-R19 · Volumetric A illustrated planes
+- R18 Modify: direction acceptable, needs anime-style painted light per user 76038.png.
+- Broad near-flat translucent cream/mint planes, narrow feathered edges, normal alpha compositing; white Gaussian spines removed.
+- Width/opacity breathe; positional sway reduced. Mid-water fade retained. A only; locked Base/B/C/other effects unchanged.
+- Original procedural renderer; no ImageGen. QA Candidate awaiting Live Keep/Modify/Reject.
+
 ## LABS-2026.10.05-R18 · Volumetric A concept fan
 - User clarification: do not preserve a three-shaft count; use the original concept fan. R17 superseded before art review.
 - Seven unequal soft shafts fan out from upper centre, overlap at the source and separate downward; bright core, irregular widths, mid-water fade.

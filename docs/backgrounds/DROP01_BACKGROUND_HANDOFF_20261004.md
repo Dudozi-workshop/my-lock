@@ -1,6 +1,11 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · R18 candidate
+## Current handoff · R19 candidate
+- R18 deployed at `c3087cd458c64e7a732b00601e4c1aef6ab9bb10`, run `37217486802` success. User verdict Modify: wants illustrated anime-style light per `76038.png`.
+- A R19: broad translucent cream/mint light planes, near-flat fill with narrow soft edges; width and opacity motion prioritised over positional sway. Mid-water fade retained.
+- LABS-2026.10.05-R19; CI/deploy/public verification then user Live Keep/Modify/Reject. Base v2/B/C/other effects immutable; no ImageGen. Background not Final/LOCK.
+
+## Previous handoff · R18 candidate
 - User clarification supersedes three-shaft constraint: follow the initial concept with many unequal soft rays spreading from one upper source. R17 `25dbb42ed1065ba5f068d009fb13c946a8a4817e` superseded before art review.
 - R18 A uses seven unequal overlapping soft shafts as the current implementation of the concept fan; count is not an approval requirement. Existing mid-water fade retained; Base/B/C/other effects locked.
 - LABS-2026.10.05-R18; CI/deploy/public verification then user Live Keep/Modify/Reject.
