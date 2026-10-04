@@ -13,6 +13,7 @@ import 'sea_turtle_shell_runtime_qa_screen.dart';
 import 'sea_turtle_swim_runtime_qa_screen.dart';
 import 'sea_turtle_underbelly_runtime_qa_screen.dart';
 import 'sea_turtle_whole_runtime_qa_screen.dart';
+import 'starfish_round1_lab_screen.dart';
 
 class LabHomeScreen extends StatelessWidget {
   const LabHomeScreen({super.key});
@@ -23,6 +24,7 @@ class LabHomeScreen extends StatelessWidget {
       '?qa=aurora-sea-palette-round2' => const AuroraSeaPaletteRound2Screen(),
       '?qa=aurora-sea-palette-round1' => const AuroraSeaPaletteLabScreen(),
       '?qa=background-composition' => const BackgroundCompositionLabScreen(),
+      '?qa=starfish-round1' => const StarfishRound1LabScreen(),
       '?qa=sea-turtle-whole' => const SeaTurtleWholeRuntimeQaScreen(),
       '?qa=sea-turtle-production' => const SeaTurtleProductionRuntimeQaScreen(),
       '?qa=sea-turtle-app-integration' =>
@@ -65,6 +67,7 @@ class LabHomeScreen extends StatelessWidget {
         'Shape Lab',
         'Sea Turtle v3 · QA',
         [
+          ('Starfish · Round 1 · 6 silhouettes', '?qa=starfish-round1'),
           ('Whole Runtime', '?qa=sea-turtle-whole'),
           ('Production Runtime', '?qa=sea-turtle-production'),
           ('App Integration', '?qa=sea-turtle-app-integration'),
