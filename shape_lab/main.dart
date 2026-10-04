@@ -124,7 +124,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R08 · Background Effects · Layer Stack Candidate',
+                                  'LABS-2026.10.04-R09 · Starfish · 58px QA',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -294,14 +294,9 @@ class _StarfishProductionSystemPanel extends StatelessWidget {
   final Color fg;
   final Color muted;
 
-  static const _candidates = [
-    ('S01', 'Balanced Soft', .43, .22, 10.0, 0.0, 0.0),
-    ('S02', 'Baby Wide', .40, .27, 12.0, -5.0, 0.0),
-    ('S03', 'Slim Natural', .45, .18, 9.0, 3.0, 0.0),
-    ('S04', 'Round Chubby', .39, .30, 13.0, 0.0, 0.0),
-    ('S05', 'Organic Lean', .44, .21, 10.5, 8.0, .055),
-    ('S06', 'Compact Icon', .38, .25, 11.5, -2.0, 0.0),
-  ];
+  static const _assetPath =
+      'assets/shape_masters/drop01/starfish/master/starfish_appearance_master_final_v1_2048.png';
+  static const _sizes = <double>[160, 120, 100, 80, 58];
 
   @override
   Widget build(BuildContext context) {
@@ -311,8 +306,9 @@ class _StarfishProductionSystemPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SectionTitle(
-            title: 'Shape Production · Starfish · Round 1',
-            subtitle: '신규 Shape 제작을 Source → Silhouette → Style → 58px QA → Asset/Registry → LOCK 순서로 관리하는 Production Gate입니다.',
+            title: 'Starfish · Appearance Master v1 · 58px QA',
+            subtitle:
+                'FINAL / LOCKED / ACTIVE Master binary를 그대로 사용합니다. Geometry·색·명암·픽셀 내용은 수정하지 않고 리사이즈만 하여 소형 가독성을 검수합니다.',
             fg: fg,
             muted: muted,
           ),
@@ -321,10 +317,10 @@ class _StarfishProductionSystemPanel extends StatelessWidget {
             spacing: 7,
             runSpacing: 7,
             children: [
-              _ValueChip(label: 'Grade', value: 'Normal'),
-              _ValueChip(label: 'Master', value: 'Not Locked'),
-              _ValueChip(label: 'Current Gate', value: 'Silhouette'),
-              _ValueChip(label: 'Production', value: 'NO'),
+              _ValueChip(label: 'Status', value: 'FINAL / LOCKED / ACTIVE'),
+              _ValueChip(label: 'Master', value: '2048 RGBA'),
+              _ValueChip(label: 'Current Gate', value: '58px QA'),
+              _ValueChip(label: 'Geometry', value: 'LOCKED'),
             ],
           ),
           const SizedBox(height: 14),
@@ -333,46 +329,282 @@ class _StarfishProductionSystemPanel extends StatelessWidget {
             runSpacing: 7,
             children: [
               _ShapeGateChip('01 Source', true),
-              _ShapeGateChip('02 Silhouette', true),
-              _ShapeGateChip('03 Style', false),
+              _ShapeGateChip('02 Appearance', true),
+              _ShapeGateChip('03 Master Lock', true),
               _ShapeGateChip('04 58px QA', false),
-              _ShapeGateChip('05 Asset / Registry', false),
-              _ShapeGateChip('06 LOCK', false),
+              _ShapeGateChip('05 Color QA', false),
+              _ShapeGateChip('06 Runtime / BG', false),
             ],
           ),
+          const SizedBox(height: 18),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final stacked = constraints.maxWidth < 760;
+              final master = _StarfishMasterPreview(
+                assetPath: _assetPath,
+                fg: fg,
+                muted: muted,
+              );
+              final sizes = _StarfishSizeQaGrid(
+                assetPath: _assetPath,
+                fg: fg,
+                muted: muted,
+              );
+              if (stacked) {
+                return Column(
+                  children: [
+                    master,
+                    const SizedBox(height: 14),
+                    sizes,
+                  ],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 5, child: master),
+                  const SizedBox(width: 14),
+                  Expanded(flex: 7, child: sizes),
+                ],
+              );
+            },
+          ),
           const SizedBox(height: 16),
-          LayoutBuilder(builder: (context, constraints) {
-            final width = constraints.maxWidth >= 900
-                ? (constraints.maxWidth - 30) / 3
-                : constraints.maxWidth >= 560
-                    ? (constraints.maxWidth - 14) / 2
-                    : constraints.maxWidth;
-            return Wrap(
-              spacing: 14,
-              runSpacing: 14,
-              children: [
-                for (final item in _candidates)
-                  SizedBox(
-                    width: width,
-                    child: _StarfishCandidateCard(
-                      code: item.$1,
-                      label: item.$2,
-                      outer: item.$3,
-                      inner: item.$4,
-                      corner: item.$5,
-                      rotationDeg: item.$6,
-                      asymmetry: item.$7,
-                      fg: fg,
-                      muted: muted,
-                    ),
-                  ),
-              ],
-            );
-          }),
+          _StarfishBackgroundQaRow(
+            assetPath: _assetPath,
+            fg: fg,
+            muted: muted,
+          ),
           const SizedBox(height: 14),
           Text(
-            'Selection Gate: 실루엣 1안을 사용자 승인하기 전 Style/Asset/Registry 단계로 승격하지 않습니다. 58px 미리보기는 선택 판단용이며 QA Gate 통과를 의미하지 않습니다.',
-            style: TextStyle(color: muted, fontSize: 10.5, height: 1.4),
+            'Gate 기준: 58px에서 5팔 실루엣과 중심부가 즉시 불가사리로 읽혀야 합니다. 이 화면은 승인 Master의 축소 렌더만 사용하며, 별도 후보 생성·재도색·재조명은 하지 않습니다. 사용자 시각 승인 전 58px QA를 PASS로 기록하지 않습니다.',
+            style: TextStyle(color: muted, fontSize: 10.5, height: 1.45),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StarfishMasterPreview extends StatelessWidget {
+  const _StarfishMasterPreview({
+    required this.assetPath,
+    required this.fg,
+    required this.muted,
+  });
+
+  final String assetPath;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7F5F2),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE7E2DA)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Canonical Master', style: TextStyle(color: fg, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 3),
+          Text('2048×2048 · transparent RGBA · pixel locked', style: TextStyle(color: muted, fontSize: 10.5)),
+          const SizedBox(height: 12),
+          Center(
+            child: SizedBox.square(
+              dimension: 290,
+              child: Image.asset(
+                assetPath,
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.high,
+                gaplessPlayback: true,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StarfishSizeQaGrid extends StatelessWidget {
+  const _StarfishSizeQaGrid({
+    required this.assetPath,
+    required this.fg,
+    required this.muted,
+  });
+
+  final String assetPath;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F8FA),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE6E6EC)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Size Legibility', style: TextStyle(color: fg, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 3),
+          Text('160 / 120 / 100 / 80 / 58px 동일 Master 비교', style: TextStyle(color: muted, fontSize: 10.5)),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            crossAxisAlignment: WrapCrossAlignment.end,
+            children: [
+              for (final size in _StarfishProductionSystemPanel._sizes)
+                _StarfishSizeTile(
+                  assetPath: assetPath,
+                  size: size,
+                  fg: fg,
+                  muted: muted,
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StarfishSizeTile extends StatelessWidget {
+  const _StarfishSizeTile({
+    required this.assetPath,
+    required this.size,
+    required this.fg,
+    required this.muted,
+  });
+
+  final String assetPath;
+  final double size;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    final tileSize = math.max(size + 24, 96.0);
+    return Container(
+      width: tileSize,
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 9),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: size == 58 ? const Color(0xFF7257F5) : const Color(0xFFE8E7ED),
+          width: size == 58 ? 1.6 : 1,
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox.square(
+            dimension: size,
+            child: Image.asset(
+              assetPath,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.high,
+              gaplessPlayback: true,
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            '${size.toInt()}px',
+            style: TextStyle(color: fg, fontWeight: FontWeight.w900, fontSize: 11),
+          ),
+          if (size == 58)
+            Text(
+              'TARGET',
+              style: TextStyle(color: muted, fontSize: 8.5, fontWeight: FontWeight.w800),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StarfishBackgroundQaRow extends StatelessWidget {
+  const _StarfishBackgroundQaRow({
+    required this.assetPath,
+    required this.fg,
+    required this.muted,
+  });
+
+  final String assetPath;
+  final Color fg;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    const samples = [
+      ('Light', Color(0xFFF5F3EF)),
+      ('Aqua', Color(0xFFBFE8E7)),
+      ('Ocean', Color(0xFF3E7893)),
+      ('Dark', Color(0xFF14202A)),
+    ];
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F8FA),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE6E6EC)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('58px Background Contrast', style: TextStyle(color: fg, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 3),
+          Text('배경만 변경 · Master binary는 동일', style: TextStyle(color: muted, fontSize: 10.5)),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (final sample in samples)
+                Container(
+                  width: 112,
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
+                  decoration: BoxDecoration(
+                    color: sample.$2,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.black12),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox.square(
+                        dimension: 58,
+                        child: Image.asset(
+                          assetPath,
+                          fit: BoxFit.contain,
+                          filterQuality: FilterQuality.high,
+                          gaplessPlayback: true,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        sample.$1,
+                        style: TextStyle(
+                          color: sample.$1 == 'Dark' || sample.$1 == 'Ocean'
+                              ? Colors.white
+                              : const Color(0xFF242630),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ),
         ],
       ),

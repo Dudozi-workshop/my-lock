@@ -22,3 +22,11 @@
 - W01/W02/W03 Rejected / Archived; R1 history remains in Git.
 - C02 Quick Signature v2 remains Production Final / Locked / Active. No candidate auto-promotion.
 - CPU mesh field at 24Hz, shared across enlarged/58px previews; Android runtime/performance unverified.
+
+
+## LABS-2026.10.04-R09 · Starfish 58px QA
+- Replaced stale Starfish Round 1 silhouette candidates with the approved Appearance Master v1.
+- Uses the locked 2048×2048 RGBA canonical binary; no generated reference substitution.
+- Added 160/120/100/80/58px legibility comparison and 58px light/aqua/ocean/dark background contrast checks.
+- Geometry, color, shading and source pixels remain immutable; only runtime resize/background presentation changes.
+- 58px Gate remains visually pending until explicit user approval.

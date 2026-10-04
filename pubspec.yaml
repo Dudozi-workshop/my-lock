@@ -28,6 +28,7 @@ flutter:
     - assets/raster_shapes/
     - assets/raster_shapes/candy_soft_r2/
     - assets/backgrounds/drop01/
+    - assets/shape_masters/drop01/starfish/master/
 
 flutter_launcher_icons:
   android: true
