@@ -1,0 +1,14 @@
+{
+  "asset_id": "starfish",
+  "artifact_type": "appearance_master",
+  "version": "v1",
+  "status": "final_locked",
+  "active": true,
+  "canvas": [2048, 2048],
+  "mode": "RGBA",
+  "background": "transparent",
+  "source": "approved MY LOCK Style Calibration Candidate",
+  "drive_file_id": "10-w4EO6igWWpuPMOgmehUfiCWv0CafiZ",
+  "sha256": "e782ae23622e549ecc75b6cfb067438398dd0aa21b88fcf6dc34a4b50c8dcceb",
+  "notes": "Option 01 silhouette/proportion retained. Appearance approved by user on 2026-10-04."
+}
