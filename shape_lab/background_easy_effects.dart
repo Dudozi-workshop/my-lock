@@ -6,37 +6,142 @@ class FloorCausticPainter extends CustomPainter {
   FloorCausticPainter({required this.animation}) : super(repaint: animation);
   final Animation<double> animation;
 
+  double _hash(double x) {
+    final v = sin(x * 127.1 + 311.7) * 43758.5453;
+    return v - v.floorToDouble();
+  }
+
+  Path _flowPath(
+    Size size, {
+    required double baseY,
+    required double phase,
+    required double tilt,
+    required double seed,
+  }) {
+    final path = Path();
+    const segments = 20;
+    for (var i = 0; i <= segments; i++) {
+      final u = i / segments;
+      final local = _hash(seed + i * 1.73);
+      final px = size.width * (u + (local - .5) * .022);
+      final waveA = sin(u * pi * 2.4 + phase + seed) * size.height * .009;
+      final waveB = sin(u * pi * 5.2 - phase * .63 + seed * .41) *
+          size.height *
+          .0045;
+      final py = baseY +
+          (u - .5) * size.width * tilt +
+          waveA +
+          waveB +
+          (local - .5) * size.height * .006;
+      if (i == 0) {
+        path.moveTo(px, py);
+      } else {
+        path.lineTo(px, py);
+      }
+    }
+    return path;
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     final t = animation.value * pi * 2;
-    final region = Rect.fromLTWH(0, size.height * .64, size.width, size.height * .36);
+    final top = size.height * .61;
+    final region = Rect.fromLTWH(0, top, size.width, size.height - top);
     canvas.save();
     canvas.clipRect(region);
 
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = max(1.2, size.width * .004)
-      ..strokeCap = StrokeCap.round
-      ..blendMode = BlendMode.screen
-      ..color = const Color(0xFFFFFFFF).withValues(alpha: .10)
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, max(2.0, size.width * .006));
+    final fade = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color(0x00FFFFFF),
+          Color(0xFFFFFFFF),
+          Color(0xFFFFFFFF),
+        ],
+        stops: [0, .23, 1],
+      ).createShader(region);
 
-    for (var row = 0; row < 5; row++) {
-      final y = size.height * (.70 + row * .055);
+    canvas.saveLayer(region, fade);
+
+    const rows = 7;
+    for (var row = 0; row < rows; row++) {
+      final y = size.height * (.665 + row * .047);
+      final phase = t * (.28 + row * .018) + row * .71;
+      final path = _flowPath(
+        size,
+        baseY: y,
+        phase: phase,
+        tilt: -.035 + row * .008,
+        seed: 11.0 + row * 3.9,
+      );
+
+      final glow = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = max(3.0, size.width * .010)
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..blendMode = BlendMode.screen
+        ..color = const Color(0xFFFFF1D8).withValues(alpha: .17)
+        ..maskFilter =
+            MaskFilter.blur(BlurStyle.normal, max(4.0, size.width * .012));
+      canvas.drawPath(path, glow);
+
+      final core = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = max(1.1, size.width * .0036)
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..blendMode = BlendMode.screen
+        ..color = const Color(0xFFFFF8EA).withValues(alpha: .34);
+      canvas.drawPath(path, core);
+    }
+
+    const diagonals = 8;
+    for (var column = 0; column < diagonals; column++) {
+      final seed = 71.0 + column * 4.7;
       final path = Path();
-      for (var x = -1; x <= 13; x++) {
-        final px = size.width * (x / 12);
-        final py = y +
-            sin(x * .92 + row * .67 + t * .42) * size.height * .009 +
-            cos(x * .41 - t * .29 + row) * size.height * .005;
-        if (x == -1) {
+      const segments = 16;
+      for (var i = 0; i <= segments; i++) {
+        final v = i / segments;
+        final local = _hash(seed + i * 2.17);
+        final baseX = size.width * (-.08 + column * .145);
+        final px = baseX +
+            v * size.width * (.28 + (column % 3) * .025) +
+            sin(v * pi * 3.1 + t * .34 + seed) * size.width * .014 +
+            (local - .5) * size.width * .010;
+        final py = top +
+            v * (size.height - top) +
+            cos(v * pi * 2.7 - t * .27 + seed * .31) * size.height * .007;
+        if (i == 0) {
           path.moveTo(px, py);
         } else {
           path.lineTo(px, py);
         }
       }
-      canvas.drawPath(path, paint);
+
+      final glow = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = max(2.5, size.width * .008)
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..blendMode = BlendMode.screen
+        ..color = const Color(0xFFDDFEFF).withValues(alpha: .12)
+        ..maskFilter =
+            MaskFilter.blur(BlurStyle.normal, max(3.0, size.width * .010));
+      canvas.drawPath(path, glow);
+
+      final core = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = max(.9, size.width * .0030)
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..blendMode = BlendMode.screen
+        ..color = const Color(0xFFF7FFFF).withValues(alpha: .25);
+      canvas.drawPath(path, core);
     }
+
+    canvas.restore();
     canvas.restore();
   }
 
