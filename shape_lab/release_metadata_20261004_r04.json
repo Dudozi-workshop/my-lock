@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.04-R04",
+  "purpose": "Isolate Jellyfish Multi-Color PoC as a Palette Lab experimental sub-route",
+  "status": "Experimental / PoC / Candidate",
+  "scope": "Palette Lab > Experimental > Jellyfish Multi-Color only; no Production Palette changes",
+  "route": "?lab=palette&experiment=jellyfish-multicolor",
+  "source_branch": "feat/style-lab-integration",
+  "production_impact": "none",
+  "next_gate": "Jellyfish Static Master canonicalization and lock"
+}
