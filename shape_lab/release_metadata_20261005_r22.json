@@ -1,0 +1,12 @@
+{
+  "version": "LABS-2026.10.05-R22",
+  "source_branch": "feat/style-lab-integration",
+  "date": "2026-10-05",
+  "purpose": "Volumetric A reference texture + subtle local shader motion; R21 comparison preserved",
+  "status": "QA Candidate / Awaiting Keep-Modify-Reject / Not Final or Locked",
+  "scope": "Volumetric A only; Base, B/C and all other effects immutable",
+  "source_asset": "background.drop01.shallow_clear.base_only_v2",
+  "gate": "Drive registration, CI/deploy/public verification, then user static and motion Keep/Modify/Reject",
+  "reference": "User 76252.png panel 03",
+  "reference_usage": "Reference-density approximation, not exact extraction or Production Master; no ImageGen"
+}

@@ -1,6 +1,15 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · R21 candidate
+## Current handoff · A texture study R22 / QA Candidate
+- User authorizes an A-only painted-layer + subtle warp trial after R21 quality concerns. R21 renderer is preserved behind a comparison chip. No B/C expansion.
+- Preflight reads Notion 06 / Asset Master / 05 / 04 and current branch. Latest remote `32820b4210959188ba0b1c3392fd4f1747d333b0`, CI `37235876928` success; unrelated palette changes retained.
+- User reference `76252.png` has baked checker pixels. R22 texture is an approximate reference-density study (293×436 RGBA), not an original-alpha extraction or Production Master. No ImageGen.
+- Runtime: registered asset ID, cached per-widget texture/shader, local anchored deformation and mild brightness, mid-water fade. Reference frame / pause / play and R21 comparison.
+- Drive upload rejected by automatic approval review: explicit upload authorization required. Folder metadata confirms same approved-Base folder and non-shared state, but review still rejects. Do not retry or use another external destination to bypass.
+- User explicitly approved Drive upload on 2026-10-05. Uploaded and read-back verified: file `1hVs9mcDvkYdltEQoinaOiEAGSg8xQxeR`, PNG 20,248 bytes. Registry linked. CI/deploy/public verification next; art approval pending.
+- Base checksum unchanged. Non-A effect renderer file unchanged. Background remains not Final/LOCK.
+
+## Current deployed handoff · R21 candidate
 - R20 deployed `5be8a8d3029afc77f8494c6119dee3a3f2fccd04`, CI `37218684946` success; user rejects direction: independent overhead lamps, too thick, missing coherent fan.
 - User `76038.png` is primary art reference. R21 uses broad upper source region with a coherent outward fan, thin/medium shafts, faint broad support, irregular blue gaps, asymmetric soft boundaries.
 - A reference-frame/pause/play in Full Live: inspect frozen composition first, then motion. B/C clocks and every other effect unchanged.

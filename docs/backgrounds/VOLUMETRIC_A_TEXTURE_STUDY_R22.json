@@ -1,0 +1,31 @@
+{
+  "role": "reference_density_texture_study",
+  "status": "qa_candidate",
+  "production_master": false,
+  "imagegen": false,
+  "exact_alpha_extraction": false,
+  "source_sha256": "cbe6af6c27ca9e115b5c13d6342980e47bd7f75981b35148a8e61c7a1cf8779e",
+  "source_canvas": [
+    1536,
+    1024
+  ],
+  "reference_crop": [
+    634,
+    65,
+    927,
+    501
+  ],
+  "texture_canvas": [
+    293,
+    436
+  ],
+  "method": "4px vertical / 1.5px horizontal Gaussian checker suppression, bottom-water subtraction, blue/luminance density estimation, authored cream-to-cyan colour, mid-water alpha fade",
+  "limitations": [
+    "low-resolution baked checker reference",
+    "estimated density, not source pixels or original alpha",
+    "static art and Web motion approval pending"
+  ],
+  "runtime_asset": "assets/backgrounds/drop01/volumetric_a_texture_study_r22.png",
+  "sha256": "52b3bb4029a345642f8212c698914f4dd0a8089c5a1ab02a0d75dcbb50ff9d61",
+  "byte_size": 20248
+}

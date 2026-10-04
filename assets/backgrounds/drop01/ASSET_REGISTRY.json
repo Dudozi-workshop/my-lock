@@ -72,6 +72,34 @@
         "sha256": "0bbc263d61b3a524b9c027e1894fab3209085d631c7a2c313d261a17ecf98ff2"
       },
       "current_integrity": "verified_source_binary"
+    },
+    {
+      "asset_id": "background.drop01.shallow_clear.volumetric_a_texture_study_r22",
+      "slot": "01",
+      "name_ko": "Volumetric A · Texture Study R22",
+      "lifecycle": "qa_candidate",
+      "active_for_lab": true,
+      "production_role": "reference_density_study_not_production",
+      "registration_status": "registered",
+      "runtime_ref": {
+        "type": "flutter_asset",
+        "path": "assets/backgrounds/drop01/volumetric_a_texture_study_r22.png",
+        "git_blob_sha": "48864d3e1b70da48d3334d16c52b72cb34958fa3"
+      },
+      "source_of_truth": {
+        "decision": "User authorized A-only painted texture prototype; art approval pending",
+        "binary": "Google Drive / MY LOCK Assets / Drop 01 / Background Masters / volumetric_a_texture_study_r22.png",
+        "binary_url": "https://drive.google.com/file/d/1hVs9mcDvkYdltEQoinaOiEAGSg8xQxeR/view?usp=drivesdk"
+      },
+      "expected_integrity": {
+        "mime": "image/png",
+        "width": 293,
+        "height": 436,
+        "byte_size": 20248,
+        "sha256": "52b3bb4029a345642f8212c698914f4dd0a8089c5a1ab02a0d75dcbb50ff9d61"
+      },
+      "current_integrity": "verified_local_binary",
+      "derived_from": "User 76252.png panel 03 reference study, estimated alpha not exact extraction"
     }
   ]
 }

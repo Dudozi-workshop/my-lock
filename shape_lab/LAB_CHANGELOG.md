@@ -1,3 +1,6 @@
+## LABS-2026.10.05-R22 — A texture motion study
+A texture-density prototype from user panel 03 reference, subtle local shader warp, preserved R21 comparison and static/play controls. Low-resolution approximate study, not approved production art. Base/B/C/non-A unchanged. Drive upload explicitly authorized, registered and read-back verified. CI/deploy/public checks precede art approval.
+
 ## LABS-2026.10.05-R21 · Volumetric A reference-led fan
 - R20 rejected direction: unrelated overhead lights, shafts too thick, no shared fan.
 - User 76038.png is primary art reference; coherent outward angle field, thin/medium shafts with two faint broad supports and blue gaps.

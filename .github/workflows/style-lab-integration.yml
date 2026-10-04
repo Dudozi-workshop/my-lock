@@ -58,7 +58,7 @@ jobs:
           python3 - <<'PYCODE'
           import json, os, html
           from pathlib import Path
-          meta = json.loads(Path('shape_lab/release_metadata_20261005_r21.json').read_text())
+          meta = json.loads(Path('shape_lab/release_metadata_20261005_r22.json').read_text())
           meta['source_commit'] = os.environ['GITHUB_SHA']
           Path('build/shape_lab/labs-release.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2))
           page = Path('build/shape_lab/index.html')
@@ -106,7 +106,14 @@ jobs:
           test "$(wc -c < /tmp/base-only-v2.png | tr -d ' ')" = "1547439"
           echo "0bbc263d61b3a524b9c027e1894fab3209085d631c7a2c313d261a17ecf98ff2  /tmp/base-only-v2.png" | sha256sum -c -
 
-      - name: Verify R21 release identity
+      - name: Verify A texture study public binary
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        run: |
+          curl --fail --show-error --silent --location --retry 5 --retry-delay 3 --retry-all-errors --output /tmp/light-texture-r22.png "${PRIMARY_URL}assets/assets/backgrounds/drop01/volumetric_a_texture_study_r22.png"
+          test "$(wc -c < /tmp/light-texture-r22.png | tr -d ' ')" = "20248"
+          echo "52b3bb4029a345642f8212c698914f4dd0a8089c5a1ab02a0d75dcbb50ff9d61  /tmp/light-texture-r22.png" | sha256sum -c -
+
+      - name: Verify R22 release identity
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           python3 - <<'PYCODE'
@@ -117,8 +124,8 @@ jobs:
               url = os.environ['PRIMARY_URL'] + '?release=' + sha + '&attempt=' + str(attempt)
               try:
                   page = subprocess.check_output(['curl', '--fail', '--silent', '--show-error', '--location', '--max-time', '20', url], text=True)
-                  if expected in page and 'LABS-2026.10.05-R21' in page:
-                      print('Canonical R21 release verified:', sha)
+                  if expected in page and 'LABS-2026.10.05-R22' in page:
+                      print('Canonical R22 release verified:', sha)
                       break
                   print('Canonical HTML release propagation pending', flush=True)
               except Exception as error:

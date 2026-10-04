@@ -1,0 +1,18 @@
+{
+  "status": "registered_candidate_ci_pending",
+  "local_checks": "PASS: PNG RGBA decode, lower alpha 0, transparent RGB 0, beam-gap contrast, Base SHA256, complete existing effect source equality",
+  "not_run": [
+    "Flutter analyze",
+    "Flutter tests",
+    "shader compilation",
+    "CI",
+    "deployment",
+    "public asset checksum",
+    "live motion inspection"
+  ],
+  "external_write": "Drive upload explicitly approved; file 1hVs9mcDvkYdltEQoinaOiEAGSg8xQxeR metadata size/mime/parent verified",
+  "texture_sha256": "52b3bb4029a345642f8212c698914f4dd0a8089c5a1ab02a0d75dcbb50ff9d61",
+  "texture_byte_size": 20248,
+  "source_commit": "a31ced651b189af20664e6f5509313eb8a0ac331",
+  "inherited_ci_blocker": "Prior run 37236987812 fails Analyze with 18 issues from incomplete starfish integration; unrelated changes preserved"
+}

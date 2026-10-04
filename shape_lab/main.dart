@@ -18,6 +18,7 @@ import 'background_asset_registry.dart';
 import 'water_refraction_field.dart';
 import 'surface_refraction_field.dart';
 import 'background_easy_effects.dart';
+import 'painted_sunbeam_layer.dart';
 import 'candy_soft_review.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
 
@@ -124,7 +125,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R21 · Background Effects · A Broad Sunbeam',
+                                  'LABS-2026.10.05-R22 · Background Effects · A Texture Study',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5583,6 +5584,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   bool volumetricExpanded = true;
   int selectedVolumetric = 0;
   bool _broadSunbeamPaused = false;
+  bool _usePaintedSunbeam = true;
 
   static const backgrounds = [
     ('01', '투명한 얕은 바다', 'Image Selected · Effects In Progress'),
@@ -6044,7 +6046,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   ];
 
   static const _volumetricLabels = <String>[
-    'A · Broad Sunbeam · R21',
+    'A · Broad Sunbeam · R22 Texture Study',
     'B · Living Rays',
     'C · Soft Drift',
   ];
@@ -6211,6 +6213,20 @@ class _BackgroundLabState extends State<BackgroundLab>
               spacing: 8,
               runSpacing: 6,
               children: [
+                for (final painted in [true, false])
+                  ChoiceChip(
+                    label: Text(painted ? 'A 그림 레이어 · R22' : 'A 기존 방식 · R21'),
+                    selected: _usePaintedSunbeam == painted,
+                    onSelected: (_) {
+                      _soloEffect(2);
+                      setState(() {
+                        _usePaintedSunbeam = painted;
+                        _broadSunbeamClock.stop();
+                        _broadSunbeamClock.value = 0;
+                        _broadSunbeamPaused = true;
+                      });
+                    },
+                  ),
                 OutlinedButton.icon(
                   icon: Icon(_broadSunbeamPaused ? Icons.play_arrow : Icons.pause),
                   label: Text(_broadSunbeamPaused ? 'A 재생' : 'A 일시정지'),
@@ -6269,7 +6285,9 @@ class _BackgroundLabState extends State<BackgroundLab>
                   intensity: intensity,
                 ),
               ),
-            if (showVolumetricLight)
+            if (showVolumetricLight && selectedVolumetric == 0 && _usePaintedSunbeam)
+              PaintedSunbeamLayer(animation: _broadSunbeamClock),
+            if (showVolumetricLight && (selectedVolumetric != 0 || !_usePaintedSunbeam))
               CustomPaint(
                 painter: VolumetricLightPainter(
                   animation: selectedVolumetric == 0
