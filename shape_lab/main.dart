@@ -124,7 +124,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R13 · Background Effects · Legacy Surface Cleanup',
+                                  'LABS-2026.10.04-R14 · Background Effects · Volumetric Light A-C',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5492,23 +5492,6 @@ class _ValueChip extends StatelessWidget {
 enum _SurfaceRefractionCandidate { calmBroad, softPrism, livingSurface }
 
 extension on _SurfaceRefractionCandidate {
-  String get code => switch (this) {
-    _SurfaceRefractionCandidate.calmBroad => 'A',
-    _SurfaceRefractionCandidate.softPrism => 'B',
-    _SurfaceRefractionCandidate.livingSurface => 'C',
-  };
-
-  String get label => switch (this) {
-    _SurfaceRefractionCandidate.calmBroad => 'Calm Broad',
-    _SurfaceRefractionCandidate.softPrism => 'Soft Prism',
-    _SurfaceRefractionCandidate.livingSurface => 'Living Surface',
-  };
-
-  String get note => switch (this) {
-    _SurfaceRefractionCandidate.calmBroad => '넓고 느린 굴절 · 가장 잔잔한 기준안',
-    _SurfaceRefractionCandidate.softPrism => 'Planning Master의 Peach/Pink 반사광을 가장 적극적으로 반영',
-    _SurfaceRefractionCandidate.livingSurface => 'Cyan/White 중심 · 물이 살아있는 체감이 가장 큼',
-  };
   SurfaceRefractionProfile get profile => switch (this) {
     _SurfaceRefractionCandidate.calmBroad => const SurfaceRefractionProfile(
         mode: SurfaceRefractionMode.broadField,
@@ -5597,6 +5580,8 @@ class _BackgroundLabState extends State<BackgroundLab>
   bool showBubble = true;
   double intensity = 1.0;
   int? soloEffectIndex;
+  bool volumetricExpanded = true;
+  int selectedVolumetric = 0;
 
   static const backgrounds = [
     ('01', '투명한 얕은 바다', 'Image Selected · Effects In Progress'),
@@ -6028,6 +6013,79 @@ class _BackgroundLabState extends State<BackgroundLab>
     );
   }
 
+  static const _volumetricProfiles = <VolumetricLightProfile>[
+    VolumetricLightProfile(
+      mode: VolumetricLightMode.broadCalm,
+      energy: 1.0,
+      drift: .025,
+      width: .24,
+      depth: .64,
+    ),
+    VolumetricLightProfile(
+      mode: VolumetricLightMode.livingRays,
+      energy: 1.0,
+      drift: .035,
+      width: .20,
+      depth: .70,
+    ),
+    VolumetricLightProfile(
+      mode: VolumetricLightMode.softDrift,
+      energy: .92,
+      drift: .050,
+      width: .22,
+      depth: .62,
+    ),
+  ];
+
+  static const _volumetricLabels = <String>[
+    'A · Broad Calm',
+    'B · Living Rays',
+    'C · Soft Drift',
+  ];
+
+  Widget _volumetricCandidatePanel() {
+    return AnimatedCrossFade(
+      duration: const Duration(milliseconds: 160),
+      crossFadeState: volumetricExpanded
+          ? CrossFadeState.showSecond
+          : CrossFadeState.showFirst,
+      firstChild: const SizedBox.shrink(),
+      secondChild: Padding(
+        padding: const EdgeInsets.fromLTRB(42, 8, 8, 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '빛이 내려오는 방식 선택 · 선택 즉시 상단 Full Live에 반영',
+              style: TextStyle(
+                color: widget.muted,
+                fontSize: 10.5,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 7,
+              runSpacing: 7,
+              children: [
+                for (var i = 0; i < _volumetricLabels.length; i++)
+                  ChoiceChip(
+                    label: Text(_volumetricLabels[i]),
+                    selected: selectedVolumetric == i,
+                    onSelected: (_) => setState(() {
+                      selectedVolumetric = i;
+                      showVolumetricLight = true;
+                      soloEffectIndex = 2;
+                    }),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _layerStatusList() {
     final layers = [
       ('01', 'Surface Refraction', 'Deferred', showSurface, (bool v) => setState(() => showSurface = v), () => _soloEffect(0)),
@@ -6059,12 +6117,26 @@ class _BackgroundLabState extends State<BackgroundLab>
                   child: Text(layers[i].$2, style: TextStyle(color: widget.fg, fontSize: 12, fontWeight: FontWeight.w800)),
                 ),
                 _statusBadge(layers[i].$3, layers[i].$3 != 'Deferred'),
-                const SizedBox(width: 6),
+                const SizedBox(width: 4),
+                if (i == 2)
+                  IconButton(
+                    tooltip: volumetricExpanded ? '접기' : 'A-C 후보 열기',
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () => setState(
+                      () => volumetricExpanded = !volumetricExpanded,
+                    ),
+                    icon: Icon(
+                      volumetricExpanded
+                          ? Icons.expand_less_rounded
+                          : Icons.expand_more_rounded,
+                    ),
+                  ),
                 TextButton(onPressed: layers[i].$6, child: const Text('Solo')),
                 Switch(value: layers[i].$4, onChanged: layers[i].$5),
               ],
             ),
           ),
+          if (i == 2) _volumetricCandidatePanel(),
         ],
         const SizedBox(height: 8),
         Align(
@@ -6158,7 +6230,12 @@ class _BackgroundLabState extends State<BackgroundLab>
                 ),
               ),
             if (showVolumetricLight)
-              CustomPaint(painter: VolumetricLightPainter(animation: _surfaceClock)),
+              CustomPaint(
+                painter: VolumetricLightPainter(
+                  animation: _surfaceClock,
+                  profile: _volumetricProfiles[selectedVolumetric],
+                ),
+              ),
             if (showFloorCaustic)
               CustomPaint(painter: FloorCausticPainter(animation: _surfaceClock)),
             if (showAmbientParticle)
