@@ -6936,7 +6936,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    '같은 Base를 기기 비율별 BoxFit.cover로 표시해 실제 잘림과 Play Field를 확인합니다.',
+                    '현재 2:3 Core를 기기 비율별 BoxFit.cover로 표시해 실제 잘림을 확인합니다. Production 목표는 20:9 Master입니다.',
                     style: TextStyle(
                       color: widget.muted,
                       fontSize: 11,
@@ -7006,9 +7006,9 @@ class _BackgroundLabState extends State<BackgroundLab>
         ),
         const SizedBox(height: 10),
         Text(
-          'QA 원칙: 배경은 늘리거나 찌그러뜨리지 않고 cover crop을 사용합니다. '
-          '핵심 오브젝트와 중앙 Play Field는 모든 지원 비율의 공통 Safe Zone 안에서 유지되어야 합니다. '
-          '현재 Base가 특정 비율에서 잘리면 Base를 억지로 스케일하지 않고 Production Background Master의 overscan/anchor 설계를 수정합니다.',
+          'QA 원칙: 배경은 늘리거나 찌그러뜨리지 않습니다. 현재 1024×1536 이미지는 Core Composition으로 보존하고, '
+          'Production Master는 1440×3200(20:9)로 세로 방향을 확장합니다. 16:9에서는 상·하 약 10%씩만 bleed, '
+          '21:9에서는 좌·우 약 2.4%씩만 bleed가 발생하도록 설계합니다. 산호·주요 암석과 Play Field는 공통 Safe Zone 안에 유지합니다.',
           style: TextStyle(
             color: widget.muted,
             fontSize: 11,
@@ -7631,10 +7631,10 @@ class _BackgroundSafeZonePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final safe = Rect.fromLTWH(
-      size.width * .10,
-      size.height * .08,
-      size.width * .80,
-      size.height * .84,
+      size.width * .02381,
+      size.height * .10,
+      size.width * .95238,
+      size.height * .80,
     );
 
     final shade = Paint()..color = Colors.black.withValues(alpha: .12);
