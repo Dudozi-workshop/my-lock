@@ -4934,11 +4934,10 @@ class _WaterWaveCandidateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget preview(double size, Color background) {
-      return Container(
+    Widget preview(double size) {
+      return SizedBox(
         width: size,
         height: size,
-        color: background,
         child: CustomPaint(
           painter: _WaterWaveSeaTurtlePainter(
             paletteBase: paletteBase,
@@ -5000,7 +4999,7 @@ class _WaterWaveCandidateCard extends StatelessWidget {
           Center(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),
-              child: preview(190, const Color(0xFFF4FBFF)),
+              child: preview(190),
             ),
           ),
           const SizedBox(height: 9),
@@ -5009,19 +5008,19 @@ class _WaterWaveCandidateCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: preview(58, const Color(0xFFF5FBFF)),
+                child: preview(58),
               ),
               const SizedBox(width: 10),
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: preview(58, const Color(0xFF071A2D)),
+                child: preview(58),
               ),
             ],
           ),
           const SizedBox(height: 7),
           Center(
             child: Text(
-              '58px · Light / Dark',
+              '58px · Shape only',
               style: TextStyle(
                 color: muted,
                 fontSize: 9.5,
