@@ -74,3 +74,14 @@ Do not use as production masters:
 - Hidden Underlap fill remains unresolved.
 - Do not promote any v6/v7-style fill or generated QA sheet.
 - Resume only with the approved Mask v5 and a source-locked local restoration pipeline.
+
+
+## Static 2-Part Candidate v13 QA — 2026-10-04
+- Current Body candidate: Jellyfish_R4_Body_HiddenUnderlap_Candidate_v13_2048.png
+- Current Legs candidate: Jellyfish_R4_Legs_Clean_Candidate_v3_2048.png
+- Approved underlap boundary: Merged No-Gap Mask v5.
+- Source-lock QA: outside-mask Body changed pixels = 0; locked visible-region changed pixels = 0; new alpha pixels exist only inside Mask v5.
+- Runtime order: Body below, Legs above.
+- Raw RGBA recomposite differs from Appearance Master in hidden-underlap pixels because the legs contain partial transparency; this is expected for the restored hidden layer and is not treated as geometry drift.
+- Status: Candidate / NOT FINAL / NOT LOCKED.
+- Next gate: user visual approval, then Static 2-Part Master LOCK and production registration.
