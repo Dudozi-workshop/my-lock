@@ -6515,6 +6515,24 @@ extension on _SurfaceRefractionCandidate {
   };
 }
 
+enum _BackgroundWorkbenchStep { image, effects, composite, finalState }
+
+extension on _BackgroundWorkbenchStep {
+  String get code => switch (this) {
+    _BackgroundWorkbenchStep.image => '01',
+    _BackgroundWorkbenchStep.effects => '02',
+    _BackgroundWorkbenchStep.composite => '03',
+    _BackgroundWorkbenchStep.finalState => '04',
+  };
+
+  String get label => switch (this) {
+    _BackgroundWorkbenchStep.image => '배경 이미지',
+    _BackgroundWorkbenchStep.effects => '레이어 효과',
+    _BackgroundWorkbenchStep.composite => '합성 QA',
+    _BackgroundWorkbenchStep.finalState => 'Final',
+  };
+}
+
 class BackgroundLab extends StatefulWidget {
   const BackgroundLab({
     super.key,
@@ -6534,11 +6552,20 @@ class BackgroundLab extends StatefulWidget {
 class _BackgroundLabState extends State<BackgroundLab>
     with SingleTickerProviderStateMixin {
   late final AnimationController _surfaceClock;
+  late final Uint8List _approvedBaseBytes;
+
+  int selectedBackground = 0;
+  _BackgroundWorkbenchStep step = _BackgroundWorkbenchStep.image;
   _SurfaceRefractionCandidate selected = _SurfaceRefractionCandidate.calmBroad;
   bool showSurface = true;
   bool playing = true;
   double intensity = 1.0;
-  late final Uint8List _approvedBaseBytes;
+
+  static const backgrounds = [
+    ('01', '투명한 얕은 바다', 'Image Selected · Effects In Progress'),
+    ('02', '바닷속 하루', 'Not Started'),
+    ('03', '고요한 심해', 'Not Started'),
+  ];
 
   @override
   void initState() {
@@ -6569,13 +6596,33 @@ class _BackgroundLabState extends State<BackgroundLab>
 
   @override
   Widget build(BuildContext context) {
-    const candidates = _SurfaceRefractionCandidate.values;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _title(),
+        const SizedBox(height: 16),
+        _dropSelector(),
+        const SizedBox(height: 14),
+        _backgroundSelector(),
+        const SizedBox(height: 14),
+        _stepSelector(),
+        const SizedBox(height: 18),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 180),
+          child: selectedBackground == 0
+              ? _activeBackgroundBody()
+              : _notStartedBody(),
+        ),
+      ],
+    );
+  }
 
+  Widget _title() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Background Lab · Drop 01',
+          'Background Lab',
           style: TextStyle(
             color: widget.fg,
             fontSize: 24,
@@ -6584,141 +6631,61 @@ class _BackgroundLabState extends State<BackgroundLab>
         ),
         const SizedBox(height: 4),
         Text(
-          '투명한 얕은 바다 · P2 Surface Refraction',
+          'Drop → Background → Production Step',
           style: TextStyle(
             color: widget.muted,
-            fontWeight: FontWeight.w800,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Planning Visual Master v1의 상단 수면광만 Runtime Effect로 재현합니다. '
-          '구도 · 오브젝트 밀도 · 중앙 Play Field · 정적 Base는 잠금 상태입니다.',
-          style: TextStyle(color: widget.muted),
-        ),
-        const SizedBox(height: 14),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            _gateChip('P0 Planning', false, true),
-            _gateChip('P1 Clean Base', false, true),
-            _gateChip('P2 Surface', true, false),
-            _gateChip('P3 Floor Caustic', false, false),
-            _gateChip('P4 Light', false, false),
-            _gateChip('P5 Ambient', false, false),
-            _gateChip('P6 Composite', false, false),
-            _gateChip('P7 Shape QA', false, false),
-            _gateChip('P8 Closeout', false, false),
-          ],
-        ),
-        const SizedBox(height: 14),
-        _planningAnchor(),
-        const SizedBox(height: 14),
-        LayoutBuilder(
-          builder: (context, box) {
-            final columns = box.maxWidth >= 860 ? 3 : 1;
-            final w = columns == 3 ? (box.maxWidth - 24) / 3 : box.maxWidth;
-            return Wrap(
-              spacing: 12,
-              runSpacing: 14,
-              children: [
-                for (final candidate in candidates)
-                  SizedBox(
-                    width: w,
-                    child: _candidateCard(candidate),
-                  ),
-              ],
-            );
-          },
-        ),
-        const SizedBox(height: 14),
-        _controls(),
-        const SizedBox(height: 14),
-        _selectedPreview(),
-        const SizedBox(height: 10),
-        Text(
-          'P2에서는 Surface Refraction만 평가합니다. '
-          'Floor Caustic / Volumetric Light / Particle / Bubble / Shape는 모두 OFF입니다.',
-          style: TextStyle(color: widget.muted, fontSize: 12),
         ),
       ],
     );
   }
 
-  Widget _gateChip(String label, bool active, bool completed) {
-    final background = active
-        ? const Color(0xFFECE5FF)
-        : completed
-            ? const Color(0xFFEAF7EF)
-            : widget.card;
-    final border = active
-        ? const Color(0xFF7655C9)
-        : completed
-            ? const Color(0xFF5A9B70)
-            : const Color(0xFFE4E0E8);
-    return Chip(
-      label: Text(
-        completed ? label + ' · ✓' : label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: active || completed ? FontWeight.w900 : FontWeight.w700,
-        ),
+  Widget _dropSelector() {
+    return _sectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionLabel('DROP'),
+          const SizedBox(height: 9),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _navChip(
+                label: 'Drop 01 · 작은 바닷속',
+                selected: true,
+                onTap: () {},
+              ),
+              _navChip(
+                label: 'Drop 02 · 준비중',
+                selected: false,
+                enabled: false,
+                onTap: () {},
+              ),
+            ],
+          ),
+        ],
       ),
-      backgroundColor: background,
-      side: BorderSide(color: border),
     );
   }
 
-  Widget _planningAnchor() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: widget.card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE4E0E8)),
-      ),
-      child: Row(
+  Widget _backgroundSelector() {
+    return _sectionCard(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 10,
-            height: 78,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFFFC5D1),
-                  Color(0xFFC9F5F1),
-                  Color(0xFF7CCFE4),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(99),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          _sectionLabel('BACKGROUND'),
+          const SizedBox(height: 9),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
               children: [
-                Text(
-                  'Planning Master Anchor · LOCKED',
-                  style: TextStyle(
-                    color: widget.fg,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '목표: 상단 20–28%에서만 부드러운 굴절광이 살아 움직이고, '
-                  '중앙은 깨끗하게 유지. 선형 Wave Stroke / 반복 Sin Pattern 금지.',
-                  style: TextStyle(
-                    color: widget.muted,
-                    fontSize: 12,
-                    height: 1.45,
-                  ),
-                ),
+                for (var i = 0; i < backgrounds.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 8),
+                  _backgroundTab(i),
+                ],
               ],
             ),
           ),
@@ -6727,16 +6694,376 @@ class _BackgroundLabState extends State<BackgroundLab>
     );
   }
 
+  Widget _backgroundTab(int index) {
+    final item = backgrounds[index];
+    final active = selectedBackground == index;
+    return InkWell(
+      borderRadius: BorderRadius.circular(15),
+      onTap: () => setState(() {
+        selectedBackground = index;
+        step = _BackgroundWorkbenchStep.image;
+      }),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        constraints: const BoxConstraints(minWidth: 184),
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
+        decoration: BoxDecoration(
+          color: active ? const Color(0xFFECE5FF) : widget.card,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+            color: active ? const Color(0xFF7655C9) : const Color(0xFFE1DDE8),
+            width: active ? 1.6 : 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              item.$1 + ' · ' + item.$2,
+              style: TextStyle(
+                color: widget.fg,
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              item.$3,
+              style: TextStyle(
+                color: active ? const Color(0xFF6A4FC0) : widget.muted,
+                fontSize: 9.5,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _stepSelector() {
+    return _sectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionLabel('PRODUCTION STEP'),
+          const SizedBox(height: 9),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final item in _BackgroundWorkbenchStep.values)
+                _navChip(
+                  label: item.code + ' · ' + item.label,
+                  selected: step == item,
+                  enabled: selectedBackground == 0 ||
+                      item == _BackgroundWorkbenchStep.image,
+                  onTap: () => setState(() => step = item),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _activeBackgroundBody() {
+    return switch (step) {
+      _BackgroundWorkbenchStep.image => _imageStep(),
+      _BackgroundWorkbenchStep.effects => _effectsStep(),
+      _BackgroundWorkbenchStep.composite => _compositeStep(),
+      _BackgroundWorkbenchStep.finalState => _finalStep(),
+    };
+  }
+
+  Widget _imageStep() {
+    return _sectionCard(
+      key: const ValueKey('background-image-step'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _stepHeader(
+            '01 · 배경 이미지',
+            'Planning Visual → 선택 → Clean Background Base',
+            'Selected / Base Candidate',
+          ),
+          const SizedBox(height: 14),
+          LayoutBuilder(
+            builder: (context, box) {
+              final wide = box.maxWidth >= 720;
+              final preview = _approvedBasePreview(showBadge: true);
+              final info = _imageInfo();
+              if (!wide) {
+                return Column(
+                  children: [
+                    preview,
+                    const SizedBox(height: 14),
+                    info,
+                  ],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 5, child: preview),
+                  const SizedBox(width: 16),
+                  Expanded(flex: 4, child: info),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _imageInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _infoRow('현재 기준', 'Planning Visual Master v1'),
+        _infoRow('Base', 'shallow_clear_base_v1'),
+        _infoRow('구도', '중앙 Play Field 확보 · 좌하단 환경 요소 집중'),
+        _infoRow('잠금', '구도 · 오브젝트 밀도 · 색감 계열 · 세계관'),
+        _infoRow('동적 요소', 'Base에 Bake하지 않음'),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEAF7EF),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: const Text(
+            '배경 이미지 선정 완료. 다음 수정은 새 Candidate/Version으로만 진행.',
+            style: TextStyle(
+              color: Color(0xFF356C49),
+              fontSize: 11,
+              height: 1.4,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _effectsStep() {
+    return _sectionCard(
+      key: const ValueKey('background-effects-step'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _stepHeader(
+            '02 · 레이어 효과',
+            '승인 Base는 그대로 유지하고 Effect만 독립 제작',
+            'Surface Active',
+          ),
+          const SizedBox(height: 14),
+          _layerStatusList(),
+          const SizedBox(height: 16),
+          Divider(color: widget.muted.withValues(alpha: .18)),
+          const SizedBox(height: 12),
+          Text(
+            'Surface Refraction · Candidate Compare',
+            style: TextStyle(
+              color: widget.fg,
+              fontSize: 15,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '현재 단계에서는 Surface만 평가합니다. 다른 Effect와 Shape는 모두 잠금.',
+            style: TextStyle(color: widget.muted, fontSize: 11.5),
+          ),
+          const SizedBox(height: 12),
+          _surfaceCandidates(),
+          const SizedBox(height: 14),
+          _controls(),
+          const SizedBox(height: 14),
+          _selectedPreview(),
+        ],
+      ),
+    );
+  }
+
+  Widget _layerStatusList() {
+    const layers = [
+      ('01', 'Surface Refraction', 'Candidate', true),
+      ('02', 'Floor Caustic', 'Not Started', false),
+      ('03', 'Volumetric Light', 'Not Started', false),
+      ('04', 'Ambient Particle', 'Not Started', false),
+      ('05', 'Bubble', 'Not Started', false),
+    ];
+    return Column(
+      children: [
+        for (var i = 0; i < layers.length; i++) ...[
+          if (i > 0) const SizedBox(height: 7),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: layers[i].$4
+                  ? const Color(0xFFF3EFFF)
+                  : widget.muted.withValues(alpha: .06),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: layers[i].$4
+                    ? const Color(0xFFD9CDF9)
+                    : widget.muted.withValues(alpha: .12),
+              ),
+            ),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 30,
+                  child: Text(
+                    layers[i].$1,
+                    style: TextStyle(
+                      color: widget.muted,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    layers[i].$2,
+                    style: TextStyle(
+                      color: widget.fg,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                _statusBadge(layers[i].$3, layers[i].$4),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _surfaceCandidates() {
+    const candidates = _SurfaceRefractionCandidate.values;
+    return LayoutBuilder(
+      builder: (context, box) {
+        final columns = box.maxWidth >= 860 ? 3 : 1;
+        final w = columns == 3 ? (box.maxWidth - 24) / 3 : box.maxWidth;
+        return Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            for (final candidate in candidates)
+              SizedBox(width: w, child: _candidateCard(candidate)),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _compositeStep() {
+    return _sectionCard(
+      key: const ValueKey('background-composite-step'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _stepHeader(
+            '03 · 합성 QA',
+            'Base Only ↔ Full Composite · 승인 Effect 전체 검수',
+            'Waiting',
+          ),
+          const SizedBox(height: 16),
+          _lockedStage(
+            '레이어 효과 승인 후 활성화',
+            'Surface / Floor Caustic / Light / Ambient / Bubble을 하나씩 승인한 뒤 '
+                '전체 합성과 실제 Locked Shape 6·9·12개 조건을 검수합니다.',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _finalStep() {
+    return _sectionCard(
+      key: const ValueKey('background-final-step'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _stepHeader(
+            '04 · Final',
+            'Production Master · Runtime Asset · Manifest · QA',
+            'Waiting',
+          ),
+          const SizedBox(height: 16),
+          _lockedStage(
+            '합성 QA 통과 후 활성화',
+            '사용자 승인 전에는 Final / Locked / Active로 승격하지 않습니다. '
+                '승격 후 수정은 기존 파일 덮어쓰기가 아니라 새 Version으로 진행합니다.',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _notStartedBody() {
+    final item = backgrounds[selectedBackground];
+    return _sectionCard(
+      key: ValueKey('background-not-started-' + selectedBackground.toString()),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _stepHeader(
+            item.$1 + ' · ' + item.$2,
+            '동일 Production Step 구조 적용',
+            'Not Started',
+          ),
+          const SizedBox(height: 14),
+          _lockedStage(
+            '아직 제작 시작 전',
+            '01 배경 이미지 선정부터 시작하며, 투명한 얕은 바다 파일럿에서 '
+                '검증된 공정을 그대로 적용합니다.',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _approvedBasePreview({bool showBadge = false}) {
+    return AspectRatio(
+      aspectRatio: .67,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.memory(
+              _approvedBaseBytes,
+              fit: BoxFit.cover,
+              gaplessPlayback: true,
+            ),
+            if (showBadge)
+              Positioned(
+                left: 10,
+                top: 10,
+                child: _previewBadge('APPROVED BASE'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _candidateCard(_SurfaceRefractionCandidate candidate) {
     final active = selected == candidate;
     return InkWell(
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(20),
       onTap: () => setState(() => selected = candidate),
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(9),
         decoration: BoxDecoration(
           color: widget.card,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: active ? const Color(0xFF7655C9) : const Color(0xFFE4E0E8),
             width: active ? 2 : 1,
@@ -6748,41 +7075,35 @@ class _BackgroundLabState extends State<BackgroundLab>
             AspectRatio(
               aspectRatio: .67,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(15),
                 child: Stack(
+                  fit: StackFit.expand,
                   children: [
-                    Positioned.fill(
-                      child: Image.memory(_approvedBaseBytes, fit: BoxFit.cover, gaplessPlayback: true),
+                    Image.memory(
+                      _approvedBaseBytes,
+                      fit: BoxFit.cover,
+                      gaplessPlayback: true,
                     ),
                     if (showSurface)
-                      Positioned.fill(
-                        child: CustomPaint(
-                          painter: _SurfaceRefractionPainter(
-                            candidate: candidate,
-                            animation: _surfaceClock,
-                            intensity: intensity,
-                          ),
+                      CustomPaint(
+                        painter: _SurfaceRefractionPainter(
+                          candidate: candidate,
+                          animation: _surfaceClock,
+                          intensity: intensity,
                         ),
                       ),
                     Positioned(
-                      left: 10,
-                      top: 10,
-                      child: _previewBadge(candidate.code + ' · ' + candidate.label),
-                    ),
-                    if (active)
-                      const Positioned(
-                        right: 10,
-                        top: 10,
-                        child: Icon(
-                          Icons.check_circle_rounded,
-                          color: Color(0xFF7655C9),
-                        ),
+                      left: 8,
+                      top: 8,
+                      child: _previewBadge(
+                        candidate.code + ' · ' + candidate.label,
                       ),
+                    ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 9),
+            const SizedBox(height: 8),
             Text(
               candidate.code + ' · ' + candidate.label,
               style: TextStyle(
@@ -6795,7 +7116,7 @@ class _BackgroundLabState extends State<BackgroundLab>
               candidate.note,
               style: TextStyle(
                 color: widget.muted,
-                fontSize: 12,
+                fontSize: 11,
                 height: 1.35,
               ),
             ),
@@ -6807,11 +7128,10 @@ class _BackgroundLabState extends State<BackgroundLab>
 
   Widget _controls() {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
-        color: widget.card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE4E0E8)),
+        color: widget.muted.withValues(alpha: .055),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
@@ -6844,12 +7164,12 @@ class _BackgroundLabState extends State<BackgroundLab>
           Row(
             children: [
               SizedBox(
-                width: 82,
+                width: 74,
                 child: Text(
                   'Intensity',
                   style: TextStyle(
                     color: widget.muted,
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -6865,13 +7185,13 @@ class _BackgroundLabState extends State<BackgroundLab>
                 ),
               ),
               SizedBox(
-                width: 42,
+                width: 38,
                 child: Text(
                   intensity.toStringAsFixed(2),
                   textAlign: TextAlign.end,
                   style: TextStyle(
                     color: widget.fg,
-                    fontSize: 11,
+                    fontSize: 10.5,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -6884,49 +7204,228 @@ class _BackgroundLabState extends State<BackgroundLab>
   }
 
   Widget _selectedPreview() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Selected Runtime Preview · ' + selected.code + ' ' + selected.label,
+          style: TextStyle(
+            color: widget.fg,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 9),
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: AspectRatio(
+              aspectRatio: .67,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.memory(
+                      _approvedBaseBytes,
+                      fit: BoxFit.cover,
+                      gaplessPlayback: true,
+                    ),
+                    if (showSurface)
+                      CustomPaint(
+                        painter: _SurfaceRefractionPainter(
+                          candidate: selected,
+                          animation: _surfaceClock,
+                          intensity: intensity,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _stepHeader(String title, String subtitle, String status) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: widget.fg,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  color: widget.muted,
+                  fontSize: 11,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 10),
+        _statusBadge(status, status != 'Waiting' && status != 'Not Started'),
+      ],
+    );
+  }
+
+  Widget _lockedStage(String title, String detail) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: widget.card,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE4E0E8)),
+        color: widget.muted.withValues(alpha: .055),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: widget.muted.withValues(alpha: .12)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Icon(Icons.lock_outline_rounded, color: widget.muted),
+          const SizedBox(height: 8),
           Text(
-            'Selected Runtime Preview · ' + selected.code + ' ' + selected.label,
+            title,
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: widget.fg,
               fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(height: 10),
-          Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 430),
-              child: AspectRatio(
-                aspectRatio: .67,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(22),
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Image.memory(_approvedBaseBytes, fit: BoxFit.cover, gaplessPlayback: true),
-                      ),
-                      if (showSurface)
-                        Positioned.fill(
-                          child: CustomPaint(
-                            painter: _SurfaceRefractionPainter(
-                              candidate: selected,
-                              animation: _surfaceClock,
-                              intensity: intensity,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+          const SizedBox(height: 5),
+          Text(
+            detail,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: widget.muted,
+              fontSize: 11,
+              height: 1.45,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sectionCard({Key? key, required Widget child}) {
+    return Container(
+      key: key,
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: widget.card,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE4E0E8)),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _navChip({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+    bool enabled = true,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(99),
+      onTap: enabled ? onTap : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected
+              ? const Color(0xFFECE5FF)
+              : enabled
+                  ? widget.card
+                  : widget.muted.withValues(alpha: .06),
+          borderRadius: BorderRadius.circular(99),
+          border: Border.all(
+            color: selected
+                ? const Color(0xFF7655C9)
+                : widget.muted.withValues(alpha: .20),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: enabled ? widget.fg : widget.muted,
+            fontSize: 11,
+            fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _statusBadge(String label, bool active) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: active
+            ? const Color(0xFFEAF7EF)
+            : widget.muted.withValues(alpha: .08),
+        borderRadius: BorderRadius.circular(99),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: active ? const Color(0xFF356C49) : widget.muted,
+          fontSize: 9,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
+
+  Widget _sectionLabel(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        color: widget.muted,
+        fontSize: 9.5,
+        letterSpacing: .7,
+        fontWeight: FontWeight.w900,
+      ),
+    );
+  }
+
+  Widget _infoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 9),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 74,
+            child: Text(
+              label,
+              style: TextStyle(
+                color: widget.muted,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                color: widget.fg,
+                fontSize: 11,
+                height: 1.35,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -6938,16 +7437,16 @@ class _BackgroundLabState extends State<BackgroundLab>
   Widget _previewBadge(String text) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: .88),
+        color: Colors.white.withValues(alpha: .90),
         borderRadius: BorderRadius.circular(99),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         child: Text(
           text,
           style: const TextStyle(
             color: Color(0xFF34313B),
-            fontSize: 9.5,
+            fontSize: 9,
             fontWeight: FontWeight.w900,
           ),
         ),
