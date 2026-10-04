@@ -129,7 +129,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R23 · Starfish · Motion Runtime QA',
+                                  'LABS-2026.10.05-R24 · Starfish · Shape + Motion QA',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -282,6 +282,8 @@ class ShapeLab extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         _StarfishProductionSystemPanel(card: card, fg: fg, muted: muted),
+        const SizedBox(height: 14),
+        _StarfishMotionRuntimePanel(card: card, fg: fg, muted: muted),
       ],
     );
   }
