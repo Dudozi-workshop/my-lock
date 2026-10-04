@@ -47,10 +47,18 @@ jobs:
       - name: Test
         run: flutter test
 
+      - name: Build production Web for PR
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          python3 tool/mylock_asset_system.py validate-all assets/shape_masters
+          bash tool/build_web.sh
+
       - name: Build integrated Labs
+        if: ${{ github.event_name != 'pull_request' }}
         run: bash tool/build_shape_lab.sh
 
       - name: Upload recovery artifact
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@v4
         with:
           name: my-lock-integrated-labs
