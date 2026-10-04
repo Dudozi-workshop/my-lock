@@ -233,7 +233,15 @@ class ShapeSpecRenderer {
     final source = Offset.zero & spec.metadata.runtimeCanvas;
     final idle = spec.metadata.idle.isEmpty || swimKey == null
         ? const WholeShapeIdleTransform()
-        : WholeShapeIdleRuntime.instance.transformFor(key: swimKey, timeSeconds: paletteTimeSeconds, config: spec.metadata.idle, radius: radius);
+        : WholeShapeIdleRuntime.instance.transformFor(
+            key: swimKey,
+            timeSeconds: paletteTimeSeconds,
+            config: spec.metadata.idle,
+            radius: radius,
+          );
+    void applyObjectTransform() {
+      applyObjectTransform();
+    }
     final sampling = Paint()..filterQuality = FilterQuality.high;
     final pose = spec.metadata.swim.isEmpty || swimKey == null
         ? 's0'
@@ -247,10 +255,7 @@ class ShapeSpecRenderer {
     final auroraConfig = auroraConfigOverride ?? spec.metadata.aurora;
     if (token.tone == ShapeTone.auroraSea && auroraConfig['mode'] == 'water_refraction') {
       canvas.save();
-      canvas.translate(center.dx + idle.offset.dx, center.dy + idle.offset.dy);
-      canvas.rotate(objectRotation + idle.rotationRadians);
-      canvas.scale(idle.scaleX, idle.scaleY);
-      canvas.translate(-center.dx, -center.dy);
+      applyObjectTransform();
       canvas.clipRect(destination, doAntiAlias: false);
       canvas.saveLayer(destination, Paint()..color = Colors.white.withValues(alpha: opacity));
       // Exact approved LABS alpha-first + srcIn pass, followed by fixed finish.
@@ -269,10 +274,7 @@ class ShapeSpecRenderer {
       return;
     }
     canvas.save();
-    canvas.translate(center.dx + idle.offset.dx, center.dy + idle.offset.dy);
-    canvas.rotate(objectRotation + idle.rotationRadians);
-    canvas.scale(idle.scaleX, idle.scaleY);
-    canvas.translate(-center.dx, -center.dy);
+    applyObjectTransform();
     canvas.saveLayer(
       destination,
       Paint()..color = Colors.white.withValues(alpha: opacity),
