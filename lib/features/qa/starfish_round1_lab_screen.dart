@@ -61,11 +61,11 @@ class _CandidateCard extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('${candidate.code} · ${candidate.label}', style: const TextStyle(fontWeight: FontWeight.w900)),
           const Spacer(),
-          Center(child: CustomPaint(size: const Size.square(170), painter: _StarfishPainter(candidate, 58Mode: false))),
+          Center(child: CustomPaint(size: const Size.square(170), painter: _StarfishPainter(candidate, runtimeMode: false))),
           const Spacer(),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             const Text('58 px  ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-            CustomPaint(size: const Size.square(58), painter: _StarfishPainter(candidate, 58Mode: true)),
+            CustomPaint(size: const Size.square(58), painter: _StarfishPainter(candidate, runtimeMode: true)),
           ]),
         ]),
       ),
@@ -74,9 +74,9 @@ class _CandidateCard extends StatelessWidget {
 }
 
 class _StarfishPainter extends CustomPainter {
-  _StarfishPainter(this.candidate, {required this.58Mode});
+  _StarfishPainter(this.candidate, {required this.runtimeMode});
   final _StarfishCandidate candidate;
-  final bool 58Mode;
+  final bool runtimeMode;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -119,7 +119,7 @@ class _StarfishPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _StarfishPainter oldDelegate) => oldDelegate.candidate != candidate || oldDelegate.58Mode != 58Mode;
+  bool shouldRepaint(covariant _StarfishPainter oldDelegate) => oldDelegate.candidate != candidate || oldDelegate.runtimeMode != runtimeMode;
 }
 
 class _StarfishCandidate {
