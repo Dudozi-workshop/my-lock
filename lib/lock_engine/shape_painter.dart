@@ -12,6 +12,7 @@ class LockTokenPainter extends CustomPainter {
   LockTokenPainter(this.token, {this.style = ShapeStyle.softBasic})
     : super(
         repaint: token.shape == ShapeKind.seaTurtle ||
+                token.shape == ShapeKind.starfish ||
                 token.tone == ShapeTone.auroraSea
             ? RasterPaletteClock.instance
             : null,
