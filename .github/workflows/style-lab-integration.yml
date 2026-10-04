@@ -27,8 +27,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: feat/style-lab-integration
 
       - name: Validate two-site governance
         run: python3 tool/validate_site_governance.py
@@ -61,20 +59,20 @@ jobs:
           retention-days: 14
 
       - name: Set Pages production branch to integration
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        if: ${{ github.event_name != 'pull_request' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           set -e
           API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$PAGES_PROJECT"
           curl --fail --show-error --silent --request PATCH --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" --header "Content-Type: application/json" --data '{"production_branch":"feat/style-lab-integration"}' "$API" --output /tmp/pages-project-update.json
 
       - name: Deploy integrated Labs
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        if: ${{ github.event_name != 'pull_request' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           set -e
           npx wrangler pages deploy build/shape_lab --project-name "$PAGES_PROJECT" --branch "feat/style-lab-integration" --commit-hash "$(git rev-parse HEAD)"
 
       - name: Verify public Labs
-        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        if: ${{ github.event_name != 'pull_request' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           set -e
           curl --fail --show-error --silent --location --retry 5 --retry-delay 3 --retry-all-errors --output /tmp/pages-index.html "$PRIMARY_URL"
