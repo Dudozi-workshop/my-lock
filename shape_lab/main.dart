@@ -129,7 +129,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R25 · Background A · Visible Motion / QA Candidate',
+                                  'LABS-2026.10.05-R26 · Background A · Visible Motion / QA Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -6224,7 +6224,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   ];
 
   static const _volumetricLabels = <String>[
-    'A · Broad Sunbeam · R25 Visible Motion',
+    'A · Broad Sunbeam · R26 Visible Motion',
     'B · Living Rays',
     'C · Soft Drift',
   ];
@@ -6393,7 +6393,7 @@ class _BackgroundLabState extends State<BackgroundLab>
               children: [
                 for (final painted in [true, false])
                   ChoiceChip(
-                    label: Text(painted ? 'A 그림 레이어 · R25' : 'A 기존 방식 · R21'),
+                    label: Text(painted ? 'A 그림 레이어 · R26' : 'A 기존 방식 · R21'),
                     selected: _usePaintedSunbeam == painted,
                     onSelected: (_) {
                       _soloEffect(2);

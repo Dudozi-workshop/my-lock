@@ -1,6 +1,11 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · A R25 visible motion / QA Candidate
+## Current handoff · A R26 Canvas image motion / QA Candidate
+- R25 full CI/deploy passed but live showed clock running while texture was absent, including static frame. Browser reported CPU-only fallback (webGLVersion -1); no shader load exception. Treat visual failure as open, not deployment success.
+- R26 actual renderer uses image-only Canvas overlapping strip warp, width/brightness modulation with same registered R22 PNG. Removes FragmentShader dependency from the layer. Top anchor/mid-water image alpha preserved. Actual runtime painter tested at 0/2s/loop, not a separate shader.
+- Auto-play, explicit pause/reference and R21 comparison retained. Header/metadata/workflow synchronized R26. No new binary, other effects unchanged. Live verification pending.
+
+## Previous handoff · A R25 visible motion / QA Candidate
 - User reports R22 playback seems absent and requests visible motion. R22 frame delta was technical PASS, insufficient perceptual change. No claim that user device playback was reproduced.
 - R25 keeps exact registered R22 texture and static phase zero. Local horizontal warp 0.020/0.007, vertical 0.007, brightness 0.18, primary period 4.8 seconds on preserved 24-second A clock. Upper anchor/mid-water cutoff preserved. R21 and B/C clocks/other effects unchanged.
 - Selecting painted A now auto-plays instead of silently pausing; explicit reference frame still pauses. Visible play state and clock progress added. Pause/play retained.

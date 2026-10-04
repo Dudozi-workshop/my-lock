@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
+import 'package:flutter/animation.dart';
+import '../shape_lab/painted_sunbeam_layer.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../shape_lab/background_asset_registry.dart';
 
@@ -25,7 +27,7 @@ void main() {
     }
     image.dispose();
   });
-  test('A shader changes within two seconds and closes the loop', () async {
+  test('A actual Canvas image painter changes within two seconds and closes the loop', () async {
     final registry = await BackgroundAssetRegistry.load();
     final data = await rootBundle.load(registry.resolve(
       'background.drop01.shallow_clear.volumetric_a_texture_study_r22',
@@ -33,12 +35,10 @@ void main() {
     final codec = await ui.instantiateImageCodec(data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes));
     final texture = (await codec.getNextFrame()).image;
     codec.dispose();
-    final program = await ui.FragmentProgram.fromAsset('shaders/volumetric_texture.frag');
-    final shader = program.fragmentShader()..setImageSampler(0, texture);
     Future<List<int>> frame(double phase) async {
-      shader..setFloat(0, 180)..setFloat(1, 320)..setFloat(2, phase);
       final recorder = ui.PictureRecorder();
-      ui.Canvas(recorder).drawRect(const ui.Rect.fromLTWH(0, 0, 180, 320), ui.Paint()..shader = shader);
+      PaintedSunbeamPainter(texture, AlwaysStoppedAnimation(phase / (math.pi * 2)))
+          .paint(ui.Canvas(recorder), const ui.Size(180, 320));
       final picture = recorder.endRecording();
       final image = await picture.toImage(180, 320);
       final bytes = (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!.buffer.asUint8List().toList();
@@ -60,7 +60,7 @@ void main() {
     expect(changed, greaterThan(200));
     expect(strongChanged, greaterThan(800));
     expect(largestLoopDifference, lessThanOrEqualTo(1));
-    shader.dispose(); texture.dispose();
+    texture.dispose();
   });
 
 }
