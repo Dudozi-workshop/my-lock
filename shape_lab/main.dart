@@ -5753,7 +5753,7 @@ class _PaletteLabState extends State<PaletteLab>
               _SectionTitle(
                 title: 'Water Wave R2 · H02B Final',
                 subtitle:
-                    'Production C02는 잠금 유지. 동일 Sea Turtle Production Palette Base + Fixed Finish에서 굴절면과 불규칙 수면광만 비교합니다. W01~W03은 Reject / Archived.',
+                    'H02B는 Signature Color v3 Final / Locked / Active. C02 원본은 복구 이력으로 보존합니다. 동일 Palette Base + Fixed Finish 기준이며 W01~W03은 Reject / Archived.',
                 fg: widget.fg,
                 muted: widget.muted,
               ),
