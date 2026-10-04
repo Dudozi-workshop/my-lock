@@ -85,3 +85,17 @@ Do not use as production masters:
 - Raw RGBA recomposite differs from Appearance Master in hidden-underlap pixels because the legs contain partial transparency; this is expected for the restored hidden layer and is not treated as geometry drift.
 - Status: Candidate / NOT FINAL / NOT LOCKED.
 - Next gate: user visual approval, then Static 2-Part Master LOCK and production registration.
+
+
+## STATIC 2-PART MASTER — FINAL / LOCKED — 2026-10-04
+- User approved v13 visual QA and authorized promotion.
+- Appearance: J04-M3-R4 Compact.
+- Body Master: Hidden Underlap v13 -> FINAL / LOCKED.
+- Legs Master: Corrected Split v3 -> FINAL / LOCKED.
+- Underlap Mask: Merged No-Gap Mask v5 -> LOCKED support asset.
+- Runtime layer order: Body below -> Legs above.
+- Canvas: 2048x2048 RGBA.
+- QA gate passed: outside-mask Body changed pixels = 0; locked visible Body changed pixels = 0; Legs unchanged.
+- Color / Multi Palette and Motion remain separate tracks and were not modified.
+- Prior CleanSplit v1 / Registered v3 cross-ownership assets and rejected Hidden Underlap v2/v6/v7-style outputs remain excluded from Production.
+- This promotion supersedes Candidate status for the static 2-part geometry only.
