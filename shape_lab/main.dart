@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:my_lock/lock_engine/effects.dart';
 import 'package:my_lock/lock_engine/floating_preview.dart';
 import 'package:my_lock/lock_engine/models.dart';
+import 'package:my_lock/lock_engine/raster_palette_clock.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_render_overrides.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec.dart';
@@ -26,6 +27,7 @@ import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ShapeSpecRegistry.instance.load();
+  await ShapeSpecRegistry.instance.loadRasterShapes();
   await CandySoftRuntime.instance.load();
   await BackgroundAssetRegistry.load();
   runApp(const MyLockLabsApp());
@@ -127,7 +129,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R22 · Background Effects · A Texture Study',
+                                  'LABS-2026.10.05-R23 · Starfish · Motion Runtime QA',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5201,6 +5203,166 @@ class _EffectLabState extends State<EffectLab> {
   }
 }
 
+
+class _StarfishMotionRuntimePanel extends StatelessWidget {
+  const _StarfishMotionRuntimePanel({
+    required this.card,
+    required this.fg,
+    required this.muted,
+  });
+
+  final Color card;
+  final Color fg;
+  final Color muted;
+
+  Widget _token({
+    required String keyName,
+    required double size,
+    required ShapeTone tone,
+  }) {
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(
+        painter: _StarfishIdleQaPainter(
+          keyName: keyName,
+          tone: tone,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _Panel(
+      color: card,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: 'Starfish · micro-idle · APP EXACT',
+            subtitle:
+                '승인 Production Asset과 본앱 ShapeSpecRenderer를 그대로 사용합니다. 별도 Preview renderer 없이 Whole Shape micro-idle만 검수합니다.',
+            fg: fg,
+            muted: muted,
+          ),
+          const SizedBox(height: 10),
+          const Wrap(
+            spacing: 7,
+            runSpacing: 7,
+            children: [
+              _ValueChip(label: 'Static', value: 'FINAL / LOCKED'),
+              _ValueChip(label: 'Motion', value: 'Candidate v1'),
+              _ValueChip(label: 'Loop', value: '3.6 s'),
+              _ValueChip(label: 'Sway', value: '±2.4°'),
+              _ValueChip(label: 'Breathing', value: '±1.2%'),
+            ],
+          ),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final stacked = constraints.maxWidth < 720;
+              final hero = Container(
+                height: 310,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8F8FA),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: const Color(0xFFE6E6EC)),
+                ),
+                child: Center(
+                  child: _token(
+                    keyName: 'starfish-motion-hero',
+                    size: 250,
+                    tone: ShapeTone.coralPink,
+                  ),
+                ),
+              );
+              final exact = Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8F8FA),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: const Color(0xFFE6E6EC)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '58px · Production size',
+                      style: TextStyle(color: fg, fontWeight: FontWeight.w900),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 18,
+                      runSpacing: 18,
+                      children: [
+                        _token(keyName: 's1', size: 58, tone: ShapeTone.coralPink),
+                        _token(keyName: 's2', size: 58, tone: ShapeTone.deepOcean),
+                        _token(keyName: 's3', size: 58, tone: ShapeTone.aquaMint),
+                        _token(keyName: 's4', size: 58, tone: ShapeTone.lavender),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      '각 인스턴스는 안정적인 seed 기반 phase offset을 사용합니다. 색상은 Shape 내부에만 적용되며 QA 배경은 Palette 색으로 칠하지 않습니다.',
+                      style: TextStyle(color: muted, fontSize: 10.5, height: 1.45),
+                    ),
+                  ],
+                ),
+              );
+              if (stacked) {
+                return Column(children: [hero, const SizedBox(height: 12), exact]);
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 6, child: hero),
+                  const SizedBox(width: 12),
+                  Expanded(flex: 5, child: exact),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '검수 포인트: 흔들림 과도 여부 · breathing이 찌그러짐처럼 보이지 않는지 · 58px 실루엣 유지 · 개체들이 완전히 동기화되지 않는지.',
+            style: TextStyle(color: muted, fontSize: 10.5, height: 1.45),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StarfishIdleQaPainter extends CustomPainter {
+  _StarfishIdleQaPainter({
+    required this.keyName,
+    required this.tone,
+  }) : super(repaint: RasterPaletteClock.instance);
+
+  final String keyName;
+  final ShapeTone tone;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final radius = size.shortestSide * 0.43;
+    ShapeSpecRenderer.paintToken(
+      canvas,
+      center: center,
+      radius: radius,
+      token: LockToken(shape: ShapeKind.starfish, tone: tone),
+      style: ShapeStyle.softBasic,
+      opacity: 1,
+      paletteTimeSeconds: RasterPaletteClock.instance.value,
+      swimKey: 'labs:$keyName',
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _StarfishIdleQaPainter oldDelegate) =>
+      oldDelegate.keyName != keyName || oldDelegate.tone != tone;
+}
+
 class RuntimeQaLab extends StatefulWidget {
   const RuntimeQaLab({
     super.key,
@@ -5224,7 +5386,16 @@ class _RuntimeQaLabState extends State<RuntimeQaLab> {
 
   @override
   Widget build(BuildContext context) {
-    return _Panel(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _StarfishMotionRuntimePanel(
+          card: widget.card,
+          fg: widget.fg,
+          muted: widget.muted,
+        ),
+        const SizedBox(height: 14),
+        _Panel(
       color: widget.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -5287,6 +5458,7 @@ class _RuntimeQaLabState extends State<RuntimeQaLab> {
           ),
         ],
       ),
+      ],
     );
   }
 }
