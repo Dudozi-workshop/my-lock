@@ -4,10 +4,10 @@
     "MAIN": {
       "canonical_url": "https://my-lock-preview.rlatkd5959.workers.dev",
       "deploy_target": "my-lock-preview",
-      "version": "MAIN-2026.10.04-R01",
-      "purpose": "Approved H02B Living Water Brighter Signature Color v3 integration using locked Sea Turtle sources",
-      "status": "Production Preview / Visual Master Final / Device performance QA pending",
-      "scope": "Sea Turtle Aurora Sea dynamic palette only",
+      "version": "MAIN-2026.10.04-R02",
+      "purpose": "Approved Candy Soft R2 default shapes and colors integration",
+      "status": "Production Preview / Visual Master Final / Android device QA pending",
+      "scope": "Soft Basic 3 shapes x 3 default colors; H02B remains active",
       "source_branch": "main",
       "source_commit": "resolved by workflow GITHUB_SHA"
     },
@@ -17,7 +17,7 @@
       "version": "LABS-2026.10.03-R02",
       "purpose": "Integrated Palette Lab comparison for Aurora Sea Water Wave R1 candidates using locked Sea Turtle production raster sources",
       "status": "QA / Candidate",
-      "scope": "Palette Lab · Aurora Sea Water Wave R1 · W01/W02/W03",
+      "scope": "Palette Lab \u00b7 Aurora Sea Water Wave R1 \u00b7 W01/W02/W03",
       "source_branch": "feat/style-lab-integration",
       "source_commit": "87e0a63edaf2a419c9a11d07b255f980a51ba791"
     }

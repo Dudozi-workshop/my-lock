@@ -20,6 +20,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/raster_shapes/candy_soft_r2/
     - assets/shape_specs/soft_basic/
     - assets/shape_specs/crayon_soft/
     - assets/shape_masters/drop01/sea_turtle_v3/shell/runtime/

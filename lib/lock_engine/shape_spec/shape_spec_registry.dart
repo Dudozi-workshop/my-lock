@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../models.dart';
 import 'shape_spec.dart';
 import 'raster_shape_spec.dart';
+import 'candy_soft_runtime.dart';
 
 class ShapeSpecRegistry {
   ShapeSpecRegistry._();
@@ -67,6 +68,7 @@ class ShapeSpecRegistry {
       }
     }
 
+    await CandySoftRuntime.instance.load();
     _loaded = true;
   }
 
