@@ -1,0 +1,44 @@
+name: MY LOCK Starfish Motion Lab
+
+on:
+  push:
+    branches:
+      - feat/starfish-micro-idle-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mylock-starfish-motion-lab
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PAGES_PROJECT: my-lock-shape-lab-pages
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+      - name: Bootstrap Web
+        env:
+          PLATFORMS: web
+        run: bash tool/bootstrap.sh
+      - name: Analyze
+        run: flutter analyze
+      - name: Test Starfish micro idle
+        run: flutter test test/starfish_micro_idle_test.dart
+      - name: Build Starfish Runtime Lab
+        run: flutter build web --release --target starfish_lab/main.dart --base-href "/"
+      - name: Deploy LABS branch preview
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        run: |
+          npx wrangler pages deploy build/web --project-name "$PAGES_PROJECT" --branch "feat/starfish-micro-idle-v1" --commit-hash "$(git rev-parse HEAD)"
