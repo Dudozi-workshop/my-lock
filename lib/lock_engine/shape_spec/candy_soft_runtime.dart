@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models.dart';
-import '../effects.dart';
+import 'shape_spec.dart';
 
 /// Opt-in review assets. Production callers keep the candidate flag false.
 class CandySoftRuntime {
