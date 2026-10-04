@@ -1,0 +1,74 @@
+{
+  "asset_id": "starfish",
+  "version": "final_v1",
+  "status": "Final / Locked / Active",
+  "canonical_source": {
+    "file": "starfish_appearance_master_final_v1_2048.png",
+    "sha256": "e782ae23622e549ecc75b6cfb067438398dd0aa21b88fcf6dc34a4b50c8dcceb",
+    "canvas": [
+      2048,
+      2048
+    ],
+    "mode": "RGBA"
+  },
+  "ownership": {
+    "main_palette_region": "all visible Starfish pixels",
+    "fixed_non_color_region": "none",
+    "mask": "starfish_palette_region_mask_final_v1_2048.png",
+    "asset": "starfish_palette_region_asset_final_v1_2048.png",
+    "removed_remainder": "starfish_removed_remainder_final_v1_2048.png"
+  },
+  "runtime": {
+    "canvas": [
+      256,
+      256
+    ],
+    "master": "starfish_runtime_master_final_v1_256.webp",
+    "palette_base": "starfish_palette_base_final_v1_256.webp",
+    "fixed_finish": "starfish_fixed_finish_final_v1_256.webp",
+    "reference_albedo_luminance": 0.7,
+    "material_model": "runtime optical albedo + fixed achromatic finish"
+  },
+  "qa": {
+    "semantic_recompose_changed_pixels": 0,
+    "semantic_recompose_max_channel_diff": 0,
+    "runtime_content_bbox": [
+      40,
+      48,
+      222,
+      210
+    ],
+    "runtime_edge_alpha_pixels": 0,
+    "reference_luminance_max_error": 0.001372549019607816,
+    "imagegen_used": false,
+    "geometry_changed": false
+  },
+  "files": {
+    "starfish_fixed_finish_final_v1_256.webp": {
+      "sha256": "b5951a7bf8366139a1ce07d7d1671a5cb768ce5de3c583859c8af14cd421f3cc",
+      "bytes": 11564
+    },
+    "starfish_palette_base_final_v1_256.webp": {
+      "sha256": "90e2156eccfc4fb25db403276f1e9211d3c85a0fdbd2b6d9843c2531c9bf644b",
+      "bytes": 666
+    },
+    "starfish_palette_region_asset_final_v1_2048.png": {
+      "sha256": "7ba1ba5a2c08092801686a9dd749e9e3d934c8c4da87f903a0a78b8ed2108bad",
+      "bytes": 1214194
+    },
+    "starfish_palette_region_mask_final_v1_2048.png": {
+      "sha256": "4560a7cb6d0d09206cd1122c516d143ffc460dc2b9935e764aff7e8fdaf936bc",
+      "bytes": 114416
+    },
+    "starfish_removed_remainder_final_v1_2048.png": {
+      "sha256": "8fc8af1ab29c4ccc3d3447fbb86c5c18cd5da3c39f4ebe5124d95fe31235f4d6",
+      "bytes": 16350
+    },
+    "starfish_runtime_master_final_v1_256.webp": {
+      "sha256": "b3a35bba9d238afba67d2e17b8649129a75f905f7c52048dc82ba09d105f9e60",
+      "bytes": 22754
+    }
+  },
+  "user_approved": true,
+  "approval_date": "2026-10-05"
+}
