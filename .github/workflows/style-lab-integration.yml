@@ -44,6 +44,9 @@ jobs:
       - name: Validate Sea Turtle master
         run: python3 tool/validate_sea_turtle_master.py
 
+      - name: Verify A texture shader and preserved R21
+        run: flutter test test/painted_sunbeam_test.dart test/broad_sunbeam_test.dart
+
       - name: Analyze
         run: flutter analyze
 
