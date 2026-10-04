@@ -1,3 +1,9 @@
+## LABS-2026.10.05-R17 · Volumetric A luminous fan
+- R16 Modify: still weak; user concept 76252.png panel 03 is the visual reference.
+- Brighter cores, unequal broad ribs, clear blue gaps, fan-shaped spread from upper centre; mid-water fade unchanged.
+- A only. Base v2, B/C R14 and other effects immutable. Original procedural renderer; no ImageGen.
+- Candidate awaiting Live Keep/Modify/Reject; not Final/Locked.
+
 ## LABS-2026.10.05-R16 · Volumetric A refinement
 - R15 user verdict: Modify — visible, quality needs refinement.
 - A only: unequal main/support beams, overlapping soft internal lobes, depth-delayed aperture movement; 24-second closed loop.

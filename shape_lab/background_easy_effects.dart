@@ -179,20 +179,21 @@ class VolumetricLightPainter extends CustomPainter {
   final Animation<double> animation;
   final VolumetricLightProfile profile;
 
-  // R16 A only: broad volumes with moving, overlapping light lobes.
+  // R17 A only: luminous fan-shaped shafts, separated by clear water.
   // Vertex alpha carries both lateral falloff and depth attenuation.
   void _drawBroadSunbeams(Canvas canvas, Size size, double t) {
-    const centers = [.17, .49, .80];
-    const widths = [.20, .25, .19];
+    const centers = [.30, .50, .71];
+    const widths = [.15, .21, .14];
     const depths = [.57, .64, .59];
     const phases = [.3, 2.5, 4.6];
-    const strengths = [.30, .43, .24];
-    const columns = 40;
+    const strengths = [.57, .78, .50];
+    const angles = [-.13, .025, .15];
+    const columns = 56;
     const rows = 36;
     for (var beam = 0; beam < 3; beam++) {
       final phase = phases[beam];
-      final sway = sin(t + phase) * profile.drift;
-      final angle = .075 + .035 * sin(t + phase + .8);
+      final sway = sin(t + phase) * profile.drift * .55;
+      final angle = angles[beam] + .035 * sin(t + phase + .8);
       final width = widths[beam] * (profile.width / .24) *
           (1 + .16 * sin(t + phase + 1.1));
       final depth = depths[beam] * (profile.depth / .64);
@@ -208,7 +209,7 @@ class VolumetricLightPainter extends CustomPainter {
         final flow = t * 2 + phase - v * 2.3;
         final center = centers[beam] + sway + angle * v +
             sin(flow) * .022 * v;
-        final halfWidth = width * (.58 + .48 * v) *
+        final halfWidth = width * (.50 + .76 * v) *
             (1 + .09 * sin(flow + .7));
         // Smoothly dissolve through mid-water; nothing reaches the floor.
         final fade = ((v - .18) / .82).clamp(0.0, 1.0);
@@ -216,17 +217,19 @@ class VolumetricLightPainter extends CustomPainter {
         final depthEnergy = (1 - .28 * v) * attenuation;
         for (var column = 0; column <= columns; column++) {
           final u = column / columns * 2 - 1;
-          final feather = (exp(-u * u * 4.2) - exp(-4.2)) /
-              (1 - exp(-4.2));
-          // Two broad off-centre lobes separate and merge inside the
-          // soft envelope. No thin stripes, particles or caustic layer.
-          final split = .24 + .14 * sin(flow + .5);
-          final left = exp(-pow((u + split + .10 * sin(flow)) / .39, 2));
-          final right = exp(-pow((u - split) / .46, 2));
-          final aperture = .55 +
-              left * (.24 + .12 * sin(t * 3 + phase - v * 1.4)) +
-              right * (.25 + .11 * cos(t * 2 + phase - v * 2.1));
-          final density = .92 + .08 * sin(u * 4.1 + flow) *
+          final feather = (exp(-u * u * 3.2) - exp(-3.2)) /
+              (1 - exp(-3.2));
+          // Unequal broad ribs retain visible shafts, with moving blue gaps.
+          // Ribs bend and breathe within each fan; no uniform haze floor.
+          final split = .47 + .10 * sin(flow + .5);
+          final left = exp(-pow((u + split + .08 * sin(flow)) / .20, 2));
+          final middle = exp(-pow((u - .07 * sin(flow + 1.1)) / .20, 2));
+          final right = exp(-pow((u - split) / .19, 2));
+          final aperture = .16 +
+              left * (.65 + .12 * sin(t * 3 + phase - v * 1.4)) +
+              middle * (.82 + .14 * cos(t * 2 + phase - v * 2.1)) +
+              right * (.60 + .10 * sin(t * 2 + phase + v));
+          final density = .94 + .06 * sin(u * 4.1 + flow) *
               cos(u * 2.7 - v * 3.2 + t + phase);
           positions.add(Offset(
             size.width * (center + u * halfWidth),

@@ -1,6 +1,11 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · R16 candidate
+## Current handoff · R17 candidate
+- R16 deployed at `00f656e8a57c9e0c9b44f531573f5ec9fcb3bf2e`, CI `37216758856` success; user verdict Modify: too weak.
+- R17 uses user concept `76252.png`, panel 03 Volumetric Light v1 as visual direction: brighter cores, broad irregular ribs and clear gaps within 3 fan-shaped shafts. Mid-water fade retained; no surface/floor changes.
+- Current release: LABS-2026.10.05-R17. CI/deploy/public verification before user Live review. A art approval pending.
+
+## Previous handoff · R16 candidate
 - Preflight reconciliation: older R14 sections below are history. R15 deployed at `365e0f02998a54efbb7bccbb63432453ea90d33f`, Actions `37215859267` success; user verdict Modify (visible, quality insufficient).
 - A Broad Sunbeam R16: original procedural light with broad merging lobes, unequal main/support energy and depth-delayed motion. Reference: https://motionarray.com/stock-motion-graphics/light-rays-overlay-loop-1055584/ (preview study only; no stock import).
 - Release identity: LABS-2026.10.05-R16. CI/deploy/public checks required before live review; user Keep/Modify/Reject pending.
