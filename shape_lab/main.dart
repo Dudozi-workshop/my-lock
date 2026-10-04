@@ -17,6 +17,7 @@ import 'soft_basic_candidates.dart';
 import 'background_asset_registry.dart';
 import 'water_refraction_field.dart';
 import 'surface_refraction_field.dart';
+import 'background_easy_effects.dart';
 import 'candy_soft_review.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
 
@@ -123,7 +124,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R07 · Background Effects · Surface Refraction R2',
+                                  'LABS-2026.10.04-R08 · Background Effects · Layer Stack Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5300,7 +5301,11 @@ class _BackgroundLabState extends State<BackgroundLab>
   late final BackgroundAssetRecord _shallowClearBase;
   _BackgroundWorkbenchStep step = _BackgroundWorkbenchStep.image;
   _SurfaceRefractionCandidate selected = _SurfaceRefractionCandidate.calmBroad;
-  bool showSurface = true;
+  bool showSurface = false;
+  bool showFloorCaustic = true;
+  bool showVolumetricLight = true;
+  bool showAmbientParticle = true;
+  bool showBubble = true;
   bool playing = true;
   double intensity = 1.0;
 
@@ -5717,7 +5722,7 @@ class _BackgroundLabState extends State<BackgroundLab>
           _stepHeader(
             '02 · 레이어 효과',
             '승인 Base는 그대로 유지하고 Effect만 독립 제작',
-            'Surface Active',
+            '5 Layer Candidates',
           ),
           const SizedBox(height: 14),
           _layerStatusList(),
@@ -5725,7 +5730,7 @@ class _BackgroundLabState extends State<BackgroundLab>
           Divider(color: widget.muted.withValues(alpha: .18)),
           const SizedBox(height: 12),
           Text(
-            'Surface Refraction · Candidate Compare',
+            'Layer Stack · Independent ON/OFF',
             style: TextStyle(
               color: widget.fg,
               fontSize: 15,
@@ -5734,7 +5739,7 @@ class _BackgroundLabState extends State<BackgroundLab>
           ),
           const SizedBox(height: 4),
           Text(
-            '현재 단계에서는 Surface만 평가합니다. 다른 Effect와 Shape는 모두 잠금.',
+            'Base는 잠금. 각 Effect는 독립 ON/OFF로 하나씩 Solo 검수할 수 있습니다.',
             style: TextStyle(color: widget.muted, fontSize: 11.5),
           ),
           const SizedBox(height: 12),
@@ -5749,60 +5754,69 @@ class _BackgroundLabState extends State<BackgroundLab>
   }
 
   Widget _layerStatusList() {
-    const layers = [
-      ('01', 'Surface Refraction', 'Candidate', true),
-      ('02', 'Floor Caustic', 'Not Started', false),
-      ('03', 'Volumetric Light', 'Not Started', false),
-      ('04', 'Ambient Particle', 'Not Started', false),
-      ('05', 'Bubble', 'Not Started', false),
+    final layers = [
+      ('01', 'Surface Refraction', 'Deferred', showSurface, (bool v) => setState(() => showSurface = v), () => _soloEffect(0)),
+      ('02', 'Floor Caustic', 'Candidate', showFloorCaustic, (bool v) => setState(() => showFloorCaustic = v), () => _soloEffect(1)),
+      ('03', 'Volumetric Light', 'Candidate', showVolumetricLight, (bool v) => setState(() => showVolumetricLight = v), () => _soloEffect(2)),
+      ('04', 'Ambient Particle', 'Candidate', showAmbientParticle, (bool v) => setState(() => showAmbientParticle = v), () => _soloEffect(3)),
+      ('05', 'Bubble', 'Candidate', showBubble, (bool v) => setState(() => showBubble = v), () => _soloEffect(4)),
     ];
     return Column(
       children: [
         for (var i = 0; i < layers.length; i++) ...[
           if (i > 0) const SizedBox(height: 7),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: layers[i].$4
-                  ? const Color(0xFFF3EFFF)
-                  : widget.muted.withValues(alpha: .06),
+              color: layers[i].$4 ? const Color(0xFFF3EFFF) : widget.muted.withValues(alpha: .06),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: layers[i].$4
-                    ? const Color(0xFFD9CDF9)
-                    : widget.muted.withValues(alpha: .12),
+                color: layers[i].$4 ? const Color(0xFFD9CDF9) : widget.muted.withValues(alpha: .12),
               ),
             ),
             child: Row(
               children: [
                 SizedBox(
                   width: 30,
-                  child: Text(
-                    layers[i].$1,
-                    style: TextStyle(
-                      color: widget.muted,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
+                  child: Text(layers[i].$1, style: TextStyle(color: widget.muted, fontSize: 10, fontWeight: FontWeight.w900)),
                 ),
                 Expanded(
-                  child: Text(
-                    layers[i].$2,
-                    style: TextStyle(
-                      color: widget.fg,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
+                  child: Text(layers[i].$2, style: TextStyle(color: widget.fg, fontSize: 12, fontWeight: FontWeight.w800)),
                 ),
-                _statusBadge(layers[i].$3, layers[i].$4),
+                _statusBadge(layers[i].$3, layers[i].$3 != 'Deferred'),
+                const SizedBox(width: 6),
+                TextButton(onPressed: layers[i].$6, child: const Text('Solo')),
+                Switch(value: layers[i].$4, onChanged: layers[i].$5),
               ],
             ),
           ),
         ],
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: () => setState(() {
+              showSurface = false;
+              showFloorCaustic = true;
+              showVolumetricLight = true;
+              showAmbientParticle = true;
+              showBubble = true;
+            }),
+            child: const Text('Easy Stack Reset'),
+          ),
+        ),
       ],
     );
+  }
+
+  void _soloEffect(int index) {
+    setState(() {
+      showSurface = index == 0;
+      showFloorCaustic = index == 1;
+      showVolumetricLight = index == 2;
+      showAmbientParticle = index == 3;
+      showBubble = index == 4;
+    });
   }
 
   Widget _surfaceCandidates() {
@@ -6099,6 +6113,14 @@ class _BackgroundLabState extends State<BackgroundLab>
                           intensity: intensity,
                         ),
                       ),
+                    if (showVolumetricLight)
+                      CustomPaint(painter: VolumetricLightPainter(animation: _surfaceClock)),
+                    if (showFloorCaustic)
+                      CustomPaint(painter: FloorCausticPainter(animation: _surfaceClock)),
+                    if (showAmbientParticle)
+                      CustomPaint(painter: AmbientParticlePainter(animation: _surfaceClock)),
+                    if (showBubble)
+                      CustomPaint(painter: BubblePainter(animation: _surfaceClock)),
                   ],
                 ),
               ),
