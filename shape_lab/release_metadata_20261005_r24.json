@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.05-R24",
+  "date": "2026-10-05",
+  "purpose": "Show approved Starfish micro-idle in both Shape Lab and Runtime QA",
+  "scope": "Shape Lab · Runtime QA · Starfish whole-shape micro-idle · APP EXACT",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "runtime",
+  "status": "QA Candidate / Static Production Locked / Motion user-approved",
+  "governance": "2-Site compliant; canonical Integrated LABS only"
+}
