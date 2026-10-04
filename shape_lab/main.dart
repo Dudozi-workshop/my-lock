@@ -123,7 +123,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R04 · Candy Soft Final · MAIN 적용 · Android 기기 QA 대기',
+                                  'LABS-2026.10.04-R05 · Shape Production System · QA / Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -274,6 +274,8 @@ class ShapeLab extends StatelessWidget {
             Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const Scaffold(body: SafeArea(child: SingleChildScrollView(padding: EdgeInsets.all(16),child: CandySoftReview())))));
           }, child: const Text('Candy Soft 최종 검수 열기'))),
         const SizedBox(height:14),
+        _StarfishProductionSystemPanel(card: card, fg: fg, muted: muted),
+        const SizedBox(height: 14),
         _CoreBasicMasterComparePanel(
           card: card,
           fg: fg,
@@ -328,6 +330,276 @@ class ShapeLab extends StatelessWidget {
   }
 }
 
+
+
+class _StarfishProductionSystemPanel extends StatelessWidget {
+  const _StarfishProductionSystemPanel({
+    required this.card,
+    required this.fg,
+    required this.muted,
+  });
+
+  final Color card;
+  final Color fg;
+  final Color muted;
+
+  static const _candidates = [
+    ('S01', 'Balanced Soft', .43, .22, 10.0, 0.0, 0.0),
+    ('S02', 'Baby Wide', .40, .27, 12.0, -5.0, 0.0),
+    ('S03', 'Slim Natural', .45, .18, 9.0, 3.0, 0.0),
+    ('S04', 'Round Chubby', .39, .30, 13.0, 0.0, 0.0),
+    ('S05', 'Organic Lean', .44, .21, 10.5, 8.0, .055),
+    ('S06', 'Compact Icon', .38, .25, 11.5, -2.0, 0.0),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return _Panel(
+      color: card,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: 'Shape Production · Starfish · Round 1',
+            subtitle: '신규 Shape 제작을 Source → Silhouette → Style → 58px QA → Asset/Registry → LOCK 순서로 관리하는 Production Gate입니다.',
+            fg: fg,
+            muted: muted,
+          ),
+          const SizedBox(height: 10),
+          const Wrap(
+            spacing: 7,
+            runSpacing: 7,
+            children: [
+              _ValueChip(label: 'Grade', value: 'Normal'),
+              _ValueChip(label: 'Master', value: 'Not Locked'),
+              _ValueChip(label: 'Current Gate', value: 'Silhouette'),
+              _ValueChip(label: 'Production', value: 'NO'),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 7,
+            runSpacing: 7,
+            children: const [
+              _ShapeGateChip('01 Source', true),
+              _ShapeGateChip('02 Silhouette', true),
+              _ShapeGateChip('03 Style', false),
+              _ShapeGateChip('04 58px QA', false),
+              _ShapeGateChip('05 Asset / Registry', false),
+              _ShapeGateChip('06 LOCK', false),
+            ],
+          ),
+          const SizedBox(height: 16),
+          LayoutBuilder(builder: (context, constraints) {
+            final width = constraints.maxWidth >= 900
+                ? (constraints.maxWidth - 30) / 3
+                : constraints.maxWidth >= 560
+                    ? (constraints.maxWidth - 14) / 2
+                    : constraints.maxWidth;
+            return Wrap(
+              spacing: 14,
+              runSpacing: 14,
+              children: [
+                for (final item in _candidates)
+                  SizedBox(
+                    width: width,
+                    child: _StarfishCandidateCard(
+                      code: item.$1,
+                      label: item.$2,
+                      outer: item.$3,
+                      inner: item.$4,
+                      corner: item.$5,
+                      rotationDeg: item.$6,
+                      asymmetry: item.$7,
+                      fg: fg,
+                      muted: muted,
+                    ),
+                  ),
+              ],
+            );
+          }),
+          const SizedBox(height: 14),
+          Text(
+            'Selection Gate: 실루엣 1안을 사용자 승인하기 전 Style/Asset/Registry 단계로 승격하지 않습니다. 58px 미리보기는 선택 판단용이며 QA Gate 통과를 의미하지 않습니다.',
+            style: TextStyle(color: muted, fontSize: 10.5, height: 1.4),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ShapeGateChip extends StatelessWidget {
+  const _ShapeGateChip(this.label, this.active);
+  final String label;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: active ? const Color(0xFFECE5FF) : const Color(0xFFF3F1F5),
+        borderRadius: BorderRadius.circular(99),
+        border: Border.all(
+          color: active ? const Color(0xFF7655C9) : const Color(0xFFE1DDE5),
+        ),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: active ? const Color(0xFF5C43A5) : const Color(0xFF8B8492),
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
+}
+
+class _StarfishCandidateCard extends StatelessWidget {
+  const _StarfishCandidateCard({
+    required this.code,
+    required this.label,
+    required this.outer,
+    required this.inner,
+    required this.corner,
+    required this.rotationDeg,
+    required this.asymmetry,
+    required this.fg,
+    required this.muted,
+  });
+
+  final String code;
+  final String label;
+  final double outer;
+  final double inner;
+  final double corner;
+  final double rotationDeg;
+  final double asymmetry;
+  final Color fg;
+  final Color muted;
+
+  List<List<double>> get points {
+    final result = <List<double>>[];
+    for (var i = 0; i < 10; i++) {
+      final arm = i ~/ 2;
+      final angle = (-90 + rotationDeg + i * 36) * pi / 180;
+      var radius = i.isEven ? outer : inner;
+      if (i.isEven && asymmetry != 0) {
+        radius *= 1 + asymmetry * sin(arm * 2.17 + .7);
+      }
+      result.add([
+        50 + cos(angle) * radius * 100,
+        50 + sin(angle) * radius * 100,
+      ]);
+    }
+    return result;
+  }
+
+  ShapeSpecBundle _bundle() {
+    final base = ShapeSpecRegistry.instance.resolve(
+      ShapeStyle.softBasic,
+      ShapeKind.triangle,
+    );
+    final spec = ShapeSpec(
+      styleId: base.shape.styleId,
+      shapeId: 'starfish_${code.toLowerCase()}',
+      version: 1,
+      body: ShapeGeometrySpec('roundedPolygon', {
+        'kind': 'roundedPolygon',
+        'cornerRadius': corner,
+        'points': points,
+      }),
+      surface: const ShapeSurfaceSpec(
+        kind: 'radial',
+        centerX: -.34,
+        centerY: -.42,
+        radius: 1.2,
+        stops: [0.0, .34, .76, 1.0],
+      ),
+      rotationMode: ShapeRotationMode.rotateWithObject,
+      layers: const [],
+      shadow: const ShapeShadowSpec(
+        opacity: .035,
+        elevation: 1.7,
+        offsetX: 0,
+        offsetY: .8,
+      ),
+    );
+    return ShapeSpecBundle(style: base.style, shape: spec);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bundle = _bundle();
+    return Container(
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFAF9FC),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: muted.withValues(alpha: .18)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('$code · $label',
+              style: TextStyle(color: fg, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 12),
+          Center(
+            child: SizedBox.square(
+              dimension: 148,
+              child: CustomPaint(
+                painter: _StarfishCandidatePainter(bundle, 64),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('58px', style: TextStyle(color: muted, fontSize: 10, fontWeight: FontWeight.w800)),
+              const SizedBox(width: 9),
+              SizedBox.square(
+                dimension: 58,
+                child: CustomPaint(
+                  painter: _StarfishCandidatePainter(bundle, 25),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StarfishCandidatePainter extends CustomPainter {
+  const _StarfishCandidatePainter(this.bundle, this.radius);
+  final ShapeSpecBundle bundle;
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    ShapeSpecRenderer.paintToken(
+      canvas,
+      center: size.center(Offset.zero),
+      radius: radius,
+      token: const LockToken(
+        shape: ShapeKind.triangle,
+        tone: ShapeTone.coralPink,
+      ),
+      style: ShapeStyle.softBasic,
+      opacity: 1,
+      useCandySoft: false,
+      bundleOverride: bundle,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _StarfishCandidatePainter oldDelegate) =>
+      oldDelegate.bundle != bundle || oldDelegate.radius != radius;
+}
 
 class _CoreBasicMasterComparePanel extends StatelessWidget {
   const _CoreBasicMasterComparePanel({
