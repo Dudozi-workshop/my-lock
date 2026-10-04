@@ -587,12 +587,11 @@ class _StarfishCandidatePainter extends CustomPainter {
       radius: radius,
       token: const LockToken(
         shape: ShapeKind.triangle,
-        tone: ShapeTone.coralPink,
+        tone: ShapeTone.pink,
       ),
       style: ShapeStyle.softBasic,
       opacity: 1,
-      useCandySoft: false,
-      bundleOverride: bundle,
+      overrides: ShapeRenderOverrides(bodyGeometry: bundle.shape.body),
     );
   }
 
