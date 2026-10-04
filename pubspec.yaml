@@ -26,6 +26,7 @@ flutter:
     - assets/sea_turtle_runtime_v2/
     - assets/shape_masters/drop01/sea_turtle_v3/lab_preview/
     - assets/raster_shapes/
+    - assets/raster_shapes/candy_soft_r2/
 
 flutter_launcher_icons:
   android: true

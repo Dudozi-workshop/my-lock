@@ -20,6 +20,7 @@ class FloatingPreview extends StatefulWidget {
     this.movementStyle = MovementStyle.floating,
     this.popStyle = PopStyle.basicPop,
     this.style = ShapeStyle.softBasic,
+    this.candySoftCandidate = false,
     this.onTokenTap,
     this.requiredTokens = const <LockToken>[],
     this.objectCount = FloatingEngine.defaultObjectCount,
@@ -33,6 +34,7 @@ class FloatingPreview extends StatefulWidget {
   final MovementStyle movementStyle;
   final PopStyle popStyle;
   final ShapeStyle style;
+  final bool candySoftCandidate;
   final ValueChanged<LockToken>? onTokenTap;
   final List<LockToken> requiredTokens;
   final int objectCount;
@@ -204,6 +206,7 @@ class _FloatingPreviewState extends State<FloatingPreview>
               objects: _engine.objects,
               popStyle: widget.popStyle,
               style: widget.style,
+              candySoftCandidate: widget.candySoftCandidate,
             ),
             child: const SizedBox.expand(),
           ),

@@ -16,10 +16,13 @@ import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
 
 import 'soft_basic_candidates.dart';
 import 'water_refraction_field.dart';
+import 'candy_soft_review.dart';
+import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ShapeSpecRegistry.instance.load();
+  await CandySoftRuntime.instance.load();
   runApp(const MyLockLabsApp());
 }
 
@@ -118,7 +121,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R02 · Integrated production workbench for creation, comparison, QA, and asset registry · QA / Candidate',
+                                  'LABS-2026.10.04-R03 · Candy Soft 3도형 · 3색 및 58px Runtime 검수 · QA Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -194,7 +197,9 @@ class _LabsPageState extends State<LabsPage> {
                     constraints: const BoxConstraints(maxWidth: 1180),
                     child: switch (tab) {
                       LabTab.background => BackgroundLab(card: card, fg: fg, muted: muted),
-                      LabTab.shape => ShapeLab(card: card, fg: fg, muted: muted),
+                      LabTab.shape => Uri.base.queryParameters['review'] == 'candy-soft'
+                          ? CandySoftReview(foreground: fg)
+                          : ShapeLab(card: card, fg: fg, muted: muted),
                       LabTab.style => CrayonStyleLab(card: card, fg: fg, muted: muted),
                       LabTab.palette => PaletteLab(card: card, fg: fg, muted: muted),
                       LabTab.effect => EffectLab(card: card, fg: fg, muted: muted),
@@ -260,6 +265,13 @@ class ShapeLab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Align(alignment: Alignment.centerLeft, child: FilledButton(
+          onPressed: () {
+            final next = Uri.base.replace(queryParameters: {'lab':'shape','review':'candy-soft'});
+            SystemNavigator.routeInformationUpdated(uri: next, replace: true);
+            Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const Scaffold(body: SafeArea(child: SingleChildScrollView(padding: EdgeInsets.all(16),child: CandySoftReview())))));
+          }, child: const Text('Candy Soft 최종 검수 열기'))),
+        const SizedBox(height:14),
         _CoreBasicMasterComparePanel(
           card: card,
           fg: fg,

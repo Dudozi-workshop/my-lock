@@ -6,6 +6,7 @@ import '../models.dart';
 import 'shape_render_overrides.dart';
 import 'shape_spec.dart';
 import 'shape_spec_registry.dart';
+import 'candy_soft_runtime.dart';
 
 class ShapeSpecRenderer {
   const ShapeSpecRenderer._();
@@ -22,7 +23,9 @@ class ShapeSpecRenderer {
     double objectRotation = 0,
     CrayonTextureSpec? crayonOverride,
     ShapeRenderOverrides? overrides,
+    bool candySoftCandidate = false,
   }) {
+    if (candySoftCandidate && CandySoftRuntime.instance.paint(canvas, center: center, radius: radius, token: token, style: style, opacity: opacity, rotation: objectRotation)) return;
     final bundle = ShapeSpecRegistry.instance.resolve(style, token.shape);
     final canvasSize = bundle.style.canvasSize;
     final scale = radius * 2 / canvasSize;

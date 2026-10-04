@@ -1,0 +1,8 @@
+{
+  "version": "LABS-2026.10.04-R03",
+  "purpose": "Candy Soft normalized runtime and all 3 basic color QA",
+  "scope": "Candy Soft opt-in candidate only; approved Crayon and H02B preserved",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "resolved_by_workflow",
+  "status": "QA Candidate / visual approval and physical Android QA pending"
+}

@@ -1,0 +1,136 @@
+{
+  "version": 2,
+  "status": "qa_candidate",
+  "user_direction_approved": true,
+  "production_approved": false,
+  "source_sha256": "f32b0ef21c5aa16e4329ec966eaf5cd435947afb7334ee928f9421af837ca3c2",
+  "palette_mode": "chroma_times_selected_hue_plus_common_channel_finish",
+  "shapes": [
+    {
+      "shape": "circle",
+      "authored_tone": "pink",
+      "source_rect": [
+        0,
+        0,
+        724,
+        724
+      ],
+      "clean_bbox": [
+        114,
+        98,
+        666,
+        630
+      ],
+      "runtime_canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        128
+      ],
+      "padding_px": 20,
+      "content_bbox": [
+        20,
+        24,
+        236,
+        232
+      ],
+      "assets": {
+        "authored": {
+          "asset": "assets/raster_shapes/candy_soft_r2/circle_authored_256.b64",
+          "sha256": "5255de1d16dde6cfb2d1679519f6ea62c9263a510d6655ab43181f3561a07590"
+        },
+        "field": {
+          "asset": "assets/raster_shapes/candy_soft_r2/circle_field_256.b64",
+          "sha256": "32f14cd6502eca126681c5503d23fbea791d69bac710b6127ce83500d39ae9cb"
+        }
+      },
+      "removed_alpha_pixels": 0
+    },
+    {
+      "shape": "triangle",
+      "authored_tone": "yellow",
+      "source_rect": [
+        724,
+        0,
+        724,
+        724
+      ],
+      "clean_bbox": [
+        73,
+        109,
+        646,
+        611
+      ],
+      "runtime_canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        128
+      ],
+      "padding_px": 20,
+      "content_bbox": [
+        20,
+        33,
+        236,
+        222
+      ],
+      "assets": {
+        "authored": {
+          "asset": "assets/raster_shapes/candy_soft_r2/triangle_authored_256.b64",
+          "sha256": "7c3f10a2172915f8e83884f021ed00d53402e98ab1adb715eba63d5f58e8c69d"
+        },
+        "field": {
+          "asset": "assets/raster_shapes/candy_soft_r2/triangle_field_256.b64",
+          "sha256": "1bc8b917e574f79cfdc502f242d2f9685b6adc4771bfa7f9fa24fdffef0a25d0"
+        }
+      },
+      "removed_alpha_pixels": 0
+    },
+    {
+      "shape": "square",
+      "authored_tone": "blue",
+      "source_rect": [
+        1448,
+        0,
+        724,
+        724
+      ],
+      "clean_bbox": [
+        63,
+        97,
+        617,
+        620
+      ],
+      "runtime_canvas": [
+        256,
+        256
+      ],
+      "anchor": [
+        128,
+        128
+      ],
+      "padding_px": 20,
+      "content_bbox": [
+        20,
+        26,
+        236,
+        230
+      ],
+      "assets": {
+        "authored": {
+          "asset": "assets/raster_shapes/candy_soft_r2/square_authored_256.b64",
+          "sha256": "9ac787476727023cc45b231e55d98d7544ecbef3f123e5a51c426b27067664f3"
+        },
+        "field": {
+          "asset": "assets/raster_shapes/candy_soft_r2/square_field_256.b64",
+          "sha256": "2e7ed66917a359bfee9e2312d1cc312f9a22d064586686cadfa7c791179378dc"
+        }
+      },
+      "removed_alpha_pixels": 0
+    }
+  ]
+}

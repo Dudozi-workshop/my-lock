@@ -12,9 +12,13 @@ class ShapeChoiceCard extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
+    this.candySoftCandidate = false,
+    this.style = ShapeStyle.softBasic,
   });
 
   final ShapeKind kind;
+  final bool candySoftCandidate;
+  final ShapeStyle style;
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -32,6 +36,8 @@ class ShapeChoiceCard extends StatelessWidget {
             size: const Size(58, 58),
             painter: LockTokenPainter(
               LockToken(shape: kind, tone: ShapeTone.pink),
+              candySoftCandidate: candySoftCandidate,
+              style: style,
             ),
           ),
           const SizedBox(height: 8),
