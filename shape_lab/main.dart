@@ -6491,101 +6491,795 @@ class _ValueChip extends StatelessWidget {
 }
 
 
-enum _BackgroundComposition { openWater, lowHorizon, softFrame }
+enum _SurfaceRefractionCandidate { calmBroad, softPrism, livingSurface }
+
+extension on _SurfaceRefractionCandidate {
+  String get code => switch (this) {
+    _SurfaceRefractionCandidate.calmBroad => 'A',
+    _SurfaceRefractionCandidate.softPrism => 'B',
+    _SurfaceRefractionCandidate.livingSurface => 'C',
+  };
+
+  String get label => switch (this) {
+    _SurfaceRefractionCandidate.calmBroad => 'Calm Broad',
+    _SurfaceRefractionCandidate.softPrism => 'Soft Prism',
+    _SurfaceRefractionCandidate.livingSurface => 'Living Surface',
+  };
+
+  String get note => switch (this) {
+    _SurfaceRefractionCandidate.calmBroad => '넓고 느린 굴절 · 가장 잔잔한 기준안',
+    _SurfaceRefractionCandidate.softPrism => 'Planning Master의 Peach/Pink 반사광을 가장 적극적으로 반영',
+    _SurfaceRefractionCandidate.livingSurface => 'Cyan/White 중심 · 물이 살아있는 체감이 가장 큼',
+  };
+}
 
 class BackgroundLab extends StatefulWidget {
-  const BackgroundLab({super.key, required this.card, required this.fg, required this.muted});
+  const BackgroundLab({
+    super.key,
+    required this.card,
+    required this.fg,
+    required this.muted,
+  });
+
   final Color card;
   final Color fg;
   final Color muted;
+
   @override
   State<BackgroundLab> createState() => _BackgroundLabState();
 }
 
-class _BackgroundLabState extends State<BackgroundLab> {
-  _BackgroundComposition selected = _BackgroundComposition.openWater;
-  bool showShape = true;
+class _BackgroundLabState extends State<BackgroundLab>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _surfaceClock;
+  _SurfaceRefractionCandidate selected = _SurfaceRefractionCandidate.calmBroad;
+  bool showSurface = true;
+  bool playing = true;
+  double intensity = 1.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _surfaceClock = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 12),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _surfaceClock.dispose();
+    super.dispose();
+  }
+
+  void _togglePlayback() {
+    setState(() {
+      playing = !playing;
+      if (playing) {
+        _surfaceClock.repeat();
+      } else {
+        _surfaceClock.stop();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    const items = [
-      (_BackgroundComposition.openWater, 'A', 'Open Water', '넓은 중앙 Play Field · 해저 낮음'),
-      (_BackgroundComposition.lowHorizon, 'B', 'Low Horizon', '해저를 더 낮춰 수중 여백 확대'),
-      (_BackgroundComposition.softFrame, 'C', 'Soft Frame', '가장자리만 약하게 감싸는 구조'),
-    ];
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Background Lab · Drop 01', style: TextStyle(color: widget.fg, fontSize: 24, fontWeight: FontWeight.w900)),
-      const SizedBox(height: 4),
-      Text('Common · 투명바다 / Gate 01 · Composition', style: TextStyle(color: widget.muted, fontWeight: FontWeight.w700)),
-      const SizedBox(height: 8),
-      Text('동일 Shape · 동일 크기 · 동일 위치 조건에서 공간 구조만 비교합니다. 승인 전 Candidate 상태를 유지합니다.', style: TextStyle(color: widget.muted)),
-      const SizedBox(height: 16),
-      Wrap(spacing: 8, runSpacing: 8, children: [
-        for (final gate in const ['01 Composition','02 Color','03 Light','04 Depth','05 Ambient','06 Environment','07 Motion','08 Final QA'])
-          Chip(label: Text(gate), backgroundColor: gate.startsWith('01') ? const Color(0xFFECE5FF) : widget.card),
-      ]),
-      const SizedBox(height: 16),
-      LayoutBuilder(builder: (context, box) {
-        final w = box.maxWidth >= 800 ? (box.maxWidth - 24) / 3 : box.maxWidth;
-        return Wrap(spacing: 12, runSpacing: 14, children: [
-          for (final item in items) SizedBox(width: w, child: _candidate(item.$1, item.$2, item.$3, item.$4)),
-        ]);
-      }),
-      const SizedBox(height: 12),
-      Row(children: [
-        Expanded(child: Text('Sea Turtle Runtime v2 · 고정 비교 Shape', style: TextStyle(color: widget.fg, fontWeight: FontWeight.w800))),
-        Switch(value: showShape, onChanged: (v) => setState(() => showShape = v)),
-      ]),
-      Text('현재 Gate에서는 배경 Composition만 평가합니다. Shape Asset/색/스타일은 수정하지 않습니다.', style: TextStyle(color: widget.muted, fontSize: 12)),
-    ]);
+    const candidates = _SurfaceRefractionCandidate.values;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Background Lab · Drop 01',
+          style: TextStyle(
+            color: widget.fg,
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '투명한 얕은 바다 · P2 Surface Refraction',
+          style: TextStyle(
+            color: widget.muted,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Planning Visual Master v1의 상단 수면광만 Runtime Effect로 재현합니다. '
+          '구도 · 오브젝트 밀도 · 중앙 Play Field · 정적 Base는 잠금 상태입니다.',
+          style: TextStyle(color: widget.muted),
+        ),
+        const SizedBox(height: 14),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _gateChip('P0 Planning', false, true),
+            _gateChip('P1 Clean Base', false, true),
+            _gateChip('P2 Surface', true, false),
+            _gateChip('P3 Floor Caustic', false, false),
+            _gateChip('P4 Light', false, false),
+            _gateChip('P5 Ambient', false, false),
+            _gateChip('P6 Composite', false, false),
+            _gateChip('P7 Shape QA', false, false),
+            _gateChip('P8 Closeout', false, false),
+          ],
+        ),
+        const SizedBox(height: 14),
+        _planningAnchor(),
+        const SizedBox(height: 14),
+        LayoutBuilder(
+          builder: (context, box) {
+            final columns = box.maxWidth >= 860 ? 3 : 1;
+            final w = columns == 3 ? (box.maxWidth - 24) / 3 : box.maxWidth;
+            return Wrap(
+              spacing: 12,
+              runSpacing: 14,
+              children: [
+                for (final candidate in candidates)
+                  SizedBox(
+                    width: w,
+                    child: _candidateCard(candidate),
+                  ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 14),
+        _controls(),
+        const SizedBox(height: 14),
+        _selectedPreview(),
+        const SizedBox(height: 10),
+        Text(
+          'P2에서는 Surface Refraction만 평가합니다. '
+          'Floor Caustic / Volumetric Light / Particle / Bubble / Shape는 모두 OFF입니다.',
+          style: TextStyle(color: widget.muted, fontSize: 12),
+        ),
+      ],
+    );
   }
 
-  Widget _candidate(_BackgroundComposition value, String code, String title, String note) {
-    final active = selected == value;
+  Widget _gateChip(String label, bool active, bool completed) {
+    final background = active
+        ? const Color(0xFFECE5FF)
+        : completed
+            ? const Color(0xFFEAF7EF)
+            : widget.card;
+    final border = active
+        ? const Color(0xFF7655C9)
+        : completed
+            ? const Color(0xFF5A9B70)
+            : const Color(0xFFE4E0E8);
+    return Chip(
+      label: Text(
+        completed ? label + ' · ✓' : label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: active || completed ? FontWeight.w900 : FontWeight.w700,
+        ),
+      ),
+      backgroundColor: background,
+      side: BorderSide(color: border),
+    );
+  }
+
+  Widget _planningAnchor() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: widget.card,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE4E0E8)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 10,
+            height: 78,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFFFC5D1),
+                  Color(0xFFC9F5F1),
+                  Color(0xFF7CCFE4),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(99),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Planning Master Anchor · LOCKED',
+                  style: TextStyle(
+                    color: widget.fg,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '목표: 상단 20–28%에서만 부드러운 굴절광이 살아 움직이고, '
+                  '중앙은 깨끗하게 유지. 선형 Wave Stroke / 반복 Sin Pattern 금지.',
+                  style: TextStyle(
+                    color: widget.muted,
+                    fontSize: 12,
+                    height: 1.45,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _candidateCard(_SurfaceRefractionCandidate candidate) {
+    final active = selected == candidate;
     return InkWell(
-      onTap: () => setState(() => selected = value),
       borderRadius: BorderRadius.circular(24),
+      onTap: () => setState(() => selected = candidate),
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: widget.card,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: active ? const Color(0xFF7655C9) : const Color(0xFFE4E0E8), width: active ? 2 : 1),
+          border: Border.all(
+            color: active ? const Color(0xFF7655C9) : const Color(0xFFE4E0E8),
+            width: active ? 2 : 1,
+          ),
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          AspectRatio(aspectRatio: .72, child: ClipRRect(borderRadius: BorderRadius.circular(18), child: Stack(children: [
-            Positioned.fill(child: CustomPaint(painter: _BackgroundCompositionPainter(value))),
-            if (showShape) Positioned.fill(child: Center(child: FractionallySizedBox(widthFactor: .43, child: Image.asset('assets/sea_turtle_runtime_v2/sea_turtle_blue.png', fit: BoxFit.contain)))),
-            Positioned(top: 10, left: 10, child: Chip(label: Text('$code · $title'))),
-          ]))),
-          const SizedBox(height: 8),
-          Text('$code · $title', style: TextStyle(color: widget.fg, fontWeight: FontWeight.w900)),
-          Text(note, style: TextStyle(color: widget.muted, fontSize: 12)),
-        ]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AspectRatio(
+              aspectRatio: .67,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Stack(
+                  children: [
+                    const Positioned.fill(
+                      child: CustomPaint(painter: _ShallowSeaBasePainter()),
+                    ),
+                    if (showSurface)
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: _SurfaceRefractionPainter(
+                            candidate: candidate,
+                            animation: _surfaceClock,
+                            intensity: intensity,
+                          ),
+                        ),
+                      ),
+                    Positioned(
+                      left: 10,
+                      top: 10,
+                      child: _previewBadge(candidate.code + ' · ' + candidate.label),
+                    ),
+                    if (active)
+                      const Positioned(
+                        right: 10,
+                        top: 10,
+                        child: Icon(
+                          Icons.check_circle_rounded,
+                          color: Color(0xFF7655C9),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 9),
+            Text(
+              candidate.code + ' · ' + candidate.label,
+              style: TextStyle(
+                color: widget.fg,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              candidate.note,
+              style: TextStyle(
+                color: widget.muted,
+                fontSize: 12,
+                height: 1.35,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _controls() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: widget.card,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE4E0E8)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Surface Refraction',
+                  style: TextStyle(
+                    color: widget.fg,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              Switch(
+                value: showSurface,
+                onChanged: (v) => setState(() => showSurface = v),
+              ),
+              const SizedBox(width: 4),
+              OutlinedButton.icon(
+                onPressed: _togglePlayback,
+                icon: Icon(
+                  playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                  size: 18,
+                ),
+                label: Text(playing ? 'Freeze' : 'Play'),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              SizedBox(
+                width: 82,
+                child: Text(
+                  'Intensity',
+                  style: TextStyle(
+                    color: widget.muted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Slider(
+                  value: intensity,
+                  min: .65,
+                  max: 1.25,
+                  divisions: 12,
+                  label: intensity.toStringAsFixed(2),
+                  onChanged: (v) => setState(() => intensity = v),
+                ),
+              ),
+              SizedBox(
+                width: 42,
+                child: Text(
+                  intensity.toStringAsFixed(2),
+                  textAlign: TextAlign.end,
+                  style: TextStyle(
+                    color: widget.fg,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _selectedPreview() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: widget.card,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE4E0E8)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Selected Runtime Preview · ' + selected.code + ' ' + selected.label,
+            style: TextStyle(
+              color: widget.fg,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 430),
+              child: AspectRatio(
+                aspectRatio: .67,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(22),
+                  child: Stack(
+                    children: [
+                      const Positioned.fill(
+                        child: CustomPaint(painter: _ShallowSeaBasePainter()),
+                      ),
+                      if (showSurface)
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: _SurfaceRefractionPainter(
+                              candidate: selected,
+                              animation: _surfaceClock,
+                              intensity: intensity,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _previewBadge(String text) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: .88),
+        borderRadius: BorderRadius.circular(99),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Color(0xFF34313B),
+            fontSize: 9.5,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
       ),
     );
   }
 }
 
-class _BackgroundCompositionPainter extends CustomPainter {
-  const _BackgroundCompositionPainter(this.value);
-  final _BackgroundComposition value;
+class _ShallowSeaBasePainter extends CustomPainter {
+  const _ShallowSeaBasePainter();
+
   @override
   void paint(Canvas canvas, Size size) {
-    final water = Paint()..shader = const LinearGradient(
-      begin: Alignment.topCenter, end: Alignment.bottomCenter,
-      colors: [Color(0xFFCFF4F2), Color(0xFFAEDFE3), Color(0xFF8CC8D2)],
-    ).createShader(Offset.zero & size);
-    canvas.drawRect(Offset.zero & size, water);
-    canvas.drawOval(Rect.fromCenter(center: Offset(size.width*.5, 0), width: size.width*1.3, height: size.height*.16), Paint()..color=Colors.white.withValues(alpha:.34));
-    final horizon = switch(value) { _BackgroundComposition.openWater => .84, _BackgroundComposition.lowHorizon => .91, _BackgroundComposition.softFrame => .87 };
-    final path=Path()..moveTo(0,size.height*horizon)..quadraticBezierTo(size.width*.45,size.height*(horizon-.025),size.width,size.height*(horizon+.01))..lineTo(size.width,size.height)..lineTo(0,size.height)..close();
-    canvas.drawPath(path, Paint()..color=const Color(0xFFEADFCB).withValues(alpha:.72));
-    if(value==_BackgroundComposition.softFrame){
-      final p=Paint()..color=const Color(0xFF83BFC4).withValues(alpha:.22);
-      canvas.drawOval(Rect.fromLTWH(-size.width*.2,size.height*.58,size.width*.38,size.height*.35),p);
-      canvas.drawOval(Rect.fromLTWH(size.width*.82,size.height*.62,size.width*.35,size.height*.31),p);
+    final bounds = Offset.zero & size;
+    final water = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color(0xFFB9EFF0),
+          Color(0xFF87D9E8),
+          Color(0xFF62B6D6),
+          Color(0xFF5D9FCA),
+        ],
+        stops: [0, .25, .63, 1],
+      ).createShader(bounds);
+    canvas.drawRect(bounds, water);
+
+    final haze = Paint()
+      ..color = Colors.white.withValues(alpha: .09)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(size.width * .55, size.height * .35),
+        width: size.width * 1.1,
+        height: size.height * .34,
+      ),
+      haze,
+    );
+
+    final distant = Paint()..color = const Color(0xFF5E83B0).withValues(alpha: .20);
+    for (final spec in const [
+      (.76, .64, .24, .13),
+      (.58, .70, .18, .10),
+      (.90, .73, .16, .08),
+      (.40, .73, .14, .07),
+    ]) {
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(size.width * spec.$1, size.height * spec.$2),
+          width: size.width * spec.$3,
+          height: size.height * spec.$4,
+        ),
+        distant,
+      );
     }
+
+    final sandPath = Path()
+      ..moveTo(0, size.height * .75)
+      ..cubicTo(
+        size.width * .28,
+        size.height * .72,
+        size.width * .68,
+        size.height * .78,
+        size.width,
+        size.height * .74,
+      )
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    final sand = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFFF3DFC4), Color(0xFFD9B991)],
+      ).createShader(bounds);
+    canvas.drawPath(sandPath, sand);
+
+    final sandGlow = Paint()
+      ..color = const Color(0xFFFFF3D7).withValues(alpha: .24)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(size.width * .60, size.height * .84),
+        width: size.width * .55,
+        height: size.height * .14,
+      ),
+      sandGlow,
+    );
+
+    _rock(
+      canvas,
+      Offset(size.width * .10, size.height * .79),
+      Size(size.width * .24, size.height * .12),
+      const Color(0xFF6F75C8),
+    );
+    _rock(
+      canvas,
+      Offset(size.width * .20, size.height * .84),
+      Size(size.width * .21, size.height * .10),
+      const Color(0xFF8A81D6),
+    );
+    _rock(
+      canvas,
+      Offset(size.width * .05, size.height * .88),
+      Size(size.width * .16, size.height * .08),
+      const Color(0xFF766AB8),
+    );
+
+    final mint = Paint()..color = const Color(0xFF6CCEBB);
+    final coral = Paint()..color = const Color(0xFFE88798);
+    final cream = Paint()..color = const Color(0xFFF5C89C);
+
+    for (var i = 0; i < 5; i++) {
+      final x = size.width * (.11 + i * .027);
+      final y = size.height * (.82 - (i % 2) * .018);
+      final path = Path()
+        ..moveTo(x, size.height * .90)
+        ..quadraticBezierTo(
+          x - size.width * .015,
+          y + size.height * .025,
+          x + size.width * (.012 + i * .001),
+          y,
+        )
+        ..quadraticBezierTo(
+          x + size.width * .024,
+          y - size.height * .028,
+          x + size.width * .032,
+          y - size.height * .055,
+        );
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = const Color(0xFF5CC7B4)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = max(2.0, size.width * .009)
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(size.width * .18, size.height * .87),
+        width: size.width * .10,
+        height: size.height * .045,
+      ),
+      coral,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(size.width * .26, size.height * .88),
+        width: size.width * .12,
+        height: size.height * .050,
+      ),
+      mint,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(size.width * .10, size.height * .91),
+        width: size.width * .10,
+        height: size.height * .040,
+      ),
+      cream,
+    );
   }
-  @override bool shouldRepaint(covariant _BackgroundCompositionPainter oldDelegate)=>oldDelegate.value!=value;
+
+  void _rock(Canvas canvas, Offset center, Size size, Color color) {
+    final paint = Paint()..color = color;
+    canvas.drawOval(
+      Rect.fromCenter(center: center, width: size.width, height: size.height),
+      paint,
+    );
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: center.translate(-size.width * .08, -size.height * .10),
+        width: size.width * .66,
+        height: size.height * .50,
+      ),
+      Paint()..color = Colors.white.withValues(alpha: .10),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _ShallowSeaBasePainter oldDelegate) => false;
+}
+
+class _SurfaceRefractionPainter extends CustomPainter {
+  _SurfaceRefractionPainter({
+    required this.candidate,
+    required Animation<double> animation,
+    required this.intensity,
+  })  : animation = animation,
+        super(repaint: animation);
+
+  final _SurfaceRefractionCandidate candidate;
+  final Animation<double> animation;
+  final double intensity;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final t = animation.value * pi * 2;
+    final h = size.height * .31;
+    canvas.save();
+    canvas.clipRect(Rect.fromLTWH(0, 0, size.width, h));
+
+    final config = switch (candidate) {
+      _SurfaceRefractionCandidate.calmBroad => (
+          cells: 7,
+          alpha: .20,
+          scale: 1.30,
+          speed: .55,
+          peach: .20,
+          cyan: .24,
+        ),
+      _SurfaceRefractionCandidate.softPrism => (
+          cells: 9,
+          alpha: .25,
+          scale: 1.00,
+          speed: .72,
+          peach: .48,
+          cyan: .20,
+        ),
+      _SurfaceRefractionCandidate.livingSurface => (
+          cells: 12,
+          alpha: .28,
+          scale: .78,
+          speed: 1.05,
+          peach: .12,
+          cyan: .48,
+        ),
+    };
+
+    final veil = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFFFC4CF).withValues(
+            alpha: config.peach * .32 * intensity,
+          ),
+          Colors.white.withValues(alpha: .12 * intensity),
+          const Color(0xFFB8F4F2).withValues(
+            alpha: config.cyan * .42 * intensity,
+          ),
+          Colors.transparent,
+        ],
+        stops: const [0, .28, .56, 1],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, h));
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, h), veil);
+
+    for (var i = 0; i < config.cells; i++) {
+      final seed = i * 1.731;
+      final baseX = ((i * 0.61803398875) % 1.0) * size.width;
+      final baseY = (.03 + ((i * .287) % .22)) * size.height;
+      final driftX = sin(t * config.speed + seed) * size.width * .045;
+      final driftY = cos(t * config.speed * .83 + seed * .7) * h * .08;
+      final radius =
+          size.width * (.075 + ((i * .037) % .045)) * config.scale;
+
+      final center = Offset(baseX + driftX, baseY + driftY);
+      final path = Path();
+      const points = 9;
+      for (var p = 0; p < points; p++) {
+        final a = p / points * pi * 2;
+        final warp = 1 +
+            sin(a * 3 + seed + t * config.speed * .6) * .16 +
+            cos(a * 2 - t * config.speed * .4 + seed) * .09;
+        final rx = radius * warp;
+        final ry = radius * .46 * (1 + sin(a * 2 + seed) * .10);
+        final point = Offset(
+          center.dx + cos(a) * rx,
+          center.dy + sin(a) * ry,
+        );
+        if (p == 0) {
+          path.moveTo(point.dx, point.dy);
+        } else {
+          path.lineTo(point.dx, point.dy);
+        }
+      }
+      path.close();
+
+      final isWarm = candidate == _SurfaceRefractionCandidate.softPrism &&
+          i % 3 == 0;
+      final cellColor = isWarm
+          ? const Color(0xFFFFD0D6)
+          : (i.isEven
+              ? const Color(0xFFD8FFFF)
+              : const Color(0xFFFFFFFF));
+
+      final glow = Paint()
+        ..color = cellColor.withValues(
+          alpha: config.alpha * .38 * intensity,
+        )
+        ..maskFilter = MaskFilter.blur(
+          BlurStyle.normal,
+          max(4.0, size.width * .018),
+        )
+        ..blendMode = BlendMode.screen;
+      canvas.drawPath(path, glow);
+
+      final core = Paint()
+        ..color = cellColor.withValues(
+          alpha: config.alpha * .34 * intensity,
+        )
+        ..style = PaintingStyle.fill
+        ..blendMode = BlendMode.screen;
+      canvas.drawPath(path, core);
+    }
+
+    final broad = Paint()
+      ..color = Colors.white.withValues(alpha: .10 * intensity)
+      ..maskFilter = MaskFilter.blur(
+        BlurStyle.normal,
+        max(8.0, size.width * .028),
+      )
+      ..blendMode = BlendMode.screen;
+    final y = h * (.18 + sin(t * .34) * .035);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(
+          size.width * (.50 + sin(t * .29) * .06),
+          y,
+        ),
+        width: size.width * 1.15,
+        height: h * .22,
+      ),
+      broad,
+    );
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _SurfaceRefractionPainter oldDelegate) {
+    return oldDelegate.candidate != candidate ||
+        oldDelegate.intensity != intensity ||
+        oldDelegate.animation != animation;
+  }
 }
