@@ -123,7 +123,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R05 · Shape Production System · QA / Candidate',
+                                  'LABS-2026.10.04-R06 · Shape Production Hub · Legacy Cleanup',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -261,75 +261,25 @@ class ShapeLab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const shapes = [ShapeKind.circle, ShapeKind.triangle, ShapeKind.square];
-    const tones = [ShapeTone.pink, ShapeTone.blue, ShapeTone.yellow];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Align(alignment: Alignment.centerLeft, child: FilledButton(
-          onPressed: () {
-            final next = Uri.base.replace(queryParameters: {'lab':'shape','review':'candy-soft'});
-            SystemNavigator.routeInformationUpdated(uri: next, replace: true);
-            Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const Scaffold(body: SafeArea(child: SingleChildScrollView(padding: EdgeInsets.all(16),child: CandySoftReview())))));
-          }, child: const Text('Candy Soft 최종 검수 열기'))),
-        const SizedBox(height:14),
-        _StarfishProductionSystemPanel(card: card, fg: fg, muted: muted),
-        const SizedBox(height: 14),
-        _CoreBasicMasterComparePanel(
-          card: card,
-          fg: fg,
-          muted: muted,
-        ),
-        const SizedBox(height: 14),
         _Panel(
           color: card,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _SectionTitle(
-                title: 'Shape Lab',
-                subtitle: '기본 Shape Master와 Drop Shape를 한 화면에서 실제 렌더 기준으로 확인합니다.',
-                fg: fg,
-                muted: muted,
-              ),
-              const SizedBox(height: 16),
-              for (final shape in shapes) ...[
-                Text(
-                  shape.label,
-                  style: TextStyle(color: fg, fontWeight: FontWeight.w900),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 14,
-                  runSpacing: 10,
-                  children: [
-                    for (final tone in tones)
-                      _TokenWithLabel(
-                        shape: shape,
-                        tone: tone,
-                        style: ShapeStyle.softBasic,
-                        label: tone.label,
-                        muted: muted,
-                      ),
-                  ],
-                ),
-                if (shape != shapes.last) const SizedBox(height: 18),
-              ],
-            ],
+          child: _SectionTitle(
+            title: 'Shape Production',
+            subtitle:
+                '신규/진행 중 Shape는 동일 Gate 체계에서 관리합니다. 이전 개별 QA 패널은 기본 화면에서 제거하고 필요 시 Runtime QA 또는 보존 route에서만 확인합니다.',
+            fg: fg,
+            muted: muted,
           ),
         ),
         const SizedBox(height: 14),
-        _SeaTurtleV3StaticSplitPanel(card: card, fg: fg, muted: muted),
-        const SizedBox(height: 14),
-        _SeaTurtleShapePanel(card: card, fg: fg, muted: muted),
-        const SizedBox(height: 14),
-        _SeaTurtleRegionCrayonPanel(card: card, fg: fg, muted: muted),
+        _StarfishProductionSystemPanel(card: card, fg: fg, muted: muted),
       ],
     );
   }
 }
-
 
 
 class _StarfishProductionSystemPanel extends StatelessWidget {
