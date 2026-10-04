@@ -165,18 +165,8 @@ def main() -> None:
     if residues:
         fail("legacy Sea Turtle animation residue found: " + ", ".join(residues))
 
-    # v3 Canonical preparation intentionally keeps the runtime at neutral F0.
-    # Do not require the old Shape Animation comparison UI before Static Master Lock.
-    required_runtime_text = (
-        "v3 Canonical Draft 준비",
-        "앞지느러미 Shape Animation 분리",
-        "FloatingEngine",
-        "_SeaTurtleStaticAsset",
-    )
-    missing = [token for token in required_runtime_text if token not in lab]
-    if missing:
-        fail("current Sea Turtle ownership marker missing: " + ", ".join(missing))
-
+    # Sea Turtle ownership is validated from the canonical v3 spec, not legacy LAB UI markers.
+    # The Shape Production Hub may retire old comparison panels without invalidating the master.
     if not V3_SPEC.is_file():
         fail(f"missing v3 draft spec: {V3_SPEC.relative_to(ROOT)}")
     v3 = json.loads(V3_SPEC.read_text(encoding="utf-8"))
@@ -195,6 +185,11 @@ def main() -> None:
     animation = v3.get("animation", {})
     if animation.get("implemented") is not False:
         fail("v3 animation must remain unimplemented until Static Master Lock")
+    if animation.get("blockedUntil") != "static_master_lock":
+        fail("v3 animation block gate changed")
+    motion_owner = animation.get("motionSetOwnership", "")
+    if "FloatingEngine" not in motion_owner or "Motion Set" not in motion_owner:
+        fail("v3 whole-object motion ownership must remain FloatingEngine/Motion Set")
     qa = v3.get("qa", {})
     if qa.get("previousF0DraftRebuildMaxChannelDiff") != 0 or qa.get("previousF0DraftRebuildChangedChannelCount") != 0:
         fail("v3 previous F0 draft rebuild QA must remain exact")
