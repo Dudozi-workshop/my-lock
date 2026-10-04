@@ -124,7 +124,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R12 · Background Effects · Full Live First',
+                                  'LABS-2026.10.04-R13 · Background Effects · Legacy Surface Cleanup',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5595,7 +5595,6 @@ class _BackgroundLabState extends State<BackgroundLab>
   bool showVolumetricLight = true;
   bool showAmbientParticle = true;
   bool showBubble = true;
-  bool playing = true;
   double intensity = 1.0;
   int? soloEffectIndex;
 
@@ -5629,17 +5628,6 @@ class _BackgroundLabState extends State<BackgroundLab>
   void dispose() {
     _surfaceClock.dispose();
     super.dispose();
-  }
-
-  void _togglePlayback() {
-    setState(() {
-      playing = !playing;
-      if (playing) {
-        _surfaceClock.repeat();
-      } else {
-        _surfaceClock.stop();
-      }
-    });
   }
 
   @override
@@ -6034,26 +6022,7 @@ class _BackgroundLabState extends State<BackgroundLab>
           ),
           const SizedBox(height: 12),
           _layerStatusList(),
-          const SizedBox(height: 16),
-          Divider(color: widget.muted.withValues(alpha: .18)),
-          const SizedBox(height: 12),
-          Text(
-            'Surface Refraction · Deferred Reference',
-            style: TextStyle(
-              color: widget.fg,
-              fontSize: 15,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Surface는 현재 Deferred입니다. 후보 UI는 다음 Effect 카드 개편 전까지 참고용으로만 유지합니다.',
-            style: TextStyle(color: widget.muted, fontSize: 11.5),
-          ),
-          const SizedBox(height: 12),
-          _surfaceCandidates(),
-          const SizedBox(height: 14),
-          _controls(),
+
         ],
       ),
     );
@@ -6202,24 +6171,6 @@ class _BackgroundLabState extends State<BackgroundLab>
     );
   }
 
-  Widget _surfaceCandidates() {
-    const candidates = _SurfaceRefractionCandidate.values;
-    return LayoutBuilder(
-      builder: (context, box) {
-        final columns = box.maxWidth >= 860 ? 3 : 1;
-        final w = columns == 3 ? (box.maxWidth - 24) / 3 : box.maxWidth;
-        return Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            for (final candidate in candidates)
-              SizedBox(width: w, child: _candidateCard(candidate)),
-          ],
-        );
-      },
-    );
-  }
-
   Widget _compositeStep() {
     return _sectionCard(
       key: const ValueKey('background-composite-step'),
@@ -6308,155 +6259,6 @@ class _BackgroundLabState extends State<BackgroundLab>
               ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _candidateCard(_SurfaceRefractionCandidate candidate) {
-    final active = selected == candidate;
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: () => setState(() => selected = candidate),
-      child: Container(
-        padding: const EdgeInsets.all(9),
-        decoration: BoxDecoration(
-          color: widget.card,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: active ? const Color(0xFF7655C9) : const Color(0xFFE4E0E8),
-            width: active ? 2 : 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AspectRatio(
-              aspectRatio: .67,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset(
-                      _shallowClearBase.runtimePath!,
-                      fit: BoxFit.cover,
-                      gaplessPlayback: true,
-                    ),
-                    if (showSurface)
-                      CustomPaint(
-                        painter: SurfaceRefractionFieldPainter(
-                          profile: candidate.profile,
-                          animation: _surfaceClock,
-                          intensity: intensity,
-                        ),
-                      ),
-                    Positioned(
-                      left: 8,
-                      top: 8,
-                      child: _previewBadge(
-                        candidate.code + ' · ' + candidate.label,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              candidate.code + ' · ' + candidate.label,
-              style: TextStyle(
-                color: widget.fg,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              candidate.note,
-              style: TextStyle(
-                color: widget.muted,
-                fontSize: 11,
-                height: 1.35,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _controls() {
-    return Container(
-      padding: const EdgeInsets.all(13),
-      decoration: BoxDecoration(
-        color: widget.muted.withValues(alpha: .055),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Surface Refraction',
-                  style: TextStyle(
-                    color: widget.fg,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-              Switch(
-                value: showSurface,
-                onChanged: (v) => setState(() => showSurface = v),
-              ),
-              const SizedBox(width: 4),
-              OutlinedButton.icon(
-                onPressed: _togglePlayback,
-                icon: Icon(
-                  playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                  size: 18,
-                ),
-                label: Text(playing ? 'Freeze' : 'Play'),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              SizedBox(
-                width: 74,
-                child: Text(
-                  'Intensity',
-                  style: TextStyle(
-                    color: widget.muted,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Slider(
-                  value: intensity,
-                  min: .65,
-                  max: 1.25,
-                  divisions: 12,
-                  label: intensity.toStringAsFixed(2),
-                  onChanged: (v) => setState(() => intensity = v),
-                ),
-              ),
-              SizedBox(
-                width: 38,
-                child: Text(
-                  intensity.toStringAsFixed(2),
-                  textAlign: TextAlign.end,
-                  style: TextStyle(
-                    color: widget.fg,
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
