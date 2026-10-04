@@ -7,6 +7,7 @@ import '../water_refraction_field.dart';
 import '../swim_pose_runtime.dart';
 import '../whole_shape_idle_runtime.dart';
 import 'shape_spec.dart';
+import 'shape_render_overrides.dart';
 import 'shape_spec_registry.dart';
 import 'candy_soft_runtime.dart';
 
@@ -33,9 +34,12 @@ class ShapeSpecRenderer {
     String? swimKey,
     String swimProfile = 'standard',
     Map<String, dynamic>? auroraConfigOverride,
-    bool useCandySoft = true,
+    bool useCandySoft = false,
+    bool? candySoftCandidate,
+    CrayonTextureSpec? crayonOverride,
+    ShapeRenderOverrides? overrides,
   }) {
-    if (useCandySoft && CandySoftRuntime.instance.paint(
+    if ((candySoftCandidate ?? useCandySoft) && CandySoftRuntime.instance.paint(
       canvas, center: center, radius: radius, token: token, style: style,
       opacity: opacity, rotation: objectRotation,
     )) return;
@@ -71,13 +75,14 @@ class ShapeSpecRenderer {
     canvas.translate(center.dx - radius, center.dy - radius);
     canvas.scale(scale, scale);
 
-    final bodyPath = _pathFor(bundle.shape.body);
+    final bodyPath = _pathFor(overrides?.bodyGeometry ?? bundle.shape.body);
 
     if (bundle.style.renderMode == ShapeRenderMode.crayon) {
       _paintCrayonToken(
         canvas,
         bodyPath: bodyPath,
         style: bundle.style,
+        configOverride: crayonOverride,
         token: token,
         opacity: opacity,
         paletteTimeSeconds: paletteTimeSeconds,
@@ -88,13 +93,15 @@ class ShapeSpecRenderer {
     }
 
     final shadow = bundle.shape.shadow;
-    if (shadow.opacity > 0) {
+    final shadowOpacity = shadow.opacity * (overrides?.shadowOpacityScale ?? 1);
+    final shadowElevation = shadow.elevation * (overrides?.shadowElevationScale ?? 1);
+    if (shadowOpacity > 0) {
       canvas.save();
       canvas.translate(shadow.offsetX, shadow.offsetY);
       canvas.drawShadow(
         bodyPath,
-        Colors.black.withValues(alpha: shadow.opacity * opacity),
-        shadow.elevation,
+        Colors.black.withValues(alpha: shadowOpacity * opacity),
+        shadowElevation,
         true,
       );
       canvas.restore();
@@ -135,8 +142,8 @@ class ShapeSpecRenderer {
     } else if (bundle.shape.surface.kind == 'radial') {
       final surface = bundle.shape.surface;
       bodyPaint.shader = RadialGradient(
-        center: Alignment(surface.centerX, surface.centerY),
-        radius: surface.radius,
+        center: Alignment(overrides?.surfaceCenterX ?? surface.centerX, overrides?.surfaceCenterY ?? surface.centerY),
+        radius: overrides?.surfaceRadius ?? surface.radius,
         colors: [
           surfaceLight.withValues(alpha: opacity),
           base.withValues(alpha: opacity),
@@ -153,6 +160,7 @@ class ShapeSpecRenderer {
     canvas.save();
     canvas.clipPath(bodyPath);
     for (final layer in bundle.shape.layers) {
+      final layerOpacity = overrides?.resolveLayerOpacity(layer) ?? layer.opacity;
       final defaultLayerColor = switch (layer.role) {
         ShapeLayerRole.light => light,
         ShapeLayerRole.shade => shade,
@@ -174,9 +182,17 @@ class ShapeSpecRenderer {
           ..filterQuality = FilterQuality.high
           ..blendMode = _blendModeFor(layer.blend)
           ..colorFilter = ColorFilter.mode(
-            layerColor.withValues(alpha: layer.opacity * opacity),
+            layerColor.withValues(alpha: layerOpacity * opacity),
             BlendMode.srcIn,
           );
+        final transform = overrides?.layerTransformById[layer.id];
+        final destRect = transform == null
+            ? Rect.fromLTWH(0, 0, canvasSize, canvasSize)
+            : Rect.fromCenter(
+                center: Offset(canvasSize / 2 + transform.offsetX, canvasSize / 2 + transform.offsetY),
+                width: canvasSize * transform.scaleX,
+                height: canvasSize * transform.scaleY,
+              );
         canvas.drawImageRect(
           image,
           Rect.fromLTWH(
@@ -185,7 +201,7 @@ class ShapeSpecRenderer {
             image.width.toDouble(),
             image.height.toDouble(),
           ),
-          Rect.fromLTWH(0, 0, canvasSize, canvasSize),
+          destRect,
           paint,
         );
         continue;
@@ -204,7 +220,7 @@ class ShapeSpecRenderer {
 
       final paint = Paint()
         ..blendMode = _blendModeFor(layer.blend)
-        ..color = layerColor.withValues(alpha: layer.opacity * opacity);
+        ..color = layerColor.withValues(alpha: layerOpacity * opacity);
       if (layer.blur > 0) {
         paint.maskFilter = MaskFilter.blur(BlurStyle.normal, layer.blur);
       }
@@ -417,12 +433,13 @@ class ShapeSpecRenderer {
     Canvas canvas, {
     required Path bodyPath,
     required ShapeStyleSpec style,
+    CrayonTextureSpec? configOverride,
     required LockToken token,
     required double opacity,
     required double paletteTimeSeconds,
     required Map<String, dynamic>? auroraConfigOverride,
   }) {
-    final config = style.crayon;
+    final config = configOverride ?? style.crayon;
     if (config == null) {
       throw StateError('Crayon render mode requires crayon style config.');
     }

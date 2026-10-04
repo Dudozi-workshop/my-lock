@@ -1919,6 +1919,7 @@ class _TriangleMaterialPainter extends CustomPainter {
       ShapeTone.pink => const Color(0xFFB72F86),
       ShapeTone.blue => const Color(0xFF2874BC),
       ShapeTone.yellow => const Color(0xFFC99A18),
+      _ => adjustTone(baseColorForTone(tone), lightnessDelta: -0.18, saturationDelta: 0),
     };
   }
 

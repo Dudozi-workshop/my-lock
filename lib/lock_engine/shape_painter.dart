@@ -9,7 +9,7 @@ import 'shape_spec/shape_spec.dart';
 import 'shape_spec/shape_spec_renderer.dart';
 
 class LockTokenPainter extends CustomPainter {
-  LockTokenPainter(this.token, {this.style = ShapeStyle.softBasic})
+  LockTokenPainter(this.token, {this.style = ShapeStyle.softBasic, this.candySoftCandidate = false, this.crayonOverride})
     : super(
         repaint: token.shape == ShapeKind.seaTurtle ||
                 token.shape == ShapeKind.starfish ||
@@ -20,6 +20,8 @@ class LockTokenPainter extends CustomPainter {
 
   final LockToken token;
   final ShapeStyle style;
+  final bool candySoftCandidate;
+  final CrayonTextureSpec? crayonOverride;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -34,12 +36,15 @@ class LockTokenPainter extends CustomPainter {
       opacity: 1,
       paletteTimeSeconds: RasterPaletteClock.instance.value,
       swimKey: 'token:${token.id}',
+      candySoftCandidate: candySoftCandidate,
+      crayonOverride: crayonOverride,
     );
   }
 
   @override
   bool shouldRepaint(covariant LockTokenPainter oldDelegate) =>
-      oldDelegate.token.id != token.id || oldDelegate.style != style;
+      oldDelegate.token.id != token.id || oldDelegate.style != style ||
+      oldDelegate.candySoftCandidate != candySoftCandidate || oldDelegate.crayonOverride != crayonOverride;
 }
 
 class FloatingShapePainter extends CustomPainter {
@@ -48,12 +53,14 @@ class FloatingShapePainter extends CustomPainter {
     this.popStyle = PopStyle.basicPop,
     this.style = ShapeStyle.softBasic,
     this.speed = FloatingSpeed.normal,
+    this.candySoftCandidate = false,
   });
 
   final List<FloatingObject> objects;
   final PopStyle popStyle;
   final ShapeStyle style;
   final FloatingSpeed speed;
+  final bool candySoftCandidate;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -97,6 +104,7 @@ class FloatingShapePainter extends CustomPainter {
       objectRotation: object.rotation,
       paletteTimeSeconds: RasterPaletteClock.instance.value,
       swimKey: 'floating:${object.id}',
+      candySoftCandidate: candySoftCandidate,
       swimProfile: switch (speed) {
         FloatingSpeed.slow => 'calm',
         FloatingSpeed.normal => 'standard',
