@@ -641,149 +641,6 @@ class _ShapeGateChip extends StatelessWidget {
 }
 
 // ignore: unused_element
-class _StarfishCandidateCard extends StatelessWidget {
-  const _StarfishCandidateCard({
-    required this.code,
-    required this.label,
-    required this.outer,
-    required this.inner,
-    required this.corner,
-    required this.rotationDeg,
-    required this.asymmetry,
-    required this.fg,
-    required this.muted,
-  });
-
-  final String code;
-  final String label;
-  final double outer;
-  final double inner;
-  final double corner;
-  final double rotationDeg;
-  final double asymmetry;
-  final Color fg;
-  final Color muted;
-
-  List<List<double>> get points {
-    final result = <List<double>>[];
-    for (var i = 0; i < 10; i++) {
-      final arm = i ~/ 2;
-      final angle = (-90 + rotationDeg + i * 36) * pi / 180;
-      var radius = i.isEven ? outer : inner;
-      if (i.isEven && asymmetry != 0) {
-        radius *= 1 + asymmetry * sin(arm * 2.17 + .7);
-      }
-      result.add([
-        50 + cos(angle) * radius * 100,
-        50 + sin(angle) * radius * 100,
-      ]);
-    }
-    return result;
-  }
-
-  ShapeSpecBundle _bundle() {
-    final base = ShapeSpecRegistry.instance.resolve(
-      ShapeStyle.softBasic,
-      ShapeKind.triangle,
-    );
-    final spec = ShapeSpec(
-      styleId: base.shape.styleId,
-      shapeId: 'starfish_${code.toLowerCase()}',
-      version: 1,
-      body: ShapeGeometrySpec('roundedPolygon', {
-        'kind': 'roundedPolygon',
-        'cornerRadius': corner,
-        'points': points,
-      }),
-      surface: const ShapeSurfaceSpec(
-        kind: 'radial',
-        centerX: -.34,
-        centerY: -.42,
-        radius: 1.2,
-        stops: [0.0, .34, .76, 1.0],
-      ),
-      rotationMode: ShapeRotationMode.rotateWithObject,
-      layers: const [],
-      shadow: const ShapeShadowSpec(
-        opacity: .035,
-        elevation: 1.7,
-        offsetX: 0,
-        offsetY: .8,
-      ),
-    );
-    return ShapeSpecBundle(style: base.style, shape: spec);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final bundle = _bundle();
-    return Container(
-      padding: const EdgeInsets.all(13),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFAF9FC),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: muted.withValues(alpha: .18)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('$code · $label',
-              style: TextStyle(color: fg, fontWeight: FontWeight.w900)),
-          const SizedBox(height: 12),
-          Center(
-            child: SizedBox.square(
-              dimension: 148,
-              child: CustomPaint(
-                painter: _StarfishCandidatePainter(bundle, 64),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('58px', style: TextStyle(color: muted, fontSize: 10, fontWeight: FontWeight.w800)),
-              const SizedBox(width: 9),
-              SizedBox.square(
-                dimension: 58,
-                child: CustomPaint(
-                  painter: _StarfishCandidatePainter(bundle, 25),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StarfishCandidatePainter extends CustomPainter {
-  const _StarfishCandidatePainter(this.bundle, this.radius);
-  final ShapeSpecBundle bundle;
-  final double radius;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    ShapeSpecRenderer.paintToken(
-      canvas,
-      center: size.center(Offset.zero),
-      radius: radius,
-      token: const LockToken(
-        shape: ShapeKind.triangle,
-        tone: ShapeTone.pink,
-      ),
-      style: ShapeStyle.softBasic,
-      opacity: 1,
-      overrides: ShapeRenderOverrides(bodyGeometry: bundle.shape.body),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _StarfishCandidatePainter oldDelegate) =>
-      oldDelegate.bundle != bundle || oldDelegate.radius != radius;
-}
-
 class _CrayonCandidate {
   const _CrayonCandidate({
     required this.id,
@@ -4517,6 +4374,199 @@ class _SelectedCandidatePanel extends StatelessWidget {
   }
 }
 
+class _StarfishPaletteQaPanel extends StatelessWidget {
+  const _StarfishPaletteQaPanel({
+    required this.card,
+    required this.fg,
+    required this.muted,
+  });
+
+  final Color card;
+  final Color fg;
+  final Color muted;
+
+  static const _asset =
+      'assets/shape_masters/drop01/starfish/master/starfish_appearance_master_final_v1_2048.png';
+
+  static const _palettes = <(String, Color)>[
+    ('Deep Ocean', Color(0xFF4F8EDB)),
+    ('Aqua Mint', Color(0xFF7CCFC4)),
+    ('Coral Pink', Color(0xFFF7A7B5)),
+    ('Sand Beige', Color(0xFFEFD59A)),
+    ('Lavender', Color(0xFFB9A7E8)),
+    ('Peach Orange', Color(0xFFF7B385)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return _Panel(
+      color: card,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: 'Starfish · Drop 01 Color QA',
+            subtitle:
+                '58px QA PASS된 FINAL / LOCKED Appearance Master에 확정 6색을 적용해 색상 식별성과 명암 보존을 검수합니다. Geometry와 alpha는 변경하지 않습니다.',
+            fg: fg,
+            muted: muted,
+          ),
+          const SizedBox(height: 10),
+          const Wrap(
+            spacing: 7,
+            runSpacing: 7,
+            children: [
+              _ValueChip(label: 'Source', value: 'Starfish Master v1'),
+              _ValueChip(label: '58px', value: 'PASS'),
+              _ValueChip(label: 'Current Gate', value: 'Static 6 Color QA'),
+              _ValueChip(label: 'Geometry', value: 'LOCKED'),
+            ],
+          ),
+          const SizedBox(height: 14),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 980
+                  ? 3
+                  : constraints.maxWidth >= 620
+                      ? 2
+                      : 1;
+              const gap = 12.0;
+              final width =
+                  (constraints.maxWidth - gap * (columns - 1)) / columns;
+              return Wrap(
+                spacing: gap,
+                runSpacing: gap,
+                children: [
+                  for (final palette in _palettes)
+                    SizedBox(
+                      width: width,
+                      child: _StarfishPaletteCard(
+                        assetPath: _asset,
+                        name: palette.$1,
+                        color: palette.$2,
+                        fg: fg,
+                        muted: muted,
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F7FB),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFE3E7F0)),
+            ),
+            child: Text(
+              'Aurora Sea는 정적 색상 근사본을 만들지 않습니다. 현재 Final / Locked / Active H02B Living Water Brighter는 동적 refraction renderer이므로 Starfish Runtime palette binding이 연결된 뒤 Runtime QA에서 exact renderer로 검수합니다.',
+              style: TextStyle(color: muted, fontSize: 10.5, height: 1.45),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StarfishPaletteCard extends StatelessWidget {
+  const _StarfishPaletteCard({
+    required this.assetPath,
+    required this.name,
+    required this.color,
+    required this.fg,
+    required this.muted,
+  });
+
+  final String assetPath;
+  final String name;
+  final Color color;
+  final Color fg;
+  final Color muted;
+
+  Widget _coloredStar(double size) {
+    return SizedBox.square(
+      dimension: size,
+      child: ColorFiltered(
+        colorFilter: ColorFilter.mode(color, BlendMode.color),
+        child: Image.asset(
+          assetPath,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.high,
+          gaplessPlayback: true,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFAFAFC),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE7E7ED)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 15,
+                height: 15,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.black12),
+                ),
+              ),
+              const SizedBox(width: 7),
+              Expanded(
+                child: Text(
+                  name,
+                  style: TextStyle(color: fg, fontWeight: FontWeight.w900),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 3),
+          Text(
+            '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
+            style: TextStyle(color: muted, fontSize: 9.5),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _coloredStar(118),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _coloredStar(58),
+                  const SizedBox(height: 4),
+                  Text(
+                    '58px',
+                    style: TextStyle(
+                      color: muted,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class PaletteLab extends StatefulWidget {
   const PaletteLab({
     super.key,
@@ -4656,6 +4706,12 @@ class _PaletteLabState extends State<PaletteLab>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        _StarfishPaletteQaPanel(
+          card: widget.card,
+          fg: widget.fg,
+          muted: widget.muted,
+        ),
+        const SizedBox(height: 14),
         _Panel(
           color: widget.card,
           child: Column(

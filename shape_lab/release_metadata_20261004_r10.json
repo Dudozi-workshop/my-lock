@@ -1,0 +1,11 @@
+{
+  "version": "LABS-2026.10.04-R10",
+  "source_branch": "feat/style-lab-integration",
+  "date": "2026-10-04",
+  "purpose": "Starfish Drop 01 static six-color QA after 58px PASS",
+  "status": "QA / Candidate",
+  "scope": "Palette Lab · Starfish · Static 6 Colors",
+  "source_asset": "assets/shape_masters/drop01/starfish/master/starfish_appearance_master_final_v1_2048.png",
+  "source_sha256": "e782ae23622e549ecc75b6cfb067438398dd0aa21b88fcf6dc34a4b50c8dcceb",
+  "gate": "Static Color visual approval pending; Aurora Sea exact runtime QA deferred"
+}
