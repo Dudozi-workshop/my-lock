@@ -1,0 +1,32 @@
+{
+  "asset_id": "jellyfish_r4",
+  "shape": "J04-M3-R4 Compact",
+  "artifact_type": "static_master_and_ownership_gate",
+  "date": "2026-10-04",
+  "static_master": {
+    "file": "Jellyfish_R4_Static_Master_Candidate_v1_2048.png",
+    "canvas": [2048, 2048],
+    "format": "RGBA PNG",
+    "status": "approved_baseline",
+    "geometry_reinterpreted": false,
+    "imagegen_after_selection": false,
+    "qa_58px": "pass"
+  },
+  "scope": {
+    "color_system": "out_of_scope_separate_track",
+    "other_shapes_modified": false
+  },
+  "ownership_overlay": {
+    "file": "Jellyfish_R4_Ownership_Overlay_Candidate_v1.png",
+    "status": "candidate_user_review",
+    "regions": [
+      "bell",
+      "main_tentacles",
+      "sub_tentacles"
+    ],
+    "production_masks_created": false,
+    "removed_remainder_created": false,
+    "hidden_underlap_restored": false
+  },
+  "next_gate": "user approval of ownership overlay"
+}
