@@ -118,7 +118,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R01 · Palette Lab · Aurora Sea Water Wave R2 · Candidate',
+                                  'LABS-2026.10.04-R01 · Integrated production workbench for creation, comparison, QA, and asset registry · QA / Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
