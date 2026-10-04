@@ -16,6 +16,7 @@ import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
 
 import 'soft_basic_candidates.dart';
 import 'water_refraction_field.dart';
+import 'shallow_clear_base_v1_data.dart';
 import 'candy_soft_review.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
 
@@ -6536,10 +6537,12 @@ class _BackgroundLabState extends State<BackgroundLab>
   bool showSurface = true;
   bool playing = true;
   double intensity = 1.0;
+  late final Uint8List _approvedBaseBytes;
 
   @override
   void initState() {
     super.initState();
+    _approvedBaseBytes = base64Decode(shallowClearBaseV1WebpBase64);
     _surfaceClock = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 12),
@@ -6747,8 +6750,8 @@ class _BackgroundLabState extends State<BackgroundLab>
                 borderRadius: BorderRadius.circular(18),
                 child: Stack(
                   children: [
-                    const Positioned.fill(
-                      child: CustomPaint(painter: _ShallowSeaBasePainter()),
+                    Positioned.fill(
+                      child: Image.memory(_approvedBaseBytes, fit: BoxFit.cover, gaplessPlayback: true),
                     ),
                     if (showSurface)
                       Positioned.fill(
@@ -6907,8 +6910,8 @@ class _BackgroundLabState extends State<BackgroundLab>
                   borderRadius: BorderRadius.circular(22),
                   child: Stack(
                     children: [
-                      const Positioned.fill(
-                        child: CustomPaint(painter: _ShallowSeaBasePainter()),
+                      Positioned.fill(
+                        child: Image.memory(_approvedBaseBytes, fit: BoxFit.cover, gaplessPlayback: true),
                       ),
                       if (showSurface)
                         Positioned.fill(
@@ -6950,184 +6953,6 @@ class _BackgroundLabState extends State<BackgroundLab>
       ),
     );
   }
-}
-
-class _ShallowSeaBasePainter extends CustomPainter {
-  const _ShallowSeaBasePainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final bounds = Offset.zero & size;
-    final water = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          Color(0xFFB9EFF0),
-          Color(0xFF87D9E8),
-          Color(0xFF62B6D6),
-          Color(0xFF5D9FCA),
-        ],
-        stops: [0, .25, .63, 1],
-      ).createShader(bounds);
-    canvas.drawRect(bounds, water);
-
-    final haze = Paint()
-      ..color = Colors.white.withValues(alpha: .09)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(size.width * .55, size.height * .35),
-        width: size.width * 1.1,
-        height: size.height * .34,
-      ),
-      haze,
-    );
-
-    final distant = Paint()..color = const Color(0xFF5E83B0).withValues(alpha: .20);
-    for (final spec in const [
-      (.76, .64, .24, .13),
-      (.58, .70, .18, .10),
-      (.90, .73, .16, .08),
-      (.40, .73, .14, .07),
-    ]) {
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: Offset(size.width * spec.$1, size.height * spec.$2),
-          width: size.width * spec.$3,
-          height: size.height * spec.$4,
-        ),
-        distant,
-      );
-    }
-
-    final sandPath = Path()
-      ..moveTo(0, size.height * .75)
-      ..cubicTo(
-        size.width * .28,
-        size.height * .72,
-        size.width * .68,
-        size.height * .78,
-        size.width,
-        size.height * .74,
-      )
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-    final sand = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [Color(0xFFF3DFC4), Color(0xFFD9B991)],
-      ).createShader(bounds);
-    canvas.drawPath(sandPath, sand);
-
-    final sandGlow = Paint()
-      ..color = const Color(0xFFFFF3D7).withValues(alpha: .24)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(size.width * .60, size.height * .84),
-        width: size.width * .55,
-        height: size.height * .14,
-      ),
-      sandGlow,
-    );
-
-    _rock(
-      canvas,
-      Offset(size.width * .10, size.height * .79),
-      Size(size.width * .24, size.height * .12),
-      const Color(0xFF6F75C8),
-    );
-    _rock(
-      canvas,
-      Offset(size.width * .20, size.height * .84),
-      Size(size.width * .21, size.height * .10),
-      const Color(0xFF8A81D6),
-    );
-    _rock(
-      canvas,
-      Offset(size.width * .05, size.height * .88),
-      Size(size.width * .16, size.height * .08),
-      const Color(0xFF766AB8),
-    );
-
-    final mint = Paint()..color = const Color(0xFF6CCEBB);
-    final coral = Paint()..color = const Color(0xFFE88798);
-    final cream = Paint()..color = const Color(0xFFF5C89C);
-
-    for (var i = 0; i < 5; i++) {
-      final x = size.width * (.11 + i * .027);
-      final y = size.height * (.82 - (i % 2) * .018);
-      final path = Path()
-        ..moveTo(x, size.height * .90)
-        ..quadraticBezierTo(
-          x - size.width * .015,
-          y + size.height * .025,
-          x + size.width * (.012 + i * .001),
-          y,
-        )
-        ..quadraticBezierTo(
-          x + size.width * .024,
-          y - size.height * .028,
-          x + size.width * .032,
-          y - size.height * .055,
-        );
-      canvas.drawPath(
-        path,
-        Paint()
-          ..color = const Color(0xFF5CC7B4)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = max(2.0, size.width * .009)
-          ..strokeCap = StrokeCap.round,
-      );
-    }
-
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(size.width * .18, size.height * .87),
-        width: size.width * .10,
-        height: size.height * .045,
-      ),
-      coral,
-    );
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(size.width * .26, size.height * .88),
-        width: size.width * .12,
-        height: size.height * .050,
-      ),
-      mint,
-    );
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(size.width * .10, size.height * .91),
-        width: size.width * .10,
-        height: size.height * .040,
-      ),
-      cream,
-    );
-  }
-
-  void _rock(Canvas canvas, Offset center, Size size, Color color) {
-    final paint = Paint()..color = color;
-    canvas.drawOval(
-      Rect.fromCenter(center: center, width: size.width, height: size.height),
-      paint,
-    );
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: center.translate(-size.width * .08, -size.height * .10),
-        width: size.width * .66,
-        height: size.height * .50,
-      ),
-      Paint()..color = Colors.white.withValues(alpha: .10),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _ShallowSeaBasePainter oldDelegate) => false;
 }
 
 class _SurfaceRefractionPainter extends CustomPainter {
