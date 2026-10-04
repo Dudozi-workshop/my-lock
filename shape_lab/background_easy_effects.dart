@@ -179,27 +179,29 @@ class VolumetricLightPainter extends CustomPainter {
   final Animation<double> animation;
   final VolumetricLightProfile profile;
 
-  // R20 A only: distributed illustrated light planes of unequal scale.
+  // R21 A only: a coherent fan from a broad source above the surface.
   // Vertex alpha carries both lateral falloff and depth attenuation.
   void _drawBroadSunbeams(Canvas canvas, Size size, double t) {
-    const centers = [.045, .18, .255, .42, .485, .65, .725, .875, .97];
-    const widths = [.055, .125, .040, .090, .035, .145, .045, .095, .038];
-    const depths = [.44, .62, .49, .57, .43, .64, .50, .56, .45];
-    const phases = [.3, 1.7, 3.1, 4.6, 2.4, 5.3, .9, 3.7, 5.8];
-    const strengths = [.30, .33, .37, .31, .35, .30, .37, .33, .31];
-    const angles = [.075, .035, .115, -.055, .025, .065, -.045, -.080, -.135];
-    const fadeStarts = [.10, .22, .08, .17, .06, .25, .12, .19, .08];
-    const taper = [.25, .12, .42, .20, .46, .08, .38, .18, .42];
+    const centers = [.11, .205, .255, .36, .42, .495, .56, .64, .70, .785, .89, .98];
+    const widths = [.035, .047, .024, .072, .028, .035, .026, .063, .023, .048, .027, .034];
+    const depths = [.44, .57, .48, .64, .47, .58, .51, .63, .45, .56, .48, .45];
+    const phases = [.3, 1.7, 3.1, 4.6, 2.4, 5.3, .9, 3.7, 5.8, 1.2, 2.9, 4.1];
+    const strengths = [.25, .33, .26, .16, .30, .28, .25, .18, .28, .33, .26, .23];
+    // Every angle comes from the shared source region, never random angles.
+    final sourceX = .50 + .008 * sin(t);
+    final fanSpread = .88 + .035 * sin(t + .4);
+    const fadeStarts = [.10, .22, .08, .17, .06, .25, .12, .19, .08, .18, .10, .07];
+    const taper = [.25, .12, .42, .20, .46, .08, .38, .18, .42, .16, .30, .40];
     const columns = 32;
     const rows = 36;
     for (var beam = 0; beam < centers.length; beam++) {
       final phase = phases[beam];
-      final sway = sin(t + phase) * profile.drift * .15;
-      final angle = angles[beam] + .012 * sin(t + phase + .8);
+      final sway = sin(t) * profile.drift * .12;
+      final angle = (centers[beam] - sourceX) * fanSpread;
       final width = widths[beam] * (profile.width / .24) *
           (1 + .16 * sin(t + phase + 1.1));
       final depth = depths[beam] * (profile.depth / .64);
-      final energy = (strengths[beam] + .060 * sin(t * 2 + phase)) *
+      final energy = (strengths[beam] + .075 * sin(t * 2 + phase)) *
           profile.energy;
       final positions = <Offset>[];
       final colors = <Color>[];
@@ -209,9 +211,9 @@ class VolumetricLightPainter extends CustomPainter {
         // Depth delays the moving surface aperture; the shaft never moves
         // as a single rigid strip. All time frequencies close at 24 s.
         final flow = t * 2 + phase - v * 2.3;
-        final center = centers[beam] + sway + angle * v +
-            sin(flow) * .008 * v;
-        final halfWidth = width * (.50 + .58 * v) *
+        final center = centers[beam] + sway + angle * depth * v +
+            sin(flow) * .0035 * v;
+        final halfWidth = width * (.48 + .42 * v) *
             (1 - taper[beam] * v * v) *
             (1 + .09 * sin(flow + .7));
         // Smoothly dissolve through mid-water; nothing reaches the floor.
@@ -221,9 +223,11 @@ class VolumetricLightPainter extends CustomPainter {
         final depthEnergy = (1 - .28 * v) * attenuation;
         for (var column = 0; column <= columns; column++) {
           final u = column / columns * 2 - 1;
-          // A broad, nearly flat fill reads as an illustrated light plane.
-          // Only the outer 24% feathers; there is no white Gaussian spine.
-          final edge = ((u.abs() - .76) / .24).clamp(0.0, 1.0);
+          // The shaft stays readable, while unequal soft sides dissolve into
+          // blue water. This avoids two equally hard ribbon boundaries.
+          final edgeStart = (u < 0) == beam.isEven ? .38 : .60;
+          final edge = ((u.abs() - edgeStart) / (1 - edgeStart))
+              .clamp(0.0, 1.0);
           final feather = 1 - edge * edge * (3 - 2 * edge);
           final aperture = .88 + .10 * sin(flow + u * 1.8);
           final density = .93 + .07 * cos(t * 2 + phase - v * 1.7 + u * 2.4);

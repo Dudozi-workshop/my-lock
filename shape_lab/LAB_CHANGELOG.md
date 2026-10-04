@@ -1,3 +1,9 @@
+## LABS-2026.10.05-R21 · Volumetric A reference-led fan
+- R20 rejected direction: unrelated overhead lights, shafts too thick, no shared fan.
+- User 76038.png is primary art reference; coherent outward angle field, thin/medium shafts with two faint broad supports and blue gaps.
+- Softer asymmetric boundaries; no independent random angles. A reference-frame/pause/play controls added to Full Live.
+- Base/B/C/other effects immutable; no ImageGen. Candidate pending static shape then Live Keep/Modify/Reject.
+
 ## LABS-2026.10.05-R20 · Volumetric A distributed composition
 - R19 Modify: entry points clustered centrally; shafts too wide and similar.
 - Unequal large/medium/small planes spread across the surface with irregular gaps and distinct angles.

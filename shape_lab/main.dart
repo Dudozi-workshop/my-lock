@@ -124,7 +124,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R20 · Background Effects · A Broad Sunbeam',
+                                  'LABS-2026.10.05-R21 · Background Effects · A Broad Sunbeam',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5583,6 +5583,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   int? soloEffectIndex;
   bool volumetricExpanded = true;
   int selectedVolumetric = 0;
+  bool _broadSunbeamPaused = false;
 
   static const backgrounds = [
     ('01', '투명한 얕은 바다', 'Image Selected · Effects In Progress'),
@@ -6044,7 +6045,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   ];
 
   static const _volumetricLabels = <String>[
-    'A · Broad Sunbeam · R20',
+    'A · Broad Sunbeam · R21',
     'B · Living Rays',
     'C · Soft Drift',
   ];
@@ -6205,6 +6206,41 @@ class _BackgroundLabState extends State<BackgroundLab>
                 : '현재는 Approved Base + $_soloEffectName 단독 표시 중',
             style: TextStyle(color: widget.muted, fontSize: 10.5, fontWeight: FontWeight.w700),
           ),
+          if (showVolumetricLight && selectedVolumetric == 0) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: [
+                OutlinedButton.icon(
+                  icon: Icon(_broadSunbeamPaused ? Icons.play_arrow : Icons.pause),
+                  label: Text(_broadSunbeamPaused ? 'A 재생' : 'A 일시정지'),
+                  onPressed: () {
+                    setState(() {
+                      _broadSunbeamPaused = !_broadSunbeamPaused;
+                      if (_broadSunbeamPaused) {
+                        _broadSunbeamClock.stop();
+                      } else {
+                        _broadSunbeamClock.repeat();
+                      }
+                    });
+                  },
+                ),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.photo_outlined),
+                  label: const Text('A 기준 프레임'),
+                  onPressed: () {
+                    _soloEffect(2);
+                    setState(() {
+                      _broadSunbeamPaused = true;
+                      _broadSunbeamClock.stop();
+                      _broadSunbeamClock.value = 0;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 10),
           Center(
             child: ConstrainedBox(

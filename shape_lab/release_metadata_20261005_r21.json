@@ -1,0 +1,12 @@
+{
+  "version": "LABS-2026.10.05-R21",
+  "source_branch": "feat/style-lab-integration",
+  "date": "2026-10-05",
+  "purpose": "Volumetric A reference-led coherent thin-shaft fan and static review",
+  "status": "QA / Candidate / Awaiting Keep-Modify-Reject",
+  "scope": "Background Lab \u00b7 Volumetric A only; Base, B/C and other effects immutable",
+  "source_asset": "background.drop01.shallow_clear.base_only_v2",
+  "gate": "A visual approval required before B/C expansion",
+  "reference": "User 76038.png \u2014 illustrated underwater light planes",
+  "reference_usage": "Original procedural renderer; no stock image import; no ImageGen"
+}

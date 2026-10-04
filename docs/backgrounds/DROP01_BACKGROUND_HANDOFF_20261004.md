@@ -1,6 +1,12 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · R20 candidate
+## Current handoff · R21 candidate
+- R20 deployed `5be8a8d3029afc77f8494c6119dee3a3f2fccd04`, CI `37218684946` success; user rejects direction: independent overhead lamps, too thick, missing coherent fan.
+- User `76038.png` is primary art reference. R21 uses broad upper source region with a coherent outward fan, thin/medium shafts, faint broad support, irregular blue gaps, asymmetric soft boundaries.
+- A reference-frame/pause/play in Full Live: inspect frozen composition first, then motion. B/C clocks and every other effect unchanged.
+- LABS-2026.10.05-R21; CI/deploy/public before user art review. Base immutable; no ImageGen; not Final/LOCK.
+
+## Previous handoff · R20 candidate
 - R19 deployed at `5fd0f95603c508e7e72856a360751bf27e06245c`, CI `37218031852` success. User verdict Modify: central entry cluster and excessive similar widths.
 - A R20 distributes unequal large/medium/small light planes across the surface with irregular blue gaps and varied angles. Warm tint only near the source; sky-blue depth blend, asymmetric density, individual taper/fade.
 - LABS-2026.10.05-R20; CI/deploy/public verification then user Live Keep/Modify/Reject. Base/B/C/other effects immutable; no ImageGen. Not Final/LOCK.

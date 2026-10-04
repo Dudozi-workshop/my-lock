@@ -58,7 +58,7 @@ jobs:
           python3 - <<'PYCODE'
           import json, os, html
           from pathlib import Path
-          meta = json.loads(Path('shape_lab/release_metadata_20261005_r20.json').read_text())
+          meta = json.loads(Path('shape_lab/release_metadata_20261005_r21.json').read_text())
           meta['source_commit'] = os.environ['GITHUB_SHA']
           Path('build/shape_lab/labs-release.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2))
           page = Path('build/shape_lab/index.html')
@@ -106,7 +106,7 @@ jobs:
           test "$(wc -c < /tmp/base-only-v2.png | tr -d ' ')" = "1547439"
           echo "0bbc263d61b3a524b9c027e1894fab3209085d631c7a2c313d261a17ecf98ff2  /tmp/base-only-v2.png" | sha256sum -c -
 
-      - name: Verify R20 release identity
+      - name: Verify R21 release identity
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           python3 - <<'PYCODE'
@@ -117,8 +117,8 @@ jobs:
               url = os.environ['PRIMARY_URL'] + '?release=' + sha + '&attempt=' + str(attempt)
               try:
                   page = subprocess.check_output(['curl', '--fail', '--silent', '--show-error', '--location', '--max-time', '20', url], text=True)
-                  if expected in page and 'LABS-2026.10.05-R20' in page:
-                      print('Canonical R20 release verified:', sha)
+                  if expected in page and 'LABS-2026.10.05-R21' in page:
+                      print('Canonical R21 release verified:', sha)
                       break
                   print('Canonical HTML release propagation pending', flush=True)
               except Exception as error:
