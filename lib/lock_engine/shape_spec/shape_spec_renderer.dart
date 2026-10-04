@@ -3,12 +3,19 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../models.dart';
+import '../water_refraction_field.dart';
 import '../swim_pose_runtime.dart';
 import 'shape_spec.dart';
 import 'shape_spec_registry.dart';
 
 class ShapeSpecRenderer {
   const ShapeSpecRenderer._();
+
+  // One shared optical mesh per 24Hz frame across all turtle tokens.
+  static final _waterField = WaterRefractionField(
+    colors: const [Color(0xFF0754A3), Color(0xFF138BD3), Color(0xFF20CCD7), Color(0xFF9AF0F3)],
+    speed: 1.28, refraction: .92, cellScale: 3.7, light: .84, seed: 29,
+  );
 
   static final Map<String, _CrayonTextureGeometry> _crayonTextureCache = {};
 
@@ -227,6 +234,29 @@ class ShapeSpecRenderer {
             profile: swimProfile,
           );
     final poseImages = spec.imagesForPose(pose);
+    final auroraConfig = auroraConfigOverride ?? spec.metadata.aurora;
+    if (token.tone == ShapeTone.auroraSea && auroraConfig['mode'] == 'water_refraction') {
+      canvas.save();
+      canvas.translate(center.dx, center.dy);
+      canvas.rotate(objectRotation);
+      canvas.translate(-center.dx, -center.dy);
+      canvas.clipRect(destination, doAntiAlias: false);
+      canvas.saveLayer(destination, Paint()..color = Colors.white.withValues(alpha: opacity));
+      // Exact approved LABS alpha-first + srcIn pass, followed by fixed finish.
+      canvas.saveLayer(destination, Paint());
+      canvas.drawImageRect(poseImages.paletteBase, source, destination, sampling);
+      canvas.save();
+      canvas.translate(destination.left, destination.top);
+      canvas.scale(destination.width, destination.height);
+      canvas.drawVertices(_waterField.mesh(paletteTimeSeconds), BlendMode.src,
+        Paint()..blendMode = BlendMode.srcIn);
+      canvas.restore();
+      canvas.restore();
+      canvas.drawImageRect(poseImages.fixedFinish, source, destination, sampling);
+      canvas.restore();
+      canvas.restore();
+      return;
+    }
     canvas.save();
     canvas.translate(center.dx, center.dy);
     canvas.rotate(objectRotation);

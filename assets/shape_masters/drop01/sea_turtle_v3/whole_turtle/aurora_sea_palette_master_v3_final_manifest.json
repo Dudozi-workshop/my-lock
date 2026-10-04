@@ -1,0 +1,58 @@
+{
+  "asset_id": "sea_turtle_v3",
+  "palette_id": "aurora_sea",
+  "version": "v3",
+  "status": "Final / Locked / Active",
+  "approval_date": "2026-10-04",
+  "user_approval": "2번으로 확정: H02B Living Water Brighter",
+  "approved_candidate_commit": "ade16b84e91a9c1d344c34805cc707322622261f",
+  "production_runtime": "assets/raster_shapes/sea_turtle_v3_runtime_v5.json",
+  "supersedes": "Aurora Sea C02 Quick Signature v2",
+  "palette": {
+    "mode": "water_refraction",
+    "selection": "H02B · Living Water · Brighter",
+    "palette": [
+      "#0754A3",
+      "#138BD3",
+      "#20CCD7",
+      "#9AF0F3"
+    ],
+    "speed": 1.28,
+    "refraction": 0.92,
+    "cell_scale": 3.7,
+    "light": 0.84,
+    "seed": 29,
+    "mesh_resolution": 46,
+    "field_fps": 24,
+    "moving_layer": "base color/albedo only",
+    "fixed_layers": [
+      "shadow",
+      "pattern",
+      "division lines",
+      "highlight",
+      "outline"
+    ],
+    "note": "Signature Color Master v3; exact user-approved Water Wave R2 H02B renderer. No periodic sine-wave strokes."
+  },
+  "layer_contract": {
+    "moving_layer": "base color/albedo only",
+    "fixed_layers": [
+      "shadow",
+      "pattern",
+      "division lines",
+      "highlight",
+      "outline"
+    ],
+    "geometry_changed": false,
+    "ownership_changed": false,
+    "mask_changed": false,
+    "motion_changed": false,
+    "imagegen_used": false
+  },
+  "qa": {
+    "visual_approval": true,
+    "candidate_ci_run": 37164095529,
+    "android_device_performance": "pending"
+  },
+  "versioning_rule": "Do not modify approved renderer/preset. Subsequent visual changes require a new Candidate/Version. C02 remains immutable recovery history."
+}
