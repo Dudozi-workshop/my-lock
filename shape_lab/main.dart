@@ -5398,68 +5398,68 @@ class _RuntimeQaLabState extends State<RuntimeQaLab> {
         ),
         const SizedBox(height: 14),
         _Panel(
-      color: widget.card,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionTitle(
-            title: 'Runtime QA',
-            subtitle: '6 / 9 / 12개 동시 렌더에서 가독성과 움직임을 확인합니다.',
-            fg: widget.fg,
-            muted: widget.muted,
-          ),
-          const SizedBox(height: 14),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          color: widget.card,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              for (final value in const [6, 9, 12])
-                ChoiceChip(
-                  label: Text('$value개'),
-                  selected: count == value,
-                  onSelected: (_) => setState(() => count = value),
-                ),
-              _EnumDropdown<MovementStyle>(
-                label: 'Motion',
-                value: movement,
-                values: MovementStyle.values,
-                text: (v) => v.label,
-                onChanged: (v) => setState(() => movement = v),
+              _SectionTitle(
+                title: 'Runtime QA',
+                subtitle: '6 / 9 / 12개 동시 렌더에서 가독성과 움직임을 확인합니다.',
+                fg: widget.fg,
+                muted: widget.muted,
               ),
-              _EnumDropdown<ShapeStyle>(
-                label: 'Style',
-                value: style,
-                values: ShapeStyle.values,
-                text: (v) => v.label,
-                onChanged: (v) => setState(() => style = v),
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  for (final value in const [6, 9, 12])
+                    ChoiceChip(
+                      label: Text('$value개'),
+                      selected: count == value,
+                      onSelected: (_) => setState(() => count = value),
+                    ),
+                  _EnumDropdown<MovementStyle>(
+                    label: 'Motion',
+                    value: movement,
+                    values: MovementStyle.values,
+                    text: (v) => v.label,
+                    onChanged: (v) => setState(() => movement = v),
+                  ),
+                  _EnumDropdown<ShapeStyle>(
+                    label: 'Style',
+                    value: style,
+                    values: ShapeStyle.values,
+                    text: (v) => v.label,
+                    onChanged: (v) => setState(() => style = v),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Container(
+                height: 430,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFFFF5FA), Color(0xFFF0F3FF)],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: FloatingPreview(
+                  selectedShapes: ShapeKind.defaults,
+                  selectedTones: ShapeTone.defaults,
+                  movementStyle: movement,
+                  popStyle: PopStyle.basicPop,
+                  style: style,
+                  objectCount: count,
+                  movementArea: MovementArea.full,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          Container(
-            height: 430,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFFFFF5FA), Color(0xFFF0F3FF)],
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: FloatingPreview(
-              selectedShapes: ShapeKind.defaults,
-              selectedTones: ShapeTone.defaults,
-              movementStyle: movement,
-              popStyle: PopStyle.basicPop,
-              style: style,
-              objectCount: count,
-              movementArea: MovementArea.full,
-            ),
-          ),
-        ],
-      ),
         ),
       ],
     );
