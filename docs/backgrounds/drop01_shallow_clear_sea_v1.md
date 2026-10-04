@@ -40,9 +40,19 @@ Priority: Surface Refraction > Floor Caustic > Volumetric Light > Ambient Partic
 
 ## Gate state
 - Planning Visual Master v1: user approved.
-- Clean Background Base v1: selected candidate.
-- Next active gate: Surface Refraction.
-- Production promotion requires separate runtime reconstruction, QA, user approval, then lock.
+- Composition direction: **A Open Water**.
+- **Base Only v2: user approved** as the static Background Base visual direction.
+- 01 배경 이미지 state: **Approved Base / not complete Background Final / not Locked**.
+- Approved Base binary is durably stored in Drive as `shallow_clear_base_only_v2_approved_candidate.png`.
+- Next active Production Step: **02 레이어 효과** in LABS Background.
+- First effect target: Surface Refraction.
+- Production promotion requires LABS effect work → Composite QA → user approval → Final/LOCK.
 
 ## Scope lock
 The approved composition, object density, central negative space, palette family and world/style direction are frozen for the next effect gate. Surface Refraction work must not regenerate or redesign the static environment outside that effect scope.
+
+## LABS-first continuation rule
+- After Base approval, effect production and comparison continue in Background LABS rather than through ad-hoc chat mockups.
+- Reporting-only QA images are not production artifacts and should not be generated as a substitute for LABS QA.
+- If a required effect comparison, ratio QA, ON/OFF, Freeze/Play, or composite inspection control is missing, improve LABS first and then continue the active Production Step.
+- Effect layers remain independent from the approved Base: Surface Refraction / Floor Caustic / Volumetric Light / Ambient Particle / Bubble.
