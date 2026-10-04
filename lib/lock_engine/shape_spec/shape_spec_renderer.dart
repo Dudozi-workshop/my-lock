@@ -3,13 +3,21 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../models.dart';
-import 'shape_render_overrides.dart';
+import '../water_refraction_field.dart';
+import '../swim_pose_runtime.dart';
+import '../whole_shape_idle_runtime.dart';
 import 'shape_spec.dart';
 import 'shape_spec_registry.dart';
 import 'candy_soft_runtime.dart';
 
 class ShapeSpecRenderer {
   const ShapeSpecRenderer._();
+
+  // One shared optical mesh per 24Hz frame across all turtle tokens.
+  static final _waterField = WaterRefractionField(
+    colors: const [Color(0xFF0754A3), Color(0xFF138BD3), Color(0xFF20CCD7), Color(0xFF9AF0F3)],
+    speed: 1.28, refraction: .92, cellScale: 3.7, light: .84, seed: 29,
+  );
 
   static final Map<String, _CrayonTextureGeometry> _crayonTextureCache = {};
 
@@ -21,12 +29,34 @@ class ShapeSpecRenderer {
     required ShapeStyle style,
     required double opacity,
     double objectRotation = 0,
-    CrayonTextureSpec? crayonOverride,
-    ShapeRenderOverrides? overrides,
-    bool candySoftCandidate = false,
+    double paletteTimeSeconds = 0,
+    String? swimKey,
+    String swimProfile = 'standard',
+    Map<String, dynamic>? auroraConfigOverride,
+    bool useCandySoft = true,
   }) {
-    if (candySoftCandidate && CandySoftRuntime.instance.paint(canvas, center: center, radius: radius, token: token, style: style, opacity: opacity, rotation: objectRotation)) return;
-    final bundle = ShapeSpecRegistry.instance.resolve(style, token.shape);
+    if (useCandySoft && CandySoftRuntime.instance.paint(
+      canvas, center: center, radius: radius, token: token, style: style,
+      opacity: opacity, rotation: objectRotation,
+    )) return;
+    final registry = ShapeSpecRegistry.instance;
+    if (registry.isRasterShape(token.shape)) {
+      _paintRasterToken(
+        canvas,
+        center: center,
+        radius: radius,
+        token: token,
+        opacity: opacity,
+        objectRotation: objectRotation,
+        paletteTimeSeconds: paletteTimeSeconds,
+        swimKey: swimKey,
+        swimProfile: swimProfile,
+        auroraConfigOverride: auroraConfigOverride,
+      );
+      return;
+    }
+
+    final bundle = registry.resolve(style, token.shape);
     final canvasSize = bundle.style.canvasSize;
     final scale = radius * 2 / canvasSize;
 
@@ -41,7 +71,7 @@ class ShapeSpecRenderer {
     canvas.translate(center.dx - radius, center.dy - radius);
     canvas.scale(scale, scale);
 
-    final bodyPath = _pathFor(overrides?.bodyGeometry ?? bundle.shape.body);
+    final bodyPath = _pathFor(bundle.shape.body);
 
     if (bundle.style.renderMode == ShapeRenderMode.crayon) {
       _paintCrayonToken(
@@ -50,24 +80,21 @@ class ShapeSpecRenderer {
         style: bundle.style,
         token: token,
         opacity: opacity,
-        configOverride: crayonOverride,
+        paletteTimeSeconds: paletteTimeSeconds,
+        auroraConfigOverride: auroraConfigOverride,
       );
       canvas.restore();
       return;
     }
 
     final shadow = bundle.shape.shadow;
-    final shadowOpacity =
-        shadow.opacity * (overrides?.shadowOpacityScale ?? 1);
-    final shadowElevation =
-        shadow.elevation * (overrides?.shadowElevationScale ?? 1);
-    if (shadowOpacity > 0) {
+    if (shadow.opacity > 0) {
       canvas.save();
       canvas.translate(shadow.offsetX, shadow.offsetY);
       canvas.drawShadow(
         bodyPath,
-        Colors.black.withValues(alpha: shadowOpacity * opacity),
-        shadowElevation,
+        Colors.black.withValues(alpha: shadow.opacity * opacity),
+        shadow.elevation,
         true,
       );
       canvas.restore();
@@ -99,14 +126,17 @@ class ShapeSpecRenderer {
     );
 
     final bodyPaint = Paint();
-    if (bundle.shape.surface.kind == 'radial') {
+    if (token.tone == ShapeTone.auroraSea) {
+      bodyPaint.shader = auroraSeaGradient(
+        paletteTimeSeconds,
+        config: auroraConfigOverride,
+        opacity: opacity,
+      ).createShader(Rect.fromLTWH(0, 0, canvasSize, canvasSize));
+    } else if (bundle.shape.surface.kind == 'radial') {
       final surface = bundle.shape.surface;
       bodyPaint.shader = RadialGradient(
-        center: Alignment(
-          overrides?.surfaceCenterX ?? surface.centerX,
-          overrides?.surfaceCenterY ?? surface.centerY,
-        ),
-        radius: overrides?.surfaceRadius ?? surface.radius,
+        center: Alignment(surface.centerX, surface.centerY),
+        radius: surface.radius,
         colors: [
           surfaceLight.withValues(alpha: opacity),
           base.withValues(alpha: opacity),
@@ -123,8 +153,6 @@ class ShapeSpecRenderer {
     canvas.save();
     canvas.clipPath(bodyPath);
     for (final layer in bundle.shape.layers) {
-      final layerOpacity =
-          overrides?.resolveLayerOpacity(layer) ?? layer.opacity;
       final defaultLayerColor = switch (layer.role) {
         ShapeLayerRole.light => light,
         ShapeLayerRole.shade => shade,
@@ -146,20 +174,9 @@ class ShapeSpecRenderer {
           ..filterQuality = FilterQuality.high
           ..blendMode = _blendModeFor(layer.blend)
           ..colorFilter = ColorFilter.mode(
-            layerColor.withValues(alpha: layerOpacity * opacity),
+            layerColor.withValues(alpha: layer.opacity * opacity),
             BlendMode.srcIn,
           );
-        final transform = overrides?.layerTransformById[layer.id];
-        final destRect = transform == null
-            ? Rect.fromLTWH(0, 0, canvasSize, canvasSize)
-            : Rect.fromCenter(
-                center: Offset(
-                  canvasSize / 2 + transform.offsetX,
-                  canvasSize / 2 + transform.offsetY,
-                ),
-                width: canvasSize * transform.scaleX,
-                height: canvasSize * transform.scaleY,
-              );
         canvas.drawImageRect(
           image,
           Rect.fromLTWH(
@@ -168,7 +185,7 @@ class ShapeSpecRenderer {
             image.width.toDouble(),
             image.height.toDouble(),
           ),
-          destRect,
+          Rect.fromLTWH(0, 0, canvasSize, canvasSize),
           paint,
         );
         continue;
@@ -187,7 +204,7 @@ class ShapeSpecRenderer {
 
       final paint = Paint()
         ..blendMode = _blendModeFor(layer.blend)
-        ..color = layerColor.withValues(alpha: layerOpacity * opacity);
+        ..color = layerColor.withValues(alpha: layer.opacity * opacity);
       if (layer.blur > 0) {
         paint.maskFilter = MaskFilter.blur(BlurStyle.normal, layer.blur);
       }
@@ -199,15 +216,213 @@ class ShapeSpecRenderer {
     canvas.restore();
   }
 
+  static void _paintRasterToken(
+    Canvas canvas, {
+    required Offset center,
+    required double radius,
+    required LockToken token,
+    required double opacity,
+    required double objectRotation,
+    required double paletteTimeSeconds,
+    required String? swimKey,
+    required String swimProfile,
+    required Map<String, dynamic>? auroraConfigOverride,
+  }) {
+    final spec = ShapeSpecRegistry.instance.resolveRasterSpec(token.shape);
+    final destination = spec.metadata.destination(center, radius);
+    final source = Offset.zero & spec.metadata.runtimeCanvas;
+    final idle = spec.metadata.idle.isEmpty || swimKey == null
+        ? const WholeShapeIdleTransform()
+        : WholeShapeIdleRuntime.instance.transformFor(
+            key: swimKey,
+            timeSeconds: paletteTimeSeconds,
+            config: spec.metadata.idle,
+            radius: radius,
+          );
+    void applyObjectTransform() {
+      canvas.translate(center.dx + idle.offset.dx, center.dy + idle.offset.dy);
+      canvas.rotate(objectRotation + idle.rotationRadians);
+      canvas.scale(idle.scaleX, idle.scaleY);
+      canvas.translate(-center.dx, -center.dy);
+    }
+    final sampling = Paint()..filterQuality = FilterQuality.high;
+    final pose = spec.metadata.swim.isEmpty || swimKey == null
+        ? 's0'
+        : SwimPoseRuntime.instance.poseFor(
+            key: swimKey,
+            timeSeconds: paletteTimeSeconds,
+            config: spec.metadata.swim,
+            profile: swimProfile,
+          );
+    final poseImages = spec.imagesForPose(pose);
+    final auroraConfig = auroraConfigOverride ?? spec.metadata.aurora;
+    if (token.tone == ShapeTone.auroraSea && auroraConfig['mode'] == 'water_refraction') {
+      canvas.save();
+      applyObjectTransform();
+      canvas.clipRect(destination, doAntiAlias: false);
+      canvas.saveLayer(destination, Paint()..color = Colors.white.withValues(alpha: opacity));
+      // Exact approved LABS alpha-first + srcIn pass, followed by fixed finish.
+      canvas.saveLayer(destination, Paint());
+      canvas.drawImageRect(poseImages.paletteBase, source, destination, sampling);
+      canvas.save();
+      canvas.translate(destination.left, destination.top);
+      canvas.scale(destination.width, destination.height);
+      canvas.drawVertices(_waterField.mesh(paletteTimeSeconds), BlendMode.src,
+        Paint()..blendMode = BlendMode.srcIn);
+      canvas.restore();
+      canvas.restore();
+      canvas.drawImageRect(poseImages.fixedFinish, source, destination, sampling);
+      canvas.restore();
+      canvas.restore();
+      return;
+    }
+    canvas.save();
+    applyObjectTransform();
+    canvas.saveLayer(
+      destination,
+      Paint()..color = Colors.white.withValues(alpha: opacity),
+    );
+
+    // Layer 1: optical albedo. No color blend against the full illustration.
+    canvas.drawImageRect(
+      poseImages.paletteBase,
+      source,
+      destination,
+      Paint()
+        ..filterQuality = FilterQuality.high
+        ..colorFilter = ColorFilter.mode(
+          baseColorForTone(token.tone),
+          BlendMode.srcIn,
+        ),
+    );
+    if (token.tone == ShapeTone.auroraSea) {
+      // Full layer coverage avoids antialiased rectangle-edge residue.
+      canvas.drawPaint(Paint()
+        ..shader = auroraSeaGradient(
+          paletteTimeSeconds,
+          config: auroraConfigOverride ?? spec.metadata.aurora,
+        ).createShader(destination)
+        ..blendMode = BlendMode.srcIn);
+    }
+    // Layer 2: fixed optical density carries all source outline/shadow/light/detail.
+    canvas.drawImageRect(poseImages.fixedFinish, source, destination, sampling);
+    // Exactly one true shape-alpha application, after BOTH layers.
+    canvas.drawImageRect(
+      poseImages.master ?? poseImages.paletteBase,
+      source,
+      destination,
+      Paint()
+        ..filterQuality = FilterQuality.high
+        ..blendMode = BlendMode.dstIn,
+    );
+    canvas.restore();
+    canvas.restore();
+  }
+
+  static LinearGradient auroraSeaGradient(
+    double timeSeconds, {
+    Map<String, dynamic>? config,
+    double opacity = 1.0,
+  }) {
+    final period = (config?['period_seconds'] as num?)?.toDouble() ?? 6.5;
+    final rawPalette = (config?['palette'] as List<dynamic>?) ??
+        const ['#91D5F4', '#66ADEB', '#8A9BEF', '#B7A9EC'];
+    final mode = (config?['mode'] as String?) ?? 'ribbon';
+    final phase = (timeSeconds % period) / period * pi * 2;
+    final progress = (timeSeconds % period) / period;
+
+    Color parseColor(dynamic rawHex) {
+      final hex = rawHex as String;
+      return Color(
+        0xFF000000 | int.parse(hex.substring(1), radix: 16),
+      ).withValues(alpha: opacity);
+    }
+
+    final palette = rawPalette.map(parseColor).toList(growable: false);
+
+    Color sample(double t) {
+      final normalized = t - t.floorToDouble();
+      final scaled = normalized * palette.length;
+      final index = scaled.floor() % palette.length;
+      final next = (index + 1) % palette.length;
+      final local = scaled - scaled.floorToDouble();
+      return Color.lerp(palette[index], palette[next], local)!;
+    }
+
+    if (mode == 'breath') {
+      final center = sample(progress);
+      final edgeA = sample(progress + 0.12);
+      final edgeB = sample(progress - 0.12);
+      return LinearGradient(
+        begin: const Alignment(-1, -0.35),
+        end: const Alignment(1, 0.35),
+        colors: [edgeA, center, edgeB],
+        stops: const [0.0, 0.5, 1.0],
+      );
+    }
+
+    final colors = [...palette, palette.first];
+    final rawStops = config == null
+        ? const <dynamic>[0.0, 0.18, 0.50, 0.82, 1.0]
+        : config['stops'] as List<dynamic>?;
+    final stops = rawStops == null
+        ? null
+        : rawStops.map((value) => (value as num).toDouble()).toList();
+
+    final travelX = (config?['travel_x'] as num?)?.toDouble() ?? 1.45;
+    final travelY = (config?['travel_y'] as num?)?.toDouble() ?? 0.86;
+
+    Alignment begin;
+    Alignment end;
+    switch (mode) {
+      case 'horizontal':
+        begin = Alignment(-1.25 + sin(phase) * travelX, -0.1);
+        end = Alignment(1.25 + sin(phase) * travelX, 0.1);
+        break;
+      case 'vertical':
+        begin = Alignment(-0.12, -1.25 + sin(phase) * travelY);
+        end = Alignment(0.12, 1.25 + sin(phase) * travelY);
+        break;
+      case 'ribbon':
+        begin = Alignment(
+          -0.95 + sin(phase) * travelX,
+          -0.55 + cos(phase) * travelY,
+        );
+        end = Alignment(
+          0.95 + sin(phase) * travelX,
+          0.55 + cos(phase) * travelY,
+        );
+        break;
+      case 'drift':
+      default:
+        begin = Alignment(
+          -1.05 + sin(phase) * travelX,
+          -0.70 + cos(phase) * travelY,
+        );
+        end = Alignment(
+          1.05 + sin(phase) * travelX,
+          0.70 + cos(phase) * travelY,
+        );
+    }
+
+    return LinearGradient(
+      begin: begin,
+      end: end,
+      colors: colors,
+      stops: stops,
+    );
+  }
+
   static void _paintCrayonToken(
     Canvas canvas, {
     required Path bodyPath,
     required ShapeStyleSpec style,
     required LockToken token,
     required double opacity,
-    CrayonTextureSpec? configOverride,
+    required double paletteTimeSeconds,
+    required Map<String, dynamic>? auroraConfigOverride,
   }) {
-    final config = configOverride ?? style.crayon;
+    final config = style.crayon;
     if (config == null) {
       throw StateError('Crayon render mode requires crayon style config.');
     }
@@ -239,16 +454,22 @@ class ShapeSpecRenderer {
     );
     canvas.restore();
 
-    canvas.drawPath(
-      bodyPath,
-      Paint()
-        ..color = fill.withValues(
-          alpha: config.underpaintOpacity * opacity,
-        ),
-    );
+    final basePaint = Paint();
+    if (token.tone == ShapeTone.auroraSea) {
+      basePaint
+        ..shader = auroraSeaGradient(
+          paletteTimeSeconds,
+          config: auroraConfigOverride,
+          opacity: opacity,
+        ).createShader(
+          Rect.fromLTWH(0, 0, style.canvasSize, style.canvasSize),
+        );
+    } else {
+      basePaint.color = fill.withValues(alpha: opacity);
+    }
+    canvas.drawPath(bodyPath, basePaint);
 
-    final cacheKey =
-        '${style.id}:${style.version}:${token.id}:${_crayonConfigKey(config)}';
+    final cacheKey = '${style.id}:${style.version}:${token.id}';
     final texture = _crayonTextureCache.putIfAbsent(
       cacheKey,
       () => _buildCrayonTexture(config, cacheKey),
@@ -256,18 +477,6 @@ class ShapeSpecRenderer {
 
     canvas.save();
     canvas.clipPath(bodyPath);
-
-    if (texture.baseStrokes.isNotEmpty && config.baseStrokeOpacity > 0) {
-      final basePaint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round
-        ..strokeWidth = config.strokeWidth * 1.12
-        ..color = base.withValues(alpha: config.baseStrokeOpacity * opacity);
-      for (final path in texture.baseStrokes) {
-        canvas.drawPath(path, basePaint);
-      }
-    }
 
     final darkPaint = Paint()
       ..style = PaintingStyle.stroke
@@ -326,11 +535,7 @@ class ShapeSpecRenderer {
   ) {
     final random = Random(_stableSeed(seedText));
 
-    List<Path> buildStrokes(
-      int count,
-      double angleOffset, {
-      double breakScale = 1.0,
-    }) {
+    List<Path> buildStrokes(int count, double angleOffset) {
       final angle = (config.angleDeg + angleOffset) * pi / 180;
       final direction = Offset(cos(angle), sin(angle));
       final normal = Offset(-direction.dy, direction.dx);
@@ -350,10 +555,7 @@ class ShapeSpecRenderer {
           final point = const Offset(50, 50) +
               direction * (travel + alongWobble) +
               normal * (lane + wobble);
-          final shouldBreak = step > 0 &&
-              random.nextDouble() <
-                  (config.strokeBreakChance * breakScale).clamp(0.0, 0.85);
-          if (step == 0 || shouldBreak) {
+          if (step == 0) {
             path.moveTo(point.dx, point.dy);
           } else {
             path.lineTo(point.dx, point.dy);
@@ -364,17 +566,8 @@ class ShapeSpecRenderer {
       return strokes;
     }
 
-    final baseStrokes = buildStrokes(
-      config.baseStrokeCount,
-      -3,
-      breakScale: 1.15,
-    );
     final darkStrokes = buildStrokes(config.darkStrokeCount, 0);
-    final lightStrokes = buildStrokes(
-      config.lightStrokeCount,
-      9,
-      breakScale: 0.70,
-    );
+    final lightStrokes = buildStrokes(config.lightStrokeCount, 9);
 
     final grain = <_CrayonGrainDot>[];
     for (var i = 0; i < config.grainCount; i++) {
@@ -390,30 +583,10 @@ class ShapeSpecRenderer {
     }
 
     return _CrayonTextureGeometry(
-      baseStrokes: baseStrokes,
       darkStrokes: darkStrokes,
       lightStrokes: lightStrokes,
       grain: grain,
     );
-  }
-
-  static String _crayonConfigKey(CrayonTextureSpec config) {
-    return [
-      config.darkStrokeCount,
-      config.lightStrokeCount,
-      config.grainCount,
-      config.strokeWidth,
-      config.angleDeg,
-      config.jitter,
-      config.darkOpacity,
-      config.lightOpacity,
-      config.grainOpacity,
-      config.edgeOpacity,
-      config.baseStrokeCount,
-      config.underpaintOpacity,
-      config.baseStrokeOpacity,
-      config.strokeBreakChance,
-    ].join(':');
   }
 
   static int _stableSeed(String value) {
@@ -554,11 +727,19 @@ class ShapeSpecRenderer {
   ) {
     switch (tone) {
       case ShapeTone.pink:
+      case ShapeTone.coralPink:
+      case ShapeTone.peachOrange:
         return (light: 0.88, shade: 1.12);
       case ShapeTone.blue:
+      case ShapeTone.deepOcean:
+      case ShapeTone.aquaMint:
+      case ShapeTone.auroraSea:
         return (light: 0.84, shade: 1.00);
       case ShapeTone.yellow:
+      case ShapeTone.sandBeige:
         return (light: 0.68, shade: 1.30);
+      case ShapeTone.lavender:
+        return (light: 0.82, shade: 1.04);
     }
   }
 
@@ -610,13 +791,11 @@ class ShapeSpecRenderer {
 
 class _CrayonTextureGeometry {
   const _CrayonTextureGeometry({
-    required this.baseStrokes,
     required this.darkStrokes,
     required this.lightStrokes,
     required this.grain,
   });
 
-  final List<Path> baseStrokes;
   final List<Path> darkStrokes;
   final List<Path> lightStrokes;
   final List<_CrayonGrainDot> grain;
