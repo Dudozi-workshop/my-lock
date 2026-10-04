@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/animation.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/material.dart' show Colors;
 
 class FloorCausticPainter extends CustomPainter {
   FloorCausticPainter({required this.animation}) : super(repaint: animation);
