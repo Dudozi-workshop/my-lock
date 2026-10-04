@@ -17,7 +17,6 @@ import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
 
 import 'soft_basic_candidates.dart';
 import 'water_refraction_field.dart';
-import 'shallow_clear_base_v1_data.dart';
 import 'candy_soft_review.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
 
@@ -6552,7 +6551,6 @@ class BackgroundLab extends StatefulWidget {
 class _BackgroundLabState extends State<BackgroundLab>
     with SingleTickerProviderStateMixin {
   late final AnimationController _surfaceClock;
-  late final Uint8List _approvedBaseBytes;
 
   int selectedBackground = 0;
   _BackgroundWorkbenchStep step = _BackgroundWorkbenchStep.image;
@@ -6570,7 +6568,6 @@ class _BackgroundLabState extends State<BackgroundLab>
   @override
   void initState() {
     super.initState();
-    _approvedBaseBytes = base64Decode(shallowClearBaseV1WebpBase64);
     _surfaceClock = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 12),
@@ -7037,8 +7034,8 @@ class _BackgroundLabState extends State<BackgroundLab>
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.memory(
-              _approvedBaseBytes,
+            Image.asset(
+              'assets/backgrounds/drop01/shallow_clear_base_v1.webp',
               fit: BoxFit.cover,
               gaplessPlayback: true,
             ),
@@ -7079,8 +7076,8 @@ class _BackgroundLabState extends State<BackgroundLab>
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.memory(
-                      _approvedBaseBytes,
+                    Image.asset(
+                      'assets/backgrounds/drop01/shallow_clear_base_v1.webp',
                       fit: BoxFit.cover,
                       gaplessPlayback: true,
                     ),
@@ -7225,8 +7222,8 @@ class _BackgroundLabState extends State<BackgroundLab>
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.memory(
-                      _approvedBaseBytes,
+                    Image.asset(
+                      'assets/backgrounds/drop01/shallow_clear_base_v1.webp',
                       fit: BoxFit.cover,
                       gaplessPlayback: true,
                     ),
