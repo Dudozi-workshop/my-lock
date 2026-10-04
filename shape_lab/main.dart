@@ -124,7 +124,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.04-R09 · Starfish · 58px QA',
+                                  'LABS-2026.10.04-R10 · Background Effects · Solo Review',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5540,6 +5540,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   bool showBubble = true;
   bool playing = true;
   double intensity = 1.0;
+  int? soloEffectIndex;
 
   static const backgrounds = [
     ('01', '투명한 얕은 바다', 'Image Selected · Effects In Progress'),
@@ -5958,6 +5959,8 @@ class _BackgroundLabState extends State<BackgroundLab>
           ),
           const SizedBox(height: 14),
           _layerStatusList(),
+          const SizedBox(height: 12),
+          _soloReviewPanel(),
           const SizedBox(height: 16),
           Divider(color: widget.muted.withValues(alpha: .18)),
           const SizedBox(height: 12),
@@ -6033,6 +6036,7 @@ class _BackgroundLabState extends State<BackgroundLab>
               showVolumetricLight = true;
               showAmbientParticle = true;
               showBubble = true;
+              soloEffectIndex = null;
             }),
             child: const Text('Easy Stack Reset'),
           ),
@@ -6043,12 +6047,88 @@ class _BackgroundLabState extends State<BackgroundLab>
 
   void _soloEffect(int index) {
     setState(() {
+      soloEffectIndex = index;
       showSurface = index == 0;
       showFloorCaustic = index == 1;
       showVolumetricLight = index == 2;
       showAmbientParticle = index == 3;
       showBubble = index == 4;
     });
+  }
+
+  String get _soloEffectName => switch (soloEffectIndex) {
+    0 => 'Surface Refraction · Deferred',
+    1 => 'Floor Caustic',
+    2 => 'Volumetric Light',
+    3 => 'Ambient Particle',
+    4 => 'Bubble',
+    _ => 'Easy Stack · Composite',
+  };
+
+  Widget _soloReviewPanel() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F6FF),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFD9CDF9)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            soloEffectIndex == null ? 'Preview · Easy Stack' : 'SOLO · $_soloEffectName',
+            style: TextStyle(color: widget.fg, fontSize: 14, fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            soloEffectIndex == null
+                ? '각 레이어의 Solo를 누르면 이 자리에서 즉시 단독 검수합니다.'
+                : 'Approved Base + $_soloEffectName만 표시 중',
+            style: TextStyle(color: widget.muted, fontSize: 10.5, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 10),
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: _runtimeEffectPreview(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _runtimeEffectPreview() {
+    return AspectRatio(
+      aspectRatio: .67,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(_shallowClearBase.runtimePath!, fit: BoxFit.cover, gaplessPlayback: true),
+            if (showSurface)
+              CustomPaint(
+                painter: SurfaceRefractionFieldPainter(
+                  profile: selected.profile,
+                  animation: _surfaceClock,
+                  intensity: intensity,
+                ),
+              ),
+            if (showVolumetricLight)
+              CustomPaint(painter: VolumetricLightPainter(animation: _surfaceClock)),
+            if (showFloorCaustic)
+              CustomPaint(painter: FloorCausticPainter(animation: _surfaceClock)),
+            if (showAmbientParticle)
+              CustomPaint(painter: AmbientParticlePainter(animation: _surfaceClock)),
+            if (showBubble)
+              CustomPaint(painter: BubblePainter(animation: _surfaceClock)),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _surfaceCandidates() {
