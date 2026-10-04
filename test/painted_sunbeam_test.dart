@@ -49,13 +49,16 @@ void main() {
     final later = await frame(math.pi * 2 * 2 / 24);
     final loop = await frame(math.pi * 2);
     var changed = 0;
+    var strongChanged = 0;
     var largestLoopDifference = 0;
     for (var i = 3; i < start.length; i += 4) {
       if ((later[i] - start[i]).abs() > 2) changed++;
+      if ((later[i] - start[i]).abs() >= 10) strongChanged++;
       largestLoopDifference = math.max(largestLoopDifference, (loop[i] - start[i]).abs());
       if (i ~/ 4 ~/ 180 >= 212) expect(later[i], 0);
     }
     expect(changed, greaterThan(200));
+    expect(strongChanged, greaterThan(800));
     expect(largestLoopDifference, lessThanOrEqualTo(1));
     shader.dispose(); texture.dispose();
   });

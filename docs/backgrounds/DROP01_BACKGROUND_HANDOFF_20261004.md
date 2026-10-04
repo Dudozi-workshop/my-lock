@@ -1,6 +1,13 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · A texture study R22 / QA Candidate
+## Current handoff · A R25 visible motion / QA Candidate
+- User reports R22 playback seems absent and requests visible motion. R22 frame delta was technical PASS, insufficient perceptual change. No claim that user device playback was reproduced.
+- R25 keeps exact registered R22 texture and static phase zero. Local horizontal warp 0.020/0.007, vertical 0.007, brightness 0.18, primary period 4.8 seconds on preserved 24-second A clock. Upper anchor/mid-water cutoff preserved. R21 and B/C clocks/other effects unchanged.
+- Selecting painted A now auto-plays instead of silently pausing; explicit reference frame still pauses. Visible play state and clock progress added. Pause/play retained.
+- Preflight Notion 06/Master/05/04 and GitHub handoff/current branch read. Concurrent R23/R24 Starfish integration preserved from c46da86. Shared release identity synchronized to R25.
+- CI/deployment/live verification pending; art approval pending. No new binary or ImageGen. Not Final/LOCK.
+
+## Previous handoff · A texture study R22 / QA Candidate
 - User authorizes an A-only painted-layer + subtle warp trial after R21 quality concerns. R21 renderer is preserved behind a comparison chip. No B/C expansion.
 - Preflight reads Notion 06 / Asset Master / 05 / 04 and current branch. Latest remote `32820b4210959188ba0b1c3392fd4f1747d333b0`, CI `37235876928` success; unrelated palette changes retained.
 - User reference `76252.png` has baked checker pixels. R22 texture is an approximate reference-density study (293×436 RGBA), not an original-alpha extraction or Production Master. No ImageGen.

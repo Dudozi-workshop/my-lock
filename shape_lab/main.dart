@@ -129,7 +129,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R24 · Starfish · Shape + Motion QA',
+                                  'LABS-2026.10.05-R25 · Background A · Visible Motion / QA Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -6223,7 +6223,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   ];
 
   static const _volumetricLabels = <String>[
-    'A · Broad Sunbeam · R22 Texture Study',
+    'A · Broad Sunbeam · R25 Visible Motion',
     'B · Living Rays',
     'C · Soft Drift',
   ];
@@ -6392,7 +6392,7 @@ class _BackgroundLabState extends State<BackgroundLab>
               children: [
                 for (final painted in [true, false])
                   ChoiceChip(
-                    label: Text(painted ? 'A 그림 레이어 · R22' : 'A 기존 방식 · R21'),
+                    label: Text(painted ? 'A 그림 레이어 · R25' : 'A 기존 방식 · R21'),
                     selected: _usePaintedSunbeam == painted,
                     onSelected: (_) {
                       _soloEffect(2);
@@ -6400,7 +6400,8 @@ class _BackgroundLabState extends State<BackgroundLab>
                         _usePaintedSunbeam = painted;
                         _broadSunbeamClock.stop();
                         _broadSunbeamClock.value = 0;
-                        _broadSunbeamPaused = true;
+                        _broadSunbeamPaused = !painted;
+                        if (painted) _broadSunbeamClock.repeat();
                       });
                     },
                   ),
@@ -6433,6 +6434,23 @@ class _BackgroundLabState extends State<BackgroundLab>
               ],
             ),
           ],
+          if (showVolumetricLight && selectedVolumetric == 0)
+            AnimatedBuilder(
+              animation: _broadSunbeamClock,
+              builder: (context, _) => Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(children: [
+                  Text(_broadSunbeamPaused ? '정지 · A' : '재생 중 · A',
+                    style: TextStyle(color: widget.muted, fontSize: 11)),
+                  const SizedBox(width: 12),
+                  SizedBox(width: 100, child: LinearProgressIndicator(
+                    value: _broadSunbeamClock.value,
+                    minHeight: 3,
+                    semanticsLabel: 'A 재생 진행',
+                  )),
+                ]),
+              ),
+            ),
           const SizedBox(height: 10),
           Center(
             child: ConstrainedBox(

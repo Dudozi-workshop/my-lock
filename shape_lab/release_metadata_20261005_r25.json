@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.05-R25",
+  "date": "2026-10-05",
+  "purpose": "Background A visible local light motion and auto-play; existing Starfish Shape/Motion QA preserved",
+  "scope": "Background Volumetric A motion only; preserve current integrated Starfish QA; Base and other effects immutable",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "runtime",
+  "status": "QA Candidate / Awaiting user motion review / Not Final or Locked",
+  "governance": "2-Site compliant; no separate public site"
+}
