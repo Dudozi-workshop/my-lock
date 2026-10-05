@@ -89,11 +89,9 @@ void main() {
       ShapeKind.triangle,
       ShapeKind.square,
     ]) {
+      final reference = await render(shape, ShapeTone.pink);
       final referenceAlpha = [
-        for (var i = 3;
-            i < (await render(shape, ShapeTone.pink)).length;
-            i += 4)
-          (await render(shape, ShapeTone.pink))[i],
+        for (var i = 3; i < reference.length; i += 4) reference[i],
       ];
       for (final tone in premiumStatic) {
         final candy = await render(shape, tone);
