@@ -546,43 +546,55 @@ Future<void> showCatalogFilterSheet({
                     ),
                   ),
                   const SizedBox(height: 8),
-                  for (final item in collections)
-                    ListTile(
-                      dense: true,
-                      contentPadding: EdgeInsets.zero,
-                      leading: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: brandLavender,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(item.$3, color: brandPurple, size: 19),
-                      ),
-                      title: Text(
-                        item.$2,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      trailing: Radio<String?>(
-                        value: item.$1,
-                        groupValue: draft.collectionId,
-                        onChanged: (_) => apply(
-                          draft.copyWith(
-                            composition:
-                                CatalogCompositionFilter.collection,
-                            collectionId: item.$1,
-                          ),
-                        ),
-                      ),
-                      onTap: () => apply(
+                  RadioGroup<String>(
+                    groupValue: draft.collectionId,
+                    onChanged: (value) {
+                      if (value == null) return;
+                      apply(
                         draft.copyWith(
                           composition: CatalogCompositionFilter.collection,
-                          collectionId: item.$1,
+                          collectionId: value,
                         ),
-                      ),
+                      );
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (final item in collections)
+                          ListTile(
+                            dense: true,
+                            contentPadding: EdgeInsets.zero,
+                            leading: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: brandLavender,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                item.$3,
+                                color: brandPurple,
+                                size: 19,
+                              ),
+                            ),
+                            title: Text(
+                              item.$2,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            trailing: Radio<String>(value: item.$1),
+                            onTap: () => apply(
+                              draft.copyWith(
+                                composition:
+                                    CatalogCompositionFilter.collection,
+                                collectionId: item.$1,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
+                  ),
                 ],
               ],
             ),
