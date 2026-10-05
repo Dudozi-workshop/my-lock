@@ -6,10 +6,11 @@ import '../../app/theme.dart';
 import '../../lock_engine/effects.dart';
 import '../../lock_engine/models.dart';
 import '../../lock_engine/platform_lock_bridge.dart';
+import '../../widgets/production_ui.dart';
 import 'app_selection/app_selection_screen.dart';
 import 'native_permissions/native_permissions_screen.dart';
-import 'privacy_policy_screen.dart';
 import 'password_setup/password_setup_screen.dart';
+import 'production_detail_screens.dart';
 import 'recovery_pin/recovery_pin_screen.dart';
 import 'relock/relock_screen.dart';
 import 'screen_behavior/screen_behavior_screen.dart';
@@ -102,103 +103,145 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
     return SafeArea(
       bottom: false,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 22, 20, 30),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
         children: [
-          Text('잠금 설정', style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 6),
-          Text(
-            '잠금 방식과 보호할 앱을 설정합니다.',
-            style: Theme.of(context).textTheme.bodyMedium,
+          const ProductionScreenHeader(
+            icon: Icons.lock_rounded,
+            title: '잠금 설정',
+            subtitle: '보호 상태와 잠금 동작을 관리해요.',
           ),
-          const SizedBox(height: 22),
-          if (protectionReady) ...[
-            _CompactProtectionStatus(
-              onTap: _openNativePermissions,
-            ),
-            const SizedBox(height: 14),
-          ] else ...[
+          const SizedBox(height: 18),
+          if (protectionReady)
+            _CompactProtectionStatus(onTap: _openNativePermissions)
+          else
             _ProtectionStatusCard(
               passwordReady: settings.password != null,
               appsReady: settings.selectedAppIds.isNotEmpty,
               capabilities: _capabilities,
               onPermissionsTap: _openNativePermissions,
             ),
-            const SizedBox(height: 14),
-            _SettingTile(
-              icon: Icons.admin_panel_settings_outlined,
-              title: '기기 권한',
-              value: 'Android 권한 상태 확인',
-              onTap: _openNativePermissions,
-            ),
-          ],
-          _SettingTile(
-            icon: Icons.lock_rounded,
-            title: settings.password == null ? '비밀번호 설정' : '비밀번호 변경',
-            value: settings.password == null
-                ? '설정 전'
-                : '${settings.password!.length}자리 그래픽 패턴',
-            onTap: _openPasswordSetup,
+          const SizedBox(height: 12),
+          ProductionSettingsGroup(
+            title: '빠른 확인',
+            children: [
+              ProductionSettingsRow(
+                icon: Icons.play_circle_outline_rounded,
+                title: '잠금화면 테스트',
+                value: settings.password == null
+                    ? '비밀번호 설정 후 테스트할 수 있어요.'
+                    : '현재 설정으로 잠금 해제 흐름을 확인해요.',
+                iconBackground: productionBlue,
+                iconColor: productionBlueInk,
+                onTap: settings.password == null ? null : _openLockTest,
+              ),
+            ],
           ),
-          _SettingTile(
-            icon: Icons.pin_rounded,
-            title: settings.recoveryPinReady ? '보조 PIN 변경' : '보조 PIN 설정',
-            value: settings.recoveryPinReady ? '4자리 PIN 설정됨' : '설정 전',
-            onTap: _openRecoveryPinSetup,
+          const SizedBox(height: 20),
+          ProductionSettingsGroup(
+            title: '보호 대상',
+            children: [
+              ProductionSettingsRow(
+                icon: Icons.apps_rounded,
+                title: '보호할 앱',
+                value: settings.selectedAppIds.isEmpty
+                    ? '아직 선택한 앱이 없어요.'
+                    : '${settings.selectedAppIds.length}개 앱 보호 중',
+                iconBackground: productionMint,
+                iconColor: productionMintInk,
+                onTap: _openAppSelection,
+              ),
+            ],
           ),
-          _SettingTile(
-            icon: Icons.apps_rounded,
-            title: '잠글 앱',
-            value: settings.selectedAppIds.isEmpty
-                ? '선택 전'
-                : '${settings.selectedAppIds.length}개 앱 보호 중',
-            onTap: _openAppSelection,
+          const SizedBox(height: 20),
+          ProductionSettingsGroup(
+            title: '인증 & 다시 잠그기',
+            children: [
+              ProductionSettingsRow(
+                icon: Icons.lock_rounded,
+                title: settings.password == null ? '비밀번호 설정' : '비밀번호 변경',
+                value: settings.password == null
+                    ? '설정 전'
+                    : '${settings.password!.length}자리 그래픽 패턴',
+                showDivider: true,
+                onTap: _openPasswordSetup,
+              ),
+              ProductionSettingsRow(
+                icon: Icons.pin_rounded,
+                title:
+                    settings.recoveryPinReady ? '보조 PIN 변경' : '보조 PIN 설정',
+                value: settings.recoveryPinReady ? '4자리 PIN 설정됨' : '설정 전',
+                showDivider: true,
+                onTap: _openRecoveryPinSetup,
+              ),
+              ProductionSettingsRow(
+                icon: Icons.schedule_rounded,
+                title: '다시 잠그기',
+                value: settings.relockPolicy.summary,
+                onTap: _openRelock,
+              ),
+            ],
           ),
-          _SettingTile(
-            icon: Icons.tune_rounded,
-            title: '화면 동작',
-            value:
-                '도형 ${settings.objectCount}개 · ${settings.movementArea.label} · 속도 ${_speedLabel(settings.speed)}',
-            onTap: _openScreenBehavior,
-          ),
-          _SettingTile(
-            icon: Icons.schedule_rounded,
-            title: '다시 잠그기',
-            value: settings.relockPolicy.summary,
-            onTap: _openRelock,
+          const SizedBox(height: 20),
+          ProductionSettingsGroup(
+            title: '화면 & 피드백',
+            children: [
+              ProductionSettingsRow(
+                icon: Icons.tune_rounded,
+                title: '화면 동작',
+                value:
+                    '도형 ${settings.objectCount}개 · ${settings.movementArea.label} · 속도 ${_speedLabel(settings.speed)}',
+                iconBackground: productionBlue,
+                iconColor: productionBlueInk,
+                showDivider: true,
+                onTap: _openScreenBehavior,
+              ),
+              ProductionSettingsRow(
+                icon: Icons.volume_up_rounded,
+                title: '효과음 & 진동',
+                value: '진동 사용 중 · 효과음은 구현 항목부터 제공',
+                iconBackground: productionPink,
+                iconColor: productionPinkInk,
+                onTap: _openFeedbackSettings,
+              ),
+            ],
           ),
           if (kIsWeb && widget.webTestBridge != null) ...[
+            const SizedBox(height: 20),
             _WebTestPanel(
               settings: settings,
               bridge: widget.webTestBridge!,
             ),
-            const SizedBox(height: 14),
           ],
-          const SizedBox(height: 8),
-          const _SectionLabel(
-            title: '실험 기능',
-            badge: 'BETA',
-          ),
-          const SizedBox(height: 8),
-          _ExperimentalScreenLockTile(
-            enabled: settings.experimentalScreenLock,
-            available: settings.password != null &&
-                _capabilities?.overlayGranted == true,
-            onChanged: settings.setExperimentalScreenLock,
-          ),
-          const SizedBox(height: 8),
-          _SettingTile(
-            icon: Icons.play_circle_outline_rounded,
-            title: '잠금화면 테스트',
-            value: settings.password == null
-                ? '비밀번호 설정 후 테스트 가능'
-                : '현재 설정으로 잠금 해제 흐름 확인',
-            onTap: settings.password == null ? null : _openLockTest,
-          ),
-          _SettingTile(
-            icon: Icons.privacy_tip_outlined,
-            title: '개인정보처리방침',
-            value: 'MyLock의 데이터 처리 안내',
-            onTap: _openPrivacyPolicy,
+          const SizedBox(height: 20),
+          ProductionSettingsGroup(
+            title: '기타',
+            children: [
+              ProductionSettingsRow(
+                icon: Icons.science_outlined,
+                title: '실험실',
+                value: '화면 켤 때 MY LOCK',
+                iconBackground: productionWarm,
+                iconColor: productionWarmInk,
+                badge: 'BETA',
+                showDivider: true,
+                onTap: _openLaboratory,
+              ),
+              ProductionSettingsRow(
+                icon: Icons.favorite_outline_rounded,
+                title: '도움 주신 분들',
+                value: '테스트 · 아이디어 · 피드백',
+                iconBackground: productionPink,
+                iconColor: productionPinkInk,
+                showDivider: true,
+                onTap: _openCredits,
+              ),
+              ProductionSettingsRow(
+                icon: Icons.info_outline_rounded,
+                title: '앱 정보',
+                value: '버전 · 개인정보 · 오픈소스 · 문의',
+                onTap: _openAppInfo,
+              ),
+            ],
           ),
         ],
       ),
@@ -211,20 +254,13 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
         builder: (context) => const NativePermissionsScreen(),
       ),
     );
+    await _refreshCapabilities();
   }
 
   Future<void> _openLockTest() async {
     await _platformBridge.presentLockScreen(
       '__my_lock_demo__',
       demoMode: true,
-    );
-  }
-
-  Future<void> _openPrivacyPolicy() async {
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (context) => const PrivacyPolicyScreen(),
-      ),
     );
   }
 
@@ -255,6 +291,42 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
           movementArea: settings.movementArea,
           onChanged: settings.setScreenBehavior,
         ),
+      ),
+    );
+  }
+
+  Future<void> _openFeedbackSettings() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => const FeedbackSettingsScreen(),
+      ),
+    );
+  }
+
+  Future<void> _openLaboratory() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => LaboratoryScreen(
+          settings: widget.settings,
+          available: widget.settings.password != null &&
+              _capabilities?.overlayGranted == true,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openCredits() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => const CreditsScreen(),
+      ),
+    );
+  }
+
+  Future<void> _openAppInfo() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => const AppInfoScreen(),
       ),
     );
   }
@@ -310,48 +382,6 @@ class _LockSettingsScreenState extends State<LockSettingsScreen>
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel({
-    required this.title,
-    required this.badge,
-  });
-
-  final String title;
-  final String badge;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: ink,
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(width: 7),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-          decoration: BoxDecoration(
-            color: brandLavender,
-            borderRadius: BorderRadius.circular(99),
-          ),
-          child: Text(
-            badge,
-            style: const TextStyle(
-              color: brandPurple,
-              fontSize: 9,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _WebTestPanel extends StatelessWidget {
   const _WebTestPanel({
     required this.settings,
@@ -367,13 +397,8 @@ class _WebTestPanel extends StatelessWidget {
         settings.selectedAppIds.isEmpty ? null : settings.selectedAppIds.first;
     final ready = appId != null && settings.password != null;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF0EDFF),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFCFC4FF)),
-      ),
+    return ProductionSoftCard(
+      backgroundColor: const Color(0xFFF0EDFF),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -395,7 +420,7 @@ class _WebTestPanel extends StatelessWidget {
           Text(
             ready
                 ? 'Android 권한과 앱 전환 이벤트를 웹에서 시뮬레이션합니다.'
-                : '비밀번호와 보호 앱을 먼저 설정하면 실제 잠금 흐름을 테스트할 수 있습니다.',
+                : '비밀번호와 보호 앱을 먼저 설정하면 잠금 흐름을 테스트할 수 있습니다.',
             style: const TextStyle(
               color: secondaryInk,
               fontSize: 12,
@@ -442,151 +467,6 @@ class _WebTestPanel extends StatelessWidget {
   }
 }
 
-class _ExperimentalScreenLockTile extends StatelessWidget {
-  const _ExperimentalScreenLockTile({
-    required this.enabled,
-    required this.available,
-    required this.onChanged,
-  });
-
-  final bool enabled;
-  final bool available;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 15, 12, 15),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFFCF5),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF0E2B8)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF2C9),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Icon(
-              Icons.phone_android_rounded,
-              color: Color(0xFFA77300),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '화면 켤 때 MY LOCK',
-                  style: TextStyle(
-                    color: ink,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  available
-                      ? '휴대폰 화면이 켜질 때 MY LOCK을 추가 잠금으로 표시합니다. 시스템 PIN·지문 잠금을 대체하지 않습니다.'
-                      : '그래픽 비밀번호와 다른 앱 위에 표시 권한이 필요합니다.',
-                  style: const TextStyle(
-                    color: secondaryInk,
-                    fontSize: 11,
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Switch(
-            value: enabled && available,
-            onChanged: available ? onChanged : null,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SettingTile extends StatelessWidget {
-  const _SettingTile({
-    required this.icon,
-    required this.title,
-    required this.value,
-    this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String value;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFEDEBF2)),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(24),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(24),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: brandLavender,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Icon(icon, color: brandPurple),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: Theme.of(context).textTheme.titleMedium),
-                      const SizedBox(height: 2),
-                      Text(
-                        value,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  color: Color(0xFFB3B0BB),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-
 class _CompactProtectionStatus extends StatelessWidget {
   const _CompactProtectionStatus({
     required this.onTap,
@@ -626,6 +506,8 @@ class _CompactProtectionStatus extends StatelessWidget {
                   ),
                 ),
               ),
+              Icon(Icons.circle, color: Color(0xFF45BFA8), size: 8),
+              SizedBox(width: 6),
               Text(
                 '정상 작동 중',
                 style: TextStyle(
@@ -666,32 +548,16 @@ class _ProtectionStatusCard extends StatelessWidget {
     final nativeAvailable = capabilities?.nativeBridgeAvailable == true;
     final permissionsReady = capabilities?.androidReady == true;
     final serviceRunning = capabilities?.monitorServiceRunning == true;
-    final ready =
-        passwordReady && appsReady && permissionsReady && serviceRunning;
 
-    final title = ready
-        ? '보호 ON'
-        : nativeAvailable
-            ? '보호 설정을 확인해 주세요'
-            : '웹 미리보기 모드';
+    final title = nativeAvailable
+        ? '보호 설정을 확인해 주세요'
+        : '웹 미리보기 모드';
 
-    final subtitle = ready
-        ? '감지 서비스가 실행 중이며 선택한 앱을 보호하고 있습니다.'
-        : nativeAvailable
-            ? _missingSummary(permissionsReady, serviceRunning)
-            : '실제 앱 감지와 권한 상태는 Android 설치본에서 활성화됩니다.';
+    final subtitle = nativeAvailable
+        ? _missingSummary(permissionsReady, serviceRunning)
+        : '실제 앱 감지와 권한 상태는 Android 설치본에서 활성화됩니다.';
 
-    return Container(
-      padding: const EdgeInsets.all(17),
-      decoration: BoxDecoration(
-        color: ready ? const Color(0xFFF0EDFF) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: ready
-              ? const Color(0xFFCFC4FF)
-              : const Color(0xFFEDEBF2),
-        ),
-      ),
+    return ProductionSoftCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -704,10 +570,8 @@ class _ProtectionStatusCard extends StatelessWidget {
                   color: brandLavender,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(
-                  ready
-                      ? Icons.shield_rounded
-                      : Icons.shield_outlined,
+                child: const Icon(
+                  Icons.shield_outlined,
                   color: brandPurple,
                 ),
               ),
@@ -738,7 +602,7 @@ class _ProtectionStatusCard extends StatelessWidget {
               ),
             ],
           ),
-          if (nativeAvailable && !ready) ...[
+          if (nativeAvailable) ...[
             const SizedBox(height: 14),
             Wrap(
               spacing: 8,
@@ -750,14 +614,12 @@ class _ProtectionStatusCard extends StatelessWidget {
                 _StatusChip(label: '보호 서비스', ready: serviceRunning),
               ],
             ),
-            if (!permissionsReady) ...[
-              const SizedBox(height: 12),
-              TextButton.icon(
-                onPressed: onPermissionsTap,
-                icon: const Icon(Icons.settings_rounded, size: 18),
-                label: const Text('권한 설정'),
-              ),
-            ],
+            const SizedBox(height: 12),
+            TextButton.icon(
+              onPressed: onPermissionsTap,
+              icon: const Icon(Icons.settings_rounded, size: 18),
+              label: const Text('기기 권한 확인'),
+            ),
           ],
         ],
       ),
