@@ -15,13 +15,13 @@ void main() {
   });
   Future<List<int>> render(ShapeKind shape, ShapeTone tone, {
     bool candidate = true, ShapeStyle style = ShapeStyle.softBasic,
-    double rotation = 0, double opacity = 1,
+    double rotation = 0, double opacity = 1, double time = 0,
   }) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     ShapeSpecRenderer.paintToken(canvas,center:const Offset(32,32),radius:29,
       token:LockToken(shape:shape,tone:tone),style:style,opacity:opacity,
-      objectRotation:rotation,useCandySoft:candidate);
+      objectRotation:rotation,paletteTimeSeconds:time,useCandySoft:candidate);
     final picture = recorder.endRecording();
     final image = await picture.toImage(64,64);
     final bytes = (await image.toByteData(format:ui.ImageByteFormat.rawRgba))!.buffer.asUint8List().toList();
@@ -75,4 +75,62 @@ void main() {
     for(var i=3;i<full.length;i+=4){fullAlpha+=full[i];fadedAlpha+=faded[i];}
     expect(fadedAlpha/fullAlpha,closeTo(.5,.015));
   });
+  test('premium tones stay on Candy Soft instead of vector fallback', () async {
+    const premiumStatic = [
+      ShapeTone.deepOcean,
+      ShapeTone.aquaMint,
+      ShapeTone.coralPink,
+      ShapeTone.sandBeige,
+      ShapeTone.lavender,
+      ShapeTone.peachOrange,
+    ];
+    for (final shape in [
+      ShapeKind.circle,
+      ShapeKind.triangle,
+      ShapeKind.square,
+    ]) {
+      final referenceAlpha = [
+        for (var i = 3;
+            i < (await render(shape, ShapeTone.pink)).length;
+            i += 4)
+          (await render(shape, ShapeTone.pink))[i],
+      ];
+      for (final tone in premiumStatic) {
+        final candy = await render(shape, tone);
+        final vector = await render(shape, tone, candidate: false);
+        expect(candy, isNot(equals(vector)));
+        final alpha = [for (var i = 3; i < candy.length; i += 4) candy[i]];
+        expect(alpha, referenceAlpha);
+      }
+    }
+  });
+
+  test('Aurora Sea uses moving H02B on Candy Soft geometry', () async {
+    for (final shape in [
+      ShapeKind.circle,
+      ShapeKind.triangle,
+      ShapeKind.square,
+    ]) {
+      final before = await render(shape, ShapeTone.auroraSea, time: 0);
+      final after = await render(shape, ShapeTone.auroraSea, time: 1);
+      expect(before, isNot(equals(after)));
+
+      final beforeAlpha = [
+        for (var i = 3; i < before.length; i += 4) before[i],
+      ];
+      final afterAlpha = [
+        for (var i = 3; i < after.length; i += 4) after[i],
+      ];
+      expect(afterAlpha, beforeAlpha);
+
+      final vector = await render(
+        shape,
+        ShapeTone.auroraSea,
+        time: 1,
+        candidate: false,
+      );
+      expect(after, isNot(equals(vector)));
+    }
+  });
+
 }
