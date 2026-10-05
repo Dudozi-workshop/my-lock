@@ -113,6 +113,32 @@
         "sha256": "71423c96c5ff0be2fa3e7b7d89d34fa64025a5e67199a709dcf6b90ea72d8797",
         "reason": "body mass remained too thick relative to selected C direction"
       }
+    },
+    {
+      "scope": "production.ownership_overlay",
+      "version": "v10",
+      "status": "candidate",
+      "active": true,
+      "user_approved": true,
+      "approved_at": "2026-10-05",
+      "external_source": {
+        "provider": "google_drive",
+        "file_id": "1zJnlLWsARRAOFfjrX14lt9vhZZ3SmroK",
+        "role": "approved_ownership_overlay"
+      },
+      "characteristics": {
+        "file": "MYLOCK_Dolphin_Ownership_Overlay_v10_APPROVED_2048_20261005.png",
+        "canvas": "2048x2048 RGBA",
+        "structure": [
+          "body_core+dorsal",
+          "near_flipper",
+          "far_flipper",
+          "tail"
+        ],
+        "ts_rule": "TS-012",
+        "mask_status": "not_created",
+        "next_gate": "mask_generation"
+      }
     }
   ],
   "policy": {
@@ -121,5 +147,5 @@
     "locked_binary_overwrite_forbidden": true,
     "archive_before_delete": true
   },
-  "notes": "Soft Pastel Dolphin Appearance Master v1 is user-approved. 2048 RGBA Production Canonical v1 is a QA candidate only. Existing Dolphin Planning Master v2 remains FINAL/LOCKED/ACTIVE. Next required gate is Ownership Overlay approval before any mask or layer extraction."
+  "notes": "Soft Pastel Dolphin Appearance Master v1 is user-approved. Ownership Overlay v10 is user-approved and active for the Soft Pastel production branch. Existing Dolphin Planning Master v2 remains FINAL/LOCKED/ACTIVE. Next gate is Mask generation; no Asset/Remainder before mask QA."
 }
