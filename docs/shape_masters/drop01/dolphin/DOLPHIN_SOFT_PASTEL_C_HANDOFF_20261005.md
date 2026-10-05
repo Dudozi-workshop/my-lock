@@ -101,3 +101,13 @@ Current stop point: **Ownership Overlay approval required before Mask generation
   - Far Flipper = existing visible silhouette + minimum root cut.
   - Tail / Body / Dorsal unchanged.
 - No polygon/spline redraw.
+
+
+## Ownership Overlay v10 — Approved
+- File: `MYLOCK_Dolphin_Ownership_Overlay_v10_APPROVED_2048_20261005.png`
+- Drive file ID: `1zJnlLWsARRAOFfjrX14lt9vhZZ3SmroK`
+- Status: **User Approved / Ownership Overlay Approved / Not Mask / Not Final Locked**
+- Structure: Body Core + Dorsal / Near Flipper / Far Flipper / Tail
+- Near/Far Flipper boundaries refined from canonical pixels under TS-012. No polygon/spline redraw and no new outer outline.
+- Tail / Body / Dorsal preserved from v7 reference.
+- Next Gate: **Mask generation** from the approved ownership, then Asset → Removed Remainder → Recomposite / Residual QA → user approval → LOCK.
