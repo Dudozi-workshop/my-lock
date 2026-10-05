@@ -2,7 +2,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:my_lock/lock_engine/models.dart';
-import 'package:my_lock/lock_engine/aurora_sea_signature.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
