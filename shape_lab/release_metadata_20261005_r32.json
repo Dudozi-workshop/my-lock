@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.05-R32",
+  "date": "2026-10-05",
+  "purpose": "Rare Coral Shelter migration: composite QA with inherited Base, fixed R27 Flow and R31 Cell Flow",
+  "scope": "Background slot relabel + composite QA; Base binaries immutable; R28 optional; actual Sea Turtle/Starfish runtime post-composite preview",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "runtime",
+  "status": "Composite QA Candidate; whole Background Not Final/Locked",
+  "governance": "Existing LABS only"
+}
