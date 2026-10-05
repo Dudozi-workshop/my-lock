@@ -42,6 +42,39 @@
         "motion_reference": "Calm & Natural Swim Cycle"
       },
       "approved_at": "2026-10-03"
+    },
+    {
+      "scope": "appearance.character_direction",
+      "version": "C",
+      "status": "working",
+      "active": true,
+      "user_approved": true,
+      "approved_at": "2026-10-05",
+      "characteristics": {
+        "direction": "slim_graceful",
+        "style_system": "Soft Pastel Storybook",
+        "style_anchor": "Jellyfish Character Appearance Master v1",
+        "selection_scope": "character construction direction only",
+        "production_status": "not production"
+      }
+    },
+    {
+      "scope": "appearance.candidate",
+      "version": "v1",
+      "status": "candidate",
+      "active": false,
+      "user_approved": false,
+      "external_source": {
+        "provider": "google_drive",
+        "file_id": "1gLjMhYG094X9j_rdq98N1rHlVCv4ZV9h",
+        "role": "working_candidate"
+      },
+      "characteristics": {
+        "selected_direction": "C",
+        "canvas": "1254x1254 RGB",
+        "sha256": "71423c96c5ff0be2fa3e7b7d89d34fa64025a5e67199a709dcf6b90ea72d8797",
+        "review_state": "visual review pending"
+      }
     }
   ],
   "policy": {
@@ -50,5 +83,5 @@
     "locked_binary_overwrite_forbidden": true,
     "archive_before_delete": true
   },
-  "notes": "Dolphin Planning Master v2 / eyeless form approved 2026-10-03. v1 retained as superseded history; v2 Drive binary is active locked master."
+  "notes": "Dolphin Planning Master v2 / eyeless form remains the active locked master. On 2026-10-05, Soft Pastel Storybook character-construction direction C (Slim / Graceful) was selected for a separate appearance branch. Latest C artwork is Working Candidate v1 and is not approved as an Appearance Master or Production Asset."
 }
