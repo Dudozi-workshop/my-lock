@@ -1,12 +1,13 @@
-import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import '../../../app/theme.dart';
 import '../../../lock_engine/effects.dart';
+import '../../../lock_engine/floating_engine.dart';
 import '../../../lock_engine/floating_preview.dart';
 import '../../../lock_engine/models.dart';
+import '../../../lock_engine/shape_painter.dart';
 import '../../../widgets/production_ui.dart';
 import '../background/background_style.dart';
 
@@ -364,7 +365,7 @@ class _MotionCatalog extends StatelessWidget {
               selected: candidate == currentMovement,
               locked: candidate.locked,
               onTap: () => onSelect(candidate),
-              preview: _ShortRuntimePreview(
+              preview: _MotionCardPreview(
                 background: background,
                 selectedShapes: selectedShapes,
                 selectedTones: selectedTones,
@@ -373,6 +374,7 @@ class _MotionCatalog extends StatelessWidget {
                 style: style,
                 speed: speed,
                 movementArea: movementArea,
+                playing: candidate == currentMovement,
               ),
             ),
           )
@@ -418,16 +420,12 @@ class _ReactionCatalog extends StatelessWidget {
               selected: candidate == currentPop,
               locked: candidate.locked,
               onTap: () => onSelect(candidate),
-              preview: _ShortRuntimePreview(
+              preview: _ReactionCardPreview(
                 background: background,
-                selectedShapes: selectedShapes,
                 selectedTones: selectedTones,
-                movement: currentMovement,
                 popStyle: candidate,
                 style: style,
-                speed: speed,
-                movementArea: movementArea,
-                reactionPreview: true,
+                playing: candidate == currentPop,
               ),
             ),
           )
@@ -603,8 +601,8 @@ class _EffectChoiceCard extends StatelessWidget {
   }
 }
 
-class _ShortRuntimePreview extends StatefulWidget {
-  const _ShortRuntimePreview({
+class _MotionCardPreview extends StatelessWidget {
+  const _MotionCardPreview({
     required this.background,
     required this.selectedShapes,
     required this.selectedTones,
@@ -613,7 +611,7 @@ class _ShortRuntimePreview extends StatefulWidget {
     required this.style,
     required this.speed,
     required this.movementArea,
-    this.reactionPreview = false,
+    required this.playing,
   });
 
   final LockBackground background;
@@ -624,49 +622,33 @@ class _ShortRuntimePreview extends StatefulWidget {
   final ShapeStyle style;
   final FloatingSpeed speed;
   final MovementArea movementArea;
-  final bool reactionPreview;
-
-  @override
-  State<_ShortRuntimePreview> createState() => _ShortRuntimePreviewState();
-}
-
-class _ShortRuntimePreviewState extends State<_ShortRuntimePreview> {
-  Timer? _timer;
-  bool _playing = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer(const Duration(milliseconds: 2400), () {
-      if (mounted) setState(() => _playing = false);
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
+  final bool playing;
 
   @override
   Widget build(BuildContext context) {
+    final representativeShape = selectedShapes.isEmpty
+        ? ShapeKind.circle
+        : selectedShapes.first;
+
     return DecoratedBox(
-      decoration: BoxDecoration(gradient: widget.background.gradient),
+      decoration: BoxDecoration(gradient: background.gradient),
       child: Stack(
         fit: StackFit.expand,
         children: [
           IgnorePointer(
             child: TickerMode(
-              enabled: _playing,
+              enabled: playing,
               child: FloatingPreview(
-                selectedShapes: widget.selectedShapes,
-                selectedTones: widget.selectedTones,
-                movementStyle: widget.movement,
-                popStyle: widget.popStyle,
-                style: widget.style,
-                objectCount: 3,
-                speed: widget.speed,
-                movementArea: widget.movementArea,
+                selectedShapes: {representativeShape},
+                selectedTones: selectedTones.isEmpty
+                    ? {ShapeTone.pink}
+                    : selectedTones,
+                movementStyle: movement,
+                popStyle: popStyle,
+                style: style,
+                objectCount: 4,
+                speed: speed,
+                movementArea: movementArea,
                 topInset: 8,
               ),
             ),
@@ -674,23 +656,161 @@ class _ShortRuntimePreviewState extends State<_ShortRuntimePreview> {
           Positioned(
             left: 8,
             bottom: 8,
-            child: Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.42),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                widget.reactionPreview
-                    ? Icons.touch_app_rounded
-                    : Icons.play_arrow_rounded,
-                color: Colors.white,
-                size: 17,
-              ),
+            child: _CardPreviewStateBadge(
+              icon: playing
+                  ? Icons.play_arrow_rounded
+                  : Icons.pause_rounded,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ReactionCardPreview extends StatefulWidget {
+  const _ReactionCardPreview({
+    required this.background,
+    required this.selectedTones,
+    required this.popStyle,
+    required this.style,
+    required this.playing,
+  });
+
+  final LockBackground background;
+  final Set<ShapeTone> selectedTones;
+  final PopStyle popStyle;
+  final ShapeStyle style;
+  final bool playing;
+
+  @override
+  State<_ReactionCardPreview> createState() => _ReactionCardPreviewState();
+}
+
+class _ReactionCardPreviewState extends State<_ReactionCardPreview>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..addListener(() => setState(() {}));
+    _syncPlayback();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ReactionCardPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.playing != widget.playing) {
+      _syncPlayback();
+    }
+  }
+
+  void _syncPlayback() {
+    if (widget.playing) {
+      _controller.repeat();
+    } else {
+      _controller
+        ..stop()
+        ..value = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tone = widget.selectedTones.isEmpty
+        ? ShapeTone.pink
+        : widget.selectedTones.first;
+    final cycle = _controller.value;
+    const reactionPortion = 0.34;
+    final isReacting = widget.playing && cycle < reactionPortion;
+    final progress = isReacting
+        ? cycle / reactionPortion
+        : 0.0;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(gradient: widget.background.gradient),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final center = Offset(
+            constraints.maxWidth * 0.5,
+            constraints.maxHeight * 0.47,
+          );
+          final radius = math.min(
+                constraints.maxWidth,
+                constraints.maxHeight,
+              ) *
+              0.20;
+          final object = FloatingObject(
+            id: 0,
+            token: LockToken(
+              shape: ShapeKind.circle,
+              tone: tone,
+            ),
+            position: center,
+            velocity: Offset.zero,
+            radius: radius,
+          )..popElapsed = isReacting
+              ? FloatingEngine.popDuration * progress
+              : -1;
+
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              IgnorePointer(
+                child: CustomPaint(
+                  painter: FloatingShapePainter(
+                    objects: [object],
+                    popStyle: widget.popStyle,
+                    style: widget.style,
+                    speed: FloatingSpeed.normal,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 8,
+                bottom: 8,
+                child: _CardPreviewStateBadge(
+                  icon: widget.playing
+                      ? Icons.auto_awesome_rounded
+                      : Icons.pause_rounded,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _CardPreviewStateBadge extends StatelessWidget {
+  const _CardPreviewStateBadge({required this.icon});
+
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.42),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        icon,
+        color: Colors.white,
+        size: 17,
       ),
     );
   }
