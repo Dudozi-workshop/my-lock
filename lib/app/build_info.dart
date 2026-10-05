@@ -6,17 +6,17 @@ class BuildInfo {
 
   static const String previewVersion = String.fromEnvironment(
     'PREVIEW_VERSION',
-    defaultValue: 'MAIN-2026.10.05-R02',
+    defaultValue: 'MAIN-2026.10.05-R03',
   );
 
   static const String purpose = String.fromEnvironment(
     'PREVIEW_PURPOSE',
-    defaultValue: 'Aurora Sea H02B · live small-preview motion recovery',
+    defaultValue: 'Aurora Sea H02B · approved LABS renderer parity',
   );
 
   static const String status = String.fromEnvironment(
     'PREVIEW_STATUS',
-    defaultValue: 'Production Preview / Aurora live-motion QA / Device QA pending',
+    defaultValue: 'Production Preview / User visual QA / Device QA pending',
   );
 
   static String get display => '$previewVersion · $purpose · $status';
