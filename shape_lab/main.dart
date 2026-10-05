@@ -20,6 +20,7 @@ import 'water_refraction_field.dart';
 import 'surface_refraction_field.dart';
 import 'background_easy_effects.dart';
 import 'painted_sunbeam_layer.dart';
+import 'living_water_details.dart';
 import 'package:my_lock/lock_engine/raster_shape_bootstrap.dart';
 import 'candy_soft_review.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
@@ -129,7 +130,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R27 · Background · Motion A–C / QA Candidate',
+                                  'LABS-2026.10.05-R28 · Background · Particles & Bubbles / QA Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5745,6 +5746,7 @@ class _BackgroundLabState extends State<BackgroundLab>
     with TickerProviderStateMixin {
   late final AnimationController _surfaceClock;
   late final AnimationController _broadSunbeamClock;
+  late final AnimationController _detailClock;
 
   int selectedBackground = 0;
   int selectedRatio = 2;
@@ -5753,10 +5755,10 @@ class _BackgroundLabState extends State<BackgroundLab>
   _BackgroundWorkbenchStep step = _BackgroundWorkbenchStep.image;
   _SurfaceRefractionCandidate selected = _SurfaceRefractionCandidate.calmBroad;
   bool showSurface = false;
-  bool showFloorCaustic = true;
+  bool showFloorCaustic = false;
   bool showVolumetricLight = true;
   bool showAmbientParticle = true;
-  bool showBubble = true;
+  bool showBubble = false;
   double intensity = 1.0;
   int? soloEffectIndex;
   bool volumetricExpanded = true;
@@ -5764,6 +5766,9 @@ class _BackgroundLabState extends State<BackgroundLab>
   bool _broadSunbeamPaused = false;
   bool _usePaintedSunbeam = true;
   SunbeamMotion _sunbeamMotion = SunbeamMotion.flow;
+  bool _livingDetails = true;
+  bool _detailPaused = false;
+  bool _detailWithLight = true;
 
   static const backgrounds = [
     ('01', '투명한 얕은 바다', 'Image Selected · Effects In Progress'),
@@ -5789,6 +5794,10 @@ class _BackgroundLabState extends State<BackgroundLab>
       vsync: this,
       duration: const Duration(seconds: 12),
     )..repeat();
+    _detailClock = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 18),
+    )..repeat();
     _broadSunbeamClock = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 24),
@@ -5799,6 +5808,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   void dispose() {
     _surfaceClock.dispose();
     _broadSunbeamClock.dispose();
+    _detailClock.dispose();
     super.dispose();
   }
 
@@ -6243,7 +6253,7 @@ class _BackgroundLabState extends State<BackgroundLab>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'A · Broad Sunbeam 검수 중 · B/C는 R14 보존본',
+              'A Flow Motion 확정 · B/C는 비교 보존본',
               style: TextStyle(
                 color: widget.muted,
                 fontSize: 10.5,
@@ -6275,10 +6285,10 @@ class _BackgroundLabState extends State<BackgroundLab>
   Widget _layerStatusList() {
     final layers = [
       ('01', 'Surface Refraction', 'Deferred', showSurface, (bool v) => setState(() => showSurface = v), () => _soloEffect(0)),
-      ('02', 'Floor Caustic', 'Candidate', showFloorCaustic, (bool v) => setState(() => showFloorCaustic = v), () => _soloEffect(1)),
-      ('03', 'Volumetric Light', 'Candidate', showVolumetricLight, (bool v) => setState(() => showVolumetricLight = v), () => _soloEffect(2)),
-      ('04', 'Ambient Particle', 'Candidate', showAmbientParticle, (bool v) => setState(() => showAmbientParticle = v), () => _soloEffect(3)),
-      ('05', 'Bubble', 'Candidate', showBubble, (bool v) => setState(() => showBubble = v), () => _soloEffect(4)),
+      ('02', 'Floor Caustic', 'Rework Required', showFloorCaustic, (bool v) => setState(() => showFloorCaustic = v), () => _soloEffect(1)),
+      ('03', 'Volumetric Light', 'Motion A Fixed', showVolumetricLight, (bool v) => setState(() => showVolumetricLight = v), () => _soloEffect(2)),
+      ('04', 'Ambient Particle', 'Candidate', showAmbientParticle, (bool v) => setState(() => showAmbientParticle = v), () => _reviewWaterDetail(3, withLight: false)),
+      ('05', 'Bubble', 'Candidate', showBubble, (bool v) => setState(() => showBubble = v), () => _reviewWaterDetail(4, withLight: false)),
     ];
     return Column(
       children: [
@@ -6363,6 +6373,65 @@ class _BackgroundLabState extends State<BackgroundLab>
     _ => 'Easy Stack · Composite',
   };
 
+  void _reviewWaterDetail(int index, {bool? withLight, bool? living}) {
+    setState(() {
+      if (withLight != null) _detailWithLight = withLight;
+      if (living != null) _livingDetails = living;
+      showSurface = false;
+      showFloorCaustic = false;
+      showVolumetricLight = _detailWithLight;
+      showAmbientParticle = index == 3;
+      showBubble = index == 4;
+      soloEffectIndex = _detailWithLight ? null : index;
+      // Every detail review uses the exact approved Flow profile.
+      selectedVolumetric = 0;
+      _usePaintedSunbeam = true;
+      _sunbeamMotion = SunbeamMotion.flow;
+      _detailClock.stop();
+      _detailClock.value = 0;
+      _detailPaused = false;
+      _detailClock.repeat();
+    });
+  }
+
+  Widget _waterDetailControls() {
+    final index = showAmbientParticle ? 3 : 4;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Wrap(spacing: 7, runSpacing: 6, children: [
+          ChoiceChip(label: const Text('입자 · R28'),
+            selected: showAmbientParticle && !showBubble,
+            onSelected: (_) => _reviewWaterDetail(3)),
+          ChoiceChip(label: const Text('기포 · R28'),
+            selected: showBubble && !showAmbientParticle,
+            onSelected: (_) => _reviewWaterDetail(4)),
+          ChoiceChip(label: const Text('R28 새 표현'), selected: _livingDetails,
+            onSelected: (_) => _reviewWaterDetail(index, living: true)),
+          ChoiceChip(label: const Text('기존 표현'), selected: !_livingDetails,
+            onSelected: (_) => _reviewWaterDetail(index, living: false)),
+          FilterChip(label: const Text('확정 빛 A와 함께'), selected: _detailWithLight,
+            onSelected: (v) => _reviewWaterDetail(index, withLight: v)),
+          OutlinedButton.icon(
+            icon: Icon(_detailPaused ? Icons.play_arrow : Icons.pause),
+            label: Text(_detailPaused ? '입자·기포 재생' : '입자·기포 정지'),
+            onPressed: () => setState(() {
+              _detailPaused = !_detailPaused;
+              if (_detailPaused) { _detailClock.stop(); } else { _detailClock.repeat(); }
+            }),
+          ),
+        ]),
+        const SizedBox(height: 6),
+        Text(showAmbientParticle
+          ? '깊이별 크기·속도 + 국소 일렁임·반짝임 · 중앙 밀도 낮춤'
+          : '서로 다른 상승 속도·좌우 흔들림 + 얇은 테두리·비대칭 반사광',
+          style: TextStyle(color: widget.muted, fontSize: 11)),
+        Text('${_detailPaused ? '입자·기포 정지' : '입자·기포 재생 중'} · 미술 승인 대기',
+          style: TextStyle(color: widget.muted, fontSize: 11)),
+      ]),
+    );
+  }
+
   Widget _fullLivePanel() {
     return Container(
       width: double.infinity,
@@ -6386,7 +6455,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                 : '현재는 Approved Base + $_soloEffectName 단독 표시 중',
             style: TextStyle(color: widget.muted, fontSize: 10.5, fontWeight: FontWeight.w700),
           ),
-          if (showVolumetricLight && selectedVolumetric == 0) ...[
+          if (showVolumetricLight && selectedVolumetric == 0 && !showAmbientParticle && !showBubble) ...[
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -6452,13 +6521,13 @@ class _BackgroundLabState extends State<BackgroundLab>
               ],
             ),
           ],
-          if (showVolumetricLight && selectedVolumetric == 0 && _usePaintedSunbeam)
+          if (showVolumetricLight && selectedVolumetric == 0 && !showAmbientParticle && !showBubble && _usePaintedSunbeam)
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text('${_sunbeamMotion.description} · 비교용 강도 / 미술 승인 대기',
                 style: TextStyle(color: widget.muted, fontSize: 11)),
             ),
-          if (showVolumetricLight && selectedVolumetric == 0)
+          if (showVolumetricLight && selectedVolumetric == 0 && !showAmbientParticle && !showBubble)
             AnimatedBuilder(
               animation: _broadSunbeamClock,
               builder: (context, _) => Padding(
@@ -6475,6 +6544,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                 ]),
               ),
             ),
+          if (showAmbientParticle || showBubble) _waterDetailControls(),
           const SizedBox(height: 10),
           Center(
             child: ConstrainedBox(
@@ -6517,9 +6587,13 @@ class _BackgroundLabState extends State<BackgroundLab>
             if (showFloorCaustic)
               CustomPaint(painter: FloorCausticPainter(animation: _surfaceClock)),
             if (showAmbientParticle)
-              CustomPaint(painter: AmbientParticlePainter(animation: _surfaceClock)),
+              CustomPaint(painter: _livingDetails
+                ? LivingParticlePainter(animation: _detailClock)
+                : AmbientParticlePainter(animation: _detailClock)),
             if (showBubble)
-              CustomPaint(painter: BubblePainter(animation: _surfaceClock)),
+              CustomPaint(painter: _livingDetails
+                ? LivingBubblePainter(animation: _detailClock)
+                : BubblePainter(animation: _detailClock)),
           ],
         ),
       ),

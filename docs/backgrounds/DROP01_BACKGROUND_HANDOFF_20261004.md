@@ -1,6 +1,12 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · Volumetric Motion A Flow Approved / Fixed · 2026-10-05
+## Current handoff · R28 Ambient Particle / Bubble QA candidates · 2026-10-05
+- User “응 다음들 가자.” authorizes the next effects after fixed Flow A. Fresh Preflight 06/Master/05/04, handoff and integration ce8fb80 checked. Master priority is Light → Ambient → Bubble → Floor rework → Surface review, so proceed with Ambient/Bubble first; initial commentary saying Floor first corrected before any Floor edit.
+- New independent living_water_details.dart: 42 sparse multi-depth particles with independent rise/drift/shimmer, central quiet zone; 12 bubbles with varied size/rise speed, compound lateral wobble, gentle aspect changes, thin rim/asymmetric highlights and soft fill. Integer-period 18-second loop with entry/exit fades. No ImageGen, stock media or new binary.
+- Upper Live review switches Particle/Bubble, R28/new vs original preserved renderer, detail pause/play, Solo vs exact approved A Flow composite. Only one new detail effect in candidate selection; actual other switches OFF. Default A+particles, rejected Floor OFF. Original procedural effect file and approved painted Flow source unchanged.
+- R28 visible version / release metadata / workflow synchronized. Candidate motion/sparsity/loop tests and whole CI/deploy/Public/browser verification pending. Not user-approved; no Background Final/LOCK or MAIN promotion. Floor remains Rework Required; Surface Deferred. Existing concurrent Starfish preserved.
+
+## Previous handoff · Volumetric Motion A Flow Approved / Fixed · 2026-10-05
 - User approval 2026-10-05 09:40:09 KST: “A안으로 픽스하고 넘어가자.” Select and freeze R27 A Flow exactly as reviewed; do not weaken ranges or continue refinement without a new request.
 - Master registered: `docs/backgrounds/VOLUMETRIC_A_FLOW_MOTION_MASTER_V1.json`. Source renderer/profile, texture stable ID/hash, exact parameters, approval quote and existing CI/Live QA linked. Changes require v2; preserve v1.
 - LABS default already `SunbeamMotion.flow`; no renderer/UI/binary change or redeploy required for this decision. Public R27 source `3a418053f0a8843da933bb1979e1f5190b745d69`, complete CI 37247961279 SUCCESS remains applicable.

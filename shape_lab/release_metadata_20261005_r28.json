@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.05-R28",
+  "date": "2026-10-05",
+  "purpose": "Ambient particles and bubbles: visible layered drift/rise and illustrated highlights, approved Flow A preserved",
+  "scope": "Ambient/Bubble QA candidates only; Base and approved Flow A fixed; Floor Rework and Surface Deferred preserved",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "runtime",
+  "status": "Particle/Bubble QA Candidate; Flow A Approved/Fixed; whole Background not Final/Locked",
+  "governance": "2-Site compliant; no separate public site"
+}
