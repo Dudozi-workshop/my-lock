@@ -155,7 +155,7 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
               ),
             ),
             Text(
-              '\${items.length}개',
+              '${items.length}개',
               style: const TextStyle(
                 color: secondaryInk,
                 fontSize: 11,
@@ -192,7 +192,7 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
     if (item.locked) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('\${item.label} 배경은 아직 보유하지 않은 항목입니다.'),
+          content: Text('${item.label} 배경은 아직 보유하지 않은 항목입니다.'),
           duration: const Duration(milliseconds: 1400),
         ),
       );
