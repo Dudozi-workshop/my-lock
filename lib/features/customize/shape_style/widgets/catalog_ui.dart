@@ -497,6 +497,7 @@ Future<void> showCatalogFilterSheet({
                       onTap: () => apply(
                         draft.copyWith(
                           composition: CatalogCompositionFilter.all,
+                          clearCollection: true,
                         ),
                       ),
                     ),
