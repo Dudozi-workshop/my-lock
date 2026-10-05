@@ -1,6 +1,15 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · Floor static study v1 / art review pending · 2026-10-05
+## Current handoff · Floor motion R29 prepared / Drive registration approval blocked · 2026-10-05
+- User “오 좋다 좋아. 이렇게 가보자.” at 12:09:10 KST selects static v1 direction and authorizes animation. Exact selected PNG retained; motion itself not yet user-approved.
+- New independent painter and offline preview generator complete; Base-centered cover mapping fixes texture alignment under the LABS crop. 24-second loop, 48 local bands, multiple depth-dependent drift/stretch/brightness harmonics, phase zero retains static pattern. Other effect source files and Base unchanged.
+- Offline preview: 2988 alpha changes >12 after 2 seconds, exact 24-second alpha loop closure. GIF retained. Not actual Flutter or browser proof. Geometric native test prepared; Flutter/Dart absent locally, CI/Analyze and real playback pending.
+- Automatic approval review rejected new PNG upload to existing Background Masters folder 1Yh8Vz2-_Si5V1j0SolqvGptLyt2XupN3: specific destination/disclosure not explicitly authorized and ownership/trust not established. No retry or alternate raster destination. Explicit authorization required for this PNG/folder.
+- Code-only draft and staged wiring patch retained, NOT activated. Public stays R28; R29 reserved but not deployed. docs/backgrounds/FLOOR_CAUSTIC_MOTION_R29_PENDING.md details blocker and next steps. Canonical Drive registration → binary/Registry → prepared UI wiring → CI/deploy/Public/actual Solo/composite QA remain pending.
+- Base/approved Flow A/R28 details maintained, Surface Deferred. Static direction selected; Floor motion art review pending; whole Background Not Final/Locked.
+
+
+## Previous handoff · Floor static study v1 / art review pending · 2026-10-05
 - User positive R28 feedback “응 좋은데?!” / “좋다좋다”: preserve particle/bubble direction and exact source. No blanket Background Final/LOCK.
 - User authorizes Floor planning/trial. Fresh Notion 06/Master/05/04 and GitHub branch/handoff/CI Preflight complete; integration d304f792, prior R28 CI 37249040322 whole SUCCESS.
 - First gate is static pattern review. 841×1870 independent RGBA cream caustic field with irregular curved cells, perspective size variation, soft horizon fade and approximate scene-specific rock/coral occlusion. No ImageGen; approved Base hash unchanged and zero composite pixel changes above floor start.

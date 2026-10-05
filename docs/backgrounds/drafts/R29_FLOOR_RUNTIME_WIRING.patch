@@ -1,0 +1,264 @@
+--- a/shape_lab/main.dart
++++ b/shape_lab/main.dart
+@@ -20,6 +20,7 @@
+ import 'surface_refraction_field.dart';
+ import 'background_easy_effects.dart';
+ import 'painted_sunbeam_layer.dart';
++import 'painted_floor_caustic_layer.dart';
+ import 'living_water_details.dart';
+ import 'package:my_lock/lock_engine/raster_shape_bootstrap.dart';
+ import 'candy_soft_review.dart';
+@@ -130,7 +131,7 @@
+                                 ),
+                                 const SizedBox(height: 2),
+                                 Text(
+-                                  'LABS-2026.10.05-R28 · Background · Particles & Bubbles / QA Candidate',
++                                  'LABS-2026.10.05-R29 · Background · Floor Caustic Motion / QA Candidate',
+                                   style: TextStyle(color: muted, fontSize: 11.5),
+                                 ),
+                               ],
+@@ -5747,6 +5748,7 @@
+   late final AnimationController _surfaceClock;
+   late final AnimationController _broadSunbeamClock;
+   late final AnimationController _detailClock;
++  late final AnimationController _floorClock;
+ 
+   int selectedBackground = 0;
+   int selectedRatio = 2;
+@@ -5755,12 +5757,12 @@
+   _BackgroundWorkbenchStep step = _BackgroundWorkbenchStep.image;
+   _SurfaceRefractionCandidate selected = _SurfaceRefractionCandidate.calmBroad;
+   bool showSurface = false;
+-  bool showFloorCaustic = false;
+-  bool showVolumetricLight = true;
+-  bool showAmbientParticle = true;
++  bool showFloorCaustic = true;
++  bool showVolumetricLight = false;
++  bool showAmbientParticle = false;
+   bool showBubble = false;
+   double intensity = 1.0;
+-  int? soloEffectIndex;
++  int? soloEffectIndex = 1;
+   bool volumetricExpanded = true;
+   int selectedVolumetric = 0;
+   bool _broadSunbeamPaused = false;
+@@ -5769,6 +5771,9 @@
+   bool _livingDetails = true;
+   bool _detailPaused = false;
+   bool _detailWithLight = true;
++  bool _paintedFloor = true;
++  bool _floorPaused = false;
++  bool _floorComposite = false;
+ 
+   static const backgrounds = [
+     ('01', '투명한 얕은 바다', 'Image Selected · Effects In Progress'),
+@@ -5794,6 +5799,7 @@
+       vsync: this,
+       duration: const Duration(seconds: 12),
+     )..repeat();
++    _floorClock = AnimationController(vsync: this, duration: const Duration(seconds: 24))..repeat();
+     _detailClock = AnimationController(
+       vsync: this,
+       duration: const Duration(seconds: 18),
+@@ -5809,6 +5815,7 @@
+     _surfaceClock.dispose();
+     _broadSunbeamClock.dispose();
+     _detailClock.dispose();
++    _floorClock.dispose();
+     super.dispose();
+   }
+ 
+@@ -6285,7 +6292,7 @@
+   Widget _layerStatusList() {
+     final layers = [
+       ('01', 'Surface Refraction', 'Deferred', showSurface, (bool v) => setState(() => showSurface = v), () => _soloEffect(0)),
+-      ('02', 'Floor Caustic', 'Rework Required', showFloorCaustic, (bool v) => setState(() => showFloorCaustic = v), () => _soloEffect(1)),
++      ('02', 'Floor Caustic', 'R29 Motion Candidate', showFloorCaustic, (bool v) => setState(() => showFloorCaustic = v), () => _reviewFloor(composite: false)),
+       ('03', 'Volumetric Light', 'Motion A Fixed', showVolumetricLight, (bool v) => setState(() => showVolumetricLight = v), () => _soloEffect(2)),
+       ('04', 'Ambient Particle', 'Candidate', showAmbientParticle, (bool v) => setState(() => showAmbientParticle = v), () => _reviewWaterDetail(3, withLight: false)),
+       ('05', 'Bubble', 'Candidate', showBubble, (bool v) => setState(() => showBubble = v), () => _reviewWaterDetail(4, withLight: false)),
+@@ -6394,6 +6401,55 @@
+     });
+   }
+ 
++  void _reviewFloor({bool? painted, bool? composite}) {
++    setState(() {
++      if (painted != null) _paintedFloor = painted;
++      if (composite != null) _floorComposite = composite;
++      showSurface = false;
++      showFloorCaustic = true;
++      showVolumetricLight = _floorComposite;
++      showAmbientParticle = _floorComposite;
++      showBubble = _floorComposite;
++      soloEffectIndex = _floorComposite ? null : 1;
++      selectedVolumetric = 0;
++      _usePaintedSunbeam = true;
++      _sunbeamMotion = SunbeamMotion.flow;
++      _livingDetails = true;
++      _floorClock.stop();
++      _floorClock.value = 0;
++      _floorPaused = false;
++      _floorClock.repeat();
++      // Existing A and detail clocks keep their current phases.
++    });
++  }
++
++  Widget _floorControls() {
++    return Padding(padding: const EdgeInsets.only(top: 8), child: Column(
++      crossAxisAlignment: CrossAxisAlignment.start, children: [
++        Wrap(spacing: 7, runSpacing: 6, children: [
++          ChoiceChip(label: const Text('바닥빛 · R29'), selected: _paintedFloor,
++            onSelected: (_) => _reviewFloor(painted: true)),
++          ChoiceChip(label: const Text('이전 바닥빛 · 비교'), selected: !_paintedFloor,
++            onSelected: (_) => _reviewFloor(painted: false)),
++          FilterChip(label: const Text('빛 A·입자·기포와 합성'), selected: _floorComposite,
++            onSelected: (v) => _reviewFloor(composite: v)),
++          OutlinedButton.icon(icon: Icon(_floorPaused ? Icons.play_arrow : Icons.pause),
++            label: Text(_floorPaused ? '바닥빛 재생' : '바닥빛 정지'),
++            onPressed: () => setState(() {
++              _floorPaused = !_floorPaused;
++              if (_floorPaused) { _floorClock.stop(); } else { _floorClock.repeat(); }
++            })),
++          OutlinedButton(onPressed: () => setState(() {
++            _floorClock.stop(); _floorClock.value = 0; _floorPaused = true;
++          }), child: const Text('승인 정지 무늬')),
++        ]),
++        Text('부분별 다른 일렁임·밝기 · 원근 유지 · 바닥빛만 정지/재생',
++          style: TextStyle(color: widget.muted, fontSize: 11)),
++        Text('${_floorPaused ? "바닥빛 정지" : "바닥빛 재생 중"} · 움직임 미술 승인 대기',
++          style: TextStyle(color: widget.muted, fontSize: 11)),
++      ]));
++  }
++
+   Widget _waterDetailControls() {
+     final index = showAmbientParticle ? 3 : 4;
+     return Padding(
+@@ -6455,7 +6511,7 @@
+                 : '현재는 Approved Base + $_soloEffectName 단독 표시 중',
+             style: TextStyle(color: widget.muted, fontSize: 10.5, fontWeight: FontWeight.w700),
+           ),
+-          if (showVolumetricLight && selectedVolumetric == 0 && !showAmbientParticle && !showBubble) ...[
++          if (showVolumetricLight && selectedVolumetric == 0 && !showAmbientParticle && !showBubble && !showFloorCaustic) ...[
+             const SizedBox(height: 8),
+             Wrap(
+               spacing: 8,
+@@ -6527,7 +6583,7 @@
+               child: Text('${_sunbeamMotion.description} · 비교용 강도 / 미술 승인 대기',
+                 style: TextStyle(color: widget.muted, fontSize: 11)),
+             ),
+-          if (showVolumetricLight && selectedVolumetric == 0 && !showAmbientParticle && !showBubble)
++          if (showVolumetricLight && selectedVolumetric == 0 && !showAmbientParticle && !showBubble && !showFloorCaustic)
+             AnimatedBuilder(
+               animation: _broadSunbeamClock,
+               builder: (context, _) => Padding(
+@@ -6544,7 +6600,8 @@
+                 ]),
+               ),
+             ),
+-          if (showAmbientParticle || showBubble) _waterDetailControls(),
++          if (showFloorCaustic) _floorControls(),
++          if (!showFloorCaustic && (showAmbientParticle || showBubble)) _waterDetailControls(),
+           const SizedBox(height: 10),
+           Center(
+             child: ConstrainedBox(
+@@ -6585,7 +6642,9 @@
+                 ),
+               ),
+             if (showFloorCaustic)
+-              CustomPaint(painter: FloorCausticPainter(animation: _surfaceClock)),
++              _paintedFloor
++                ? PaintedFloorCausticLayer(animation: _floorClock)
++                : CustomPaint(painter: FloorCausticPainter(animation: _floorClock)),
+             if (showAmbientParticle)
+               CustomPaint(painter: _livingDetails
+                 ? LivingParticlePainter(animation: _detailClock)
+--- a/assets/backgrounds/drop01/ASSET_REGISTRY.json
++++ b/assets/backgrounds/drop01/ASSET_REGISTRY.json
+@@ -100,6 +100,33 @@
+       },
+       "current_integrity": "verified_local_binary",
+       "derived_from": "User 76252.png panel 03 reference study, estimated alpha not exact extraction"
++    },
++    {
++      "asset_id": "background.drop01.shallow_clear.floor_caustic_static_v1",
++      "slot": "01",
++      "name_ko": "Floor Caustic · Selected Static v1 / Motion Candidate R29",
++      "lifecycle": "motion_qa_candidate",
++      "active_for_lab": true,
++      "production_role": "lab_floor_motion_candidate",
++      "registration_status": "PENDING_DRIVE_APPROVAL_REPLACE_BEFORE_APPLY",
++      "runtime_ref": {
++        "type": "flutter_asset",
++        "path": "assets/backgrounds/drop01/floor_caustic_static_v1.png",
++        "git_blob_sha": "PENDING_BINARY_BLOB"
++      },
++      "source_of_truth": {
++        "decision": "Notion Drop 01 Asset Master · 2026-10-05 12:09:10 KST static direction selected",
++        "binary": "Google Drive / Background Masters / floor_caustic_static_v1.png",
++        "binary_url": "PENDING_CANONICAL_DRIVE_REGISTRATION"
++      },
++      "expected_integrity": {
++        "mime": "image/png",
++        "width": 841,
++        "height": 1870,
++        "byte_size": 105959,
++        "sha256": "b09d20b24b4ebd9f933234dbb4f5982b243c5fb628a2667dd669d7dd59c93a05"
++      },
++      "current_integrity": "verified_local_binary"
+     }
+   ]
+ }
+--- a/.github/workflows/style-lab-integration.yml
++++ b/.github/workflows/style-lab-integration.yml
+@@ -50,6 +50,9 @@
+       - name: Verify living particles and bubbles
+         run: flutter test test/living_water_details_test.dart
+ 
++      - name: Verify Floor geometry and cover alignment
++        run: flutter test test/painted_floor_caustic_geometry_test.dart
++
+       - name: Test Starfish micro idle
+         run: flutter test test/starfish_micro_idle_test.dart
+ 
+@@ -67,7 +70,7 @@
+           python3 - <<'PYCODE'
+           import json, os, html
+           from pathlib import Path
+-          meta = json.loads(Path('shape_lab/release_metadata_20261005_r28.json').read_text())
++          meta = json.loads(Path('shape_lab/release_metadata_20261005_r29.json').read_text())
+           meta['source_commit'] = os.environ['GITHUB_SHA']
+           Path('build/shape_lab/labs-release.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2))
+           page = Path('build/shape_lab/index.html')
+@@ -128,7 +131,7 @@
+           curl --fail --show-error --silent --location --retry 5 --retry-delay 3 --retry-all-errors --output /tmp/starfish-runtime.webp "${PRIMARY_URL}assets/assets/raster_shapes/starfish_runtime_master_final_v1_256.webp"
+           echo "b3a35bba9d238afba67d2e17b8649129a75f905f7c52048dc82ba09d105f9e60  /tmp/starfish-runtime.webp" | sha256sum -c -
+ 
+-      - name: Verify R28 release identity
++      - name: Verify R29 release identity
+         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+         run: |
+           python3 - <<'PYCODE'
+@@ -139,8 +142,8 @@
+               url = os.environ['PRIMARY_URL'] + '?release=' + sha + '&attempt=' + str(attempt)
+               try:
+                   page = subprocess.check_output(['curl', '--fail', '--silent', '--show-error', '--location', '--max-time', '20', url], text=True)
+-                  if expected in page and 'LABS-2026.10.05-R28' in page:
+-                      print('Canonical R28 release verified:', sha)
++                  if expected in page and 'LABS-2026.10.05-R29' in page:
++                      print('Canonical R29 release verified:', sha)
+                       break
+                   print('Canonical HTML release propagation pending', flush=True)
+               except Exception as error:
+--- /dev/null
++++ b/shape_lab/release_metadata_20261005_r29.json
+@@ -0,0 +1,10 @@
++{
++  "version": "LABS-2026.10.05-R29",
++  "date": "2026-10-05",
++  "purpose": "Floor painted caustic motion: local deformation and staggered brightness; static direction selected",
++  "scope": "Floor motion candidate only; Base/Flow A/R28 details fixed, Surface Deferred",
++  "source_branch": "feat/style-lab-integration",
++  "source_commit": "runtime",
++  "status": "Floor Motion QA Candidate; whole Background Not Final/Locked",
++  "governance": "Existing LABS only"
++}
