@@ -1,7 +1,8 @@
 # MY LOCK Visual DNA v1
 
-Status: Working Standard / Candidate / Not Locked  
-Date: 2026-10-04
+Status: Superseded Working Candidate / History / Not Locked  
+Date: 2026-10-04  
+Superseded by: `docs/visual/my_lock_visual_dna_v2.md` on 2026-10-05
 
 ## Purpose
 MY LOCK visual assets must feel like one authored world even when the subject changes. The identity comes from **how things are drawn**, not from forcing the same colors or motifs onto every asset.
