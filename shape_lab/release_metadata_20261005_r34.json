@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.05-R34",
+  "date": "2026-10-05",
+  "purpose": "Rare Coral Shelter signature candidate after composite QA approval",
+  "scope": "Add independent Coral Light Sweep overlay and QA toggle; preserve Base Only v2, R27 A Flow, R31 Cell Flow, R28 optional behavior",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "runtime",
+  "status": "Signature Candidate / User Visual QA Pending / Background Not Final/Locked",
+  "governance": "Existing LABS only"
+}
