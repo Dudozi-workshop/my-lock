@@ -28,14 +28,24 @@ class AuroraSeaSignature {
 
   static ui.Vertices mesh(double seconds) => _field.mesh(seconds);
 
-  /// Paints the approved field into a caller-provided unit square.
-  ///
-  /// The destination alpha/mask must already exist in the active layer.
+  /// Applies H02B to alpha already present in the current saveLayer.
   static void paintIntoCurrentMask(ui.Canvas canvas, double seconds) {
     canvas.drawVertices(
       mesh(seconds),
       ui.BlendMode.src,
       ui.Paint()..blendMode = ui.BlendMode.srcIn,
+    );
+  }
+
+  /// Paints H02B directly into the caller's current clip in a unit square.
+  ///
+  /// Use after translating/scaling the canvas so 0..1 maps to the target
+  /// bounds. Opacity should be applied by the surrounding saveLayer.
+  static void paintUnitSquare(ui.Canvas canvas, double seconds) {
+    canvas.drawVertices(
+      mesh(seconds),
+      ui.BlendMode.src,
+      ui.Paint()..blendMode = ui.BlendMode.srcOver,
     );
   }
 }
