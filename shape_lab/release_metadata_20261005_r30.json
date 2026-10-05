@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.05-R30",
+  "date": "2026-10-05",
+  "purpose": "Floor visible local deformation, 3x lateral / 2.6x stretch / 2.3x vertical; R29 direct comparison",
+  "scope": "Floor motion candidate only; Base/Flow A/R28 details fixed, Surface Deferred",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "runtime",
+  "status": "Floor Motion QA Candidate; whole Background Not Final/Locked",
+  "governance": "Existing LABS only"
+}

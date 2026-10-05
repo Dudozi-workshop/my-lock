@@ -1,4 +1,4 @@
-"""Offline motion QA preview matching the R29 Dart painter's parameters.
+"""Offline motion QA preview matching the R30 Dart painter's parameters.
 
 This is not Flutter/browser playback proof. Requires numpy and Pillow.
 """
@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image
 
 
-def frame(texture, size, seconds):
+def frame(texture, size, seconds, visible_motion=True):
     w,h=size
     phase=seconds/24*2*math.pi
     scale=max(w/texture.width,h/texture.height)
@@ -23,15 +23,19 @@ def frame(texture, size, seconds):
     # The native painter linearly interpolates these same 25 stops.
     stops=1-strength*(.5+.5*np.sin(np.arange(25)/24*math.pi*5-phase*3))
     horizontal=np.interp(xs,np.arange(25)/24,stops)
-    for band in range(48):
-        top=math.floor(start+(h-start)*band/48)
-        bottom=h if band==47 else math.floor(start+(h-start)*(band+1)/48)
+    bands=96 if visible_motion else 48
+    lateral_gain=3 if visible_motion else 1
+    stretch_gain=2.6 if visible_motion else 1
+    vertical_gain=2.3 if visible_motion else 1
+    for band in range(bands):
+        top=math.floor(start+(h-start)*band/bands)
+        bottom=h if band==bands-1 else math.floor(start+(h-start)*(band+1)/bands)
         if bottom<=top: continue
         y=((top+bottom)/2-origin)/height
         depth=min(1,max(0,(y-.655)/.345))
-        shift=width*depth*(.009*math.sin(phase*3)*math.sin(y*19)+.004*math.sin(phase*5)*math.cos(y*31))
-        stretch=1+depth*.025*math.sin(phase*4)*math.sin(y*17)
-        vertical=height*depth*.0015*math.sin(phase*5)*math.cos(y*23)
+        shift=width*depth*lateral_gain*(.009*math.sin(phase*3)*math.sin(y*19)+.004*math.sin(phase*5)*math.cos(y*31))
+        stretch=1+depth*stretch_gain*.025*math.sin(phase*4)*math.sin(y*17)
+        vertical=height*depth*vertical_gain*.0015*math.sin(phase*5)*math.cos(y*23)
         brightness=1-.26*(.5-.5*math.cos(phase*3))*(.5+.5*math.sin(phase*4+y*19))
         sx=texture.width/(width*stretch)
         sy=texture.height/height
@@ -74,5 +78,5 @@ if __name__=='__main__':
         # Enlarged lower scene crop, where this effect actually lives.
         crop=rgb.crop((0,360,400,597)).resize((600,356),Image.Resampling.LANCZOS)
         frames.append(crop.quantize(palette=palette,dither=Image.Dither.NONE))
-    frames[0].save(a.output/'floor_caustic_motion_preview_r29.gif',save_all=True,
+    frames[0].save(a.output/'floor_caustic_motion_preview_r30.gif',save_all=True,
         append_images=frames[1:],duration=[167,167,166]*48,loop=0,optimize=True,disposal=1)

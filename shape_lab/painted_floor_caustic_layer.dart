@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'background_asset_registry.dart';
 
-/// R29 candidate. Static direction selected; motion awaits Live review.
-/// Keep inactive until canonical binary and registry registration complete.
+/// R30 visible motion candidate; R29 remains a directly comparable profile.
 class PaintedFloorCausticLayer extends StatefulWidget {
-  const PaintedFloorCausticLayer({super.key, required this.animation});
+  const PaintedFloorCausticLayer({super.key, required this.animation, this.visibleMotion = true});
   final Animation<double> animation;
+  final bool visibleMotion;
   @override
   State<PaintedFloorCausticLayer> createState() => _PaintedFloorCausticLayerState();
 }
@@ -50,7 +50,7 @@ class _PaintedFloorCausticLayerState extends State<PaintedFloorCausticLayer> {
     final image = _image;
     if (image == null) return const Center(child: CircularProgressIndicator());
     return RepaintBoundary(child: CustomPaint(
-      painter: PaintedFloorCausticPainter(image, widget.animation),
+      painter: PaintedFloorCausticPainter(image, widget.animation, visibleMotion: widget.visibleMotion),
     ));
   }
 }
@@ -58,10 +58,13 @@ class _PaintedFloorCausticLayerState extends State<PaintedFloorCausticLayer> {
 /// Matches Image.asset(..., fit: BoxFit.cover, alignment: center) exactly.
 /// Image-only bands use the CPU web-compatible path established in TS-008.
 class PaintedFloorCausticPainter extends CustomPainter {
-  PaintedFloorCausticPainter(this.image, this.animation) : super(repaint: animation);
+  PaintedFloorCausticPainter(this.image, this.animation, {this.visibleMotion = true})
+      : super(repaint: animation);
   final ui.Image image;
   /// Caller supplies a repeating 24-second clock; phase 0 is the static study.
   final Animation<double> animation;
+
+  final bool visibleMotion;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -80,7 +83,10 @@ class PaintedFloorCausticPainter extends CustomPainter {
     canvas.save();
     canvas.clipRect(floorRect, doAntiAlias: false);
     canvas.saveLayer(floorRect, Paint());
-    const bands = 48;
+    final bands = visibleMotion ? 96 : 48;
+    final lateralGain = visibleMotion ? 3.0 : 1.0;
+    final stretchGain = visibleMotion ? 2.6 : 1.0;
+    final verticalGain = visibleMotion ? 2.3 : 1.0;
     for (var band=0; band<bands; band++) {
       final top = (floorStart+(size.height-floorStart)*band/bands).floorToDouble();
       final bottom = band==bands-1 ? size.height :
@@ -88,10 +94,10 @@ class PaintedFloorCausticPainter extends CustomPainter {
       if (bottom<=top) continue;
       final canonicalY = ((top+bottom)/2-originY)/height;
       final depth = ((canonicalY-.655)/.345).clamp(0.0,1.0);
-      final shift = width*depth*(.009*math.sin(phase*3)*math.sin(canonicalY*19)+
+      final shift = width*depth*lateralGain*(.009*math.sin(phase*3)*math.sin(canonicalY*19)+
           .004*math.sin(phase*5)*math.cos(canonicalY*31));
-      final stretch = 1+depth*.025*math.sin(phase*4)*math.sin(canonicalY*17);
-      final vertical = height*depth*.0015*math.sin(phase*5)*math.cos(canonicalY*23);
+      final stretch = 1+depth*stretchGain*.025*math.sin(phase*4)*math.sin(canonicalY*17);
+      final vertical = height*depth*verticalGain*.0015*math.sin(phase*5)*math.cos(canonicalY*23);
       final alpha = 1-.26*(.5-.5*math.cos(phase*3))*
           (.5+.5*math.sin(phase*4+canonicalY*19));
       paint.color = Colors.white.withValues(alpha: alpha);
@@ -117,5 +123,5 @@ class PaintedFloorCausticPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(PaintedFloorCausticPainter oldDelegate) =>
-      oldDelegate.image!=image || oldDelegate.animation!=animation;
+      oldDelegate.image!=image || oldDelegate.animation!=animation || oldDelegate.visibleMotion!=visibleMotion;
 }

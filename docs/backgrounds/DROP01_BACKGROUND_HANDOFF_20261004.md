@@ -1,6 +1,13 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · Floor motion R29 wired / CI and Live QA pending · 2026-10-05
+## Current handoff · R30 visible Floor motion / CI and Live QA pending · 2026-10-05
+- User R29 feedback: movement hard to perceive. 13:40:09 KST “ㄱㄱ” authorizes stronger local deformation, same static artwork and other effects frozen. R29 technical playback PASS is not perceptual approval.
+- Same canonical Floor PNG and centered Base cover mapping; R30 lateral amplitude 3x, local stretch 2.6x, vertical deformation 2.3x. Depth attenuation, independent 8/6/4.8-second harmonics, 24-second loop, phase-zero static picture and brightness ranges retained. 96 integer bands smooth larger deformation. No new binary or ImageGen.
+- Upper controls: 바닥빛 · R30 / R29 · 이전 움직임 compare the same artwork and clock using preserved R29 48-band profile. Selecting either resets and plays; pause/reference/composite remain. Original legacy procedural renderer preserved in source/history.
+- Preflight: latest Notion 06/Master/05/04; this GitHub handoff and branch d1113c33; R29 CI 37260867060 SUCCESS and actual Public meta R29/3f5f8102 verified. Native actual PNG 1-second stronger-than-R29 change test added across six ratios; existing alignment/cutoff/2-second/loop checks retained. Local Flutter absent; CI and actual Live checks pending.
+- Scope Floor only; Base/Flow A/R28 and texture hashes preserved; Surface Deferred; Background Not Final/Locked. Physical Android performance and stronger mask displacement require visual QA.
+
+## Previous handoff · Floor motion R29 / CI and Live QA complete · 2026-10-05
 - User 12:44:37 KST “업로드 진행.” authorizes pending GitHub registration and existing Public LABS deployment. Exact selected PNG blob 39a332c2b17c6164bb09961384979354f8fd9f90 now created. Canonical Drive 1bvqp8q-qrql9HTLj674P4A4s-5gXjHxC raw SHA256 b09d20b24b4ebd9f933234dbb4f5982b243c5fb628a2667dd669d7dd59c93a05 verified; 841×1870 / 105959 bytes. Both upload blockers resolved.
 - Stable Floor ID, Registry/runtime binary and prepared UI applied. Own 24-second clock, depth-dependent local drift/stretch/brightness, exact Base-centered cover mapping, static phase zero. Candidate Solo auto-plays; new vs explicitly previous Floor, Floor pause/play/reference, exact A Flow plus unchanged R28 particles/bubbles composite. Other renderer files and approved Base untouched; Surface Deferred.
 - R29 runtime source 3f5f810229d9f2adcfb82b3dd8f127afa32a58b1 / CI 37260867060 whole SUCCESS: Floor actual PNG cover alignment and 2-second motion/24-second loop on 16:9/18:9/19.5:9/20:9/21:9/LABS .67; preserved A/R28/Starfish; Analyze/full tests/Build/Deploy/Public source/version and Base/A/Floor/Starfish hashes. Browser meta matches R29/source.
