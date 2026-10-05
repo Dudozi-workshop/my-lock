@@ -1,10 +1,13 @@
 # MY LOCK Visual DNA v2 — Soft Storybook Character
 
 Status: Active Working Standard / Candidate / Not Locked  
-Date: 2026-10-05
+Date: 2026-10-05  
+Selected style anchor: **Soft Pastel Storybook / Jellyfish Character Appearance Master v1**
 
 ## Core Direction
 MY LOCK Base Art is 2D character illustration first. 2.5D treatment is limited to shallow structural depth used only to explain form and overlap.
+
+The current selected visual direction is **Soft Pastel Storybook**. Detailed construction/render rules are maintained in `docs/visual/my_lock_visual_style_rule_v1.md`.
 
 Target impression:
 - quiet, warm storybook characters
@@ -88,10 +91,11 @@ Base art must remain complete and recognizably MY LOCK with these disabled.
 - micro-texture overload
 
 ## Reference Hierarchy
-- Character simplification reference: user-provided dolphin illustration, 2026-10-05. Extract only simplified silhouette, pastel color mass, shallow shading, and minimal face language; do not copy the literal artwork.
-- Production quality / geometry anchor: Sea Turtle v3. Preserve locked geometry and production QA lineage, but do not treat its current gloss or detailed volume as mandatory for the new style.
-- First active style calibration target: Jellyfish R4.
-- Dolphin Planning Master v2 remains locked; any face/style reinterpretation becomes a separate Appearance Candidate.
+- **Primary style anchor:** Jellyfish Character Appearance Master v1, approved 2026-10-05.
+- **Style rule:** `docs/visual/my_lock_visual_style_rule_v1.md`
+- Character simplification reference: user-provided dolphin illustration, 2026-10-05. Use only as early exploration context; do not copy the literal artwork.
+- Production lineage references: existing Sea Turtle / Dolphin / Jellyfish locked assets remain preserved and must not be overwritten during style migration.
+- Next translation target: Dolphin; Sea Turtle follows after Dolphin cross-asset review.
 
 ## Locked Asset Protection
 - never overwrite existing Final / Locked / Active Master binaries for style migration
@@ -120,5 +124,6 @@ States:
 - Visual DNA v2: Active Working Standard / Candidate / Not Locked
 - Visual DNA v1: Superseded Working Candidate / History
 - Naming system: deferred until style lock
-- Next Gate: Minimal Face + Render Rule detail lock → Jellyfish Appearance Calibration → Dolphin / Sea Turtle Cross-Asset QA
-- Promote v2 to Final / Locked only after visual consistency is proven across at least two character shapes.
+- Jellyfish style anchor: approved.
+- Next Gate: Dolphin character-construction translation → Sea Turtle translation → Cross-Asset QA.
+- Promote the shared style to Final / Locked only after visual consistency is proven across at least three character shapes.
