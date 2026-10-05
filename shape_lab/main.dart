@@ -131,7 +131,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R31 · Background · Floor Caustic Cell Flow / QA Candidate',
+                                  'LABS-2026.10.05-R32 · Background · Coral Shelter / Composite QA',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5750,7 +5750,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   late final AnimationController _detailClock;
   late final AnimationController _floorClock;
 
-  int selectedBackground = 0;
+  int selectedBackground = 1;
   int selectedRatio = 2;
   bool showSafeZone = true;
   late final BackgroundAssetRecord _shallowClearBase;
@@ -5774,11 +5774,13 @@ class _BackgroundLabState extends State<BackgroundLab>
   bool _paintedFloor = true;
   bool _floorPaused = false;
   bool _floorComposite = false;
+  int _compositeShapeCount = 9;
+  bool _compositeR28 = false;
 
   static const backgrounds = [
-    ('01', '투명한 얕은 바다', 'Image Selected · Effects In Progress'),
-    ('02', '바닷속 하루', 'Not Started'),
-    ('03', '고요한 심해', 'Not Started'),
+    ('01', 'Normal · 맑은 물길', 'Planned · Minimal Redesign'),
+    ('02', 'Rare · 산호 쉼터', 'Inherited · Composite QA'),
+    ('03', 'Legendary · 빛나는 바다정원', 'Planned · New Hero Scene'),
   ];
 
   static const deviceRatios = [
@@ -5834,7 +5836,7 @@ class _BackgroundLabState extends State<BackgroundLab>
         const SizedBox(height: 18),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
-          child: selectedBackground == 0
+          child: selectedBackground == 1
               ? _activeBackgroundBody()
               : _notStartedBody(),
         ),
@@ -6614,7 +6616,7 @@ class _BackgroundLabState extends State<BackgroundLab>
     );
   }
 
-  Widget _runtimeEffectPreview() {
+  Widget _runtimeEffectPreview({bool withShapes = false}) {
     return AspectRatio(
       aspectRatio: .67,
       child: ClipRRect(
@@ -6651,6 +6653,16 @@ class _BackgroundLabState extends State<BackgroundLab>
               CustomPaint(painter: _livingDetails
                 ? LivingBubblePainter(animation: _detailClock)
                 : BubblePainter(animation: _detailClock)),
+            if (withShapes)
+              FloatingPreview(
+                selectedShapes: const {ShapeKind.seaTurtle, ShapeKind.starfish},
+                selectedTones: ShapeTone.drop01Palette,
+                movementStyle: MovementStyle.floating,
+                popStyle: PopStyle.basicPop,
+                style: ShapeStyle.softBasic,
+                objectCount: _compositeShapeCount,
+                movementArea: MovementArea.full,
+              ),
           ],
         ),
       ),
@@ -6658,6 +6670,26 @@ class _BackgroundLabState extends State<BackgroundLab>
   }
 
   Widget _compositeStep() {
+    final needsSync = !showFloorCaustic || !showVolumetricLight || soloEffectIndex != null ||
+        showAmbientParticle != _compositeR28 || showBubble != _compositeR28;
+    if (needsSync) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        setState(() {
+          showSurface = false;
+          showFloorCaustic = true;
+          showVolumetricLight = true;
+          showAmbientParticle = _compositeR28;
+          showBubble = _compositeR28;
+          soloEffectIndex = null;
+          selectedVolumetric = 0;
+          _usePaintedSunbeam = true;
+          _sunbeamMotion = SunbeamMotion.flow;
+          _paintedFloor = true;
+        });
+      });
+    }
+
     return _sectionCard(
       key: const ValueKey('background-composite-step'),
       child: Column(
@@ -6665,15 +6697,101 @@ class _BackgroundLabState extends State<BackgroundLab>
         children: [
           _stepHeader(
             '03 · 합성 QA',
-            'Base Only ↔ Full Composite · 승인 Effect 전체 검수',
-            'Waiting',
+            'Rare · 산호 쉼터 · Base Only ↔ R27 + R31 ↔ 실제 Locked Shape 후합성',
+            'QA Active',
           ),
-          const SizedBox(height: 16),
-          _lockedStage(
-            '레이어 효과 승인 후 활성화',
-            'Surface / Floor Caustic / Light / Ambient / Bubble을 하나씩 승인한 뒤 '
-                '전체 합성과 실제 Locked Shape 6·9·12개 조건을 검수합니다.',
+          const SizedBox(height: 10),
+          Text(
+            '기본 합성은 승인 Base Only v2 + R27 A Flow + R31 Cell Flow입니다. '
+            'R28 Ambient/Bubble은 Rare 핵심 Motion이 아니므로 기본 OFF, 선택 Atmosphere로만 비교합니다.',
+            style: TextStyle(color: widget.muted, fontSize: 11, height: 1.45),
           ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              for (final count in const [6, 9, 12])
+                ChoiceChip(
+                  label: Text('Shape $count'),
+                  selected: _compositeShapeCount == count,
+                  onSelected: (_) => setState(() => _compositeShapeCount = count),
+                ),
+              FilterChip(
+                label: const Text('R28 Ambient/Bubble · Optional'),
+                selected: _compositeR28,
+                onSelected: (value) => setState(() => _compositeR28 = value),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final stacked = constraints.maxWidth < 860;
+              final base = _compositeQaCard(
+                'A · Base Only',
+                'Approved Base Only v2 · lineage immutable',
+                _approvedBasePreview(),
+              );
+              final full = _compositeQaCard(
+                'B · Full Composite',
+                'R27 A Flow + R31 Cell Flow' + (_compositeR28 ? ' + R28 Optional' : ''),
+                _runtimeEffectPreview(),
+              );
+              final shapes = _compositeQaCard(
+                'C · Full + Locked Shapes',
+                'Sea Turtle + Starfish · $_compositeShapeCount objects · actual runtime renderer',
+                _runtimeEffectPreview(withShapes: true),
+              );
+              if (stacked) {
+                return Column(children: [
+                  base,
+                  const SizedBox(height: 12),
+                  full,
+                  const SizedBox(height: 12),
+                  shapes,
+                ]);
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: base),
+                  const SizedBox(width: 12),
+                  Expanded(child: full),
+                  const SizedBox(width: 12),
+                  Expanded(child: shapes),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'QA: 중앙 Play Field 혼잡도 · Shape/Background 색 분리 · R27/R31 동시 존재감 · '
+            '좌하단 환경 밀도 · 6/9/12개 Runtime 가독성. Shape 재조명·재색보정·재생성은 하지 않습니다.',
+            style: TextStyle(color: widget.muted, fontSize: 10.5, height: 1.45),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _compositeQaCard(String title, String subtitle, Widget preview) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F6FF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFD9CDF9)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: TextStyle(color: widget.fg, fontSize: 12, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 2),
+          Text(subtitle, style: TextStyle(color: widget.muted, fontSize: 9.5, height: 1.3)),
+          const SizedBox(height: 8),
+          preview,
         ],
       ),
     );
@@ -6716,8 +6834,9 @@ class _BackgroundLabState extends State<BackgroundLab>
           const SizedBox(height: 14),
           _lockedStage(
             '아직 제작 시작 전',
-            '01 배경 이미지 선정부터 시작하며, 투명한 얕은 바다 파일럿에서 '
-                '검증된 공정을 그대로 적용합니다.',
+            selectedBackground == 0
+                ? 'Normal · 맑은 물길은 산호 쉼터와 겹치지 않는 Minimal Ocean Base로 새로 설계합니다.'
+                : 'Legendary · 빛나는 바다정원은 밝은 Hero Scene과 고유 Signature Moment를 새로 설계합니다.',
           ),
         ],
       ),
