@@ -1,0 +1,52 @@
+{
+  "version": "LABS-2026.10.05-R27",
+  "scope": "Three motion comparisons within painted Volumetric A; original R14 B/C immutable",
+  "user_evidence": "R26 moves; motion too simple; explicitly requests A-C with large perceptible differences",
+  "runtime_commit": "c96d1254a9847aee83ef5d9de197e48a3337d6da",
+  "final_commit": "3a418053f0a8843da933bb1979e1f5190b745d69",
+  "initial_ci": {
+    "run": 37247633946,
+    "result": "success"
+  },
+  "final_ci": {
+    "run": 37247961279,
+    "result": "success"
+  },
+  "profiles": {
+    "A": "Lateral traveling brightness mask .25-1; 8 second cycle",
+    "B": "Coherent anchored fan stretch amplitude .24; 8 second cycle",
+    "C": "Broad brightness breathing .22-1; 6 second cycle plus secondary ripple"
+  },
+  "preserved": [
+    "Exact R26 painter branch",
+    "R21 renderer",
+    "Original R14 B/C",
+    "Approved Base Only v2",
+    "Other effects",
+    "Current integrated Starfish"
+  ],
+  "native_actual_painter_qa": {
+    "two_second_change_each": "pass",
+    "pairwise_difference": "pass",
+    "loop_continuity": "pass",
+    "floor_alpha_zero": "pass"
+  },
+  "browser_qa": {
+    "runtime_commit": "c96d1254a9847aee83ef5d9de197e48a3337d6da",
+    "visible_light_each": "pass",
+    "scene_only_play_captures_differ_each": "pass",
+    "reference_pause_scene_captures_identical": "pass",
+    "resume_clock_advances": "pass",
+    "candidate_selection_auto_plays_and_other_effects_off": "pass",
+    "R26_baseline_visible": "pass",
+    "renderer": "CPU fallback webGLVersion -1 observed",
+    "app_errors": "none observed; extension metadata errors separately present"
+  },
+  "final_public_identity": "LABS-2026.10.05-R27 / 3a418053f0a8843da933bb1979e1f5190b745d69 verified in actual browser",
+  "art_approval": "pending user Keep/Modify/Reject",
+  "background_final_locked": false,
+  "physical_android_qa": "not performed",
+  "new_binary": false,
+  "final_ui_qa": "Shared playback labels and A Solo visible on final source; renderer identical to initially verified source",
+  "screenshot": "my-lock-r27-motion-abc-1791160583502.jpg"
+}
