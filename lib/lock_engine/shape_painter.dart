@@ -9,16 +9,21 @@ import 'shape_spec/shape_spec.dart';
 import 'shape_spec/shape_spec_renderer.dart';
 
 class LockTokenPainter extends CustomPainter {
-  LockTokenPainter(this.token, {this.style = ShapeStyle.softBasic})
-    : super(
-        repaint: token.shape == ShapeKind.seaTurtle ||
-                token.tone == ShapeTone.auroraSea
-            ? RasterPaletteClock.instance
-            : null,
-      );
+  LockTokenPainter(
+    this.token, {
+    this.style = ShapeStyle.softBasic,
+    this.paletteTimeSeconds,
+  }) : super(
+          repaint: paletteTimeSeconds == null &&
+                  (token.shape == ShapeKind.seaTurtle ||
+                      token.tone == ShapeTone.auroraSea)
+              ? RasterPaletteClock.instance
+              : null,
+        );
 
   final LockToken token;
   final ShapeStyle style;
+  final double? paletteTimeSeconds;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -31,14 +36,17 @@ class LockTokenPainter extends CustomPainter {
       token: token,
       style: style,
       opacity: 1,
-      paletteTimeSeconds: RasterPaletteClock.instance.value,
+      paletteTimeSeconds:
+          paletteTimeSeconds ?? RasterPaletteClock.instance.value,
       swimKey: 'token:${token.id}',
     );
   }
 
   @override
   bool shouldRepaint(covariant LockTokenPainter oldDelegate) =>
-      oldDelegate.token.id != token.id || oldDelegate.style != style;
+      oldDelegate.token.id != token.id ||
+      oldDelegate.style != style ||
+      oldDelegate.paletteTimeSeconds != paletteTimeSeconds;
 }
 
 class FloatingShapePainter extends CustomPainter {
