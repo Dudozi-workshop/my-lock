@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.05-R29",
+  "date": "2026-10-05",
+  "purpose": "Floor painted caustic motion: local deformation and staggered brightness; static direction selected",
+  "scope": "Floor motion candidate only; Base/Flow A/R28 details fixed, Surface Deferred",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "runtime",
+  "status": "Floor Motion QA Candidate; whole Background Not Final/Locked",
+  "governance": "Existing LABS only"
+}

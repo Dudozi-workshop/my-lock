@@ -1,6 +1,21 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · Floor motion R29 prepared / Drive registration approval blocked · 2026-10-05
+## Current handoff · Floor motion R29 wired / CI and Live QA pending · 2026-10-05
+- User 12:44:37 KST “업로드 진행.” authorizes pending GitHub registration and existing Public LABS deployment. Exact selected PNG blob 39a332c2b17c6164bb09961384979354f8fd9f90 now created. Canonical Drive 1bvqp8q-qrql9HTLj674P4A4s-5gXjHxC raw SHA256 b09d20b24b4ebd9f933234dbb4f5982b243c5fb628a2667dd669d7dd59c93a05 verified; 841×1870 / 105959 bytes. Both upload blockers resolved.
+- Stable Floor ID, Registry/runtime binary and prepared UI applied. Own 24-second clock, depth-dependent local drift/stretch/brightness, exact Base-centered cover mapping, static phase zero. Candidate Solo auto-plays; new vs explicitly previous Floor, Floor pause/play/reference, exact A Flow plus unchanged R28 particles/bubbles composite. Other renderer files and approved Base untouched; Surface Deferred.
+- LABS/header/release metadata/workflow R29 synchronized, Public Floor byte/hash verification added. CI/native geometry/motion/loop/Analyze/Build/Deploy/Public and actual browser playback checks next. No deployment or approval claimed from implementation alone.
+- Static direction selected; motion QA Candidate pending user Live art review. Whole Background Not Final/Locked. Physical Android QA pending; approximate scene occlusion requires Live review.
+
+
+## Previous handoff · Floor canonical Drive registered / GitHub publication approval blocked · 2026-10-05
+- User 12:21:28 KST “업로드 진행.” explicitly approves the requested PNG/Drive destination. Canonical upload complete: Drive 1bvqp8q-qrql9HTLj674P4A4s-5gXjHxC in verified Background Masters folder 1Yh8Vz2-_Si5V1j0SolqvGptLyt2XupN3, PNG 841×1870 / 105959 bytes. Raw download SHA256 b09d20b24b4ebd9f933234dbb4f5982b243c5fb628a2667dd669d7dd59c93a05 exactly matches selected static v1. Drive gate complete.
+- Separate automatic approval review rejects GitHub create_blob: private PNG repository publication lacks explicit approval; user's current authorization covered Drive only. No binary registered on GitHub; no alternative upload method or destination attempted after visible rejection. Need explicit approval for this PNG to Dudozi-workshop/my-lock integration branch and existing public LABS.
+- Updated runtime wiring draft includes canonical Drive reference, R29 header/metadata, own clock/UI and new Floor Public checksum gate. Draft not activated. Code/geometry tests prepared and unchanged; Flutter/Dart unavailable locally, native/CI/actual browser QA pending.
+- Public remains R28. Exact Base/Flow A/R28 details and original renderer hashes maintained. Static direction selected; motion QA Candidate; Surface Deferred; Background Not Final/Locked.
+- Next authorized gate: GitHub binary/Registry → apply prepared runtime wiring → CI/Build/Deploy/Public source/hash → actual Solo/composite playback and user motion review. Prior Drive blocker resolved; publication blocker currently pending.
+
+
+## Previous handoff · Floor motion R29 prepared / Drive registration approval blocked · 2026-10-05
 - User “오 좋다 좋아. 이렇게 가보자.” at 12:09:10 KST selects static v1 direction and authorizes animation. Exact selected PNG retained; motion itself not yet user-approved.
 - New independent painter and offline preview generator complete; Base-centered cover mapping fixes texture alignment under the LABS crop. 24-second loop, 48 local bands, multiple depth-dependent drift/stretch/brightness harmonics, phase zero retains static pattern. Other effect source files and Base unchanged.
 - Offline preview: 2988 alpha changes >12 after 2 seconds, exact 24-second alpha loop closure. GIF retained. Not actual Flutter or browser proof. Geometric native test prepared; Flutter/Dart absent locally, CI/Analyze and real playback pending.

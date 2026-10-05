@@ -2,22 +2,22 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/animation.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../shape_lab/painted_floor_caustic_layer.dart';
+import '../shape_lab/background_asset_registry.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   test('Floor follows the Base cover transform across phone ratios and loops', () async {
-    // Geometric fixture, not a stand-in for actual texture/browser art review.
-    final recorder=ui.PictureRecorder();
-    final canvas=ui.Canvas(recorder);
-    for(var y=680;y<1000;y+=17) {
-      canvas.drawRect(ui.Rect.fromLTWH(20+(y%43).toDouble(),y.toDouble(),380,6),
-        ui.Paint()..color=const ui.Color(0xBFFFF0C0));
-    }
-    final picture=recorder.endRecording();
-    final texture=await picture.toImage(450,1000);
-    picture.dispose();
+    await BackgroundAssetRegistry.load();
+    final record=BackgroundAssetRegistry.instance.resolve(
+      'background.drop01.shallow_clear.floor_caustic_static_v1');
+    final bytes=await rootBundle.load(record.runtimePath!);
+    final codec=await ui.instantiateImageCodec(bytes.buffer.asUint8List(bytes.offsetInBytes,bytes.lengthInBytes));
+    final texture=(await codec.getNextFrame()).image;
+    codec.dispose();
+    expect(texture.width,841); expect(texture.height,1870);
     Future<List<int>> frame(ui.Size size,double seconds,{bool reference=false}) async {
       final recorder=ui.PictureRecorder();
       final canvas=ui.Canvas(recorder);

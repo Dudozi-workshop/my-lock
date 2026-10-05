@@ -100,6 +100,33 @@
       },
       "current_integrity": "verified_local_binary",
       "derived_from": "User 76252.png panel 03 reference study, estimated alpha not exact extraction"
+    },
+    {
+      "asset_id": "background.drop01.shallow_clear.floor_caustic_static_v1",
+      "slot": "01",
+      "name_ko": "Floor Caustic · Selected Static v1 / Motion Candidate R29",
+      "lifecycle": "motion_qa_candidate",
+      "active_for_lab": true,
+      "production_role": "lab_floor_motion_candidate",
+      "registration_status": "registered",
+      "runtime_ref": {
+        "type": "flutter_asset",
+        "path": "assets/backgrounds/drop01/floor_caustic_static_v1.png",
+        "git_blob_sha": "39a332c2b17c6164bb09961384979354f8fd9f90"
+      },
+      "source_of_truth": {
+        "decision": "Notion Drop 01 Asset Master · 2026-10-05 12:09:10 KST static direction selected",
+        "binary": "Google Drive / Background Masters / floor_caustic_static_v1.png",
+        "binary_url": "https://drive.google.com/file/d/1bvqp8q-qrql9HTLj674P4A4s-5gXjHxC/view"
+      },
+      "expected_integrity": {
+        "mime": "image/png",
+        "width": 841,
+        "height": 1870,
+        "byte_size": 105959,
+        "sha256": "b09d20b24b4ebd9f933234dbb4f5982b243c5fb628a2667dd669d7dd59c93a05"
+      },
+      "current_integrity": "verified_canonical_and_runtime_binary"
     }
   ]
 }

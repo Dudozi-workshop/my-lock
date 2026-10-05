@@ -186,16 +186,16 @@
 +      "lifecycle": "motion_qa_candidate",
 +      "active_for_lab": true,
 +      "production_role": "lab_floor_motion_candidate",
-+      "registration_status": "PENDING_DRIVE_APPROVAL_REPLACE_BEFORE_APPLY",
++      "registration_status": "canonical_registered_runtime_registration_pending",
 +      "runtime_ref": {
 +        "type": "flutter_asset",
 +        "path": "assets/backgrounds/drop01/floor_caustic_static_v1.png",
-+        "git_blob_sha": "PENDING_BINARY_BLOB"
++        "git_blob_sha": "PENDING_GITHUB_UPLOAD_APPROVAL"
 +      },
 +      "source_of_truth": {
 +        "decision": "Notion Drop 01 Asset Master · 2026-10-05 12:09:10 KST static direction selected",
 +        "binary": "Google Drive / Background Masters / floor_caustic_static_v1.png",
-+        "binary_url": "PENDING_CANONICAL_DRIVE_REGISTRATION"
++        "binary_url": "https://drive.google.com/file/d/1bvqp8q-qrql9HTLj674P4A4s-5gXjHxC/view"
 +      },
 +      "expected_integrity": {
 +        "mime": "image/png",
@@ -204,7 +204,7 @@
 +        "byte_size": 105959,
 +        "sha256": "b09d20b24b4ebd9f933234dbb4f5982b243c5fb628a2667dd669d7dd59c93a05"
 +      },
-+      "current_integrity": "verified_local_binary"
++      "current_integrity": "verified_canonical_sha256_runtime_pending"
      }
    ]
  }
@@ -229,7 +229,20 @@
            meta['source_commit'] = os.environ['GITHUB_SHA']
            Path('build/shape_lab/labs-release.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2))
            page = Path('build/shape_lab/index.html')
-@@ -128,7 +131,7 @@
+@@ -122,13 +125,20 @@
+           test "$(wc -c < /tmp/light-texture-r22.png | tr -d ' ')" = "20248"
+           echo "52b3bb4029a345642f8212c698914f4dd0a8089c5a1ab02a0d75dcbb50ff9d61  /tmp/light-texture-r22.png" | sha256sum -c -
+ 
++      - name: Verify Floor texture public binary
++        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
++        run: |
++          curl --fail --show-error --silent --location --retry 5 --retry-delay 3 --retry-all-errors --output /tmp/floor-caustic-v1.png "${PRIMARY_URL}assets/assets/backgrounds/drop01/floor_caustic_static_v1.png"
++          test "$(wc -c < /tmp/floor-caustic-v1.png | tr -d ' ')" = "105959"
++          echo "b09d20b24b4ebd9f933234dbb4f5982b243c5fb628a2667dd669d7dd59c93a05  /tmp/floor-caustic-v1.png" | sha256sum -c -
++
+       - name: Verify Starfish runtime public binary
+         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+         run: |
            curl --fail --show-error --silent --location --retry 5 --retry-delay 3 --retry-all-errors --output /tmp/starfish-runtime.webp "${PRIMARY_URL}assets/assets/raster_shapes/starfish_runtime_master_final_v1_256.webp"
            echo "b3a35bba9d238afba67d2e17b8649129a75f905f7c52048dc82ba09d105f9e60  /tmp/starfish-runtime.webp" | sha256sum -c -
  
@@ -238,7 +251,7 @@
          if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
          run: |
            python3 - <<'PYCODE'
-@@ -139,8 +142,8 @@
+@@ -139,8 +149,8 @@
                url = os.environ['PRIMARY_URL'] + '?release=' + sha + '&attempt=' + str(attempt)
                try:
                    page = subprocess.check_output(['curl', '--fail', '--silent', '--show-error', '--location', '--max-time', '20', url], text=True)

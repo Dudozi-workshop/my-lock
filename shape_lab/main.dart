@@ -20,6 +20,7 @@ import 'water_refraction_field.dart';
 import 'surface_refraction_field.dart';
 import 'background_easy_effects.dart';
 import 'painted_sunbeam_layer.dart';
+import 'painted_floor_caustic_layer.dart';
 import 'living_water_details.dart';
 import 'package:my_lock/lock_engine/raster_shape_bootstrap.dart';
 import 'candy_soft_review.dart';
@@ -130,7 +131,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R28 · Background · Particles & Bubbles / QA Candidate',
+                                  'LABS-2026.10.05-R29 · Background · Floor Caustic Motion / QA Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5747,6 +5748,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   late final AnimationController _surfaceClock;
   late final AnimationController _broadSunbeamClock;
   late final AnimationController _detailClock;
+  late final AnimationController _floorClock;
 
   int selectedBackground = 0;
   int selectedRatio = 2;
@@ -5755,12 +5757,12 @@ class _BackgroundLabState extends State<BackgroundLab>
   _BackgroundWorkbenchStep step = _BackgroundWorkbenchStep.image;
   _SurfaceRefractionCandidate selected = _SurfaceRefractionCandidate.calmBroad;
   bool showSurface = false;
-  bool showFloorCaustic = false;
-  bool showVolumetricLight = true;
-  bool showAmbientParticle = true;
+  bool showFloorCaustic = true;
+  bool showVolumetricLight = false;
+  bool showAmbientParticle = false;
   bool showBubble = false;
   double intensity = 1.0;
-  int? soloEffectIndex;
+  int? soloEffectIndex = 1;
   bool volumetricExpanded = true;
   int selectedVolumetric = 0;
   bool _broadSunbeamPaused = false;
@@ -5769,6 +5771,9 @@ class _BackgroundLabState extends State<BackgroundLab>
   bool _livingDetails = true;
   bool _detailPaused = false;
   bool _detailWithLight = true;
+  bool _paintedFloor = true;
+  bool _floorPaused = false;
+  bool _floorComposite = false;
 
   static const backgrounds = [
     ('01', '투명한 얕은 바다', 'Image Selected · Effects In Progress'),
@@ -5794,6 +5799,7 @@ class _BackgroundLabState extends State<BackgroundLab>
       vsync: this,
       duration: const Duration(seconds: 12),
     )..repeat();
+    _floorClock = AnimationController(vsync: this, duration: const Duration(seconds: 24))..repeat();
     _detailClock = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 18),
@@ -5809,6 +5815,7 @@ class _BackgroundLabState extends State<BackgroundLab>
     _surfaceClock.dispose();
     _broadSunbeamClock.dispose();
     _detailClock.dispose();
+    _floorClock.dispose();
     super.dispose();
   }
 
@@ -6285,7 +6292,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   Widget _layerStatusList() {
     final layers = [
       ('01', 'Surface Refraction', 'Deferred', showSurface, (bool v) => setState(() => showSurface = v), () => _soloEffect(0)),
-      ('02', 'Floor Caustic', 'Rework Required', showFloorCaustic, (bool v) => setState(() => showFloorCaustic = v), () => _soloEffect(1)),
+      ('02', 'Floor Caustic', 'R29 Motion Candidate', showFloorCaustic, (bool v) => setState(() => showFloorCaustic = v), () => _reviewFloor(composite: false)),
       ('03', 'Volumetric Light', 'Motion A Fixed', showVolumetricLight, (bool v) => setState(() => showVolumetricLight = v), () => _soloEffect(2)),
       ('04', 'Ambient Particle', 'Candidate', showAmbientParticle, (bool v) => setState(() => showAmbientParticle = v), () => _reviewWaterDetail(3, withLight: false)),
       ('05', 'Bubble', 'Candidate', showBubble, (bool v) => setState(() => showBubble = v), () => _reviewWaterDetail(4, withLight: false)),
@@ -6394,6 +6401,55 @@ class _BackgroundLabState extends State<BackgroundLab>
     });
   }
 
+  void _reviewFloor({bool? painted, bool? composite}) {
+    setState(() {
+      if (painted != null) _paintedFloor = painted;
+      if (composite != null) _floorComposite = composite;
+      showSurface = false;
+      showFloorCaustic = true;
+      showVolumetricLight = _floorComposite;
+      showAmbientParticle = _floorComposite;
+      showBubble = _floorComposite;
+      soloEffectIndex = _floorComposite ? null : 1;
+      selectedVolumetric = 0;
+      _usePaintedSunbeam = true;
+      _sunbeamMotion = SunbeamMotion.flow;
+      _livingDetails = true;
+      _floorClock.stop();
+      _floorClock.value = 0;
+      _floorPaused = false;
+      _floorClock.repeat();
+      // Existing A and detail clocks keep their current phases.
+    });
+  }
+
+  Widget _floorControls() {
+    return Padding(padding: const EdgeInsets.only(top: 8), child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Wrap(spacing: 7, runSpacing: 6, children: [
+          ChoiceChip(label: const Text('바닥빛 · R29'), selected: _paintedFloor,
+            onSelected: (_) => _reviewFloor(painted: true)),
+          ChoiceChip(label: const Text('이전 바닥빛 · 비교'), selected: !_paintedFloor,
+            onSelected: (_) => _reviewFloor(painted: false)),
+          FilterChip(label: const Text('빛 A·입자·기포와 합성'), selected: _floorComposite,
+            onSelected: (v) => _reviewFloor(composite: v)),
+          OutlinedButton.icon(icon: Icon(_floorPaused ? Icons.play_arrow : Icons.pause),
+            label: Text(_floorPaused ? '바닥빛 재생' : '바닥빛 정지'),
+            onPressed: () => setState(() {
+              _floorPaused = !_floorPaused;
+              if (_floorPaused) { _floorClock.stop(); } else { _floorClock.repeat(); }
+            })),
+          OutlinedButton(onPressed: () => setState(() {
+            _floorClock.stop(); _floorClock.value = 0; _floorPaused = true;
+          }), child: const Text('승인 정지 무늬')),
+        ]),
+        Text('부분별 다른 일렁임·밝기 · 원근 유지 · 바닥빛만 정지/재생',
+          style: TextStyle(color: widget.muted, fontSize: 11)),
+        Text('${_floorPaused ? "바닥빛 정지" : "바닥빛 재생 중"} · 움직임 미술 승인 대기',
+          style: TextStyle(color: widget.muted, fontSize: 11)),
+      ]));
+  }
+
   Widget _waterDetailControls() {
     final index = showAmbientParticle ? 3 : 4;
     return Padding(
@@ -6455,7 +6511,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                 : '현재는 Approved Base + $_soloEffectName 단독 표시 중',
             style: TextStyle(color: widget.muted, fontSize: 10.5, fontWeight: FontWeight.w700),
           ),
-          if (showVolumetricLight && selectedVolumetric == 0 && !showAmbientParticle && !showBubble) ...[
+          if (showVolumetricLight && selectedVolumetric == 0 && !showAmbientParticle && !showBubble && !showFloorCaustic) ...[
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -6527,7 +6583,7 @@ class _BackgroundLabState extends State<BackgroundLab>
               child: Text('${_sunbeamMotion.description} · 비교용 강도 / 미술 승인 대기',
                 style: TextStyle(color: widget.muted, fontSize: 11)),
             ),
-          if (showVolumetricLight && selectedVolumetric == 0 && !showAmbientParticle && !showBubble)
+          if (showVolumetricLight && selectedVolumetric == 0 && !showAmbientParticle && !showBubble && !showFloorCaustic)
             AnimatedBuilder(
               animation: _broadSunbeamClock,
               builder: (context, _) => Padding(
@@ -6544,7 +6600,8 @@ class _BackgroundLabState extends State<BackgroundLab>
                 ]),
               ),
             ),
-          if (showAmbientParticle || showBubble) _waterDetailControls(),
+          if (showFloorCaustic) _floorControls(),
+          if (!showFloorCaustic && (showAmbientParticle || showBubble)) _waterDetailControls(),
           const SizedBox(height: 10),
           Center(
             child: ConstrainedBox(
@@ -6585,7 +6642,9 @@ class _BackgroundLabState extends State<BackgroundLab>
                 ),
               ),
             if (showFloorCaustic)
-              CustomPaint(painter: FloorCausticPainter(animation: _surfaceClock)),
+              _paintedFloor
+                ? PaintedFloorCausticLayer(animation: _floorClock)
+                : CustomPaint(painter: FloorCausticPainter(animation: _floorClock)),
             if (showAmbientParticle)
               CustomPaint(painter: _livingDetails
                 ? LivingParticlePainter(animation: _detailClock)

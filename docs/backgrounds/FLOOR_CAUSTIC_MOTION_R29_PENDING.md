@@ -1,3 +1,7 @@
+> Update 2026-10-05 12:44:37 KST: user authorizes GitHub upload/public LABS deployment after publication rejection. Binary blob 39a332c2b17c6164bb09961384979354f8fd9f90 registered; Drive canonical SHA256 verified. Current wiring applied; CI/actual Live review next. Both upload blockers resolved. Earlier notes are historical.
+
+> Update 2026-10-05 12:21:28 KST: user explicitly approved Drive upload. Canonical file 1bvqp8q-qrql9HTLj674P4A4s-5gXjHxC, parent Background Masters verified, downloaded raw 105959 bytes / SHA256 b09d20b24b4ebd9f933234dbb4f5982b243c5fb628a2667dd669d7dd59c93a05 matches exactly. Drive blocker resolved. Separate auto-review rejects GitHub binary publication because current explicit approval covered Drive only. No binary repository registration or new Public deployment. Need explicit authorization for this PNG to Dudozi-workshop/my-lock feat/style-lab-integration and existing Public LABS. Updated wiring draft includes canonical Drive reference and Floor Public checksum verification.
+
 # Floor Caustic Motion R29 · Implementation Ready / Registration Pending
 
 ## Decision
