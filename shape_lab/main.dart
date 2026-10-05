@@ -131,7 +131,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R32 · Background · Coral Shelter / Composite QA',
+                                  'LABS-2026.10.05-R33 · Background · Coral Shelter / Composite QA Access Fix',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5754,7 +5754,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   int selectedRatio = 2;
   bool showSafeZone = true;
   late final BackgroundAssetRecord _shallowClearBase;
-  _BackgroundWorkbenchStep step = _BackgroundWorkbenchStep.image;
+  _BackgroundWorkbenchStep step = _BackgroundWorkbenchStep.composite;
   _SurfaceRefractionCandidate selected = _SurfaceRefractionCandidate.calmBroad;
   bool showSurface = false;
   bool showFloorCaustic = true;
@@ -5983,7 +5983,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                 _navChip(
                   label: item.code + ' · ' + item.label,
                   selected: step == item,
-                  enabled: selectedBackground == 0 ||
+                  enabled: selectedBackground == 1 ||
                       item == _BackgroundWorkbenchStep.image,
                   onTap: () => setState(() => step = item),
                 ),
