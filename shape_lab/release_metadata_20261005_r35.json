@@ -6,5 +6,7 @@
   "source_branch": "feat/style-lab-integration",
   "source_commit": "runtime",
   "status": "Motion PoC / User Visual QA Pending / No Production Asset Approval",
-  "governance": "Existing LABS only; no external third-party art binary imported"
+  "governance": "Existing LABS only; no external third-party art binary imported",
+  "redeploy_reason": "retry after cancelled concurrency run",
+  "redeploy_at": "2026-10-05T21:58:00+09:00"
 }
