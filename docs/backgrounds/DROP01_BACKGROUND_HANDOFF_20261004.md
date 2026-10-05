@@ -1,6 +1,13 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · R30 visible Floor motion / CI and Live QA complete · 2026-10-05
+## Current handoff · R31 Floor Cell Flow / CI and Live QA pending · 2026-10-05
+- R30 user “아직도 움직임이 좀 약하다” → Modify. 14:18:17 KST “ㄱㄱ” authorizes a different motion form: local cell compression/expansion plus traveling highlights, strong comparison range first. Motion and whole Background remain unapproved.
+- Same canonical Floor PNG and centered cover. R31 image-only 48×12 clipped cells share a continuous positive horizontal mapping; local regions squeeze/open instead of the whole row merely shifting/stretching. Depth-dependent vertical ripple; regional highlights travel across x, peak alpha gain 1.8 and trough mask .30. Phase zero matches the selected static pattern; own 24-second loop, primary four-second local flow. Normalizes depth to visible foreground so LABS cover crop does not hide strongest changes. No new binary or ImageGen.
+- Direct R30 profile comparison preserved in upper controls; R29 retained in API/history. Selecting new/previous resets and auto-plays. Existing independent pause/reference and exact A/R28 composite unchanged. Original legacy renderer unchanged.
+- Preflight Notion 06/Master/05/04, this handoff, integration 832118aa, R30 CI 37264859048 whole SUCCESS and existing Public R30 checked. Actual PNG native alignment/cutoff/1-second stronger-than-R30 change/2-second/loop on six ratios, CI/Deploy/Public/actual browser pending. Flutter absent locally.
+- Scope Floor only; Base/Flow A/R28 sources and texture hashes unchanged. Surface Deferred; Background Not Final/Locked; physical Android performance and stronger occlusion displacement QA pending. Small-raster grid still requires actual browser visual/performance confirmation, not a shader/mesh assumption.
+
+## Previous handoff · R30 visible Floor motion / CI and Live QA complete · 2026-10-05
 - User R29 feedback: movement hard to perceive. 13:40:09 KST “ㄱㄱ” authorizes stronger local deformation, same static artwork and other effects frozen. R29 technical playback PASS is not perceptual approval.
 - Same canonical Floor PNG and centered Base cover mapping; R30 lateral amplitude 3x, local stretch 2.6x, vertical deformation 2.3x. Depth attenuation, independent 8/6/4.8-second harmonics, 24-second loop, phase-zero static picture and brightness ranges retained. 96 integer bands smooth larger deformation. No new binary or ImageGen.
 - Upper controls: 바닥빛 · R30 / R29 · 이전 움직임 compare the same artwork and clock using preserved R29 48-band profile. Selecting either resets and plays; pause/reference/composite remain. Original legacy procedural renderer preserved in source/history.

@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.05-R31",
+  "date": "2026-10-05",
+  "purpose": "Floor Cell Flow: local cell compression/expansion and traveling highlights; direct R30 comparison",
+  "scope": "Floor motion candidate only; Base/Flow A/R28 details fixed, Surface Deferred",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "runtime",
+  "status": "Floor Motion QA Candidate; whole Background Not Final/Locked",
+  "governance": "Existing LABS only"
+}

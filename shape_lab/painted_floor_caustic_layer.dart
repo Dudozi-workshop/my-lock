@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'background_asset_registry.dart';
 
-/// R30 visible motion candidate; R29 remains a directly comparable profile.
+/// R31 cell-flow candidate; R30/R29 profiles remain preserved.
 class PaintedFloorCausticLayer extends StatefulWidget {
-  const PaintedFloorCausticLayer({super.key, required this.animation, this.visibleMotion = true});
+  const PaintedFloorCausticLayer({super.key, required this.animation, this.visibleMotion = true, this.cellMotion = true});
   final Animation<double> animation;
   final bool visibleMotion;
+  final bool cellMotion;
   @override
   State<PaintedFloorCausticLayer> createState() => _PaintedFloorCausticLayerState();
 }
@@ -50,7 +51,7 @@ class _PaintedFloorCausticLayerState extends State<PaintedFloorCausticLayer> {
     final image = _image;
     if (image == null) return const Center(child: CircularProgressIndicator());
     return RepaintBoundary(child: CustomPaint(
-      painter: PaintedFloorCausticPainter(image, widget.animation, visibleMotion: widget.visibleMotion),
+      painter: PaintedFloorCausticPainter(image, widget.animation, visibleMotion: widget.visibleMotion, cellMotion: widget.cellMotion),
     ));
   }
 }
@@ -58,13 +59,14 @@ class _PaintedFloorCausticLayerState extends State<PaintedFloorCausticLayer> {
 /// Matches Image.asset(..., fit: BoxFit.cover, alignment: center) exactly.
 /// Image-only bands use the CPU web-compatible path established in TS-008.
 class PaintedFloorCausticPainter extends CustomPainter {
-  PaintedFloorCausticPainter(this.image, this.animation, {this.visibleMotion = true})
+  PaintedFloorCausticPainter(this.image, this.animation, {this.visibleMotion = true, this.cellMotion = true})
       : super(repaint: animation);
   final ui.Image image;
   /// Caller supplies a repeating 24-second clock; phase 0 is the static study.
   final Animation<double> animation;
 
   final bool visibleMotion;
+  final bool cellMotion;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -83,6 +85,12 @@ class PaintedFloorCausticPainter extends CustomPainter {
     canvas.save();
     canvas.clipRect(floorRect, doAntiAlias: false);
     canvas.saveLayer(floorRect, Paint());
+    if (cellMotion) {
+      _paintCellFlow(canvas, size, source, paint, floorRect, width, height, left, originY, phase);
+      canvas.restore();
+      canvas.restore();
+      return;
+    }
     final bands = visibleMotion ? 96 : 48;
     final lateralGain = visibleMotion ? 3.0 : 1.0;
     final stretchGain = visibleMotion ? 2.6 : 1.0;
@@ -121,7 +129,64 @@ class PaintedFloorCausticPainter extends CustomPainter {
     canvas.restore();
   }
 
+  // A continuous horizontal deformation map: adjacent cells share boundaries.
+  // Full-image draws preserve the TS-008 compatible path; no texture shaders.
+  void _paintCellFlow(Canvas canvas, Size size, Rect source, Paint paint,
+      Rect floorRect, double width, double height, double left,
+      double originY, double phase) {
+    const rows = 48;
+    const columns = 12;
+    final highlightGain = 1 + .8 * (.5 - .5 * math.cos(phase * 6));
+    paint.colorFilter = ColorFilter.matrix(<double>[
+      1, 0, 0, 0, 0,
+      0, 1, 0, 0, 0,
+      0, 0, 1, 0, 0,
+      0, 0, 0, highlightGain, 0,
+    ]);
+    // LABS cover crops the closest floor: normalize to the visible foreground.
+    final visibleDepth = ((size.height - originY) / height - .655).clamp(.01, .345);
+    for (var row = 0; row < rows; row++) {
+      final top = (floorRect.top + floorRect.height * row / rows).floorToDouble();
+      final bottom = row == rows - 1 ? floorRect.bottom :
+          (floorRect.top + floorRect.height * (row + 1) / rows).floorToDouble();
+      if (bottom <= top) continue;
+      final y = ((top + bottom) / 2 - originY) / height;
+      final depth = ((y - .655) / visibleDepth).clamp(0.0, 1.0);
+      double mappedX(double u) => left + width * (u + depth * math.sin(math.pi * u) *
+          (.055 * math.sin(phase * 6) * math.sin(u * math.pi * 2.5 + y * 7) +
+           .020 * math.sin(phase * 4) * math.sin(u * math.pi * 4 - y * 11)));
+      final vertical = height * depth * .007 * math.sin(phase * 5) * math.cos(y * 13);
+      paint.color = Colors.white.withValues(alpha:
+          1 - .18 * (.5 - .5 * math.cos(phase * 4)) * (.5 + .5 * math.sin(phase * 5 + y * 11)));
+      for (var column = 0; column < columns; column++) {
+        final u0 = column / columns;
+        final u1 = (column + 1) / columns;
+        final x0 = mappedX(u0);
+        final x1 = mappedX(u1);
+        final stretch = (x1 - x0) / (width / columns);
+        // The derivative is positive at every phase: cells cannot fold.
+        final destination = Rect.fromLTWH(x0 - width * stretch * u0,
+            originY + vertical, width * stretch, height);
+        canvas.save();
+        canvas.clipRect(Rect.fromLTRB(x0.roundToDouble(), top, x1.roundToDouble(), bottom),
+            doAntiAlias: false);
+        canvas.drawImageRect(image, source, destination, paint);
+        canvas.restore();
+      }
+    }
+    // Regional highlights travel across the artwork rather than flashing it all.
+    // At phase zero the source remains an exact static reference.
+    final strength = .70 * (.5 - .5 * math.cos(phase * 6));
+    const samples = 24;
+    canvas.drawRect(floorRect, Paint()
+      ..blendMode = BlendMode.dstIn
+      ..shader = ui.Gradient.linear(Offset.zero, Offset(size.width, 0),
+          [for (var i = 0; i <= samples; i++) Colors.white.withValues(alpha:
+              1 - strength * (.5 + .5 * math.sin(i / samples * math.pi * 3 - phase * 6)))],
+          [for (var i = 0; i <= samples; i++) i / samples]));
+  }
+
   @override
   bool shouldRepaint(PaintedFloorCausticPainter oldDelegate) =>
-      oldDelegate.image!=image || oldDelegate.animation!=animation || oldDelegate.visibleMotion!=visibleMotion;
+      oldDelegate.image!=image || oldDelegate.animation!=animation || oldDelegate.visibleMotion!=visibleMotion || oldDelegate.cellMotion!=cellMotion;
 }

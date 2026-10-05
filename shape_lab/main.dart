@@ -131,7 +131,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R30 · Background · Floor Caustic Visible Motion / QA Candidate',
+                                  'LABS-2026.10.05-R31 · Background · Floor Caustic Cell Flow / QA Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -6292,7 +6292,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   Widget _layerStatusList() {
     final layers = [
       ('01', 'Surface Refraction', 'Deferred', showSurface, (bool v) => setState(() => showSurface = v), () => _soloEffect(0)),
-      ('02', 'Floor Caustic', 'R30 Motion Candidate', showFloorCaustic, (bool v) => setState(() => showFloorCaustic = v), () => _reviewFloor(composite: false)),
+      ('02', 'Floor Caustic', 'R31 Motion Candidate', showFloorCaustic, (bool v) => setState(() => showFloorCaustic = v), () => _reviewFloor(composite: false)),
       ('03', 'Volumetric Light', 'Motion A Fixed', showVolumetricLight, (bool v) => setState(() => showVolumetricLight = v), () => _soloEffect(2)),
       ('04', 'Ambient Particle', 'Candidate', showAmbientParticle, (bool v) => setState(() => showAmbientParticle = v), () => _reviewWaterDetail(3, withLight: false)),
       ('05', 'Bubble', 'Candidate', showBubble, (bool v) => setState(() => showBubble = v), () => _reviewWaterDetail(4, withLight: false)),
@@ -6427,9 +6427,9 @@ class _BackgroundLabState extends State<BackgroundLab>
     return Padding(padding: const EdgeInsets.only(top: 8), child: Column(
       crossAxisAlignment: CrossAxisAlignment.start, children: [
         Wrap(spacing: 7, runSpacing: 6, children: [
-          ChoiceChip(label: const Text('바닥빛 · R30'), selected: _paintedFloor,
+          ChoiceChip(label: const Text('바닥빛 · R31'), selected: _paintedFloor,
             onSelected: (_) => _reviewFloor(painted: true)),
-          ChoiceChip(label: const Text('R29 · 이전 움직임'), selected: !_paintedFloor,
+          ChoiceChip(label: const Text('R30 · 이전 움직임'), selected: !_paintedFloor,
             onSelected: (_) => _reviewFloor(painted: false)),
           FilterChip(label: const Text('빛 A·입자·기포와 합성'), selected: _floorComposite,
             onSelected: (v) => _reviewFloor(composite: v)),
@@ -6443,7 +6443,7 @@ class _BackgroundLabState extends State<BackgroundLab>
             _floorClock.stop(); _floorClock.value = 0; _floorPaused = true;
           }), child: const Text('승인 정지 무늬')),
         ]),
-        Text('무늬 휘어짐 강화 · 먼 바닥은 잔잔하게 · R29와 직접 비교',
+        Text('칸마다 다른 폭 변화 · 밝은 구간 흐름 · R30와 직접 비교',
           style: TextStyle(color: widget.muted, fontSize: 11)),
         Text('${_floorPaused ? "바닥빛 정지" : "바닥빛 재생 중"} · 움직임 미술 승인 대기',
           style: TextStyle(color: widget.muted, fontSize: 11)),
@@ -6642,7 +6642,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                 ),
               ),
             if (showFloorCaustic)
-              PaintedFloorCausticLayer(animation: _floorClock, visibleMotion: _paintedFloor),
+              PaintedFloorCausticLayer(animation: _floorClock, cellMotion: _paintedFloor),
             if (showAmbientParticle)
               CustomPaint(painter: _livingDetails
                 ? LivingParticlePainter(animation: _detailClock)
