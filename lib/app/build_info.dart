@@ -6,17 +6,17 @@ class BuildInfo {
 
   static const String previewVersion = String.fromEnvironment(
     'PREVIEW_VERSION',
-    defaultValue: 'MAIN-2026.10.04-R02',
+    defaultValue: 'MAIN-2026.10.05-R01',
   );
 
   static const String purpose = String.fromEnvironment(
     'PREVIEW_PURPOSE',
-    defaultValue: 'Candy Soft R2 default shapes / colors',
+    defaultValue: 'Shape & Color catalog · Candy Soft all-tone · Aurora Sea H02B',
   );
 
   static const String status = String.fromEnvironment(
     'PREVIEW_STATUS',
-    defaultValue: 'Production Preview / Device QA pending',
+    defaultValue: 'Production Preview / Technical QA / Device QA pending',
   );
 
   static String get display => '$previewVersion · $purpose · $status';
