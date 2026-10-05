@@ -1,0 +1,22 @@
+{
+  "version": "LABS-2026.10.05-R26",
+  "source_commit": "1ab091ac41e40acfb98c8da996f7e6abb1483078",
+  "ci_run": 37246007980,
+  "status": "deployed_qa_candidate_user_motion_review_pending",
+  "renderer": "Canvas.drawImageRect full-image draws with integer-aligned non-antialiased band clips; no FragmentProgram, ImageShader or drawVertices in layer",
+  "registered_texture": "background.drop01.shallow_clear.volumetric_a_texture_study_r22",
+  "texture_sha256": "52b3bb4029a345642f8212c698914f4dd0a8089c5a1ab02a0d75dcbb50ff9d61",
+  "base_sha256": "0bbc263d61b3a524b9c027e1894fab3209085d631c7a2c313d261a17ecf98ff2",
+  "tests": "PASS actual painter 2s substantial alpha change, loop continuity, lower alpha zero; R21 preserved; full CI PASS",
+  "browser": "PASS R26/source meta, A auto-play, solo other effects OFF, light actually visible, light-only play captures differ, paused captures identical, resume clock progress; prior band seams absent",
+  "not_run": [
+    "physical Android performance/codec smoke",
+    "user 1-2 second perceptual Keep/Modify/Reject"
+  ],
+  "art_status": "Not Final / Not Locked",
+  "rejected_runtime_paths": [
+    "FragmentProgram layer absent in CPU-only web despite native PASS",
+    "ImageShader mesh absent in same browser despite native PASS",
+    "source-strip drawImageRect showed horizontal alpha/filter seams"
+  ]
+}

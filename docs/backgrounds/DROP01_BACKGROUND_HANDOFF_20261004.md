@@ -1,9 +1,11 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
 ## Current handoff · A R26 Canvas image motion / QA Candidate
-- R25 full CI/deploy passed but live showed clock running while texture was absent, including static frame. Browser reported CPU-only fallback (webGLVersion -1); no shader load exception. Treat visual failure as open, not deployment success.
-- R26 actual renderer uses image-only Canvas overlapping strip warp, width/brightness modulation with same registered R22 PNG. Removes FragmentShader dependency from the layer. Top anchor/mid-water image alpha preserved. Actual runtime painter tested at 0/2s/loop, not a separate shader.
-- Auto-play, explicit pause/reference and R21 comparison retained. Header/metadata/workflow synchronized R26. No new binary, other effects unchanged. Live verification pending.
+- R25 CI/deploy passed but browser Live clock advanced while texture was absent, including static frame. CPU-only fallback (webGLVersion -1) observed; no shader load exception. User device failure itself was not reproduced.
+- R26 preserves the same registered R22 PNG and A auto-play/pause/reference/R21 controls. Uses only Canvas.drawImageRect of the full texture with local warp/width/opacity. Integer-aligned, non-antialiased band clips avoid overlapping alpha and source-strip filtering seams. No FragmentProgram/ImageShader/drawVertices dependency in this layer.
+- Initial direct source strips rendered but showed horizontal seams; overlap removal insufficient. Shared-edge ImageShader mesh passed native tests but also disappeared in this CPU web path, so rejected. Final full-image drawing route requires actual browser visibility + scene-only frame comparison after CI.
+- Base/B/C/other effects locked. No new binary or ImageGen. Physical Android performance not measured. Art review pending, not Final/LOCK.
+- Header/metadata/workflow identity synchronized R26; concurrent Starfish Shape/Motion QA preserved. Final source `1ab091ac41e40acfb98c8da996f7e6abb1483078`; CI [37246007980](https://github.com/Dudozi-workshop/my-lock/actions/runs/37246007980) SUCCESS: actual A painter/R21 tests, Starfish test, Analyze, full tests, build/deploy, Public identity and Base/A/Starfish hashes. Browser metadata matches source/R26; actual light visible without strip seams; light-only captures change in play, identical in reference pause; resume advances clock. User motion approval still pending.
 
 ## Previous handoff · A R25 visible motion / QA Candidate
 - User reports R22 playback seems absent and requests visible motion. R22 frame delta was technical PASS, insufficient perceptual change. No claim that user device playback was reproduced.
