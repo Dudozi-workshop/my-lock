@@ -6425,7 +6425,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                     ),
                 OutlinedButton.icon(
                   icon: Icon(_broadSunbeamPaused ? Icons.play_arrow : Icons.pause),
-                  label: Text(_broadSunbeamPaused ? 'A 재생' : 'A 일시정지'),
+                  label: Text(_broadSunbeamPaused ? '재생' : '일시정지'),
                   onPressed: () {
                     setState(() {
                       _broadSunbeamPaused = !_broadSunbeamPaused;
@@ -6439,7 +6439,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                 ),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.photo_outlined),
-                  label: const Text('A 기준 프레임'),
+                  label: const Text('기준 프레임'),
                   onPressed: () {
                     _soloEffect(2);
                     setState(() {
@@ -6470,7 +6470,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                   SizedBox(width: 100, child: LinearProgressIndicator(
                     value: _broadSunbeamClock.value,
                     minHeight: 3,
-                    semanticsLabel: 'A 재생 진행',
+                    semanticsLabel: '빛 재생 진행',
                   )),
                 ]),
               ),
