@@ -109,3 +109,18 @@ Do not use as production masters:
 - Motion work must start from the locked Body v13 + Legs v3 masters. Appearance J04-M3-R4 Compact remains locked.
 - Color / Multi Palette remains a separate track and must not be modified during Motion.
 - Do not resurrect CleanSplit v1, Registered v3 cross-ownership, or rejected underlap generations.
+
+
+## CHARACTER APPEARANCE MASTER v1 — FINAL / LOCKED / ACTIVE — 2026-10-05
+- User approved the selected rebuilt jellyfish character illustration as the new MY LOCK style anchor.
+- Status: **Character Appearance Master v1 / FINAL / LOCKED / ACTIVE (visual source)**.
+- Style: **Soft Pastel Storybook**.
+- Approved source: `MYLOCK_Jellyfish_Character_Appearance_Master_v1_20261005.jpg`.
+- Source dimensions: **1536×1536 RGB JPEG**.
+- SHA-256: `815e823c166b0aa3d9c22e5931cd6cc204ff4d317046c370b489ecb70a031067`.
+- Google Drive file ID: `1OB62WuS0xx__1spO8mpaizJiQOeLYJzt`.
+- Drive folder: `03 Jellyfish / 01 Appearance Master`.
+- This source is the **approved visual appearance master**, not yet a 2048 transparent RGBA production canonical.
+- The 2026-10-04 R4 Static 2-Part FINAL / LOCKED package remains preserved as the current production geometry/runtime source until the new character master completes canonicalization, ownership split, recomposite QA, and runtime registration.
+- Do not trace-filter the prior glossy master. Future production rebuilding must follow the approved character construction and the Soft Pastel Storybook rules.
+- Next gate: canonical production asset plan for the approved visual master, then Dolphin cross-asset translation.
