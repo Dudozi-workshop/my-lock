@@ -118,7 +118,7 @@
       "scope": "production.ownership_overlay",
       "version": "v10",
       "status": "candidate",
-      "active": true,
+      "active": false,
       "user_approved": true,
       "approved_at": "2026-10-05",
       "external_source": {
