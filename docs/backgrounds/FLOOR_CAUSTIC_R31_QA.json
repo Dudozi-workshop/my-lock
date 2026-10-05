@@ -1,0 +1,77 @@
+{
+  "version": "LABS-2026.10.05-R31",
+  "source_commit": "57ffc5207afab6a8a1ed3c0fe5a7ec8f78856ee9",
+  "ci": {
+    "run_id": 37267837612,
+    "result": "SUCCESS"
+  },
+  "canonical": {
+    "drive_file_id": "1bvqp8q-qrql9HTLj674P4A4s-5gXjHxC",
+    "sha256": "b09d20b24b4ebd9f933234dbb4f5982b243c5fb628a2667dd669d7dd59c93a05",
+    "git_blob": "39a332c2b17c6164bb09961384979354f8fd9f90",
+    "width": 841,
+    "height": 1870,
+    "bytes": 105959,
+    "raw_download_checksum_verified": true
+  },
+  "approval": {
+    "static_direction": "selected_by_user_2026-10-05T12:09:10+09:00",
+    "motion": "R30 Modify: still too weak; R31 Cell Flow pending user Live art review",
+    "background_final_locked": false,
+    "main_promoted": false
+  },
+  "change": {
+    "same_static_artwork": true,
+    "local_deformation": "continuous positive x map across 12 columns, 48 rows",
+    "x_coefficients": [
+      0.055,
+      0.02
+    ],
+    "vertical_coefficient": 0.007,
+    "depth": "normalized to visible foreground with canonical .655 horizon",
+    "highlight_alpha_gain_max": 1.8,
+    "traveling_highlight_mask_min": 0.3,
+    "primary_period_seconds": 4,
+    "loop_seconds": 24,
+    "previous_comparison": "exact R30 96-band profile"
+  },
+  "native_actual_asset_tests": {
+    "six_ratios": "PASS",
+    "phase_zero_alignment": "PASS",
+    "no_light_above_floor": "PASS",
+    "one_second_change_exceeds_r30_by_50_percent": "PASS",
+    "two_second_change": "PASS",
+    "24_second_loop": "PASS"
+  },
+  "public": {
+    "version_source": "PASS",
+    "binary_checksum": "PASS",
+    "url": "https://my-lock-shape-lab-pages.pages.dev/?lab=background"
+  },
+  "actual_browser": {
+    "solo_visible": "PASS",
+    "non_floor_effects_actual_OFF": "PASS",
+    "playing_scene_captures_different": "PASS",
+    "playing_capture_interval_ms": 12815,
+    "paused_scene_captures_identical": "PASS",
+    "same_artwork_R30_comparison_visible": "PASS",
+    "selection_auto_resumes": "PASS",
+    "reference_button_stops_at_static_pattern": "PASS",
+    "explicit_resume_button": "PASS",
+    "approved_flow_a_r28_details_composite_visible": "PASS",
+    "surface_actual_OFF": "PASS",
+    "app_errors_observed": false,
+    "obvious_grid_gaps_observed": false,
+    "screenshot": "my-lock-r31-floor-live-1791178354511.jpg",
+    "note": "Frame byte comparison verifies playback, not physical Android 1-second perception or FPS. Native actual-PNG tests cover the 1-second gate."
+  },
+  "physical_android": "not_performed",
+  "occlusion": "approximate scene-specific static mask carried by texture; stronger displacement pending user visual review",
+  "preserved_source_hashes": {
+    "shape_lab/painted_sunbeam_layer.dart": "4f36632181b706b5e6fd78edfab42affd6d740348c339450f9d519b19874d9a4",
+    "shape_lab/living_water_details.dart": "d7e84b28d6b0df1723efe20af4a2676a70c89bbc797f3010e14bb4aa46563f3a",
+    "shape_lab/background_easy_effects.dart": "3bc215b05045dc4e164d44e8227efba0a3a90a835c565486441d2685a981e697",
+    "assets/backgrounds/drop01/shallow_clear_base_only_v2_approved_candidate.png": "0bbc263d61b3a524b9c027e1894fab3209085d631c7a2c313d261a17ecf98ff2"
+  },
+  "painter_sha256": "fc598b301919bb0b8d28712544199003420b4001c972201d503791e75291edff"
+}
