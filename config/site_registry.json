@@ -4,10 +4,10 @@
     "MAIN": {
       "canonical_url": "https://my-lock-preview.rlatkd5959.workers.dev",
       "deploy_target": "my-lock-preview",
-      "version": "MAIN-2026.10.05-R02",
-      "purpose": "Aurora Sea H02B live motion recovery for small Color preview and runtime",
-      "status": "Production Preview / Technical QA / Android device QA pending",
-      "scope": "Basic-first Shape/Color catalog; Candy Soft R2 all-tone; Aurora Sea H02B shared runtime with Web-safe live Canvas field; Signature card small round remains live",
+      "version": "MAIN-2026.10.05-R03",
+      "purpose": "Aurora Sea H02B production path restored to the user-approved LABS renderer",
+      "status": "Production Preview / User visual QA pending / Android device QA pending",
+      "scope": "Basic-first Shape/Color catalog; Candy Soft R2 all-tone; Aurora Sea H02B exact LABS drawVertices + alpha-first srcIn; Signature card small round uses dedicated LABS-style ticker",
       "source_branch": "main",
       "source_commit": "resolved by workflow GITHUB_SHA"
     },
