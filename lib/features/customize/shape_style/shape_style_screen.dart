@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../app/theme.dart';
 import '../../../lock_engine/effects.dart';
@@ -9,7 +10,6 @@ import 'shape_style_controller.dart';
 import 'shape_style_preview.dart';
 import 'tabs/color_tab.dart';
 import 'tabs/shape_tab.dart';
-import 'tabs/style_tab.dart';
 
 class ShapeStyleScreen extends StatefulWidget {
   const ShapeStyleScreen({
@@ -47,11 +47,12 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   late final ShapeStyleController _controller;
+  int _shuffleSeed = 0;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     _controller = ShapeStyleController(
       initialShapes: widget.selectedShapes,
       initialTones: widget.selectedTones,
@@ -82,7 +83,7 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
         password.any((token) => !_controller.tones.contains(token.tone));
 
     if (toneChanged && !shapeChanged) return '사용 중인 색상이 변경됐어요.';
-    if (shapeChanged && !toneChanged) return '사용 중인 도형이 변경됐어요.';
+    if (shapeChanged && !toneChanged) return '사용 중인 모양이 변경됐어요.';
     return '사용 중인 항목이 변경됐어요.';
   }
 
@@ -105,9 +106,17 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
       appBar: AppBar(
         backgroundColor: appBackground,
         surfaceTintColor: Colors.transparent,
-        title: const Text(
-          '도형 & 스타일',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        titleSpacing: 0,
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.palette_rounded, color: Color(0xFFE45C9D), size: 22),
+            SizedBox(width: 8),
+            Text(
+              '모양 & 색상',
+              style: TextStyle(fontWeight: FontWeight.w900),
+            ),
+          ],
         ),
       ),
       body: SafeArea(
@@ -116,7 +125,7 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
               child: ShapeStylePreview(
                 shapes: _controller.shapes,
                 tones: _controller.tones,
@@ -127,13 +136,16 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
                 objectCount: widget.objectCount,
                 speed: widget.speed,
                 movementArea: widget.movementArea,
+                shuffleSeed: _shuffleSeed,
+                onTap: _openRuntimePreview,
+                onShuffle: _reshufflePreview,
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _StyleTabBar(controller: _tabController),
+              child: _ShapeColorTabBar(controller: _tabController),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
             Expanded(
               child: TabBarView(
                 controller: _tabController,
@@ -141,14 +153,14 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
                   ShapeTab(
                     selectedShapes: _controller.shapes,
                     onToggle: _controller.toggleShape,
+                    onMinimumSelectionBlocked: () =>
+                        _showMinimumSelectionMessage('모양'),
                   ),
                   ColorTab(
                     selectedTones: _controller.tones,
                     onToggle: _controller.toggleTone,
-                  ),
-                  StyleTab(
-                    selectedStyle: _controller.style,
-                    onSelect: _controller.selectStyle,
+                    onMinimumSelectionBlocked: () =>
+                        _showMinimumSelectionMessage('색상'),
                   ),
                 ],
               ),
@@ -189,15 +201,57 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
                   minimumSize: const Size.fromHeight(54),
                   backgroundColor: brandPurple,
                   disabledBackgroundColor: const Color(0xFFD8D3EB),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                 ),
                 onPressed: _controller.hasChanges ? _applyChanges : null,
-                child: const Text('적용'),
+                child: const Text(
+                  '저장',
+                  style: TextStyle(fontWeight: FontWeight.w800),
+                ),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _reshufflePreview() {
+    HapticFeedback.selectionClick();
+    setState(() => _shuffleSeed++);
+  }
+
+  Future<void> _openRuntimePreview() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => ShapeStyleRuntimePreviewScreen(
+          shapes: _controller.shapes,
+          tones: _controller.tones,
+          background: widget.background,
+          movementStyle: widget.movementStyle,
+          popStyle: widget.popStyle,
+          style: _controller.style,
+          objectCount: widget.objectCount,
+          speed: widget.speed,
+          movementArea: widget.movementArea,
+        ),
+      ),
+    );
+  }
+
+  void _showMinimumSelectionMessage(String category) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('$category은(는) 최소 1개 이상 선택해야 해요.'),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
   }
 
   Future<void> _applyChanges() async {
@@ -244,22 +298,32 @@ class _ShapeStyleScreenState extends State<ShapeStyleScreen>
       replacementPassword,
     );
     _controller.markApplied();
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text('모양과 색상을 저장했어요.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 }
 
-class _StyleTabBar extends StatelessWidget {
-  const _StyleTabBar({required this.controller});
+class _ShapeColorTabBar extends StatelessWidget {
+  const _ShapeColorTabBar({required this.controller});
 
   final TabController controller;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 46,
+      height: 42,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFEFEFF4),
-        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFFF0EFF6),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: TabBar(
         controller: controller,
@@ -267,18 +331,18 @@ class _StyleTabBar extends StatelessWidget {
         indicatorSize: TabBarIndicatorSize.tab,
         indicator: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(13),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFD7CCFF)),
         ),
-        labelColor: ink,
+        labelColor: brandPurple,
         unselectedLabelColor: secondaryInk,
         labelStyle: const TextStyle(
-          fontWeight: FontWeight.w800,
+          fontWeight: FontWeight.w900,
           fontSize: 13,
         ),
         tabs: const [
-          Tab(text: '도형'),
+          Tab(text: '모양'),
           Tab(text: '색상'),
-          Tab(text: '스타일'),
         ],
       ),
     );
