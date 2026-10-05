@@ -70,7 +70,7 @@ jobs:
           python3 - <<'PYCODE'
           import json, os, html
           from pathlib import Path
-          meta = json.loads(Path('shape_lab/release_metadata_20261005_r32.json').read_text())
+          meta = json.loads(Path('shape_lab/release_metadata_20261005_r33.json').read_text())
           meta['source_commit'] = os.environ['GITHUB_SHA']
           Path('build/shape_lab/labs-release.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2))
           page = Path('build/shape_lab/index.html')
@@ -138,7 +138,7 @@ jobs:
           curl --fail --show-error --silent --location --retry 5 --retry-delay 3 --retry-all-errors --output /tmp/starfish-runtime.webp "${PRIMARY_URL}assets/assets/raster_shapes/starfish_runtime_master_final_v1_256.webp"
           echo "b3a35bba9d238afba67d2e17b8649129a75f905f7c52048dc82ba09d105f9e60  /tmp/starfish-runtime.webp" | sha256sum -c -
 
-      - name: Verify R32 release identity
+      - name: Verify R33 release identity
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/style-lab-integration' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           python3 - <<'PYCODE'
@@ -149,8 +149,8 @@ jobs:
               url = os.environ['PRIMARY_URL'] + '?release=' + sha + '&attempt=' + str(attempt)
               try:
                   page = subprocess.check_output(['curl', '--fail', '--silent', '--show-error', '--location', '--max-time', '20', url], text=True)
-                  if expected in page and 'LABS-2026.10.05-R32' in page:
-                      print('Canonical R32 release verified:', sha)
+                  if expected in page and 'LABS-2026.10.05-R33' in page:
+                      print('Canonical R33 release verified:', sha)
                       break
                   print('Canonical HTML release propagation pending', flush=True)
               except Exception as error:
