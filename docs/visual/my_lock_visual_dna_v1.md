@@ -151,8 +151,6 @@ Applies to:
 UI typography, layout, and icon systems remain separate unless they contain illustrative art.
 
 ## Gate State
-- Visual DNA v1: Working Standard / Candidate / Not Locked
-- Current Anchor: Sea Turtle v3
-- First Calibration: Jellyfish + Shallow Clear Sea
-- Next Gate: Jellyfish Style Calibration v2 → Cross-Asset QA with Sea Turtle / Background
-- Promote Visual DNA v1 to Final / Locked only after calibration is visually stable.
+- Visual DNA v1: Superseded Working Candidate / History / Not Locked
+- Superseded by: `docs/visual/my_lock_visual_dna_v2.md`
+- This file remains as historical calibration context and is not the active production style standard.
