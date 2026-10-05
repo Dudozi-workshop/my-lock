@@ -6,5 +6,7 @@
   "source_branch": "feat/style-lab-integration",
   "source_commit": "runtime",
   "status": "Composite QA Candidate; access fix only; whole Background Not Final/Locked",
-  "governance": "Existing LABS only"
+  "governance": "Existing LABS only",
+  "redeploy_reason": "retry after cancelled concurrency runs",
+  "redeploy_at": "2026-10-05T20:40:00+09:00"
 }
