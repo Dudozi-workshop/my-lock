@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.05-R35",
+  "date": "2026-10-05",
+  "purpose": "Rare Coral Shelter fish-school motion proof of concept",
+  "scope": "One PoC only: five independently phased storybook-shadow fish using a long pass path; Coral Light Sweep removed from active comparison after user Reject",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "runtime",
+  "status": "Motion PoC / User Visual QA Pending / No Production Asset Approval",
+  "governance": "Existing LABS only; no external third-party art binary imported"
+}
