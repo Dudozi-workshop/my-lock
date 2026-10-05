@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../models.dart';
-import '../water_refraction_field.dart';
+import '../aurora_sea_signature.dart';
 import '../swim_pose_runtime.dart';
 import 'shape_spec.dart';
 import 'shape_spec_registry.dart';
@@ -11,12 +11,6 @@ import 'candy_soft_runtime.dart';
 
 class ShapeSpecRenderer {
   const ShapeSpecRenderer._();
-
-  // One shared optical mesh per 24Hz frame across all turtle tokens.
-  static final _waterField = WaterRefractionField(
-    colors: const [Color(0xFF0754A3), Color(0xFF138BD3), Color(0xFF20CCD7), Color(0xFF9AF0F3)],
-    speed: 1.28, refraction: .92, cellScale: 3.7, light: .84, seed: 29,
-  );
 
   static final Map<String, _CrayonTextureGeometry> _crayonTextureCache = {};
 
@@ -254,8 +248,7 @@ class ShapeSpecRenderer {
       canvas.save();
       canvas.translate(destination.left, destination.top);
       canvas.scale(destination.width, destination.height);
-      canvas.drawVertices(_waterField.mesh(paletteTimeSeconds), BlendMode.src,
-        Paint()..blendMode = BlendMode.srcIn);
+      AuroraSeaSignature.paintIntoCurrentMask(canvas, paletteTimeSeconds);
       canvas.restore();
       canvas.restore();
       canvas.drawImageRect(poseImages.fixedFinish, source, destination, sampling);
