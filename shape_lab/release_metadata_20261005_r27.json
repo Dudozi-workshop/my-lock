@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.05-R27",
+  "date": "2026-10-05",
+  "purpose": "Background painted Volumetric A: three deliberately distinct motion candidates A-C, R26 baseline preserved",
+  "scope": "Motion comparison only; original R14 B/C, approved Base and other effects preserved",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "runtime",
+  "status": "QA Candidate / Awaiting user motion review / Not Final or Locked",
+  "governance": "2-Site compliant; no separate public site"
+}

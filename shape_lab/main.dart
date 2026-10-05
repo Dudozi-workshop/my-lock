@@ -129,7 +129,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R26 · Background A · Visible Motion / QA Candidate',
+                                  'LABS-2026.10.05-R27 · Background · Motion A–C / QA Candidate',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -5763,6 +5763,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   int selectedVolumetric = 0;
   bool _broadSunbeamPaused = false;
   bool _usePaintedSunbeam = true;
+  SunbeamMotion _sunbeamMotion = SunbeamMotion.flow;
 
   static const backgrounds = [
     ('01', '투명한 얕은 바다', 'Image Selected · Effects In Progress'),
@@ -6224,7 +6225,7 @@ class _BackgroundLabState extends State<BackgroundLab>
   ];
 
   static const _volumetricLabels = <String>[
-    'A · Broad Sunbeam · R26 Visible Motion',
+    'A · Broad Sunbeam · R27 Motion A–C',
     'B · Living Rays',
     'C · Soft Drift',
   ];
@@ -6393,7 +6394,7 @@ class _BackgroundLabState extends State<BackgroundLab>
               children: [
                 for (final painted in [true, false])
                   ChoiceChip(
-                    label: Text(painted ? 'A 그림 레이어 · R26' : 'A 기존 방식 · R21'),
+                    label: Text(painted ? '그림 레이어 · 움직임 비교' : '기존 방식 · R21'),
                     selected: _usePaintedSunbeam == painted,
                     onSelected: (_) {
                       _soloEffect(2);
@@ -6406,6 +6407,22 @@ class _BackgroundLabState extends State<BackgroundLab>
                       });
                     },
                   ),
+                if (_usePaintedSunbeam)
+                  for (final motion in SunbeamMotion.values)
+                    ChoiceChip(
+                      label: Text(motion.label),
+                      selected: _sunbeamMotion == motion,
+                      onSelected: (_) {
+                        _soloEffect(2);
+                        setState(() {
+                          _sunbeamMotion = motion;
+                          _broadSunbeamClock.stop();
+                          _broadSunbeamClock.value = 0;
+                          _broadSunbeamPaused = false;
+                          _broadSunbeamClock.repeat();
+                        });
+                      },
+                    ),
                 OutlinedButton.icon(
                   icon: Icon(_broadSunbeamPaused ? Icons.play_arrow : Icons.pause),
                   label: Text(_broadSunbeamPaused ? 'A 재생' : 'A 일시정지'),
@@ -6435,13 +6452,19 @@ class _BackgroundLabState extends State<BackgroundLab>
               ],
             ),
           ],
+          if (showVolumetricLight && selectedVolumetric == 0 && _usePaintedSunbeam)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text('${_sunbeamMotion.description} · 비교용 강도 / 미술 승인 대기',
+                style: TextStyle(color: widget.muted, fontSize: 11)),
+            ),
           if (showVolumetricLight && selectedVolumetric == 0)
             AnimatedBuilder(
               animation: _broadSunbeamClock,
               builder: (context, _) => Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Row(children: [
-                  Text(_broadSunbeamPaused ? '정지 · A' : '재생 중 · A',
+                  Text('${_broadSunbeamPaused ? '정지' : '재생 중'} · ${_usePaintedSunbeam ? _sunbeamMotion.label : 'R21'}',
                     style: TextStyle(color: widget.muted, fontSize: 11)),
                   const SizedBox(width: 12),
                   SizedBox(width: 100, child: LinearProgressIndicator(
@@ -6482,7 +6505,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                 ),
               ),
             if (showVolumetricLight && selectedVolumetric == 0 && _usePaintedSunbeam)
-              PaintedSunbeamLayer(animation: _broadSunbeamClock),
+              PaintedSunbeamLayer(animation: _broadSunbeamClock, motion: _sunbeamMotion),
             if (showVolumetricLight && (selectedVolumetric != 0 || !_usePaintedSunbeam))
               CustomPaint(
                 painter: VolumetricLightPainter(

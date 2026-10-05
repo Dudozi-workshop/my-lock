@@ -1,6 +1,13 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · A R26 Canvas image motion / QA Candidate
+## Current handoff · R27 Motion A–C / QA Candidate
+- User confirms R26 moves, but motion feels too simple. Explicitly authorizes three markedly distinct motion comparisons A–C, superseding A-only limitation for this painted Volumetric A motion experiment. Original R14 B/C remain untouched.
+- A Flow: traveling lateral brightness mask (alpha .25–1, 8-second period); mild local shape drift. B Fan: shared upper anchor, depth-dependent symmetric opening/closing (stretch amplitude .24, 8-second period). C Breathe: broad .22–1 brightness breathing (6-second period) with secondary local ripple clocks. Deliberately large comparison ranges, not production strengths.
+- All use the same registered R22 texture and CPU-compatible full-image drawImageRect bands; A additionally uses a conventional linear gradient alpha mask. R26 exact painter branch and R21 comparison preserved. Each selection resets to phase zero and auto-plays; pause/reference controls retained.
+- Preflight: Notion 06 / Asset Master / 05 / 04; this handoff; integration branch ffc2dc0 and prior complete R26 CI/public state checked. No ImageGen or binary change, approved Base unchanged, other effects locked; concurrent Starfish preserved.
+- R27 header/metadata/workflow synchronized. CI/deploy/Public/actual browser comparison pending. Not Final/LOCK; user Keep/Modify/Reject pending.
+
+## Previous handoff · A R26 Canvas image motion / QA Candidate
 - R25 CI/deploy passed but browser Live clock advanced while texture was absent, including static frame. CPU-only fallback (webGLVersion -1) observed; no shader load exception. User device failure itself was not reproduced.
 - R26 preserves the same registered R22 PNG and A auto-play/pause/reference/R21 controls. Uses only Canvas.drawImageRect of the full texture with local warp/width/opacity. Integer-aligned, non-antialiased band clips avoid overlapping alpha and source-strip filtering seams. No FragmentProgram/ImageShader/drawVertices dependency in this layer.
 - Initial direct source strips rendered but showed horizontal seams; overlap removal insufficient. Shared-edge ImageShader mesh passed native tests but also disappeared in this CPU web path, so rejected. Final full-image drawing route requires actual browser visibility + scene-only frame comparison after CI.
