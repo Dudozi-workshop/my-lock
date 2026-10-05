@@ -1,6 +1,15 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · R28 Ambient Particle / Bubble QA candidates · 2026-10-05
+## Current handoff · Floor static study v1 / art review pending · 2026-10-05
+- User positive R28 feedback “응 좋은데?!” / “좋다좋다”: preserve particle/bubble direction and exact source. No blanket Background Final/LOCK.
+- User authorizes Floor planning/trial. Fresh Notion 06/Master/05/04 and GitHub branch/handoff/CI Preflight complete; integration d304f792, prior R28 CI 37249040322 whole SUCCESS.
+- First gate is static pattern review. 841×1870 independent RGBA cream caustic field with irregular curved cells, perspective size variation, soft horizon fade and approximate scene-specific rock/coral occlusion. No ImageGen; approved Base hash unchanged and zero composite pixel changes above floor start.
+- Generator and specification: tool/render_floor_caustic_static_v1.py; docs/backgrounds/FLOOR_CAUSTIC_STATIC_STUDY_V1.md. Exact preview/layer/metadata/source package retained. Approximate static occlusion must be reviewed with viewport mapping before runtime.
+- Art direction candidate only, not approved or production registered. Motion not implemented; no LABS version/deploy change. Public stays R28. Base/Flow A/R28 details unchanged; Surface Deferred; Floor remains Rework Required until new candidate approved.
+- Next: user static shape/brightness review, then local animated deformation/brightness, LABS increment, CI/deploy/Public/actual playback and Solo/composite QA.
+
+## Previous handoff · R28 Ambient Particle / Bubble QA candidates · 2026-10-05
+
 - User “응 다음들 가자.” authorizes the next effects after fixed Flow A. Fresh Preflight 06/Master/05/04, handoff and integration ce8fb80 checked. Master priority is Light → Ambient → Bubble → Floor rework → Surface review, so proceed with Ambient/Bubble first; initial commentary saying Floor first corrected before any Floor edit.
 - New independent living_water_details.dart: 42 sparse multi-depth particles with independent rise/drift/shimmer, central quiet zone; 12 bubbles with varied size/rise speed, compound lateral wobble, gentle aspect changes, thin rim/asymmetric highlights and soft fill. Integer-period 18-second loop with entry/exit fades. No ImageGen, stock media or new binary.
 - Upper Live review switches Particle/Bubble, R28/new vs original preserved renderer, detail pause/play, Solo vs exact approved A Flow composite. Only one new detail effect in candidate selection; actual other switches OFF. Default A+particles, rejected Floor OFF. Original procedural effect file and approved painted Flow source unchanged.
