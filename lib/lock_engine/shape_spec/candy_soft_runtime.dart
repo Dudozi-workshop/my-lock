@@ -175,16 +175,16 @@ class CandySoftRuntime {
     canvas.restore();
     canvas.restore();
 
-    // Re-apply only a restrained achromatic finish so Candy's approved
-    // dimensional cues survive without changing H02B hue identity.
+    // Re-apply a restrained achromatic finish with srcATop so Candy's
+    // dimensional cues survive while the original silhouette alpha is exact.
     canvas.drawImageRect(
       field,
       source,
       bounds,
       ui.Paint()
         ..filterQuality = ui.FilterQuality.high
-        ..blendMode = ui.BlendMode.softLight
-        ..color = const ui.Color.fromRGBO(255, 255, 255, 0.24)
+        ..blendMode = ui.BlendMode.srcATop
+        ..color = const ui.Color.fromRGBO(255, 255, 255, 0.18)
         ..colorFilter = const ui.ColorFilter.matrix([
           0.2126, 0.7152, 0.0722, 0, 0,
           0.2126, 0.7152, 0.0722, 0, 0,
