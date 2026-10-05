@@ -212,3 +212,41 @@ Status: Fixed / Technical QA Passed / User Visual QA Pending
 - Release: `MAIN-2026.10.05-R02`
 
 User-visible motion on the user's actual browser remains the final visual gate.
+
+## Aurora Sea R03 · Approved LABS Renderer Parity — 2026-10-05
+
+Release: `MAIN-2026.10.05-R03`
+Status: Implemented / Web Deploy Passed / User Visual QA Pending
+
+### Decision
+- R02 Web-only 20×20 Canvas-cell fallback is rejected and removed.
+- Production now uses the same H02B field math and optical renderer that the user approved in Palette LABS.
+- Password-selection policy remains unchanged.
+- Shape Master / H02B parameters remain locked.
+
+### Renderer parity
+Approved LABS source commit: `ade16b84e91a9c1d344c34805cc707322622261f`.
+
+Parity points:
+- H02B WaterRefractionField parameters unchanged.
+- Production `lib/lock_engine/water_refraction_field.dart` is implementation-identical to the approved LABS field; only the top documentation comment differs.
+- Optical pass: `drawVertices(field.mesh(timeSeconds), BlendMode.src, Paint()..blendMode = BlendMode.srcIn)`.
+- Alpha-first compositing retained.
+- Small Aurora Signature swatch uses a dedicated LABS-style Ticker and passes explicit palette time into `LockTokenPainter`.
+- Runtime remains on the shared monotonic palette clock.
+
+### Commits
+- `bbd206b8` restore exact approved H02B LABS renderer
+- `bdb710ea` allow explicit palette time in token painter
+- `6bd1dbc5` drive Aurora swatch with approved LABS ticker pattern
+- `6e52c686` 72px approved H02B motion regression test
+- `6ee993b0` remove obsolete R02 fallback test import
+- `728b0b8b` / `4579d3e8` / `fc0d1d59` publish R03 metadata
+
+### Verification
+- R03 Web Build / Cloudflare deploy run `37268510568`: **PASS**.
+- R03 CI Analyze: **PASS**.
+- R03 CI Test: **PASS**.
+- ARM64 APK build in run `37268510698`: still running at closeout update time; do not claim full CI completion until finished.
+
+Final visual gate: compare the small Aurora Round and applied Aurora runtime directly against the previously approved LABS H02B behavior in the user's browser.
