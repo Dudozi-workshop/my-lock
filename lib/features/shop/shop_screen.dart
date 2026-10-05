@@ -184,7 +184,7 @@ class _ShopScreenState extends State<ShopScreen> {
               ),
             ),
             Text(
-              '\${cards.length}개',
+              '${cards.length}개',
               style: const TextStyle(
                 color: secondaryInk,
                 fontSize: 11,
