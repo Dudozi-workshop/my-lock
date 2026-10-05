@@ -64,3 +64,40 @@ Canonical Production Asset Rule now advances to:
 8. LOCK
 
 Current stop point: **Ownership Overlay approval required before Mask generation.**
+
+
+## Ownership Overlay Troubleshooting / Prevention — TS-012
+### Reject history
+- v2-v6 and v8-v9: **REJECTED / Production unused**.
+- v7: **Working Reference only / Not Approved / Not Final**.
+
+### Root cause
+- Ownership Overlay was incorrectly treated as a part-geometry redraw step.
+- User rough paint was copied or converted into polygon/spline boundaries instead of being used only as a semantic seed.
+- Existing canonical alpha/colored contours were ignored and new artificial outer boundaries were introduced.
+- Cleanup requests were misread as redraw requests, increasing drift instead of reducing it.
+
+### Active prevention rule
+1. Approved 2048 canonical pixels remain immutable.
+2. User markup is **semantic seed only**.
+3. Existing canonical alpha edge / colored contour / visible fold line is the authoritative outer boundary.
+4. Do **not** redraw outer perimeter with polygon / bezier / spline.
+5. For closed-contour parts, extract ownership from the existing contour directly.
+6. For partially occluded parts, keep the existing visible silhouette and define only the minimum root cut.
+7. Hidden Underlap reconstruction requires explicit user approval.
+8. Dorsal remains Body Core unless independent motion is explicitly required.
+9. Overlay presentation uses translucent fill only; new outline is prohibited except a minimal root-cut QA cue.
+10. User approval of Ownership Overlay is required before Mask / Asset / Removed Remainder generation.
+11. Scope-limited cleanup must keep non-target ownership bit-identical.
+
+### Dolphin recovery point
+- Roll back to v7's **4-part structure** only:
+  - Body Core + Dorsal
+  - Near Flipper
+  - Far Flipper
+  - Tail
+- Next refinement:
+  - Near Flipper = direct extraction of existing closed colored contour.
+  - Far Flipper = existing visible silhouette + minimum root cut.
+  - Tail / Body / Dorsal unchanged.
+- No polygon/spline redraw.
