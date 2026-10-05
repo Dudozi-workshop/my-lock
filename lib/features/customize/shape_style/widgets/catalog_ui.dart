@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme.dart';
 
-enum CatalogCompositionFilter { all, collection, standalone }
+enum CatalogCompositionFilter { all, basic, collection, standalone }
 
 class CatalogFilterState {
   const CatalogFilterState({
@@ -497,6 +497,17 @@ Future<void> showCatalogFilterSheet({
                       onTap: () => apply(
                         draft.copyWith(
                           composition: CatalogCompositionFilter.all,
+                        ),
+                      ),
+                    ),
+                    choiceChip(
+                      label: '기본',
+                      selected:
+                          draft.composition == CatalogCompositionFilter.basic,
+                      onTap: () => apply(
+                        draft.copyWith(
+                          composition: CatalogCompositionFilter.basic,
+                          clearCollection: true,
                         ),
                       ),
                     ),
