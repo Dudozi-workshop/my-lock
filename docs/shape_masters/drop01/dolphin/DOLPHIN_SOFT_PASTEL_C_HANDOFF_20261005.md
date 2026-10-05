@@ -111,3 +111,23 @@ Current stop point: **Ownership Overlay approval required before Mask generation
 - Near/Far Flipper boundaries refined from canonical pixels under TS-012. No polygon/spline redraw and no new outer outline.
 - Tail / Body / Dorsal preserved from v7 reference.
 - Next Gate: **Mask generation** from the approved ownership, then Asset → Removed Remainder → Recomposite / Residual QA → user approval → LOCK.
+
+
+## Part Package Candidate v1 — Mask / Asset / Remainder / QA
+- Package: `MYLOCK_Dolphin_PartPackage_Candidate_v1_2048_20261005.zip`
+- Package SHA-256: `1ffc5b7acfb575c64090f8219b2410b32ff0e746b81aeadd28a86568d1fee340`
+- Source Ownership: **v10 User Approved**
+- Parts:
+  - Body Core + Dorsal
+  - Near Flipper
+  - Far Flipper
+  - Tail
+- Method: direct extraction from approved ownership masks; no ImageGen, redraw, or hidden-underlap generation.
+- Mask overlap: **0 px**
+- Mask union vs Canonical alpha mismatch: **0 px**
+- Per-part Asset + Removed Remainder recomposite: **all 0 px mismatch / PASS**
+- Full 4-part recomposite vs Canonical: **0 px mismatch / max channel delta 0 / PASS**
+- Residual QA: **0 changed visible pixels / PASS**
+- Status: **Candidate / User Review Required / Not Locked**
+- Drive publication is pending user approval of this package.
+- Next Gate: user visual/package approval → register final package / LOCK.
