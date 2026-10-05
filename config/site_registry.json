@@ -4,10 +4,10 @@
     "MAIN": {
       "canonical_url": "https://my-lock-preview.rlatkd5959.workers.dev",
       "deploy_target": "my-lock-preview",
-      "version": "MAIN-2026.10.05-R01",
-      "purpose": "Shape & Color catalog correction with Candy Soft all-tone rendering and shared Aurora Sea H02B",
+      "version": "MAIN-2026.10.05-R02",
+      "purpose": "Aurora Sea H02B live motion recovery for small Color preview and runtime",
       "status": "Production Preview / Technical QA / Android device QA pending",
-      "scope": "Basic-first Shape/Color catalog; Candy Soft R2 retained across all tones; Aurora Sea H02B shared runtime; full-width Signature Color card",
+      "scope": "Basic-first Shape/Color catalog; Candy Soft R2 all-tone; Aurora Sea H02B shared runtime with Web-safe live Canvas field; Signature card small round remains live",
       "source_branch": "main",
       "source_commit": "resolved by workflow GITHUB_SHA"
     },
