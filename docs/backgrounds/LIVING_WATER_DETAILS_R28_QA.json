@@ -1,0 +1,43 @@
+{
+  "version": "LABS-2026.10.05-R28",
+  "source_commit": "46ac7957b3233853a4bb722453f8e84c7586cf68",
+  "ci_run": 37249040322,
+  "ci_result": "success",
+  "scope": [
+    "Ambient Particle candidate",
+    "Bubble candidate"
+  ],
+  "preserved": [
+    "Approved Flow A source hash",
+    "Base binary hash",
+    "All original effect renderers",
+    "Current Starfish integration"
+  ],
+  "runtime_tests": [
+    "2 second visible change",
+    "Sparse coverage",
+    "18 second loop continuity",
+    "No loop wrap pop"
+  ],
+  "public_identity": "R28/source matches actual browser",
+  "live_qa": {
+    "particles_visible": "pass",
+    "bubbles_visible": "pass",
+    "scene_play_changes_each": "pass",
+    "scene_pause_identical_each": "pass",
+    "candidate_switch_auto_play": "pass",
+    "solo_actual_layer_booleans": "pass",
+    "original_bubble_comparison": "pass",
+    "approved_Flow_A_composite": "pass",
+    "app_error": "none observed; extension metadata errors separate"
+  },
+  "screenshot": "my-lock-r28-details-live-1791161734142.jpg",
+  "approval": {
+    "Ambient": "pending user Keep/Modify/Reject",
+    "Bubble": "pending user Keep/Modify/Reject",
+    "Flow_A": "approved/fixed v1"
+  },
+  "background_final_locked": false,
+  "new_binary": false,
+  "physical_android_qa": "not performed"
+}
