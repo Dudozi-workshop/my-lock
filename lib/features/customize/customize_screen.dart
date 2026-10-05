@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../app/my_lock_settings_controller.dart';
-import '../../app/theme.dart';
 import '../../lock_engine/floating_preview.dart';
-import '../../widgets/customization_card.dart';
+import '../../widgets/production_ui.dart';
 import 'background/background_screen.dart';
 import 'effects/effects_screen.dart';
+import 'runtime_preview_screen.dart';
 import 'shape_style_screen.dart';
 
 class CustomizeScreen extends StatefulWidget {
@@ -51,124 +51,68 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
       bottom: false,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final previewHeight =
-              (constraints.maxHeight * 0.48).clamp(300.0, 440.0).toDouble();
-
           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 26),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'MY LOCK',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '나만의 잠금화면을 꾸며보세요.',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 18),
-                Container(
-                  height: previewHeight,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(32),
-                    gradient: settings.background.gradient,
-                    border: Border.all(color: const Color(0xFFE9E4F3)),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x173F2E83),
-                        blurRadius: 28,
-                        offset: Offset(0, 14),
-                      ),
-                    ],
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 46,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const ProductionScreenHeader(
+                    icon: Icons.auto_awesome_rounded,
+                    title: '꾸미기',
+                    subtitle: '나만의 잠금화면을 만들어보세요.',
                   ),
-                  child: Stack(
+                  const SizedBox(height: 18),
+                  _CurrentLockRepresentative(settings: settings),
+                  const SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Positioned.fill(
-                        child: FloatingPreview(
-                          selectedShapes: settings.selectedShapes,
-                          selectedTones: settings.selectedTones,
-                          movementStyle: settings.movementStyle,
-                          popStyle: settings.popStyle,
-                          style: settings.style,
-                          objectCount: settings.objectCount,
-                          speed: settings.speed,
-                          movementArea: settings.movementArea,
+                      Expanded(
+                        child: ProductionShortcutTile(
+                          icon: Icons.palette_rounded,
+                          title: '모양 & 색상',
+                          subtitle: '캐릭터와 컬러를\n꾸며요',
+                          backgroundColor: productionPink,
+                          iconColor: productionPinkInk,
+                          onTap: () => _openShapeStyle(context),
                         ),
                       ),
-                      Positioned(
-                        top: 18,
-                        right: 18,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 11,
-                            vertical: 7,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.82),
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                          child: const Text(
-                            'LIVE',
-                            style: TextStyle(
-                              color: brandPurple,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ProductionShortcutTile(
+                          icon: Icons.bubble_chart_rounded,
+                          title: '움직임 & 반응',
+                          subtitle: '터치와 움직임을\n설정해요',
+                          backgroundColor: productionBlue,
+                          iconColor: productionBlueInk,
+                          onTap: () => _openEffects(context),
                         ),
                       ),
-                      Positioned(
-                        left: 18,
-                        bottom: 18,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.78),
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                          child: const Text(
-                            '도형을 눌러보세요',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF615D6A),
-                            ),
-                          ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ProductionShortcutTile(
+                          icon: Icons.image_rounded,
+                          title: '배경',
+                          subtitle: '배경화면을\n선택해요',
+                          backgroundColor: productionMint,
+                          iconColor: productionMintInk,
+                          onTap: () => _openBackground(context),
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 20),
-                CustomizationCard(
-                  icon: Icons.wallpaper_rounded,
-                  title: '배경',
-                  subtitle: settings.background.label,
-                  onTap: () => _openBackground(context),
-                ),
-                const SizedBox(height: 10),
-                CustomizationCard(
-                  icon: Icons.category_rounded,
-                  title: '도형 & 스타일',
-                  subtitle: _styleSummary,
-                  onTap: () => _openShapeStyle(context),
-                ),
-                const SizedBox(height: 10),
-                CustomizationCard(
-                  icon: Icons.auto_fix_high_rounded,
-                  title: '효과',
-                  subtitle:
-                      '${settings.movementStyle.label} · ${settings.popStyle.label}',
-                  onTap: () => _openEffects(context),
-                ),
-              ],
+                  const SizedBox(height: 18),
+                  ProductionPrimaryButton(
+                    icon: Icons.open_in_full_rounded,
+                    label: '전체화면 보기',
+                    onPressed: () => _openRuntimePreview(context),
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -176,9 +120,14 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
     );
   }
 
-  String get _styleSummary {
-    final settings = widget.settings;
-    return '도형 ${settings.selectedShapes.length}개 · 색상 ${settings.selectedTones.length}개 · ${settings.style.label}';
+  Future<void> _openRuntimePreview(BuildContext context) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) =>
+            CustomizeRuntimePreviewScreen(settings: widget.settings),
+      ),
+    );
   }
 
   Future<void> _openEffects(BuildContext context) async {
@@ -252,6 +201,75 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
               );
             }
           },
+        ),
+      ),
+    );
+  }
+}
+
+class _CurrentLockRepresentative extends StatelessWidget {
+  const _CurrentLockRepresentative({
+    required this.settings,
+  });
+
+  final MyLockSettingsController settings;
+
+  @override
+  Widget build(BuildContext context) {
+    return ProductionSoftCard(
+      padding: EdgeInsets.zero,
+      radius: 30,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: AspectRatio(
+          aspectRatio: 1.03,
+          child: DecoratedBox(
+            decoration: BoxDecoration(gradient: settings.background.gradient),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: TickerMode(
+                      enabled: false,
+                      child: FloatingPreview(
+                        selectedShapes: settings.selectedShapes,
+                        selectedTones: settings.selectedTones,
+                        movementStyle: settings.movementStyle,
+                        popStyle: settings.popStyle,
+                        style: settings.style,
+                        objectCount: settings.objectCount,
+                        speed: settings.speed,
+                        movementArea: settings.movementArea,
+                        topInset: 54,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 18,
+                  left: 18,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 7,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.84),
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                    child: const Text(
+                      '현재 잠금화면',
+                      style: TextStyle(
+                        color: Color(0xFF5C5766),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
