@@ -71,3 +71,20 @@
 - Full Composite QA using the inherited Base + fixed R27 A Flow + fixed R31 Cell Flow.
 - R28 is reviewed at low/subordinate intensity or optional state during composite QA.
 - Use actual approved Shape assets for post-composite readability QA; do not regenerate Shapes.
+
+
+## Rare · 산호 쉼터 — Base Refinement Gate · 2026-10-05
+
+- Goal: evaluate whether the inherited approved Base needs a dedicated v3 edit for stronger place identity.
+- Result: **no pixel edit required**.
+- The approved `background.drop01.shallow_clear.base_only_v2` already satisfies the intended composition:
+  - lower-left main coral shelter cluster,
+  - smaller lower-right environmental counterweight,
+  - broad central Play Field,
+  - open upper water column.
+- Do not create a redundant Base Candidate v3.
+- Do not overwrite or rename the approved Base binary, checksum, Drive source, or lineage.
+- ImageGen was not used; approved-Base lock and current ImageGen hard gate remain intact.
+- R27 A Flow already functions as upper/mid spatial light and R31 Cell Flow as lower surface light; preserve both approved motion profiles unchanged.
+- R28 Ambient/Bubble remains Optional and default OFF for Rare composite QA.
+- Next gate: R32 Full Composite visual review at 6 / 9 / 12 runtime Shapes. If accepted, stabilize the Rare body state before adding any Coral Light Sweep signature moment.
