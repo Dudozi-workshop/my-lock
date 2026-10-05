@@ -1,7 +1,7 @@
 # MY LOCK Production UI Implementation Spec v1
 
 Date: 2026-10-05
-Status: Visual Approved / Implementation Ready
+Status: Implemented / QA Pending
 Scope: Foundation + Customize Main + Lock Settings Main
 Platform: Android-first Flutter
 Theme: Light only for launch
@@ -261,10 +261,21 @@ Before marking Implemented / QA Passed:
 Current:
 - Planning Locked
 - Visual Approved
+- Component / State Defined
+- Android Implementation complete for Foundation + Customize Main + Lock Settings Main
+
+Implementation commits:
+- `88febd28` — Production UI foundation components
+- `06e67f87` — Production theme refinement
+- `d047678b` — Customize fullscreen Runtime Preview
+- `200bb9ff` — Production Customize Main
+- `8d3c14c5` / `1c9954b2` — Lock Settings detail screens and app-info actions
+- `5640356b` — Grouped Production Lock Settings Main
 
 Next:
-- Component/State Defined — this spec
-- Android Implementation
-- QA Passed
+- Flutter analyze / test / build
+- responsive/device QA
+- visual comparison against approved mockup
+- QA Passed promotion
 
-This document becomes implementation baseline after user confirmation.
+Note: current connector exposed no workflow/check result for the latest commit, so build/test completion is not claimed yet.
