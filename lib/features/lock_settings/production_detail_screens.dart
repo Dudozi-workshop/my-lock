@@ -207,23 +207,39 @@ class AppInfoScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
         children: [
-          const ProductionSettingsGroup(
+          ProductionSettingsGroup(
             title: 'MY LOCK',
             children: [
-              ProductionSettingsRow(
+              const ProductionSettingsRow(
                 icon: Icons.info_outline_rounded,
                 title: '앱 버전',
                 value: '0.1.2 (3)',
+                showDivider: true,
               ),
               ProductionSettingsRow(
                 icon: Icons.code_rounded,
                 title: '오픈소스 라이선스',
                 value: '사용 중인 오픈소스 라이선스 보기',
+                showDivider: true,
+                onTap: () {
+                  showLicensePage(
+                    context: context,
+                    applicationName: 'MY LOCK',
+                    applicationVersion: '0.1.2+3',
+                  );
+                },
               ),
               ProductionSettingsRow(
                 icon: Icons.chat_bubble_outline_rounded,
                 title: '문의 · 피드백',
                 value: '출시 피드백 채널 연결 예정',
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('문의 · 피드백 채널은 출시 준비 중입니다.'),
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -235,23 +251,15 @@ class AppInfoScreen extends StatelessWidget {
                 icon: Icons.privacy_tip_outlined,
                 title: '개인정보처리방침',
                 value: 'MY LOCK의 데이터 처리 안내',
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push<void>(
+                    MaterialPageRoute(
+                      builder: (context) => const PrivacyPolicyScreen(),
+                    ),
+                  );
+                },
               ),
             ],
-          ),
-          const SizedBox(height: 18),
-          SizedBox(
-            height: 48,
-            child: OutlinedButton(
-              onPressed: () {
-                Navigator.of(context).push<void>(
-                  MaterialPageRoute(
-                    builder: (context) => const PrivacyPolicyScreen(),
-                  ),
-                );
-              },
-              child: const Text('개인정보처리방침 열기'),
-            ),
           ),
         ],
       ),
