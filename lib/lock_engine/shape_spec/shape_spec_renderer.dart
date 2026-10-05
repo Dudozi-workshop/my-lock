@@ -29,8 +29,14 @@ class ShapeSpecRenderer {
     bool useCandySoft = true,
   }) {
     if (useCandySoft && CandySoftRuntime.instance.paint(
-      canvas, center: center, radius: radius, token: token, style: style,
-      opacity: opacity, rotation: objectRotation,
+      canvas,
+      center: center,
+      radius: radius,
+      token: token,
+      style: style,
+      opacity: opacity,
+      paletteTimeSeconds: paletteTimeSeconds,
+      rotation: objectRotation,
     )) return;
     final registry = ShapeSpecRegistry.instance;
     if (registry.isRasterShape(token.shape)) {
