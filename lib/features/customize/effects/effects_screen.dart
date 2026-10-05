@@ -142,7 +142,7 @@ class _EffectsScreenState extends State<EffectsScreen>
     if (style.locked) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('\${style.label} 모션은 아직 보유하지 않은 항목입니다.'),
+          content: Text('${style.label} 모션은 아직 보유하지 않은 항목입니다.'),
           duration: const Duration(milliseconds: 1400),
         ),
       );
@@ -157,7 +157,7 @@ class _EffectsScreenState extends State<EffectsScreen>
     if (style.locked) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('\${style.label} 반응은 아직 보유하지 않은 항목입니다.'),
+          content: Text('${style.label} 반응은 아직 보유하지 않은 항목입니다.'),
           duration: const Duration(milliseconds: 1400),
         ),
       );
@@ -223,7 +223,7 @@ class _CompactEffectPreview extends StatelessWidget {
                   top: 12,
                   child: _PreviewPill(
                     icon: Icons.play_arrow_rounded,
-                    label: '\${movement.label} · \${popStyle.label}',
+                    label: '${movement.label} · ${popStyle.label}',
                   ),
                 ),
                 const Positioned(
