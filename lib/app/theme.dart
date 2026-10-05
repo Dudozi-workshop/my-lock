@@ -5,6 +5,8 @@ const Color brandLavender = Color(0xFFF1EDFF);
 const Color appBackground = Color(0xFFF8F8FC);
 const Color ink = Color(0xFF1C1A25);
 const Color secondaryInk = Color(0xFF777480);
+const Color surfaceBorder = Color(0xFFEDEBF2);
+const Color softSurface = Color(0xFFFFFFFF);
 
 ThemeData buildMyLockTheme() {
   final colorScheme = ColorScheme.fromSeed(
@@ -39,6 +41,7 @@ ThemeData buildMyLockTheme() {
       bodyMedium: TextStyle(
         fontSize: 14,
         height: 1.45,
+        fontWeight: FontWeight.w500,
         color: secondaryInk,
       ),
     ),
@@ -47,6 +50,7 @@ ThemeData buildMyLockTheme() {
       elevation: 0,
       backgroundColor: Colors.white.withValues(alpha: 0.96),
       indicatorColor: brandLavender,
+      surfaceTintColor: Colors.transparent,
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         final selected = states.contains(WidgetState.selected);
         return TextStyle(
@@ -59,7 +63,7 @@ ThemeData buildMyLockTheme() {
         final selected = states.contains(WidgetState.selected);
         return IconThemeData(
           color: selected ? brandPurple : const Color(0xFF8F8C98),
-          size: 23,
+          size: 24,
         );
       }),
     ),
