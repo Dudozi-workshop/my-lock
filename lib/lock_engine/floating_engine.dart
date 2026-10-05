@@ -9,7 +9,7 @@ class FloatingEngine {
   FloatingEngine({int? seed}) : _random = seed == null ? Random() : Random(seed);
 
   static const int defaultObjectCount = 9;
-  static const Set<int> supportedObjectCounts = {6, 9, 12};
+  static const Set<int> supportedObjectCounts = {1, 4, 6, 9, 12};
   static const double popDuration = 0.18;
 
   final Random _random;
