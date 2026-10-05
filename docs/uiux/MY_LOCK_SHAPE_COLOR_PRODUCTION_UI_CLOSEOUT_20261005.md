@@ -173,3 +173,42 @@ Do not promote physical Android QA to PASS from CI alone.
 - full Drop 01 runtime registration for planned assets
 - collection-completion runtime data
 - Customize Main collection summary / Collection Hub
+
+
+## Aurora Sea Web live-motion correction — 2026-10-05
+
+Release: `MAIN-2026.10.05-R02`
+Status: Fixed / Technical QA Passed / User Visual QA Pending
+
+### Symptom
+
+- Aurora Sea Signature Color preview used the correct small Candy Soft Round, but the H02B field appeared static on the public Web preview.
+- Applying Aurora Sea to basic shapes could also look fixed even though the palette clock and time-dependent renderer were connected.
+
+### Root cause
+
+- The canonical H02B clock and sampler were active.
+- On Web, the `drawVertices` optical field could repaint while still failing to present perceptible motion at the actual 58–72 px card size.
+- Therefore technical frame inequality was insufficient as a visual-motion gate.
+
+### Correction
+
+- H02B Master values and Shape Masters were not changed.
+- `AuroraSeaSignature` now uses a Web-safe Canvas field path based on the same `WaterRefractionField.sample()` source.
+- Web renders a 20×20 time-varying cell field through Canvas drawRect.
+- Native keeps the existing higher-resolution vertices path.
+- The Signature Color card remains the approved small live Round preview.
+- Password-selection policy remains unchanged.
+
+### Regression QA
+
+- Added a 72 px Aurora preview test at 0 / 0.5 / 1.0 / 1.5 / 2.0 seconds.
+- The test requires a perceptible changed-pixel count rather than only asserting that two full frames differ.
+
+### Verification
+
+- Web Build / deploy run: `37261998567` — PASS
+- MyLock CI run: `37261998603` — PASS
+- Release: `MAIN-2026.10.05-R02`
+
+User-visible motion on the user's actual browser remains the final visual gate.
