@@ -43,3 +43,31 @@
 - Former roster `01 투명한 얕은 바다 / 02 바닷속 하루 / 03 고요한 심해` is superseded as Active Planning and retained as history.
 - The former `바닷속 하루` 24-hour real-time-linked system is removed from current Drop 01 scope and may return later as a standalone Legendary Dynamic Background concept.
 - Existing former-01 background binaries and the Base/R27/R28/R31 implementation remain preserved.
+
+## Rare · 산호 쉼터 — Migration Visual QA · 2026-10-05
+
+### Source
+- Inherited visual source: former **01 투명한 얕은 바다 · A Open Water · Base Only v2 Approved**.
+- Approved visual binary remains unchanged: `shallow_clear_base_only_v2_approved_candidate.png`.
+- Existing R27 / R28 / R31 assets and QA history remain lineage assets and are not renamed or regenerated as part of this migration.
+
+### Visual QA Result
+- **PASS — Mini-world fit:** bright Aqua/Blue palette, rounded reef forms, pastel coral accents, and broad soft depth read as a cozy Soft Storybook ocean rather than a realistic reef.
+- **PASS — Central Play Field:** the center remains strongly open and low-detail; Shape readability remains the visual priority.
+- **PASS — Rare tier fit:** the scene already provides clear foreground / midground / surface depth and environmental richness without requiring a new Base.
+- **PASS — Composition:** environmental detail is concentrated at the lower/side edges, especially the lower-left cluster, while the main floating area remains open.
+- **PASS — Visual DNA v2 compatibility:** no black hard outline, no photorealistic lighting, no deep AO, and no glossy/plastic identity dominates the Base.
+- **WATCH — Peripheral density:** the lower-left coral/rock/shell cluster is intentionally richer than Normal. Do not simplify the approved Base pre-emptively; first evaluate the Full Composite with actual Shapes.
+- **WATCH — Motion density:** R27 A Flow Light + R31 Cell Flow already satisfy the Rare target of 1–2 independent background motions. R28 Ambient/Bubble should be treated as subordinate/optional atmosphere, not as an additional equally strong motion layer.
+
+### Migration Decision
+- The approved former-01 Base is **accepted as the current visual candidate for Rare · 산호 쉼터 without redraw**.
+- No Base pixel changes are approved in this migration.
+- Former slot naming is historical; active product-slot identity is **Rare · 산호 쉼터**.
+- Existing binary IDs, checksums, Drive files, and QA evidence remain immutable lineage references.
+- Any future polish must be versioned as a new candidate and must not overwrite Base Only v2.
+
+### Next Gate
+- Full Composite QA using the inherited Base + fixed R27 A Flow + fixed R31 Cell Flow.
+- R28 is reviewed at low/subordinate intensity or optional state during composite QA.
+- Use actual approved Shape assets for post-composite readability QA; do not regenerate Shapes.
