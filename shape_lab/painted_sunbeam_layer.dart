@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'background_asset_registry.dart';
@@ -67,7 +66,8 @@ class _PaintedSunbeamLayerState extends State<PaintedSunbeamLayer> {
   }
 }
 
-/// Standard image shader + shared-edge mesh, including CPU web rendering.
+/// Uses only drawImageRect; compatible with CPU-only web rendering.
+/// Clip full-image draws into integer-aligned bands to avoid sampled edges.
 class PaintedSunbeamPainter extends CustomPainter {
   PaintedSunbeamPainter(this.image, this.animation) : super(repaint: animation);
   final ui.Image image;
@@ -76,14 +76,16 @@ class PaintedSunbeamPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (size.isEmpty) return;
     final phase = animation.value * math.pi * 2;
-    final positions = <Offset>[];
-    final coordinates = <Offset>[];
-    final colors = <Color>[];
-    final indices = <int>[];
-    const rows = 64;
-    const columns = 8;
-    for (var row = 0; row <= rows; row++) {
-      final y = row / rows;
+    final source = Rect.fromLTWH(0, 0,
+      image.width.toDouble(), image.height.toDouble());
+    final paint = Paint()..filterQuality = FilterQuality.medium;
+    const bands = 128;
+    for (var band = 0; band < bands; band++) {
+      final top = (band * size.height / bands).floorToDouble();
+      final bottom = band == bands - 1 ? size.height :
+          ((band + 1) * size.height / bands).floorToDouble();
+      if (bottom <= top) continue;
+      final y = (top + bottom) / (2 * size.height);
       final envelope = (y / .08).clamp(0.0, 1.0) *
           (1 - ((y - .35) / .31).clamp(0.0, 1.0));
       final a = y * 4;
@@ -96,30 +98,15 @@ class PaintedSunbeamPainter extends CustomPainter {
           (math.sin(phase * 3 + a) - math.sin(a));
       final alpha = (1 + .18 *
           (math.sin(phase * 5 + a) - math.sin(a))).clamp(.55, 1.0);
-      for (var col = 0; col <= columns; col++) {
-        final x = col / columns;
-        positions.add(Offset(size.width * (.5 + (x - .5) * stretch + shift),
-          size.height * (y + vertical)));
-        coordinates.add(Offset(x * image.width, y * image.height));
-        colors.add(Colors.white.withValues(alpha: alpha));
-        if (row < rows && col < columns) {
-          final i = row * (columns + 1) + col;
-          indices.addAll([i, i + 1, i + columns + 1,
-            i + 1, i + columns + 2, i + columns + 1]);
-        }
-      }
+      paint.color = Colors.white.withValues(alpha: alpha);
+      canvas.save();
+      canvas.clipRect(Rect.fromLTRB(0, top, size.width, bottom),
+        doAntiAlias: false);
+      canvas.drawImageRect(image, source,
+        Rect.fromLTWH(size.width * (shift - (stretch - 1) / 2),
+          -vertical * size.height, size.width * stretch, size.height), paint);
+      canvas.restore();
     }
-    final shader = ui.ImageShader(image, TileMode.clamp, TileMode.clamp,
-      Float64List.fromList([1, 0, 0, 0, 0, 1, 0, 0,
-        0, 0, 1, 0, 0, 0, 0, 1]), filterQuality: FilterQuality.medium);
-    final mesh = ui.Vertices(VertexMode.triangles, positions,
-      textureCoordinates: coordinates, colors: colors, indices: indices);
-    canvas.save();
-    canvas.clipRect(Offset.zero & size);
-    canvas.drawVertices(mesh, BlendMode.modulate, Paint()..shader = shader);
-    canvas.restore();
-    mesh.dispose();
-    shader.dispose();
   }
   @override
   bool shouldRepaint(PaintedSunbeamPainter oldDelegate) =>
