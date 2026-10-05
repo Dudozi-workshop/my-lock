@@ -1,0 +1,45 @@
+{
+  "profile": "Floor Caustic Cell Flow Motion v1",
+  "lab_version": "LABS-2026.10.05-R31",
+  "runtime_source_commit": "57ffc5207afab6a8a1ed3c0fe5a7ec8f78856ee9",
+  "painter_path": "shape_lab/painted_floor_caustic_layer.dart",
+  "painter_sha256": "fc598b301919bb0b8d28712544199003420b4001c972201d503791e75291edff",
+  "canonical": {
+    "drive_file_id": "1bvqp8q-qrql9HTLj674P4A4s-5gXjHxC",
+    "sha256": "b09d20b24b4ebd9f933234dbb4f5982b243c5fb628a2667dd669d7dd59c93a05",
+    "git_blob": "39a332c2b17c6164bb09961384979354f8fd9f90",
+    "width": 841,
+    "height": 1870,
+    "bytes": 105959,
+    "raw_download_checksum_verified": true
+  },
+  "motion": {
+    "same_static_artwork": true,
+    "local_deformation": "continuous positive x map across 12 columns, 48 rows",
+    "x_coefficients": [
+      0.055,
+      0.02
+    ],
+    "vertical_coefficient": 0.007,
+    "depth": "normalized to visible foreground with canonical .655 horizon",
+    "highlight_alpha_gain_max": 1.8,
+    "traveling_highlight_mask_min": 0.3,
+    "primary_period_seconds": 4,
+    "loop_seconds": 24,
+    "previous_comparison": "exact R30 96-band profile"
+  },
+  "approval": {
+    "static_direction": "selected_by_user_2026-10-05T12:09:10+09:00",
+    "motion": "Keep: current R31 Cell Flow visually accepted; preserve current look and motion",
+    "background_final_locked": false,
+    "main_promoted": false,
+    "user_feedback": "응 솧다",
+    "reviewed_at": "2026-10-05T14:39:08+09:00",
+    "preserve_current_profile": true,
+    "production_final_locked": false
+  },
+  "active_for_lab": true,
+  "production_active": false,
+  "surface_refraction": "Deferred",
+  "qa_record": "docs/backgrounds/FLOOR_CAUSTIC_R31_QA.json"
+}

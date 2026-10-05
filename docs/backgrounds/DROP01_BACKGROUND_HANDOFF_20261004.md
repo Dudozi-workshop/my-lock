@@ -1,6 +1,12 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · R31 Floor Cell Flow / CI and Live QA complete · 2026-10-05
+## Current handoff · R31 Floor Cell Flow Keep / current profile preserved · 2026-10-05
+- User “응 솧다” at 14:39:08 KST after R31 Live review is recorded as Keep for current Floor look and motion. Preserve the exact R31 renderer, selected static PNG and motion ranges. R29/R30 remain prior Modify history.
+- Reference profile: docs/backgrounds/FLOOR_CAUSTIC_CELL_FLOW_MOTION_MASTER_V1.json; QA approval updated in FLOOR_CAUSTIC_R31_QA.json. Runtime 57ffc5207afab6a8a1ed3c0fe5a7ec8f78856ee9 / CI 37267837612 whole SUCCESS / Public LABS-2026.10.05-R31 remain unchanged. This is a docs-only approval update; no version bump or redeploy.
+- Base immutable, fixed Flow A and R28 particle/bubble preserved. Surface Refraction remains Deferred; plan separately before implementation. Floor visual Keep does not promote MAIN or Production Final/LOCK, and whole Background remains Not Final/Not Locked. Physical Android performance and reusable production ownership mask are not verified.
+
+
+## Previous handoff · R31 Floor Cell Flow / CI and Live QA complete · 2026-10-05
 - R30 user “아직도 움직임이 좀 약하다” → Modify. 14:18:17 KST “ㄱㄱ” authorizes a different motion form: local cell compression/expansion plus traveling highlights, strong comparison range first. Motion and whole Background remain unapproved.
 - Same canonical Floor PNG and centered cover. R31 image-only 48×12 clipped cells share a continuous positive horizontal mapping; local regions squeeze/open instead of the whole row merely shifting/stretching. Depth-dependent vertical ripple; regional highlights travel across x, peak alpha gain 1.8 and trough mask .30. Phase zero matches the selected static pattern; own 24-second loop, primary four-second local flow. Normalizes depth to visible foreground so LABS cover crop does not hide strongest changes. No new binary or ImageGen.
 - Direct R30 profile comparison preserved in upper controls; R29 retained in API/history. Selecting new/previous resets and auto-plays. Existing independent pause/reference and exact A/R28 composite unchanged. Original legacy renderer unchanged.

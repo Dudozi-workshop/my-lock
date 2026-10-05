@@ -16,9 +16,13 @@
   },
   "approval": {
     "static_direction": "selected_by_user_2026-10-05T12:09:10+09:00",
-    "motion": "R30 Modify: still too weak; R31 Cell Flow pending user Live art review",
+    "motion": "Keep: current R31 Cell Flow visually accepted; preserve current look and motion",
     "background_final_locked": false,
-    "main_promoted": false
+    "main_promoted": false,
+    "user_feedback": "응 솧다",
+    "reviewed_at": "2026-10-05T14:39:08+09:00",
+    "preserve_current_profile": true,
+    "production_final_locked": false
   },
   "change": {
     "same_static_artwork": true,
@@ -66,7 +70,7 @@
     "note": "Frame byte comparison verifies playback, not physical Android 1-second perception or FPS. Native actual-PNG tests cover the 1-second gate."
   },
   "physical_android": "not_performed",
-  "occlusion": "approximate scene-specific static mask carried by texture; stronger displacement pending user visual review",
+  "occlusion": "Approximate scene-specific static mask; current R31 look accepted in user Live review, reusable production ownership mask not verified.",
   "preserved_source_hashes": {
     "shape_lab/painted_sunbeam_layer.dart": "4f36632181b706b5e6fd78edfab42affd6d740348c339450f9d519b19874d9a4",
     "shape_lab/living_water_details.dart": "d7e84b28d6b0df1723efe20af4a2676a70c89bbc797f3010e14bb4aa46563f3a",
