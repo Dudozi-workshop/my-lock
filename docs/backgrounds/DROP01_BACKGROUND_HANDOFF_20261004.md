@@ -1,6 +1,13 @@
 # MY LOCK · Drop 01 Background Handoff · 2026-10-04
 
-## Current handoff · R27 Motion A–C / QA Candidate
+## Current handoff · Volumetric Motion A Flow Approved / Fixed · 2026-10-05
+- User approval 2026-10-05 09:40:09 KST: “A안으로 픽스하고 넘어가자.” Select and freeze R27 A Flow exactly as reviewed; do not weaken ranges or continue refinement without a new request.
+- Master registered: `docs/backgrounds/VOLUMETRIC_A_FLOW_MOTION_MASTER_V1.json`. Source renderer/profile, texture stable ID/hash, exact parameters, approval quote and existing CI/Live QA linked. Changes require v2; preserve v1.
+- LABS default already `SunbeamMotion.flow`; no renderer/UI/binary change or redeploy required for this decision. Public R27 source `3a418053f0a8843da933bb1979e1f5190b745d69`, complete CI 37247961279 SUCCESS remains applicable.
+- Motion B Fan / C Breathe are comparison history, not selected; original R14 B/C and R26/R21 remain preserved. No full Background Final/LOCK or automatic MAIN promotion. Base immutable; Surface Deferred; Floor Rework Required; other effects remain at prior status.
+- Volumetric motion comparison complete. Next work should use this frozen A in later effect/composite review; choose the next effect scope separately without reopening A or silently unlocking other effects.
+
+## Previous handoff · R27 Motion A–C / QA Candidate
 - User confirms R26 moves, but motion feels too simple. Explicitly authorizes three markedly distinct motion comparisons A–C, superseding A-only limitation for this painted Volumetric A motion experiment. Original R14 B/C remain untouched.
 - A Flow: traveling lateral brightness mask (alpha .25–1, 8-second period); mild local shape drift. B Fan: shared upper anchor, depth-dependent symmetric opening/closing (stretch amplitude .24, 8-second period). C Breathe: broad .22–1 brightness breathing (6-second period) with secondary local ripple clocks. Deliberately large comparison ranges, not production strengths.
 - All use the same registered R22 texture and CPU-compatible full-image drawImageRect bands; A additionally uses a conventional linear gradient alpha mask. R26 exact painter branch and R21 comparison preserved. Each selection resets to phase zero and auto-plays; pause/reference controls retained.

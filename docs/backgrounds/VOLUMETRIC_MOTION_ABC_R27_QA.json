@@ -43,10 +43,19 @@
     "app_errors": "none observed; extension metadata errors separately present"
   },
   "final_public_identity": "LABS-2026.10.05-R27 / 3a418053f0a8843da933bb1979e1f5190b745d69 verified in actual browser",
-  "art_approval": "pending user Keep/Modify/Reject",
+  "art_approval": "Approved / Fixed: motion A Flow, current R27 appearance/ranges",
   "background_final_locked": false,
   "physical_android_qa": "not performed",
   "new_binary": false,
   "final_ui_qa": "Shared playback labels and A Solo visible on final source; renderer identical to initially verified source",
-  "screenshot": "my-lock-r27-motion-abc-1791160583502.jpg"
+  "screenshot": "my-lock-r27-motion-abc-1791160583502.jpg",
+  "approval_evidence": {
+    "user": "김상현",
+    "at": "2026-10-05T09:40:09+09:00",
+    "quote": "A안으로 픽스하고 넘어가자.",
+    "scope": "R27 painted Volumetric A / Flow motion, existing appearance and parameters as reviewed",
+    "decision": "Approved / Fixed; stop further A refinement"
+  },
+  "selected_motion": "A / SunbeamMotion.flow",
+  "master_ref": "docs/backgrounds/VOLUMETRIC_A_FLOW_MOTION_MASTER_V1.json"
 }

@@ -1,0 +1,64 @@
+{
+  "master_id": "background.drop01.shallow_clear.volumetric_flow_motion.v1",
+  "status": "approved_motion_master",
+  "registered": true,
+  "artifact_path": "docs/backgrounds/VOLUMETRIC_A_FLOW_MOTION_MASTER_V1.json",
+  "immutable": true,
+  "production_active": false,
+  "background_final_locked": false,
+  "approval_evidence": {
+    "user": "김상현",
+    "at": "2026-10-05T09:40:09+09:00",
+    "quote": "A안으로 픽스하고 넘어가자.",
+    "scope": "R27 painted Volumetric A / Flow motion, existing appearance and parameters as reviewed",
+    "decision": "Approved / Fixed; stop further A refinement"
+  },
+  "source": {
+    "git_commit": "3a418053f0a8843da933bb1979e1f5190b745d69",
+    "path": "shape_lab/painted_sunbeam_layer.dart",
+    "sha256": "4f36632181b706b5e6fd78edfab42affd6d740348c339450f9d519b19874d9a4",
+    "profile": "SunbeamMotion.flow",
+    "texture_asset_id": "background.drop01.shallow_clear.volumetric_a_texture_study_r22",
+    "texture_sha256": "52b3bb4029a345642f8212c698914f4dd0a8089c5a1ab02a0d75dcbb50ff9d61"
+  },
+  "parameters": {
+    "clock_seconds": 24,
+    "flow_cycle_seconds": 8,
+    "brightness_mask_alpha": [
+      0.25,
+      1.0
+    ],
+    "gradient_samples": 24,
+    "lateral_brightness_waves": 2,
+    "shift_amplitude": 0.012,
+    "shift_phase_multiplier": 3,
+    "shift_depth_multiplier": 7,
+    "stretch_amplitude": 0.012,
+    "stretch_phase_multiplier": 5,
+    "stretch_depth_multiplier": -4,
+    "vertical_shift": 0,
+    "draw_alpha": 1,
+    "envelope_ramp_end": 0.08,
+    "fade_start": 0.35,
+    "fade_length": 0.31,
+    "bands": 128
+  },
+  "qa_evidence": {
+    "ci_run": 37247961279,
+    "ci_result": "success",
+    "qa_record": "docs/backgrounds/VOLUMETRIC_MOTION_ABC_R27_QA.json",
+    "live_release": "LABS-2026.10.05-R27",
+    "screenshot": "my-lock-r27-motion-abc-1791160583502.jpg"
+  },
+  "alternatives": {
+    "motion_B_fan": "comparison_history_not_selected",
+    "motion_C_breathe": "comparison_history_not_selected",
+    "R26": "baseline_history",
+    "R21": "baseline_history"
+  },
+  "limitations": [
+    "Production promotion and whole Background composite Final/LOCK are separate",
+    "Physical Android performance/codec QA not performed"
+  ],
+  "change_policy": "Create motion master v2 for any subsequent parameter/renderer change; preserve v1"
+}
