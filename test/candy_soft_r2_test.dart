@@ -132,30 +132,22 @@ void main() {
     }
   });
 
-  test('Web-safe Aurora canvas path visibly changes at small runtime size', () async {
-    Future<List<int>> renderCanvas(double time) async {
+  test('approved H02B renderer visibly changes at small runtime size', () async {
+    Future<List<int>> renderAurora(double time) async {
       final recorder = ui.PictureRecorder();
       final canvas = Canvas(recorder);
-      canvas.saveLayer(
-        const Rect.fromLTWH(0, 0, 72, 72),
-        Paint(),
-      );
-      canvas.drawCircle(
-        const Offset(36, 36),
-        31,
-        Paint()..color = Colors.white,
-      );
-      canvas.save();
-      canvas.translate(5, 5);
-      canvas.scale(62, 62);
-      AuroraSeaSignature.paintIntoCurrentMask(
+      ShapeSpecRenderer.paintToken(
         canvas,
-        time,
-        forceCanvasFallback: true,
+        center: const Offset(36, 36),
+        radius: 31,
+        token: const LockToken(
+          shape: ShapeKind.circle,
+          tone: ShapeTone.auroraSea,
+        ),
+        style: ShapeStyle.softBasic,
+        opacity: 1,
+        paletteTimeSeconds: time,
       );
-      canvas.restore();
-      canvas.restore();
-
       final picture = recorder.endRecording();
       final image = await picture.toImage(72, 72);
       final bytes = (await image.toByteData(
@@ -170,11 +162,11 @@ void main() {
     }
 
     final frames = <List<int>>[
-      await renderCanvas(0),
-      await renderCanvas(0.5),
-      await renderCanvas(1.0),
-      await renderCanvas(1.5),
-      await renderCanvas(2.0),
+      await renderAurora(0),
+      await renderAurora(0.5),
+      await renderAurora(1.0),
+      await renderAurora(1.5),
+      await renderAurora(2.0),
     ];
 
     for (var i = 1; i < frames.length; i++) {
@@ -189,9 +181,10 @@ void main() {
       expect(
         changedRgb,
         greaterThan(180),
-        reason: '72px Aurora preview must show perceptible H02B motion',
+        reason: '72px Aurora preview must show perceptible approved H02B motion',
       );
     }
   });
+
 
 }
