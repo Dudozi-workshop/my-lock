@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:my_lock/lock_engine/models.dart';
+import 'package:my_lock/lock_engine/aurora_sea_signature.dart';
 import 'package:my_lock/lock_engine/shape_painter.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
 import 'package:my_lock/lock_engine/shape_spec/shape_spec_registry.dart';
@@ -128,6 +129,68 @@ void main() {
         candidate: false,
       );
       expect(after, isNot(equals(vector)));
+    }
+  });
+
+  test('Web-safe Aurora canvas path visibly changes at small runtime size', () async {
+    Future<List<int>> renderCanvas(double time) async {
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder);
+      canvas.saveLayer(
+        const Rect.fromLTWH(0, 0, 72, 72),
+        Paint(),
+      );
+      canvas.drawCircle(
+        const Offset(36, 36),
+        31,
+        Paint()..color = Colors.white,
+      );
+      canvas.save();
+      canvas.translate(5, 5);
+      canvas.scale(62, 62);
+      AuroraSeaSignature.paintIntoCurrentMask(
+        canvas,
+        time,
+        forceCanvasFallback: true,
+      );
+      canvas.restore();
+      canvas.restore();
+
+      final picture = recorder.endRecording();
+      final image = await picture.toImage(72, 72);
+      final bytes = (await image.toByteData(
+        format: ui.ImageByteFormat.rawRgba,
+      ))!
+          .buffer
+          .asUint8List()
+          .toList();
+      image.dispose();
+      picture.dispose();
+      return bytes;
+    }
+
+    final frames = <List<int>>[
+      await renderCanvas(0),
+      await renderCanvas(0.5),
+      await renderCanvas(1.0),
+      await renderCanvas(1.5),
+      await renderCanvas(2.0),
+    ];
+
+    for (var i = 1; i < frames.length; i++) {
+      var changedRgb = 0;
+      for (var p = 0; p < frames[i].length; p += 4) {
+        final delta =
+            (frames[i][p] - frames[i - 1][p]).abs() +
+            (frames[i][p + 1] - frames[i - 1][p + 1]).abs() +
+            (frames[i][p + 2] - frames[i - 1][p + 2]).abs();
+        if (delta >= 18) changedRgb++;
+      }
+      expect(
+        changedRgb,
+        greaterThan(180),
+        reason: '72px Aurora preview must show perceptible H02B motion',
+      );
     }
   });
 
