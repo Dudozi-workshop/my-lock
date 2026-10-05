@@ -216,7 +216,7 @@ User-visible motion on the user's actual browser remains the final visual gate.
 ## Aurora Sea R03 · Approved LABS Renderer Parity — 2026-10-05
 
 Release: `MAIN-2026.10.05-R03`
-Status: Implemented / Web Deploy Passed / User Visual QA Pending
+Status: Implemented / Technical QA Passed / Web Deploy Passed / User Visual QA Pending
 
 ### Decision
 - R02 Web-only 20×20 Canvas-cell fallback is rejected and removed.
@@ -245,8 +245,17 @@ Parity points:
 
 ### Verification
 - R03 Web Build / Cloudflare deploy run `37268510568`: **PASS**.
-- R03 CI Analyze: **PASS**.
-- R03 CI Test: **PASS**.
-- ARM64 APK build in run `37268510698`: still running at closeout update time; do not claim full CI completion until finished.
+- R03 CI run `37268510698`: ShapeSpec validation / Asset lifecycle validation / Analyze / Test / ARM64 APK build / APK upload + byte verification **PASS**. APK email intentionally skipped.
+- R03 Web run `37268510568`: two-site governance / public route validation / Flutter Web build / artifact upload / Cloudflare deploy / canonical QA links **PASS**.
 
 Final visual gate: compare the small Aurora Round and applied Aurora runtime directly against the previously approved LABS H02B behavior in the user's browser.
+
+
+### R02 rejection / corrected root cause
+- The statement that Web itself could not reliably show H02B through `drawVertices` was disproved by the already-approved Palette LABS, which was itself a Web implementation.
+- R02 is therefore **Visual QA Rejected / Superseded by R03**.
+- The actual divergence was introduced during MAIN integration:
+  1. R02 replaced the approved H02B optical renderer with a Web-only 20×20 Canvas-cell approximation.
+  2. The small Signature swatch did not mirror the approved LABS dedicated-Ticker + explicit-time contract.
+- R03 removes the approximation and restores the approved LABS optical path plus LABS-style ticker behavior.
+- No Shape Master, H02B palette, speed, refraction, cellScale, light, seed, or password policy changed.
