@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.05-R33",
+  "date": "2026-10-05",
+  "purpose": "Fix Rare Coral Shelter composite QA access in Background LABS",
+  "scope": "Enable production steps 02/03/04 for active Rare slot; default Rare view opens 03 Composite QA; no Base/Effect/Shape asset changes",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "runtime",
+  "status": "Composite QA Candidate; access fix only; whole Background Not Final/Locked",
+  "governance": "Existing LABS only"
+}
