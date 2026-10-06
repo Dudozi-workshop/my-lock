@@ -1,0 +1,10 @@
+{
+  "version": "LABS-2026.10.06-R36",
+  "date": "2026-10-06",
+  "purpose": "Rare Coral Shelter refined distant fish-school candidate",
+  "scope": "Replace R35 technical PoC with two fish silhouette types, asynchronous body/tail motion, loose 3-5 fish school, lower-contrast distant shadow treatment, and one quiet lifecycle event",
+  "source_branch": "feat/style-lab-integration",
+  "source_commit": "runtime",
+  "status": "Refined Motion/Art Candidate / User Visual QA Pending / Not Final/Locked",
+  "governance": "Existing Base Only v2, R27 A Flow and R31 Cell Flow remain unchanged; no ImageGen and no third-party binary imported"
+}
