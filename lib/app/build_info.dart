@@ -41,14 +41,16 @@ class BuildStamp extends StatelessWidget {
               border: Border.all(color: Colors.white24),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: Text(
-                BuildInfo.display,
+                'QA · ${BuildInfo.previewVersion}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 10,
+                  fontSize: 9,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.15,
+                  letterSpacing: 0.1,
                 ),
               ),
             ),
