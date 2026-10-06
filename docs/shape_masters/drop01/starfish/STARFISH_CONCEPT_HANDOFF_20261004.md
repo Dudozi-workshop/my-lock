@@ -102,3 +102,21 @@ No Starfish Production binary is approved yet. Do not upload or register a Starf
 - Status: **QA Candidate / User Review Required / Not Locked**
 - Cross-asset 58x58 optical mass calibration remains deferred until Starfish production lock review.
 - Next Gate: user review of Mask / Asset / Remainder / QA package -> approval -> LOCK candidate.
+
+## 2026-10-06 · Production LOCK
+- User approved the QA package and advanced Starfish to LOCK.
+- Production Master: `MYLOCK_Starfish_Production_Master_FINAL_LOCKED_2048_20261006.png`
+- Production Master SHA-256: `2a10f97517071245b5b240e273faa302fef8a433a19aae3624d9dfe8cb03c76c`
+- Full Body Asset: `MYLOCK_Starfish_FullBody_Asset_FINAL_LOCKED_2048_20261006.png`
+- Asset SHA-256: `2a10f97517071245b5b240e273faa302fef8a433a19aae3624d9dfe8cb03c76c`
+- Ownership Mask: `MYLOCK_Starfish_Ownership_Mask_FINAL_LOCKED_2048_20261006.png`
+- Mask SHA-256: `8d954ebfcacc2ab82072d0e26188b73915cc7d95e382d4f45eb7da6d8dad4c6f`
+- Removed Remainder: `MYLOCK_Starfish_Removed_Remainder_FINAL_LOCKED_2048_20261006.png`
+- Remainder SHA-256: `e3f878e434edee5b0e676dfc60b3329aea41db871cb1856b60d14f1a27ebb3b6`
+- Manifest: `MYLOCK_Starfish_Production_Manifest_FINAL_LOCKED_20261006.json`
+- Package: `MYLOCK_Starfish_Production_Package_FINAL_LOCKED_20261006.zip`
+- Package SHA-256: `671356515f0c781d1887a889cb5761489bc03c9aaeaa5abd61a1f0b71b99bd59`
+- QA basis: source recomposite changed pixels 0 / max channel delta 0 / owned body delta 0 / asset connected components 1 / canvas-edge touch 0.
+- Ownership model remains **Full Body = Single Part**.
+- Status: **FINAL / LOCKED / ACTIVE PRODUCTION MASTER**
+- Important: 58×58 cross-asset optical mass / occupancy calibration is **not part of this pixel lock** and remains a downstream runtime sizing step. The locked master pixels must not be redrawn for that calibration.
