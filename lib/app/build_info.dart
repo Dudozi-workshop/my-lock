@@ -35,10 +35,12 @@ class BuildStamp extends StatelessWidget {
         child: Align(
           alignment: Alignment.bottomLeft,
           child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: const Color(0xCC26232C),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: Colors.white24),
+            decoration: const BoxDecoration(
+              color: Color(0xCC26232C),
+              borderRadius: BorderRadius.all(Radius.circular(999)),
+              border: Border.fromBorderSide(
+                BorderSide(color: Colors.white24),
+              ),
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
