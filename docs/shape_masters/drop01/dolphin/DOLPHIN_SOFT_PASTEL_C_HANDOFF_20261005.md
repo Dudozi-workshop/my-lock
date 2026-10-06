@@ -145,3 +145,24 @@ Current stop point: **Ownership Overlay approval required before Mask generation
   - ImageGen unused
 - Source Ownership: **Overlay v10 Approved**
 - Next Gate: **Asset extraction** only. Removed Remainder / Recomposite remain deferred until Asset QA.
+
+
+## Part Assets v1 — Approved
+- Package: `MYLOCK_Dolphin_Part_Assets_Candidate_v1_2048_20261006.zip`
+- Status: **User Approved / Asset Gate Passed / Not Final Locked**
+- Parts: Body Core / Near Flipper / Far Flipper / Tail
+- Method: direct extraction of Canonical RGBA through approved Mask v3.
+- QA: part overlap 0 px; approved mask domain recombine mismatch 0 px; no new pixels; no ImageGen; no Hidden Underlap reconstruction.
+- Next Gate: Removed Remainder.
+
+## Removed Remainders v1 — QA Candidate
+- Package: `MYLOCK_Dolphin_Removed_Remainders_Candidate_v1_2048_20261006.zip`
+- Parts: Body Core / Near Flipper / Far Flipper / Tail
+- Method: canonical copy with exactly the selected approved mask region cleared to RGBA 0.
+- QA per part:
+  - removed-region nonzero RGBA = 0 px
+  - outside-region mismatch vs Canonical = 0 px
+  - corresponding Asset inside-mask mismatch = 0 px
+  - Asset outside-mask nonzero alpha = 0 px
+- Status: **QA Candidate / User Review Required / Not Recomposite / Not Locked**
+- Next Gate after approval: Recomposite / Residual QA.
