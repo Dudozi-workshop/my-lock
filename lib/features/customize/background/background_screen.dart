@@ -6,6 +6,7 @@ import '../../../lock_engine/floating_preview.dart';
 import '../../../lock_engine/models.dart';
 import '../../../widgets/production_ui.dart';
 import 'background_style.dart';
+import '../shape_style/shape_style_preview.dart';
 
 enum _BackgroundFilter {
   all('전체'),
@@ -111,6 +112,7 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
               objectCount: widget.objectCount,
               speed: widget.speed,
               movementArea: widget.movementArea,
+              onTap: _openRuntimePreview,
             ),
             const SizedBox(height: 18),
             _BackgroundFilters(
@@ -124,6 +126,25 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
                 const SizedBox(height: 24),
             ],
           ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openRuntimePreview() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => ShapeStyleRuntimePreviewScreen(
+          shapes: widget.selectedShapes,
+          tones: widget.selectedTones,
+          background: _selected,
+          movementStyle: widget.movementStyle,
+          popStyle: widget.popStyle,
+          style: widget.style,
+          objectCount: widget.objectCount,
+          speed: widget.speed,
+          movementArea: widget.movementArea,
         ),
       ),
     );
@@ -232,6 +253,7 @@ class _HeroBackgroundPreview extends StatelessWidget {
     required this.objectCount,
     required this.speed,
     required this.movementArea,
+    required this.onTap,
   });
 
   final LockBackground background;
@@ -243,89 +265,130 @@ class _HeroBackgroundPreview extends StatelessWidget {
   final int objectCount;
   final FloatingSpeed speed;
   final MovementArea movementArea;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return ProductionSoftCard(
-      padding: EdgeInsets.zero,
-      radius: 30,
-      child: ClipRRect(
+    return Semantics(
+      button: true,
+      label: '현재 배경 전체화면으로 보기',
+      child: Material(
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(30),
-        child: AspectRatio(
-          aspectRatio: 1.95,
-          child: DecoratedBox(
-            decoration: BoxDecoration(gradient: background.gradient),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: TickerMode(
-                      enabled: false,
-                      child: FloatingPreview(
-                        selectedShapes: selectedShapes,
-                        selectedTones: selectedTones,
-                        movementStyle: movementStyle,
-                        popStyle: popStyle,
-                        style: style,
-                        objectCount: 4,
-                        speed: speed,
-                        movementArea: movementArea,
-                        topInset: 18,
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 16,
-                  top: 16,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 11,
-                      vertical: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.88),
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                    child: const Text(
-                      '현재 배경',
-                      style: TextStyle(
-                        color: Color(0xFF5C5766),
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 16,
-                  right: 16,
-                  bottom: 14,
-                  child: Row(
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(30),
+          child: ProductionSoftCard(
+            padding: EdgeInsets.zero,
+            radius: 30,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: AspectRatio(
+                aspectRatio: 1.95,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(gradient: background.gradient),
+                  child: Stack(
                     children: [
-                      Expanded(
-                        child: Text(
-                          background.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                            shadows: [
-                              Shadow(
-                                color: Color(0x66000000),
-                                blurRadius: 8,
-                              ),
-                            ],
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: TickerMode(
+                            enabled: false,
+                            child: FloatingPreview(
+                              selectedShapes: selectedShapes,
+                              selectedTones: selectedTones,
+                              movementStyle: movementStyle,
+                              popStyle: popStyle,
+                              style: style,
+                              objectCount: 4,
+                              speed: speed,
+                              movementArea: movementArea,
+                              topInset: 18,
+                            ),
                           ),
                         ),
                       ),
-
+                      Positioned(
+                        left: 16,
+                        top: 16,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 11,
+                            vertical: 7,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.88),
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                          child: const Text(
+                            '현재 배경',
+                            style: TextStyle(
+                              color: Color(0xFF5C5766),
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 16,
+                        right: 16,
+                        bottom: 14,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                background.label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  shadows: [
+                                    Shadow(
+                                      color: Color(0x66000000),
+                                      blurRadius: 8,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 9,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.24),
+                                borderRadius: BorderRadius.circular(99),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.open_in_full_rounded,
+                                    color: Colors.white,
+                                    size: 14,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    '전체화면 보기',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
