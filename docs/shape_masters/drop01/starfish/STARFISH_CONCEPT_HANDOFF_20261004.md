@@ -87,3 +87,18 @@ No Starfish Production binary is approved yet. Do not upload or register a Starf
 - Overlay is **planning overlay only / not a mask**.
 - Cross-asset 58×58 optical mass / occupancy calibration is intentionally deferred until post-production QA.
 - **Current Gate:** Ownership Overlay user approval → Mask. Do not proceed to Mask / Asset / Removed Remainder before approval.
+
+## 2026-10-06 · Single-Part Package Candidate v1 / QA
+- Source Ownership: **Full Body = Single Part / user approved**
+- Mask: `MYLOCK_Starfish_Ownership_Mask_Candidate_v1_2048_20261006.png`
+- Asset: `MYLOCK_Starfish_FullBody_Asset_Candidate_v1_2048_20261006.png`
+- Removed Remainder: `MYLOCK_Starfish_Removed_Remainder_Candidate_v1_2048_20261006.png`
+- Recomposite QA: `MYLOCK_Starfish_Recomposite_QA_v1_2048_20261006.png`
+- Clean Canonical Candidate v2: `MYLOCK_Starfish_Production_Canonical_Clean_Candidate_v2_2048_20261006.png`
+- Package: `MYLOCK_Starfish_PartPackage_Candidate_v1_2048_20261006.zip`
+- Package SHA-256: `a380390cb1e1a5c0ce030a490e3c32b566836746b3579858bc35c9c5ed073ddb`
+- QA: source recomposite changed pixels **0** / max channel delta **0** / owned pixel max delta **0** / asset connected components **1** / canvas-edge touch **0**.
+- Residual cleanup: source canonical v1 contained **1,874 visible pixels in 299 detached components** outside the main connected starfish body. These were isolated as Removed Remainder and excluded from Clean Canonical Candidate v2. Main owned body pixels are unchanged.
+- Status: **QA Candidate / User Review Required / Not Locked**
+- Cross-asset 58x58 optical mass calibration remains deferred until Starfish production lock review.
+- Next Gate: user review of Mask / Asset / Remainder / QA package -> approval -> LOCK candidate.
