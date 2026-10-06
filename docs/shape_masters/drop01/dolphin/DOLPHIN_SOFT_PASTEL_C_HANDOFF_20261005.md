@@ -166,3 +166,23 @@ Current stop point: **Ownership Overlay approval required before Mask generation
   - Asset outside-mask nonzero alpha = 0 px
 - Status: **QA Candidate / User Review Required / Not Recomposite / Not Locked**
 - Next Gate after approval: Recomposite / Residual QA.
+
+
+## Production Canonical v2 Normalization / Recompose QA — 2026-10-06
+- File: `MYLOCK_Dolphin_Production_Canonical_Candidate_v2_2048_20261006.png`
+- SHA-256: `a321f0c3723c58f76ca2549d2ca807e03891417480d6f7125a3d94d7152f75b6`
+- Existing Canonical v1 preserved; no overwrite.
+- Normalization only:
+  - alpha <= 24 -> transparent
+  - RGB zeroed where alpha == 0
+  - no geometry change
+  - no visible-pixel change above threshold
+  - no ImageGen
+- QA:
+  - full recomposite mismatch: **0 px**
+  - part overlap: **0 px**
+  - max channel delta: **0**
+  - runtime 58px changed pixels: **0**
+  - runtime 72px changed pixels: **0**
+- Status: **LOCK Candidate / User Final Approval Required**
+- Next Gate: user final approval -> LOCK / Final registration.
