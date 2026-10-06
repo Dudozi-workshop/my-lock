@@ -58,11 +58,8 @@ class _FishSchoolShadowPainter extends CustomPainter {
         Curves.easeInCubic.transform(((raw - 0.90) / 0.10).clamp(0.0, 1.0));
     final eventAlpha = fadeIn * fadeOut;
 
-    // Alternate the visual flow inside the long host loop without changing the
-    // fish art. First half reads L→R; the second half can later become R→L in
-    // production once cadence/random policy is approved. R36 keeps one clean
-    // direction for art/motion QA.
-    const direction = 1.0;
+    // R36 art/motion QA keeps one clean L→R direction.
+    // Reverse-direction cadence is deferred until this candidate is visually approved.
 
     for (var i = 0; i < _school.length; i++) {
       final seed = _school[i];
@@ -75,7 +72,7 @@ class _FishSchoolShadowPainter extends CustomPainter {
       final xNorm = -0.17 + follower * 1.36 + spread * 0.012;
       final yNorm = seed.y + drift * 0.012 + spread * 0.005;
 
-      final x = direction > 0 ? size.width * xNorm : size.width * (1 - xNorm);
+      final x = size.width * xNorm;
       final y = size.height * yNorm;
 
       // Each fish gets a different swim frequency/phase so the school never
@@ -93,8 +90,8 @@ class _FishSchoolShadowPainter extends CustomPainter {
 
       canvas.save();
       canvas.translate(x, y);
-      canvas.rotate(direction > 0 ? tilt : -tilt);
-      canvas.scale(direction * scale, scale);
+      canvas.rotate(tilt);
+      canvas.scale(scale, scale);
 
       _drawFish(
         canvas,
