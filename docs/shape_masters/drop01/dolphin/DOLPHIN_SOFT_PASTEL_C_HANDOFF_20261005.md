@@ -131,3 +131,17 @@ Current stop point: **Ownership Overlay approval required before Mask generation
 - Status: **Candidate / User Review Required / Not Locked**
 - Drive publication is pending user approval of this package.
 - Next Gate: user visual/package approval → register final package / LOCK.
+
+
+## Ownership Masks v3 — Approved
+- Package: `MYLOCK_Dolphin_Ownership_Masks_Candidate_v3_2048_20261005.zip`
+- Status: **User Approved / Mask Gate Passed / Not Asset / Not Final Locked**
+- Parts: Body Core / Near Flipper / Far Flipper / Tail
+- QA:
+  - overlap = 0 px
+  - canonical union mismatch = 0 px
+  - detached residual lines cleaned
+  - canonical pixels unchanged
+  - ImageGen unused
+- Source Ownership: **Overlay v10 Approved**
+- Next Gate: **Asset extraction** only. Removed Remainder / Recomposite remain deferred until Asset QA.
