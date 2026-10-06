@@ -279,3 +279,20 @@ Next:
 - QA Passed promotion
 
 Note: current connector exposed no workflow/check result for the latest commit, so build/test completion is not claimed yet.
+
+
+## 11. 2026-10-06 Customize subpage fullscreen-preview closeout
+
+Status: Implemented / Web Visual Approved
+
+- Shape & Color keeps the existing Compact Preview -> fullscreen Runtime Preview flow.
+- Movement & Reaction top Compact Preview opens the fullscreen Runtime Preview.
+- Background Hero Preview opens the fullscreen Runtime Preview.
+- Catalog card taps remain select/apply only; no per-card detail page is added in Customize.
+- Direct Reaction interaction is reserved for the fullscreen Runtime Preview rather than card previews.
+- Fullscreen Preview is a runtime viewer/experience surface using current Shape / Color / Motion / Reaction / Background / screen-behavior settings; it does not perform lock authentication.
+- Exit remains top fixed X plus Android back/gesture.
+- Production PR #65 merged as `3e1aca67569e3b0ae3df4b8b80e310d37aa4dc3c`.
+- Web QA: Analyze / Test / Production Web Build / Cloudflare MAIN deploy passed; user visual review approved the current behavior.
+
+Next UI gate: Store Main Production QA -> Product Detail -> Showcase fullscreen -> Purchase completion -> Customize apply flow.
