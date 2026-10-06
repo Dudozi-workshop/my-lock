@@ -263,6 +263,29 @@
         },
         "next_gate": "user_final_approval_then_lock"
       }
+    },
+    {
+      "scope": "production.canonical",
+      "version": "v2",
+      "status": "final_locked",
+      "active": true,
+      "user_approved": true,
+      "approved_at": "2026-10-06",
+      "external_source": {
+        "provider": "google_drive",
+        "file_id": "1ug9ZUFrdXCvLGAGJmrBEWEnZMvW_s-GB",
+        "role": "production_canonical_final"
+      },
+      "characteristics": {
+        "file": "MYLOCK_Dolphin_Production_Canonical_FINAL_v2_2048_20261006.png",
+        "canvas": "2048x2048 RGBA",
+        "normalization": "alpha <= 24 cleared; transparent RGB zeroed",
+        "qa_full_recompose_mismatch_px": 0,
+        "qa_part_overlap_px": 0,
+        "qa_max_channel_delta": 0,
+        "qa_runtime_58_diff_px": 0,
+        "qa_runtime_72_diff_px": 0
+      }
     }
   ],
   "policy": {
@@ -271,5 +294,14 @@
     "locked_binary_overwrite_forbidden": true,
     "archive_before_delete": true
   },
-  "notes": "Soft Pastel Dolphin canonical v2 normalization is a LOCK Candidate with raw recomposite 0px mismatch and runtime 58/72px 0px difference. Existing Dolphin Planning Master v2 remains FINAL/LOCKED/ACTIVE; Soft Pastel branch is awaiting final user approval before lock."
+  "notes": "Dolphin Soft Pastel Production Canonical v2 and final package v1 are FINAL/LOCKED/ACTIVE as of 2026-10-06. Ownership v10, Masks v3, Assets v1, Removed Remainders v1, QA v2 form the locked production chain. Existing Planning Master v2 remains preserved.",
+  "final_package": {
+    "version": "v1",
+    "status": "final_locked",
+    "user_approved": true,
+    "approved_at": "2026-10-06",
+    "package_sha256": "82739687c030bf46b872e8480cf55fdc41c6375f7166b8741b8dca69bcf4344f",
+    "package_drive_file_id": "1qGh7nEfRZqSZD_tQr8yXlOFJOgPLR6wb",
+    "manifest_drive_file_id": "1FTcAa5njd9z7JJn5g3QKH2if08Ahl174"
+  }
 }
