@@ -232,6 +232,37 @@
         "hidden_underlap_reconstruction": false,
         "next_gate": "user_review_then_recomposite_residual_qa"
       }
+    },
+    {
+      "scope": "production.canonical_v2",
+      "version": "v2",
+      "status": "lock_candidate",
+      "active": false,
+      "user_approved": false,
+      "external_source": {
+        "provider": "local_candidate",
+        "role": "normalized_production_canonical"
+      },
+      "characteristics": {
+        "file": "MYLOCK_Dolphin_Production_Canonical_Candidate_v2_2048_20261006.png",
+        "canvas": "2048x2048 RGBA",
+        "sha256": "a321f0c3723c58f76ca2549d2ca807e03891417480d6f7125a3d94d7152f75b6",
+        "source": "production.canonical/v1",
+        "normalization": {
+          "alpha_le_24_to_zero": true,
+          "transparent_rgb_zeroed": true,
+          "visible_geometry_changed": false,
+          "visible_pixels_above_threshold_changed": false
+        },
+        "qa": {
+          "full_recompose_mismatch_px": 0,
+          "part_overlap_px": 0,
+          "max_channel_delta": 0,
+          "runtime_58_changed_px": 0,
+          "runtime_72_changed_px": 0
+        },
+        "next_gate": "user_final_approval_then_lock"
+      }
     }
   ],
   "policy": {
@@ -240,5 +271,5 @@
     "locked_binary_overwrite_forbidden": true,
     "archive_before_delete": true
   },
-  "notes": "Ownership Overlay v10, Masks v3, and Part Assets v1 are user-approved for the Soft Pastel Dolphin production branch. Removed Remainders v1 are QA candidates pending user review. Existing Dolphin Planning Master v2 remains FINAL/LOCKED/ACTIVE."
+  "notes": "Soft Pastel Dolphin canonical v2 normalization is a LOCK Candidate with raw recomposite 0px mismatch and runtime 58/72px 0px difference. Existing Dolphin Planning Master v2 remains FINAL/LOCKED/ACTIVE; Soft Pastel branch is awaiting final user approval before lock."
 }
