@@ -35,11 +35,11 @@ class _FishSchoolShadowPainter extends CustomPainter {
   final double t;
 
   static const _school = <_FishSeed>[
-    _FishSeed(_FishKind.slender, 0.00, 0.285, 0.92, 0.00, 0.00),
-    _FishSeed(_FishKind.round,   0.07, 0.235, 0.76, 0.28, 0.95),
-    _FishSeed(_FishKind.slender, 0.12, 0.345, 0.82, 0.51, 1.65),
-    _FishSeed(_FishKind.round,   0.18, 0.275, 0.67, 0.73, 2.35),
-    _FishSeed(_FishKind.slender, 0.23, 0.385, 0.71, 0.89, 3.05),
+    _FishSeed(_FishKind.slender, 0.00, 0.285, 0.92, 0.00),
+    _FishSeed(_FishKind.round,   0.07, 0.235, 0.76, 0.28),
+    _FishSeed(_FishKind.slender, 0.12, 0.345, 0.82, 0.51),
+    _FishSeed(_FishKind.round,   0.18, 0.275, 0.67, 0.73),
+    _FishSeed(_FishKind.slender, 0.23, 0.385, 0.71, 0.89),
   ];
 
   @override
@@ -202,7 +202,6 @@ class _FishSeed {
     this.y,
     this.scale,
     this.phase,
-    this.variant,
   );
 
   final _FishKind kind;
@@ -210,5 +209,4 @@ class _FishSeed {
   final double y;
   final double scale;
   final double phase;
-  final double variant;
 }
