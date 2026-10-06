@@ -10,6 +10,7 @@ import '../../../lock_engine/models.dart';
 import '../../../lock_engine/shape_painter.dart';
 import '../../../widgets/production_ui.dart';
 import '../background/background_style.dart';
+import '../shape_style/shape_style_preview.dart';
 
 typedef EffectChanged = void Function(
   MovementStyle movement,
@@ -97,6 +98,7 @@ class _EffectsScreenState extends State<EffectsScreen>
                     objectCount: widget.objectCount,
                     speed: widget.speed,
                     movementArea: widget.movementArea,
+                    onTap: _openRuntimePreview,
                   ),
                   const SizedBox(height: 16),
                   _EffectTabs(controller: _tabController),
@@ -134,6 +136,25 @@ class _EffectsScreenState extends State<EffectsScreen>
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openRuntimePreview() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => ShapeStyleRuntimePreviewScreen(
+          shapes: widget.selectedShapes,
+          tones: widget.selectedTones,
+          background: widget.background,
+          movementStyle: _movement,
+          popStyle: _popStyle,
+          style: widget.style,
+          objectCount: widget.objectCount,
+          speed: widget.speed,
+          movementArea: widget.movementArea,
         ),
       ),
     );
@@ -181,6 +202,7 @@ class _CompactEffectPreview extends StatelessWidget {
     required this.objectCount,
     required this.speed,
     required this.movementArea,
+    required this.onTap,
   });
 
   final LockBackground background;
@@ -192,50 +214,65 @@ class _CompactEffectPreview extends StatelessWidget {
   final int objectCount;
   final FloatingSpeed speed;
   final MovementArea movementArea;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return ProductionSoftCard(
-      padding: EdgeInsets.zero,
-      radius: 28,
-      child: ClipRRect(
+    return Semantics(
+      button: true,
+      label: '현재 움직임과 반응 전체화면으로 보기',
+      child: Material(
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(28),
-        child: SizedBox(
-          height: 154,
-          child: DecoratedBox(
-            decoration: BoxDecoration(gradient: background.gradient),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: FloatingPreview(
-                    selectedShapes: selectedShapes,
-                    selectedTones: selectedTones,
-                    movementStyle: movement,
-                    popStyle: popStyle,
-                    style: style,
-                    objectCount: math.min(objectCount, 6),
-                    speed: speed,
-                    movementArea: movementArea,
-                    topInset: 18,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(28),
+          child: ProductionSoftCard(
+            padding: EdgeInsets.zero,
+            radius: 28,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: SizedBox(
+                height: 154,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(gradient: background.gradient),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: FloatingPreview(
+                            selectedShapes: selectedShapes,
+                            selectedTones: selectedTones,
+                            movementStyle: movement,
+                            popStyle: popStyle,
+                            style: style,
+                            objectCount: math.min(objectCount, 6),
+                            speed: speed,
+                            movementArea: movementArea,
+                            topInset: 18,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 12,
+                        top: 12,
+                        child: _PreviewPill(
+                          icon: Icons.play_arrow_rounded,
+                          label: '${movement.label} · ${popStyle.label}',
+                        ),
+                      ),
+                      const Positioned(
+                        right: 12,
+                        bottom: 12,
+                        child: _PreviewPill(
+                          icon: Icons.open_in_full_rounded,
+                          label: '전체화면 보기',
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Positioned(
-                  left: 12,
-                  top: 12,
-                  child: _PreviewPill(
-                    icon: Icons.play_arrow_rounded,
-                    label: '${movement.label} · ${popStyle.label}',
-                  ),
-                ),
-                const Positioned(
-                  right: 12,
-                  bottom: 12,
-                  child: _PreviewPill(
-                    icon: Icons.touch_app_rounded,
-                    label: '탭해서 반응 확인',
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
