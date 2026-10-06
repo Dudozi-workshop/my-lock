@@ -22,7 +22,7 @@ import 'background_easy_effects.dart';
 import 'painted_sunbeam_layer.dart';
 import 'painted_floor_caustic_layer.dart';
 import 'living_water_details.dart';
-import 'fish_school_pass.dart';
+import 'fish_school_shadow_refined.dart';
 import 'package:my_lock/lock_engine/raster_shape_bootstrap.dart';
 import 'candy_soft_review.dart';
 import 'package:my_lock/lock_engine/shape_spec/candy_soft_runtime.dart';
@@ -132,7 +132,7 @@ class _LabsPageState extends State<LabsPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'LABS-2026.10.05-R35 · Background · Coral Shelter / Fish School Pass PoC',
+                                  'LABS-2026.10.06-R36 · Background · Coral Shelter / Fish School Shadow Refined',
                                   style: TextStyle(color: muted, fontSize: 11.5),
                                 ),
                               ],
@@ -6656,7 +6656,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                 ? LivingBubblePainter(animation: _detailClock)
                 : BubblePainter(animation: _detailClock)),
             if (_fishSchoolPass)
-              FishSchoolPass(animation: _detailClock),
+              FishSchoolShadowRefined(animation: _detailClock),
             if (withShapes)
               FloatingPreview(
                 selectedShapes: const {ShapeKind.seaTurtle, ShapeKind.starfish},
@@ -6707,7 +6707,7 @@ class _BackgroundLabState extends State<BackgroundLab>
           const SizedBox(height: 10),
           Text(
             '기본 합성은 승인 Base Only v2 + R27 A Flow + R31 Cell Flow입니다. '
-            'R28은 기본 OFF. Coral Light Sweep은 사용자 Reject로 제외하고, Fish School Pass PoC 하나만 비교합니다.',
+            'R28은 기본 OFF. Coral Light Sweep은 Reject로 제외. Rare 생명체는 Fish School Shadow R36 한 종만 비교합니다.',
             style: TextStyle(color: widget.muted, fontSize: 11, height: 1.45),
           ),
           const SizedBox(height: 12),
@@ -6728,7 +6728,7 @@ class _BackgroundLabState extends State<BackgroundLab>
                 onSelected: (value) => setState(() => _compositeR28 = value),
               ),
               FilterChip(
-                label: const Text('Fish School Pass · PoC'),
+                label: const Text('Fish School Shadow · R36'),
                 selected: _fishSchoolPass,
                 onSelected: (value) => setState(() => _fishSchoolPass = value),
               ),
@@ -6745,7 +6745,7 @@ class _BackgroundLabState extends State<BackgroundLab>
               );
               final full = _compositeQaCard(
                 'B · Full Composite',
-                'R27 A Flow + R31 Cell Flow' + (_compositeR28 ? ' + R28 Optional' : '') + (_fishSchoolPass ? ' + Fish School Pass' : ''),
+                'R27 A Flow + R31 Cell Flow' + (_compositeR28 ? ' + R28 Optional' : '') + (_fishSchoolPass ? ' + Fish School Shadow R36' : ''),
                 _runtimeEffectPreview(),
               );
               final shapes = _compositeQaCard(
@@ -6777,7 +6777,7 @@ class _BackgroundLabState extends State<BackgroundLab>
           const SizedBox(height: 12),
           Text(
             'QA: 중앙 Play Field 혼잡도 · Shape/Background 색 분리 · R27/R31 동시 존재감 · '
-            '좌하단 환경 밀도 · 6/9/12개 Runtime 가독성 · Fish School Pass가 고정 에셋 슬라이드처럼 보이지 않는지 확인. '
+            '좌하단 환경 밀도 · 6/9/12개 Runtime 가독성 · Fish School Shadow R36가 원경 생명체처럼 읽히고, 복붙/슬라이드 느낌 없이 느슨한 군집으로 보이는지 확인. '
             'Shape 재조명·재색보정·재생성은 하지 않습니다.',
             style: TextStyle(color: widget.muted, fontSize: 10.5, height: 1.45),
           ),
