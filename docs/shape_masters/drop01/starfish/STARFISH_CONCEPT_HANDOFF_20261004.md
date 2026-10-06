@@ -71,3 +71,19 @@ These are not valid masters or QA references.
 
 ## Important
 No Starfish Production binary is approved yet. Do not upload or register a Starfish Final/Locked asset until explicit user approval.
+
+## 2026-10-06 · Appearance Master 승인 / Canonical Gate 진입
+- User-approved source: `MYLOCK_Starfish_Character_Appearance_Master_v1_20261006.png`
+- Source size: **1254×1254 RGBA**
+- SHA-256: `8fecfec9afb0cfd6a4b89d522eb5c5052a46b40a39aae44c07f5fcba946f4fa2`
+- Status: **User Approved / Active Appearance Master / Not Production Locked**
+- The approved source is preserved byte-for-byte. No redraw or ImageGen refinement after approval.
+- Production Canonical Candidate: `MYLOCK_Starfish_Production_Canonical_Candidate_v1_2048_20261006.png`
+- Canonical SHA-256: `8b6c052bcef729d366c7cd8d1fe74e2db54e3184437ba854df8cb0061e5ef739`
+- Canonical method: premultiplied-alpha Lanczos resize to 2048×2048 only. No crop, geometry reinterpretation, or optical-size adjustment.
+- Ownership model: **Full Body = Single Part**
+- Ownership Overlay Candidate: `MYLOCK_Starfish_Ownership_Overlay_Candidate_v1_2048_20261006.png`
+- Overlay SHA-256: `0dba9d837ae96ee6039c6f70a3aa04cc3f76f0dd3088793a59c006c0b93dfadd`
+- Overlay is **planning overlay only / not a mask**.
+- Cross-asset 58×58 optical mass / occupancy calibration is intentionally deferred until post-production QA.
+- **Current Gate:** Ownership Overlay user approval → Mask. Do not proceed to Mask / Asset / Removed Remainder before approval.
