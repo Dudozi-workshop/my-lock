@@ -10,7 +10,8 @@ import 'background_style.dart';
 enum _BackgroundFilter {
   all('전체'),
   basic('기본'),
-  special('스페셜');
+  drop('드롭'),
+  set('세트');
 
   const _BackgroundFilter(this.label);
   final String label;
@@ -56,10 +57,13 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
     LockBackground.basicDark,
   ];
 
-  static const _special = <LockBackground>[
-    LockBackground.galaxy,
+  static const _drop = <LockBackground>[
     LockBackground.ocean,
     LockBackground.aurora,
+  ];
+
+  static const _set = <LockBackground>[
+    LockBackground.galaxy,
   ];
 
   @override
@@ -71,9 +75,14 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
   @override
   Widget build(BuildContext context) {
     final visibleSections = switch (_filter) {
-      _BackgroundFilter.all => const [_BackgroundFilter.basic, _BackgroundFilter.special],
+      _BackgroundFilter.all => const [
+          _BackgroundFilter.basic,
+          _BackgroundFilter.drop,
+          _BackgroundFilter.set,
+        ],
       _BackgroundFilter.basic => const [_BackgroundFilter.basic],
-      _BackgroundFilter.special => const [_BackgroundFilter.special],
+      _BackgroundFilter.drop => const [_BackgroundFilter.drop],
+      _BackgroundFilter.set => const [_BackgroundFilter.set],
     };
 
     return Scaffold(
@@ -121,11 +130,19 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
   }
 
   Widget _buildSection(_BackgroundFilter section) {
-    final items = section == _BackgroundFilter.basic ? _basic : _special;
-    final title = section == _BackgroundFilter.basic ? '기본' : '스페셜';
-    final subtitle = section == _BackgroundFilter.basic
-        ? '현재 앱에 등록된 기본 배경'
-        : '보유 후 사용할 수 있는 배경';
+    final items = switch (section) {
+      _BackgroundFilter.basic => _basic,
+      _BackgroundFilter.drop => _drop,
+      _BackgroundFilter.set => _set,
+      _BackgroundFilter.all => const <LockBackground>[],
+    };
+    final title = section.label;
+    final subtitle = switch (section) {
+      _BackgroundFilter.basic => '기본으로 제공되는 배경',
+      _BackgroundFilter.drop => '드롭에 포함된 배경',
+      _BackgroundFilter.set => '세트로 구성된 배경',
+      _BackgroundFilter.all => '',
+    };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,10 +187,10 @@ class _BackgroundScreenState extends State<BackgroundScreen> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 0.78,
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 0.92,
           ),
           itemBuilder: (context, index) {
             final item = items[index];
@@ -235,22 +252,27 @@ class _HeroBackgroundPreview extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: AspectRatio(
-          aspectRatio: 1.55,
+          aspectRatio: 1.95,
           child: DecoratedBox(
             decoration: BoxDecoration(gradient: background.gradient),
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: FloatingPreview(
-                    selectedShapes: selectedShapes,
-                    selectedTones: selectedTones,
-                    movementStyle: movementStyle,
-                    popStyle: popStyle,
-                    style: style,
-                    objectCount: objectCount,
-                    speed: speed,
-                    movementArea: movementArea,
-                    topInset: 24,
+                  child: IgnorePointer(
+                    child: TickerMode(
+                      enabled: false,
+                      child: FloatingPreview(
+                        selectedShapes: selectedShapes,
+                        selectedTones: selectedTones,
+                        movementStyle: movementStyle,
+                        popStyle: popStyle,
+                        style: style,
+                        objectCount: 4,
+                        speed: speed,
+                        movementArea: movementArea,
+                        topInset: 18,
+                      ),
+                    ),
                   ),
                 ),
                 Positioned(
@@ -299,24 +321,7 @@ class _HeroBackgroundPreview extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 9,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.24),
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                        child: const Text(
-                          '정적',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
+
                     ],
                   ),
                 ),
@@ -457,18 +462,7 @@ class _BackgroundThumbnail extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 3),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 3),
-                child: Text(
-                  item.locked ? '미보유' : '정적',
-                  style: TextStyle(
-                    color: item.locked ? secondaryInk : brandPurple,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
+
             ],
           ),
         ),
