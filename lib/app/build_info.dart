@@ -35,24 +35,20 @@ class BuildStamp extends StatelessWidget {
         child: Align(
           alignment: Alignment.bottomLeft,
           child: DecoratedBox(
-            decoration: const BoxDecoration(
-              color: Color(0xCC26232C),
-              borderRadius: BorderRadius.all(Radius.circular(999)),
-              border: Border.fromBorderSide(
-                BorderSide(color: Colors.white24),
-              ),
+            decoration: BoxDecoration(
+              color: const Color(0xCC26232C),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: Colors.white24),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
               child: Text(
-                'QA · ${BuildInfo.previewVersion}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                BuildInfo.display,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 9,
+                  fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.1,
+                  letterSpacing: 0.15,
                 ),
               ),
             ),
