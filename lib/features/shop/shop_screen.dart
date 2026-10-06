@@ -107,6 +107,7 @@ class _ShopScreenState extends State<ShopScreen> {
         cards.add(
           _ShopProductCard(
             title: shape.label,
+            categoryLabel: '모양',
             badge: _tab == _ShopTopTab.newItems ? 'NEW' : null,
             preview: CustomPaint(
               painter: LockTokenPainter(
@@ -125,6 +126,7 @@ class _ShopScreenState extends State<ShopScreen> {
         cards.add(
           _ShopProductCard(
             title: tone.label,
+            categoryLabel: '색상',
             badge: tone == ShapeTone.auroraSea ? 'SIGNATURE' : null,
             preview: CustomPaint(
               painter: LockTokenPainter(
@@ -149,6 +151,7 @@ class _ShopScreenState extends State<ShopScreen> {
         cards.add(
           _ShopProductCard(
             title: background.label,
+            categoryLabel: '배경',
             preview: DecoratedBox(
               decoration: BoxDecoration(gradient: background.gradient),
             ),
@@ -200,7 +203,7 @@ class _ShopScreenState extends State<ShopScreen> {
           physics: const NeverScrollableScrollPhysics(),
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
-          childAspectRatio: 0.88,
+          childAspectRatio: 0.82,
           children: cards,
         ),
       ],
@@ -312,10 +315,10 @@ class _DropHero extends StatelessWidget {
       _ShopTopTab.limited => '시즌 한정',
     };
     final subtitle = switch (tab) {
-      _ShopTopTab.recommended => 'Shape · Color · Background를 한 세계관으로',
-      _ShopTopTab.newItems => '최근 추가된 상품을 먼저 만나보세요',
-      _ShopTopTab.collections => '모을수록 완성되는 첫 번째 컬렉션',
-      _ShopTopTab.limited => '기간이 끝난 컬렉션은 아카이브에서 확인',
+      _ShopTopTab.recommended => '조용히 흐르는, 나만의 작은 바다.',
+      _ShopTopTab.newItems => '최근 등록된 바다 아이템을 먼저 만나보세요.',
+      _ShopTopTab.collections => '모양 · 색상 · 배경으로 완성하는 첫 번째 Drop.',
+      _ShopTopTab.limited => '현재 시즌과 지난 컬렉션을 확인해보세요.',
     };
 
     return Material(
@@ -325,17 +328,17 @@ class _DropHero extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(28),
         child: Container(
-          height: 164,
-          padding: const EdgeInsets.all(18),
+          height: 184,
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(28),
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFFE8F8FF),
-                Color(0xFFDDEEFF),
-                Color(0xFFEDE6FF),
+                Color(0xFF0E4E98),
+                Color(0xFF1B85C8),
+                Color(0xFF79D8E5),
               ],
             ),
             border: Border.all(color: const Color(0xFFDDE2F1)),
@@ -344,53 +347,142 @@ class _DropHero extends StatelessWidget {
           child: Stack(
             children: [
               Positioned(
-                right: -8,
-                bottom: -14,
-                child: Icon(
-                  Icons.water_rounded,
-                  size: 126,
-                  color: Colors.white.withValues(alpha: 0.66),
+                left: -34,
+                top: -54,
+                child: Container(
+                  width: 170,
+                  height: 170,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.10),
+                  ),
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const _HeroBadge(label: 'DROP 01'),
-                  const Spacer(),
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: ink,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.4,
-                    ),
+              Positioned(
+                right: -28,
+                bottom: -44,
+                child: Container(
+                  width: 170,
+                  height: 170,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFFB99AF8).withValues(alpha: 0.20),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    maxLines: 2,
-                    style: const TextStyle(
-                      color: secondaryInk,
-                      fontSize: 11.5,
-                      height: 1.3,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+                ),
               ),
               const Positioned(
-                right: 4,
-                top: 4,
-                child: Icon(
-                  Icons.arrow_forward_rounded,
-                  color: brandPurple,
-                  size: 22,
+                right: 18,
+                top: 30,
+                child: _HeroShape(
+                  token: LockToken(
+                    shape: ShapeKind.seaTurtle,
+                    tone: ShapeTone.aquaMint,
+                  ),
+                  size: 104,
+                ),
+              ),
+              const Positioned(
+                right: 126,
+                top: 32,
+                child: _HeroShape(
+                  token: LockToken(
+                    shape: ShapeKind.circle,
+                    tone: ShapeTone.auroraSea,
+                  ),
+                  size: 46,
+                ),
+              ),
+              const Positioned(
+                right: 114,
+                bottom: 18,
+                child: _HeroShape(
+                  token: LockToken(
+                    shape: ShapeKind.triangle,
+                    tone: ShapeTone.coralPink,
+                  ),
+                  size: 42,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _HeroBadge(label: 'DROP 01'),
+                    const Spacer(),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 23,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.45,
+                        shadows: [
+                          Shadow(color: Color(0x33000000), blurRadius: 10),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    SizedBox(
+                      width: 210,
+                      child: Text(
+                        subtitle,
+                        maxLines: 2,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.90),
+                          fontSize: 11.5,
+                          height: 1.28,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                right: 14,
+                top: 14,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.26),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _HeroShape extends StatelessWidget {
+  const _HeroShape({
+    required this.token,
+    required this.size,
+  });
+
+  final LockToken token;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CustomPaint(
+        painter: LockTokenPainter(token),
       ),
     );
   }
@@ -433,7 +525,7 @@ class _CategoryFilters extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 38,
+      height: 64,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _ShopCategory.values.length,
@@ -441,23 +533,41 @@ class _CategoryFilters extends StatelessWidget {
         itemBuilder: (context, index) {
           final item = _ShopCategory.values[index];
           final active = item == selected;
-          return ChoiceChip(
-            label: Text(item.label),
-            selected: active,
-            onSelected: (_) => onChanged(item),
-            showCheckmark: false,
-            selectedColor: brandPurple,
-            backgroundColor: Colors.white,
-            side: BorderSide(
-              color: active ? brandPurple : productionBorder,
-            ),
-            labelStyle: TextStyle(
-              color: active ? Colors.white : secondaryInk,
-              fontSize: 11.5,
-              fontWeight: FontWeight.w800,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(99),
+          return InkWell(
+            onTap: () => onChanged(item),
+            borderRadius: BorderRadius.circular(18),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              width: 62,
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+              decoration: BoxDecoration(
+                color: active ? brandPurple : Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: active ? brandPurple : productionBorder,
+                ),
+                boxShadow: active ? productionCardShadow : null,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    _categoryIcon(item),
+                    size: 20,
+                    color: active ? Colors.white : _categoryColor(item),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    item.label,
+                    maxLines: 1,
+                    style: TextStyle(
+                      color: active ? Colors.white : secondaryInk,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -466,15 +576,51 @@ class _CategoryFilters extends StatelessWidget {
   }
 }
 
+IconData _categoryIcon(_ShopCategory category) {
+  switch (category) {
+    case _ShopCategory.all:
+      return Icons.auto_awesome_rounded;
+    case _ShopCategory.shape:
+      return Icons.category_rounded;
+    case _ShopCategory.color:
+      return Icons.circle_rounded;
+    case _ShopCategory.background:
+      return Icons.landscape_rounded;
+    case _ShopCategory.motion:
+      return Icons.waves_rounded;
+    case _ShopCategory.reaction:
+      return Icons.favorite_rounded;
+  }
+}
+
+Color _categoryColor(_ShopCategory category) {
+  switch (category) {
+    case _ShopCategory.all:
+      return brandPurple;
+    case _ShopCategory.shape:
+      return const Color(0xFF34A6A1);
+    case _ShopCategory.color:
+      return const Color(0xFF5C9CF3);
+    case _ShopCategory.background:
+      return const Color(0xFF6B8FCB);
+    case _ShopCategory.motion:
+      return const Color(0xFF38A9D6);
+    case _ShopCategory.reaction:
+      return const Color(0xFFE06AA5);
+  }
+}
+
 class _ShopProductCard extends StatefulWidget {
   const _ShopProductCard({
     required this.title,
+    required this.categoryLabel,
     required this.preview,
     required this.onTap,
     this.badge,
   });
 
   final String title;
+  final String categoryLabel;
   final Widget preview;
   final VoidCallback onTap;
   final String? badge;
@@ -563,12 +709,12 @@ class _ShopProductCardState extends State<_ShopProductCard> {
                 ),
               ),
               const SizedBox(height: 3),
-              const Text(
-                '상품 보기',
-                style: TextStyle(
+              Text(
+                widget.categoryLabel,
+                style: const TextStyle(
                   color: secondaryInk,
                   fontSize: 10,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
