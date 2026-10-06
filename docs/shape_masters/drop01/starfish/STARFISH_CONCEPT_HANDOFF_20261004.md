@@ -122,3 +122,15 @@ No Starfish Production binary is approved yet. Do not upload or register a Starf
 - Important: 58×58 cross-asset optical mass / occupancy calibration is **not part of this pixel lock** and remains a downstream runtime sizing step. The locked master pixels must not be redrawn for that calibration.
 
 - Drive archive: https://drive.google.com/file/d/1AvUsUxgx9oLErc7CrgTqIIBn7W0oGYXj/view?usp=drivesdk
+
+## 2026-10-06 · LOCK rollback / Runtime QA HOLD
+- The earlier same-day promotion of the new face-bearing Starfish candidate to FINAL / LOCKED was premature.
+- Superseding state for the **new 2026-10-06 face-bearing appearance lineage**: **QA CANDIDATE / PRODUCTION LOCK HOLD**.
+- Reason: MY LOCK Shape Production requires small-size detail QA, palette/color substitution QA, runtime rendering verification, and cross-asset optical-mass calibration before production lock.
+- Existing historical `ASSET_REGISTRY_V1.md` / `Starfish_Production_FINAL_LOCKED_v1.zip` belong to the earlier **eyeless** Starfish production lineage and are not the authoritative production source for this new face-bearing candidate.
+- New runtime QA registry: `assets/shape_masters/drop01/starfish/ASSET_REGISTRY_V2.md`.
+- Current new-candidate runtime model: Full Body single-part ownership + separate semantic color ownership. Eyes/mouth remain fixed non-color detail; body/contour/spots/cheeks/shading are palette-driven.
+- Drop 01 static palette QA completed for Deep Ocean / Aqua Mint / Coral Pink / Sand Beige / Lavender / Peach Orange.
+- Automated QA: palette alpha mismatch 0 px; fixed-face core RGB variation <=1 level; runtime edge alpha 0 px; transparent RGB residue 0; lossless WebP decode PASS; geometry unchanged; ImageGen not used for split.
+- Small-size QA completed at 160/120/100/80/58 px. Eyes remain readable at 58 px; mouth is a WATCH item at 58 px because it weakens first.
+- **Still required before LOCK:** user review of runtime QA -> cross-asset optical-mass calibration using actual approved Sea Turtle/Dolphin/Jellyfish binaries -> APP EXACT / Shape Lab verification -> user approval -> LOCK.
