@@ -120,3 +120,5 @@ No Starfish Production binary is approved yet. Do not upload or register a Starf
 - Ownership model remains **Full Body = Single Part**.
 - Status: **FINAL / LOCKED / ACTIVE PRODUCTION MASTER**
 - Important: 58×58 cross-asset optical mass / occupancy calibration is **not part of this pixel lock** and remains a downstream runtime sizing step. The locked master pixels must not be redrawn for that calibration.
+
+- Drive archive: https://drive.google.com/file/d/1AvUsUxgx9oLErc7CrgTqIIBn7W0oGYXj/view?usp=drivesdk
