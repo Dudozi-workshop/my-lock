@@ -136,16 +136,16 @@ class _FishSchoolShadowPainter extends CustomPainter {
     canvas.drawPath(tailPath, bodyPaint);
 
     final fin = kind == _FishKind.slender
-        ? Path()
+        ? (Path()
           ..moveTo(1.5, 2.2)
           ..quadraticBezierTo(-3.5, 8.0 + bodyWave * 1.0, -10.0, 6.2)
           ..quadraticBezierTo(-4.0, 3.0, 1.5, 2.2)
-          ..close()
-        : Path()
+          ..close())
+        : (Path()
           ..moveTo(0.0, 3.0)
           ..quadraticBezierTo(-4.0, 9.5 + bodyWave * .8, -9.0, 7.2)
           ..quadraticBezierTo(-4.0, 4.2, 0.0, 3.0)
-          ..close();
+          ..close());
     canvas.drawPath(fin, deepPaint);
   }
 
