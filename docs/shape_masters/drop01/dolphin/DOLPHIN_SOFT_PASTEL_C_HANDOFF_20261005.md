@@ -201,3 +201,12 @@ Current stop point: **Ownership Overlay approval required before Mask generation
 - Ownership Overlay v10, Masks v3, Assets v1, Removed Remainders v1, QA v2 are the approved production chain.
 - Existing Planning Master v2 remains preserved and is not overwritten.
 - Status: **FINAL / LOCKED / ACTIVE (Soft Pastel Production Lineage)**.
+
+
+## Next Work — Advanced Shape Motion
+- Static Soft Pastel Dolphin production asset is **FINAL / LOCKED / ACTIVE**.
+- Dolphin is a **고급 모양 (Advanced Shape)** and requires a dedicated shape motion pass.
+- Next chat starts from the locked static production chain; do not alter the approved static Canonical / Ownership / Masks / Assets / Remainders unless a motion-specific dependency is explicitly approved.
+- Motion work must begin with MY LOCK Preflight and current motion-related Source of Truth.
+- Motion direction should inherit the previously selected calm / graceful dolphin intent rather than re-opening static appearance design.
+- Next task: define motion production structure and key-pose plan, then produce/QA motion assets in a separate chat.
