@@ -177,11 +177,15 @@ class _ColorTabState extends State<ColorTab> {
       itemCount: items.length,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
-        childAspectRatio: 0.78,
+        // Preserve the approved three columns at enlarged system font sizes.
+        childAspectRatio: MediaQuery.sizeOf(context).width <= 340 ||
+                MediaQuery.textScalerOf(context).scale(13) >= 16
+            ? 0.65
+            : 0.78,
       ),
       itemBuilder: (context, index) {
         final tone = items[index];
