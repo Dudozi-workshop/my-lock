@@ -67,127 +67,133 @@ class _PasswordSetupScreenState extends State<PasswordSetupScreen> {
       ),
       body: SafeArea(
         top: false,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-              child: _Header(
-                confirming: confirming,
-                count: _controller.input.length,
-                targetCount: confirming ? _controller.pattern.length : null,
-                mismatch: _controller.mismatch,
-                recoveryMode: widget.recoveryMode,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _PatternSlots(
-                tokens: _controller.input,
-                style: widget.style,
-                slotCount: confirming
-                    ? _controller.pattern.length
-                    : PasswordSetupController.maxLength,
-              ),
-            ),
-            const SizedBox(height: 14),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: const Color(0xFFE9E4F3)),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                  child: _Header(
+                    confirming: confirming,
+                    count: _controller.input.length,
+                    targetCount: confirming ? _controller.pattern.length : null,
+                    mismatch: _controller.mismatch,
+                    recoveryMode: widget.recoveryMode,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 15, 16, 10),
-                        child: Row(
-                          children: [
-                            const Expanded(
-                              child: Text(
-                                '사용할 도형을 선택하세요',
-                                style: TextStyle(
-                                  color: ink,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w800,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _PatternSlots(
+                    tokens: _controller.input,
+                    style: widget.style,
+                    slotCount: confirming
+                        ? _controller.pattern.length
+                        : PasswordSetupController.maxLength,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: const Color(0xFFE9E4F3)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 15, 16, 10),
+                            child: Row(
+                              children: [
+                                const Expanded(
+                                  child: Text(
+                                    '사용할 도형을 선택하세요',
+                                    style: TextStyle(
+                                      color: ink,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Text(
+                                  '${tokens.length}개 조합',
+                                  style: const TextStyle(
+                                    color: secondaryInk,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '${tokens.length}개 조합',
-                              style: const TextStyle(
-                                color: secondaryInk,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          ),
+                          const Divider(height: 1, color: Color(0xFFF0EDF4)),
+                          Expanded(
+                            child: _TokenSelectionGrid(
+                              tokens: tokens,
+                              style: widget.style,
+                              onTap: _controller.addToken,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      const Divider(height: 1, color: Color(0xFFF0EDF4)),
-                      Expanded(
-                        child: _TokenSelectionGrid(
-                          tokens: tokens,
-                          style: widget.style,
-                          onTap: _controller.addToken,
-                        ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          TextButton.icon(
+                            onPressed: _controller.input.isEmpty
+                                ? null
+                                : _controller.removeLast,
+                            icon: const Icon(Icons.undo_rounded, size: 18),
+                            label: const Text('하나 지우기'),
+                          ),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: _controller.input.isEmpty
+                                ? null
+                                : _controller.clearInput,
+                            child: const Text('전체 지우기'),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 6),
+                      FilledButton(
+                      key: const Key('password_setup_action'),
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size.fromHeight(54),
+                          backgroundColor: brandPurple,
+                          disabledBackgroundColor: const Color(0xFFD8D3EB),
+                        ),
+                        onPressed: confirming
+                            ? (_controller.canVerify ? _verify : null)
+                            : (_controller.canContinue
+                                ? _controller.startConfirm
+                                : null),
+                        child: Text(confirming ? '확인' : '다음'),
+                      ),
+                      if (confirming) ...[
+                        const SizedBox(height: 4),
+                        TextButton(
+                          onPressed: _controller.restart,
+                          child: const Text('처음부터 다시 설정'),
+                        ),
+                      ],
                     ],
                   ),
                 ),
-              ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      TextButton.icon(
-                        onPressed: _controller.input.isEmpty
-                            ? null
-                            : _controller.removeLast,
-                        icon: const Icon(Icons.undo_rounded, size: 18),
-                        label: const Text('하나 지우기'),
-                      ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: _controller.input.isEmpty
-                            ? null
-                            : _controller.clearInput,
-                        child: const Text('전체 지우기'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  FilledButton(
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(54),
-                      backgroundColor: brandPurple,
-                      disabledBackgroundColor: const Color(0xFFD8D3EB),
-                    ),
-                    onPressed: confirming
-                        ? (_controller.canVerify ? _verify : null)
-                        : (_controller.canContinue
-                            ? _controller.startConfirm
-                            : null),
-                    child: Text(confirming ? '확인' : '다음'),
-                  ),
-                  if (confirming) ...[
-                    const SizedBox(height: 4),
-                    TextButton(
-                      onPressed: _controller.restart,
-                      child: const Text('처음부터 다시 설정'),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -215,6 +221,7 @@ class _TokenSelectionGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
+      key: const Key('password_token_grid'),
       padding: const EdgeInsets.all(12),
       itemCount: tokens.length,
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -226,6 +233,7 @@ class _TokenSelectionGrid extends StatelessWidget {
       itemBuilder: (context, index) {
         final token = tokens[index];
         return Material(
+          key: ValueKey('password_token_${token.id}'),
           color: const Color(0xFFFAF9FC),
           borderRadius: BorderRadius.circular(18),
           child: InkWell(
@@ -306,40 +314,52 @@ class _PatternSlots extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        for (var i = 0; i < slotCount; i++) ...[
-          if (i > 0) const SizedBox(width: 7),
-          Expanded(
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 140),
-                decoration: BoxDecoration(
-                  color: i < tokens.length
-                      ? Colors.white
-                      : const Color(0xFFF0EFF4),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const gap = 7.0;
+        // Two-token passwords must not create full-width desktop tiles.
+        final slotSize = ((constraints.maxWidth - gap * (slotCount - 1)) /
+                slotCount)
+            .clamp(0.0, 76.0)
+            .toDouble();
+
+        return Row(
+          key: const Key('password_pattern_slots'),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            for (var i = 0; i < slotCount; i++) ...[
+              if (i > 0) const SizedBox(width: gap),
+              SizedBox(
+                key: ValueKey('password_pattern_slot_$i'),
+                width: slotSize,
+                height: slotSize,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 140),
+                  decoration: BoxDecoration(
                     color: i < tokens.length
-                        ? brandPurple.withValues(alpha: 0.45)
-                        : const Color(0xFFE2E0E7),
+                        ? Colors.white
+                        : const Color(0xFFF0EFF4),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: i < tokens.length
+                          ? brandPurple.withValues(alpha: 0.45)
+                          : const Color(0xFFE2E0E7),
+                    ),
                   ),
+                  child: i < tokens.length
+                      ? CustomPaint(
+                          painter: LockTokenPainter(
+                            tokens[i],
+                            style: style,
+                          ),
+                        )
+                      : null,
                 ),
-                child: i < tokens.length
-                    ? CustomPaint(
-                        painter: LockTokenPainter(
-                          tokens[i],
-                          style: style,
-                        ),
-                      )
-                    : null,
               ),
-            ),
-          ),
-        ],
-      ],
+            ],
+          ],
+        );
+      },
     );
   }
 }
-

@@ -8,9 +8,24 @@ else
   echo "Asset Book auto-sync paused; using committed frozen snapshot."
 fi
 PLATFORMS=web bash tool/bootstrap.sh
-PREVIEW_VERSION="$(tr -d '[:space:]' < tool/preview_version.txt)"
+# BuildStamp metadata comes from the canonical MAIN site registry.
+read_main_metadata() {
+  python3 - "$1" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+registry = json.loads(Path("config/site_registry.json").read_text(encoding="utf-8"))
+print(registry["sites"]["MAIN"][sys.argv[1]])
+PY
+}
+PREVIEW_VERSION="$(read_main_metadata version)"
+PREVIEW_PURPOSE="$(read_main_metadata purpose)"
+PREVIEW_STATUS="$(read_main_metadata status)"
 flutter build web --release --base-href "/" \
-  --dart-define=PREVIEW_VERSION="$PREVIEW_VERSION"
+  --dart-define=PREVIEW_VERSION="$PREVIEW_VERSION" \
+  --dart-define=PREVIEW_PURPOSE="$PREVIEW_PURPOSE" \
+  --dart-define=PREVIEW_STATUS="$PREVIEW_STATUS"
 
 # Keep Asset Book as a standalone static viewer alongside the Flutter SPA.
 rm -rf build/web/asset-book
