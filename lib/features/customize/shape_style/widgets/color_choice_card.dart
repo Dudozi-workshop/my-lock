@@ -22,6 +22,15 @@ class ColorChoiceCard extends StatelessWidget {
   final VoidCallback onTap;
   final bool wide;
 
+  // Color names may wrap to three lines at 320dp with enlarged system text.
+  // Only ColorChoiceCard opts into taller cards; other ChoiceCards stay locked.
+  static double cardHeightFor(BuildContext context) {
+    final enlargedText = MediaQuery.textScalerOf(context).scale(13) >= 16;
+    if (enlargedText) return 176;
+    if (MediaQuery.sizeOf(context).width <= 340) return 148;
+    return 132;
+  }
+
   @override
   Widget build(BuildContext context) {
     final previewSize = wide ? 72.0 : 58.0;
@@ -38,6 +47,7 @@ class ColorChoiceCard extends StatelessWidget {
           );
 
     return ChoiceCard(
+      height: cardHeightFor(context),
       selected: selected,
       onTap: onTap,
       badge: tone == ShapeTone.auroraSea
