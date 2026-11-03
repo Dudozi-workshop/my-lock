@@ -50,14 +50,25 @@ class _ShopScreenState extends State<ShopScreen> {
             icon: Icons.storefront_rounded,
             title: '상점',
             subtitle: '새로운 모양과 분위기를 둘러보세요.',
-            trailing: IconButton.filledTonal(
-              tooltip: '찜',
-              onPressed: _showWishlistPlaceholder,
-              icon: const Icon(Icons.favorite_border_rounded),
-              style: IconButton.styleFrom(
-                backgroundColor: brandLavender,
-                foregroundColor: brandPurple,
-              ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _KeyShardEntry(
+                  compact: MediaQuery.sizeOf(context).width < 360 ||
+                      MediaQuery.textScalerOf(context).scale(16) > 20,
+                  onTap: _showKeyShardInfo,
+                ),
+                const SizedBox(width: 6),
+                IconButton.filledTonal(
+                  tooltip: '찜',
+                  onPressed: _showWishlistPlaceholder,
+                  icon: const Icon(Icons.favorite_border_rounded),
+                  style: IconButton.styleFrom(
+                    backgroundColor: brandLavender,
+                    foregroundColor: brandPurple,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 18),
@@ -197,16 +208,43 @@ class _ShopScreenState extends State<ShopScreen> {
           ],
         ),
         const SizedBox(height: 12),
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 0.82,
-          children: cards,
-        ),
+        if (_tab == _ShopTopTab.recommended)
+          SizedBox(
+            height: 234,
+            child: ListView.separated(
+              key: const Key('shop_recommended_rail'),
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(bottom: 8),
+              itemCount: cards.length,
+              separatorBuilder: (context, index) =>
+                  const SizedBox(width: 12),
+              itemBuilder: (context, index) => SizedBox(
+                width: 174,
+                child: cards[index],
+              ),
+            ),
+          )
+        else
+          GridView.count(
+            key: const Key('shop_new_items_grid'),
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 0.82,
+            children: cards,
+          ),
       ],
+    );
+  }
+
+  void _showKeyShardInfo() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Key Shard는 상점 재화입니다. 잔액·충전 기능은 결제 시스템 연결 후 제공됩니다.'),
+        duration: Duration(milliseconds: 2200),
+      ),
     );
   }
 
@@ -233,6 +271,54 @@ class _ShopScreenState extends State<ShopScreen> {
       SnackBar(
         content: Text('$label 컬렉션 상세는 다음 Gate에서 연결합니다.'),
         duration: const Duration(milliseconds: 1400),
+      ),
+    );
+  }
+}
+
+class _KeyShardEntry extends StatelessWidget {
+  const _KeyShardEntry({
+    required this.compact,
+    required this.onTap,
+  });
+
+  final bool compact;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: 'Key Shard · 잔액 및 충전 기능 연결 전',
+      child: Material(
+        color: const Color(0xFFFFF4DC),
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          key: const Key('shop_key_shard_entry'),
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.key_rounded,
+                  color: Color(0xFFAD7819),
+                  size: 17,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  compact ? 'KS' : 'Key Shard',
+                  style: const TextStyle(
+                    color: Color(0xFF91620E),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
