@@ -177,11 +177,16 @@ class _ColorTabState extends State<ColorTab> {
       itemCount: items.length,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
+        // Retain the approved three-column layout and baseline aspect ratio.
+        // The color card may grow only for compact / enlarged-text viewports.
         childAspectRatio: 0.78,
+        mainAxisExtent: ColorChoiceCard.cardHeightFor(context) > 132
+            ? ColorChoiceCard.cardHeightFor(context)
+            : null,
       ),
       itemBuilder: (context, index) {
         final tone = items[index];
