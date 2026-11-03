@@ -181,11 +181,12 @@ class _ColorTabState extends State<ColorTab> {
         crossAxisCount: 3,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
-        // Preserve the approved three columns at enlarged system font sizes.
-        childAspectRatio: MediaQuery.sizeOf(context).width <= 340 ||
-                MediaQuery.textScalerOf(context).scale(13) >= 16
-            ? 0.65
-            : 0.78,
+        // Retain the approved three-column layout and baseline aspect ratio.
+        // The color card may grow only for compact / enlarged-text viewports.
+        childAspectRatio: 0.78,
+        mainAxisExtent: ColorChoiceCard.cardHeightFor(context) > 132
+            ? ColorChoiceCard.cardHeightFor(context)
+            : null,
       ),
       itemBuilder: (context, index) {
         final tone = items[index];
