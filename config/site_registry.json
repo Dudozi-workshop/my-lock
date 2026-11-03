@@ -4,10 +4,10 @@
     "MAIN": {
       "canonical_url": "https://my-lock-preview.rlatkd5959.workers.dev",
       "deploy_target": "my-lock-preview",
-      "version": "MAIN-2026.11.03-R01",
-      "purpose": "MY LOCK 1차 마감 · Shop Main Key Shard entry restored; recommended items horizontal rail (PR #69)",
-      "status": "Production Preview / Shop Main Flutter PR QA passed / Main Web+Android delivery QA pending / User visual QA pending",
-      "scope": "Shop Main: Key Shard non-wallet info entry, recommended horizontal rail, new-items 2-column grid; existing Store tabs/Hero/category/wishlist and previously locked Shape/Color/Aurora runtime unchanged",
+      "version": "MAIN-2026.11.03-R02",
+      "purpose": "Shop Main closeout · Password setup desktop confirmation layout QA",
+      "status": "Production Preview / Flutter CI pending / User web and Android device visual QA pending",
+      "scope": "Shop Key Shard entry and recommended horizontal rail; Password setup width max 560px and pattern tiles max 76px; BuildStamp metadata from site registry; no change to password policy, Shape assets, ownership, or IAP",
       "source_branch": "main",
       "source_commit": "resolved by workflow GITHUB_SHA"
     },
