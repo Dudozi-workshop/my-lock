@@ -9,8 +9,10 @@ class ChoiceCard extends StatelessWidget {
     required this.onTap,
     required this.child,
     this.badge,
+    this.height = 132,
   });
 
+  final double height;
   final bool selected;
   final VoidCallback onTap;
   final Widget child;
@@ -26,7 +28,7 @@ class ChoiceCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
-          height: 132,
+          height: height,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
