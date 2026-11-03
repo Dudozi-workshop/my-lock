@@ -143,7 +143,12 @@ void main() {
     expect(tester.takeException(), isNull);
 
     await tester.tap(find.text('색상').first);
-    await tester.pump(const Duration(milliseconds: 350));
+    // Drive both the start and the completion of TabBarView's transition.
+    // A single long pump can begin, rather than finish, the tab animation.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.byType(ColorTab), findsOneWidget);
     expect(find.text('전체 색상'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
