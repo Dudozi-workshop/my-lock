@@ -9,6 +9,7 @@ void main() {
 
   setUpAll(() async {
     await ShapeSpecRegistry.instance.load();
+    await ShapeSpecRegistry.instance.loadRasterShapes();
     await CandySoftRuntime.instance.load();
   });
 
